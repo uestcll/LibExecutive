@@ -8,6 +8,7 @@
 
 TEST(CLLogger, WriteLog_pstrmsg_0)
 {
+    CLLogger::Create();
 	CLLogger *pLogger = CLLogger::GetInstance();
 	EXPECT_TRUE(pLogger != 0);
 
@@ -20,6 +21,7 @@ TEST(CLLogger, WriteLog_pstrmsg_0)
 
 TEST(CLLogger, WriteLog_pstrmsg_empty)
 {
+    CLLogger::Create();
 	CLLogger *pLogger = CLLogger::GetInstance();
 	EXPECT_TRUE(pLogger != 0);
 
@@ -32,6 +34,7 @@ TEST(CLLogger, WriteLog_pstrmsg_empty)
 
 TEST(CLLogger, WriteLogMsg_pstrmsg_0)
 {
+    CLLogger::Create();
 	CLStatus s = CLLogger::WriteLogMsg(0, 0);
 	EXPECT_EQ(s.m_clReturnCode, -1);
 }
@@ -42,17 +45,18 @@ TEST(CLLogger, WriteLogMsg_pstrmsg_empty)
 	EXPECT_EQ(s.m_clReturnCode, -1);
 }
 
-TEST(CLLogger, Flush)
+/*TEST(CLLogger, Flush)
 {
 	CLLogger *pLog = CLLogger::GetInstance();
 	EXPECT_TRUE(pLog != 0);
 
 	CLStatus s = pLog->Flush();
 	EXPECT_TRUE(s.IsSuccess());
-}
+}*/
 
 TEST(CLLogger, Features)
 {
+    CLLogger::Create();
 	const int n = 100000;
 	for(int i = 0; i < n; i++)
 		CLLogger::WriteLogMsg("nihao", 0);
@@ -60,8 +64,8 @@ TEST(CLLogger, Features)
 	CLLogger *pLog = CLLogger::GetInstance();
 	EXPECT_TRUE(pLog != 0);
 
-	CLStatus s = pLog->Flush();
-	EXPECT_TRUE(s.IsSuccess());
+	//CLStatus s = pLog->Flush();
+	//EXPECT_TRUE(s.IsSuccess());
 
 	FILE *fp = fopen("logger", "r");
 
@@ -87,8 +91,10 @@ void* TestThreadForCLLog1(void *arg)
 			CLStatus s = CLLogger::GetInstance()->WriteLog("dddfaefgds", i);
 			EXPECT_TRUE(s.IsSuccess());
 		}
-		else
+		/*
+            else
 			CLLogger::GetInstance()->Flush();
+        */
 	}
 }
 
@@ -96,6 +102,7 @@ void* TestThreadForCLLog1(void *arg)
 
 TEST(CLLogger, WriteLogForMultiThread)
 {
+    CLLogger::Create();
 	pthread_t tid[NUM];
 	for(int i = 0; i < NUM; i++)
 	{
@@ -112,7 +119,8 @@ TEST(CLLogger, WriteLogForMultiThread)
 
 TEST(CLLogger, ProcessSafety)
 {
-	CLLogger::GetInstance()->Flush();
+    CLLogger::Create();
+	//CLLogger::GetInstance()->Flush();
 	truncate("logger", 0);
 
 	pid_t p;
@@ -123,10 +131,11 @@ TEST(CLLogger, ProcessSafety)
 		for(int i = 0; i < PNUM; i++)
 		{
 			CLLogger::WriteLogMsg("111", 0);
-			CLLogger::GetInstance()->Flush();
+			//CLLogger::GetInstance()->Flush();
 		}
 
-		CLLibExecutiveInitializer::Destroy();
+		CLLogger::Destroy();
+        //CLLogger::Destroy();
 		exit(0);
 	}
 	else
@@ -134,7 +143,7 @@ TEST(CLLogger, ProcessSafety)
 		for(int i = 0; i < PNUM; i++)
 		{
 			CLLogger::WriteLogMsg("222", 0);
-			CLLogger::GetInstance()->Flush();
+			//CLLogger::GetInstance()->Flush();
 		}
 	}
 
@@ -161,7 +170,8 @@ TEST(CLLogger, ProcessSafety)
 
 TEST(CLLogger, ProcessSafety2)
 {
-	CLLogger::GetInstance()->Flush();
+    CLLogger::Create();
+	//CLLogger::GetInstance()->Flush();
 	truncate("logger", 0);
 
 	pid_t p;
@@ -171,17 +181,18 @@ TEST(CLLogger, ProcessSafety2)
 	{
 		for(int i = 0; i < PNUM; i++)
 		{
-			CLLogger::WriteLogDirectly("1111", 0);
+			CLLogger::WriteLogMsg("1111", 0);
 		}
 
-		CLLibExecutiveInitializer::Destroy();
+		CLLogger::Destroy();
+        //CLLogger::Destroy();
 		exit(0);
 	}
 	else
 	{
 		for(int i = 0; i < PNUM; i++)
 		{
-			CLLogger::WriteLogDirectly("2222", 0);
+			CLLogger::WriteLogMsg("2222", 0);
 		}
 	}
 

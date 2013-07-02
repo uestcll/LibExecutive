@@ -157,7 +157,7 @@ CLStatus CLProcess::CloseFileDescriptor()
 			char pathname[LENGTH_OF_PATH] = {0};
 			if(readlink(strTmpPath.c_str(), pathname, LENGTH_OF_PATH) == -1)
 			{
-				CLLogger::WriteLogDirectly("In CLProcess::CloseFileDescriptor(), readlink error", errno);
+				CLLogger::WriteLogMsg("In CLProcess::CloseFileDescriptor(), readlink error", errno);
 				continue;
 			}
 
@@ -168,14 +168,14 @@ CLStatus CLProcess::CloseFileDescriptor()
 			{
 				string errormsg = "In CLProcess::CloseFileDescriptor(), close error, file: ";
 				errormsg += pDirent->d_name;
-				CLLogger::WriteLogDirectly(errormsg.c_str(), errno);
+				CLLogger::WriteLogMsg(errormsg.c_str(), errno);
 			}
 		}
 	}
 
 	if(closedir(pDir) == -1)
 	{
-		CLLogger::WriteLogDirectly("In CLProcess::CloseFileDescriptor(), closedir error", errno);
+		CLLogger::WriteLogMsg("In CLProcess::CloseFileDescriptor(), closedir error", errno);
 		return CLStatus(-1, 0);
 	}
 
