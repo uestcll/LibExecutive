@@ -44,23 +44,34 @@ CLStatus CLExecutiveNameServer::PostExecutiveMessage(const char* pstrExecutiveNa
 	 	return CLStatus(-1, 0);
 	 }	
 
-	 CLStatus s = pComm->PostExecutiveMessage(pMessage);
-	 if(!s.IsSuccess())
-	 {
-	 	CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pComm->PostExecutiveMessage error", 0);
+     int flag = 1;
 
-		CLStatus s1 = pNameServer->ReleaseCommunicationPtr(pstrExecutiveName);
-		if(!s1.IsSuccess())
+     try
+     {
+	    CLStatus s = pComm->PostExecutiveMessage(pMessage);
+        if(!s.IsSuccess())
+            flag = 0;
+        throw "";
+     }
+     catch(...)
+     {
+	    if(!flag)
+	    {
+	 	    CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pComm->PostExecutiveMessage error", 0);
+
+		    CLStatus s1 = pNameServer->ReleaseCommunicationPtr(pstrExecutiveName);
+		    if(!s1.IsSuccess())
 			CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pNameServer->ReleaseCommunicationPtr error", 0);
 		
-	 	return CLStatus(-1, 0);
-	 }
+	 	    return CLStatus(-1, 0);
+	    }
 
-	 CLStatus s2 = pNameServer->ReleaseCommunicationPtr(pstrExecutiveName);
-	 if(!s2.IsSuccess())
+	    CLStatus s2 = pNameServer->ReleaseCommunicationPtr(pstrExecutiveName);
+	    if(!s2.IsSuccess())
 			CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pNameServer->ReleaseCommunicationPtr error", 0);
 
-	 return CLStatus(0, 0);
+	    return CLStatus(0, 0);
+     }
 }
 
 CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLExecutiveCommunication *pExecutiveCommunication)
