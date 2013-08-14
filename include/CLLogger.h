@@ -4,9 +4,6 @@
 #include <pthread.h>
 #include "CLStatus.h"
 
-/*
-用于向文件LOG_FILE_NAME中，记录日志信息
-*/
 class CLLogger
 {
 public:
@@ -20,7 +17,7 @@ private:
 	static CLStatus Destroy();
 	static CLStatus Create();
 
-	static CLStatus WriteMsgAndErrcodeToFile(int fd, const char *pstrMsg, const char *pstrErrcode);
+	CLStatus WriteMsgAndErrcodeToFile(int fd, const char *pstrMsg, const char *pstrErrcode);
 
 private:
 	CLLogger(const CLLogger&);
@@ -31,8 +28,6 @@ private:
 
 private:
 	static CLLogger *m_pLog;
-	//多个线程在写日志
-	//当一个线程在调用Destroy，另一个线程在试图写日志
 	static pthread_mutex_t m_Mutex;
 
 private:

@@ -8,7 +8,6 @@
 
 #define LOG_FILE_NAME "logger"
 #define MAX_SIZE 265
-#define BUFFER_SIZE_LOG_FILE 4096
 
 CLLogger* CLLogger::m_pLog = 0;
 pthread_mutex_t CLLogger::m_Mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -18,7 +17,6 @@ CLLogger::CLLogger()
 	m_Fd = open(LOG_FILE_NAME, O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR); 
 	if(m_Fd == -1)
 		throw "In CLLogger::CLLogger(), open error";
-
 }
 
 CLLogger::~CLLogger()
@@ -41,51 +39,33 @@ CLStatus CLLogger::WriteLogMsg(const char *pstrMsg, long lErrorCode)
 
 CLStatus CLLogger::WriteLog(const char *pstrMsg, long lErrorCode)
 {
-	if((m_pLog == 0) || (pstrMsg == 0) || (strlen(pstrMsg) == 0))
-		return CLStatus(-1, 0);
-
-	int fd = open(LOG_FILE_NAME, O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR); 
-	if(fd == -1)
+	if((pstrMsg == 0) || (strlen(pstrMsg) == 0))
 		return CLStatus(-1, 0);
 
 	char buf[MAX_SIZE];
-	snprintf(buf, MAX_SIZE, "	Error code: %ld\r\n",  lErrorCode);
+	snprintf(buf, MAX_SIZE, "	Error code: %ld\r\n", lErrorCode);
 
 	int r = pthread_mutex_lock(&m_Mutex);
 	if(r != 0)
-	{
-		if(close(fd) == -1)
-			return CLStatus(-1, errno);
-
 		return CLStatus(-1, r);
-	}
 
 	try
 	{
 		if(m_pLog == 0)
 			throw CLStatus(-1, 0);
 
-		if(!WriteMsgAndErrcodeToFile(fd, pstrMsg, buf).IsSuccess())
-			throw CLStatus(-1, 0);
-
-		throw CLStatus(0, 0);
+		throw WriteMsgAndErrcodeToFile(m_Fd, pstrMsg, buf);
 	}
-	catch(CLStatus &s)
+	catch(CLStatus& s)
 	{
 		r = pthread_mutex_unlock(&m_Mutex);
-		int r1 = close(fd);
-		if((r != 0) || (r1 == -1))
-			return CLStatus(-1, 0);
+		if(r != 0)
+			return CLStatus(-1, r);
 
 		return s;
 	}
-	catch(...)
-	{
-		pthread_mutex_unlock(&m_Mutex);
-		close(fd);
 
-		return CLStatus(-1, 0);
-	}
+	return CLStatus(0, 0);
 }
 
 CLStatus CLLogger::WriteMsgAndErrcodeToFile(int fd, const char *pstrMsg, const char *pstrErrcode)
@@ -118,9 +98,9 @@ CLStatus CLLogger::WriteMsgAndErrcodeToFile(int fd, const char *pstrMsg, const c
 	lock.l_len = 0;
 
 	fcntl(fd, F_SETLKW, &lock);
-	
 
 	delete [] p;
+
 	return CLStatus(0, 0);
 }
 
@@ -131,9 +111,6 @@ CLLogger* CLLogger::GetInstance()
 
 CLStatus CLLogger::Create()
 {
-	//CLLibExecutiveInitializer的Initialize方法，
-	//由于不是每个对象初始化工作都成功，
-	//因此可能多次调用前面已经成功了的对象的Create方法
 	if(m_pLog != 0)
 		return CLStatus(0, 0);
 
@@ -151,29 +128,13 @@ CLStatus CLLogger::Destroy()
 	if(r != 0)
 		return CLStatus(-1, r);
 
-	try
-	{
+	delete m_pLog;
 
-		delete m_pLog;
+	m_pLog = 0;
 
-		m_pLog = 0;
+	r = pthread_mutex_unlock(&m_Mutex);
+	if(r != 0)
+		return CLStatus(-1, r);
 
-		throw CLStatus(0, 0);
-	}
-	catch(CLStatus& s)
-	{
-		r = pthread_mutex_unlock(&m_Mutex);
-		if(r != 0)
-			return CLStatus(-1, r);
-
-		return s;
-	}
-	catch(...)
-	{
-		r = pthread_mutex_unlock(&m_Mutex);
-		if(r != 0)
-			return CLStatus(-1, r);
-
-		return CLStatus(-1, 0);
-	}
+	return CLStatus(0, 0);
 }

@@ -1,8 +1,7 @@
 #include <gtest/gtest.h>
 #include <pthread.h>
 #include <unistd.h>
-#include "CLCriticalSection.h"
-#include "CLMutex.h"
+#include "LibExecutive.h"
 
 struct TestForCLCriticalSection
 {
@@ -10,11 +9,13 @@ struct TestForCLCriticalSection
 	int i;
 };
 
-void* TestThreadForCLCriticalSection(void *arg)
+static const int count = 1000000;
+
+static void* TestThreadForCLCriticalSection(void *arg)
 {
 	TestForCLCriticalSection *pT = (TestForCLCriticalSection *)arg;
 	
-	for(int i = 0; i < 1000000; i++)
+	for(int i = 0; i < count; i++)
 	{
 		{
 			CLCriticalSection cs(&(pT->mutex));
@@ -31,22 +32,14 @@ TEST(CLCriticalSection, Normal)
 	TestForCLCriticalSection *pT = new TestForCLCriticalSection;
 	pT->i = 0;
 	
-	pthread_t tid;
-	
+	pthread_t tid;	
 	pthread_create(&tid, 0, TestThreadForCLCriticalSection, pT);
 
-	for(int i = 0; i < 1000000; i++)
-	{
-		{
-			CLCriticalSection cs(&(pT->mutex));
-			
-			pT->i = pT->i + 1;
-		}
-	}
+	TestThreadForCLCriticalSection(pT);
 
 	pthread_join(tid, 0);
 
-	EXPECT_EQ(pT->i, 2000000);
+	EXPECT_EQ(pT->i, 2*count);
 
 	delete pT;
 }

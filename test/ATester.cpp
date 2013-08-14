@@ -1,14 +1,12 @@
 #include <gtest/gtest.h>
-#include "CLLibExecutiveInitializer.h"
-#include "CLLogger.h"
-#include "CLExecutiveNameServer.h"
+#include "LibExecutive.h"
 
 #define NUM 30
 
-long ObjectsForLog[NUM];
-long ObjectsForNameServer[NUM];
+static long ObjectsForLog[NUM];
+static long ObjectsForNameServer[NUM];
 
-void* TestThreadForCLLog(void *arg)
+void* TestThreadForCLLibExecutiveInitializerSingleton(void *arg)
 {	
 	CLLibExecutiveInitializer::Initialize();
 
@@ -18,6 +16,8 @@ void* TestThreadForCLLog(void *arg)
 
 	long k = (long)CLExecutiveNameServer::GetInstance();
 	ObjectsForNameServer[i] = k;
+
+	return 0;
 }
 
 TEST(CLLibExecutiveInitializer, FirstCallDestroy)
@@ -30,7 +30,7 @@ TEST(CLLibExecutiveInitializer, Singleton)
 	pthread_t tid[NUM];	
 	for(long i = 0; i < NUM; i++)	
 	{		
-		pthread_create(&(tid[i]), 0, TestThreadForCLLog, (void *)i);
+		pthread_create(&(tid[i]), 0, TestThreadForCLLibExecutiveInitializerSingleton, (void *)i);
 	}	
 
 	for(long i = 0; i < NUM; i++)
@@ -40,6 +40,7 @@ TEST(CLLibExecutiveInitializer, Singleton)
 
 	long j = (long)CLLogger::GetInstance();	
 	long k = (long)CLExecutiveNameServer::GetInstance();
+
 	for(long i = 0; i < NUM; i++)	
 	{		
 		EXPECT_EQ(j, ObjectsForLog[i]);	

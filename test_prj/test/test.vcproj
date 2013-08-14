@@ -571,10 +571,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\test\BCLLoggerTester.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\test\CLConditionVariableTester.cpp"
 				>
 			</File>
@@ -587,23 +583,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\test\CLExecutiveFunctionForMsgLoopTester.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\test\CLExecutiveNameServerTester.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\test\CLMessageQueueByNamedPipeTester.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\test\CLMessageQueueBySTLqueueTester.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\test\CLMsgLoopManagerForMsgQueueTester.cpp"
+				RelativePath="..\..\test\CLLoggerTester.cpp"
 				>
 			</File>
 			<File
@@ -611,15 +591,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\test\CLNonThreadForMsgLoopTester.cpp"
+				RelativePath="..\..\test\CLSharedConditionVariableAllocatorTester.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\test\CLPrivateExecutiveCommunicationByNamedPipeTester.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\test\CLProcessTester.cpp"
+				RelativePath="..\..\test\CLSharedEventAllocatorTester.cpp"
 				>
 			</File>
 			<File
@@ -632,18 +608,6 @@
 			</File>
 			<File
 				RelativePath="..\..\test\CLStatusTester.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\test\CLThreadAndMsgLoopTester.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\test\CLThreadForMsgLoopTester.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\test\CLThreadTester.cpp"
 				>
 			</File>
 			<File

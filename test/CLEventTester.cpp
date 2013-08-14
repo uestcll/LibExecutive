@@ -2,7 +2,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#include "CLEvent.h"
+#include "LibExecutive.h"
 
 struct TestForCLEvent
 {
@@ -11,11 +11,13 @@ struct TestForCLEvent
 	int i;
 };
 
-void* TestThreadForCLEvent(void *arg)
+static const int count = 1000000;
+
+static void* TestThreadForCLEvent(void *arg)
 {
 	TestForCLEvent *pT = (TestForCLEvent *)arg;
 
-	for(int i = 0; i < 100000; i++)
+	for(int i = 0; i < count; i++)
 	{
 		pT->i++;
 
@@ -41,7 +43,7 @@ TEST(CLEvent, ResetAutomatically)
 	pthread_t tid;
 	pthread_create(&tid, 0, TestThreadForCLEvent, pT);
 
-	for(int i = 0; i < 100000; i++)
+	for(int i = 0; i < count; i++)
 	{
 		CLStatus s = pT->event.Wait();
 		EXPECT_EQ(s.m_clReturnCode, 0);
@@ -63,11 +65,11 @@ TEST(CLEvent, ResetAutomatically)
 	delete pT;
 }
 
-void* TestThreadForCLEvent2(void *arg)
+static void* TestThreadForCLEvent2(void *arg)
 {
 	CLEvent *p = (CLEvent *)arg;
 
-	for(int i = 0; i < 100000; i++)
+	for(int i = 0; i < count; i++)
 	{
 		EXPECT_TRUE((p->Set()).IsSuccess());
 	}
@@ -82,7 +84,7 @@ TEST(CLEvent, Semaphore)
 	pthread_t tid;
 	pthread_create(&tid, 0, TestThreadForCLEvent2, &e);
 
-	for(int i = 0; i < 100000; i++)
+	for(int i = 0; i < count; i++)
 	{
 		EXPECT_TRUE((e.Wait()).IsSuccess());
 	}
@@ -97,10 +99,12 @@ TEST(CLEvent, ResetAutomatically_shared)
 	if(pid == 0)
 	{
 		{
-			sleep(2);
 			CLEvent event("test_for_event_auto");
 			EXPECT_TRUE(event.Set().IsSuccess());
 		}
+
+		CLLibExecutiveInitializer::Destroy();
+
 		exit(0);
 	}
 
@@ -112,6 +116,7 @@ TEST(CLEvent, ResetAutomatically_shared)
 TEST(CLEvent, Semaphore_shared)
 {
 	CLEvent event("test_for_event_semaphore", true);
+
 	pid_t pid = fork();
 	if(pid == 0)
 	{
@@ -122,6 +127,9 @@ TEST(CLEvent, Semaphore_shared)
 			EXPECT_TRUE(event.Set().IsSuccess());
 			EXPECT_TRUE(event.Set().IsSuccess());
 		}
+
+		CLLibExecutiveInitializer::Destroy();
+
 		exit(0);
 	}
 

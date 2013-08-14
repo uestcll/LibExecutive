@@ -10,12 +10,14 @@ TEST(CLSharedMemory, Normal)
 	{
 		sleep(2);
 
-		CLSharedMemory sm("test_for_shared_memory_normal");
-		long *p = (long *)sm.GetAddress();
-		EXPECT_EQ(*p, 5);
-		EXPECT_EQ(sm.GetRefCount(), 2);
+		{
+			CLSharedMemory sm("test_for_shared_memory_normal");
+			long *p = (long *)sm.GetAddress();
+			EXPECT_EQ(*p, 5);
+			EXPECT_EQ(sm.GetRefCount(), 2);
 
-		*p = *p + 1;
+			*p = *p + 1;
+		}
 
 		CLLibExecutiveInitializer::Destroy();
 		exit(0);

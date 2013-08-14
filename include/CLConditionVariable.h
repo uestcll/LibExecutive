@@ -12,9 +12,6 @@ class CLMutex;
 class CLConditionVariable
 {
 public:
-	/*
-	构造函数和析构函数出错时，会抛出字符串类型异常
-	*/
     CLConditionVariable();
 	explicit CLConditionVariable(pthread_cond_t *pCond);
 	CLConditionVariable(const char* pstrCondName);

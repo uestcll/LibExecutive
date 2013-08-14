@@ -37,5 +37,8 @@
 #include "CLExecutiveCommunicationByNamedPipe.h"
 #include "CLPrivateExecutiveCommunicationByNamedPipe.h"
 #include "CLSharedExecutiveCommunicationByNamedPipe.h"
+#include "CLSharedMutexImpl.h"
+#include "CLSharedConditionVariableImpl.h"
+#include "CLSharedEventImpl.h"
 
 #endif

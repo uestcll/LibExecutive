@@ -56,9 +56,9 @@ TEST(CLConditionVariable, Wait_null)
 }
 
 static pthread_cond_t g_cond = PTHREAD_COND_INITIALIZER;
-volatile int g_flag_for_cond = 0;
-CLMutex g_mutex_for_cond;
-int g_i_for_cond = 0;
+static volatile int g_flag_for_cond = 0;
+static CLMutex g_mutex_for_cond;
+static int g_i_for_cond = 0;
 
 void* TestThreadForCLConditionVariable2(void *arg)
 {
@@ -96,54 +96,10 @@ TEST(CLConditionVariable, Normal2)
 	pthread_join(tid, 0);
 }
 
-static pthread_cond_t g_cond2 = PTHREAD_COND_INITIALIZER;
-volatile int g_flag_for_cond2 = 0;
-int g_i_for_cond2 = 0;
-
-void* TestThreadForCLConditionVariable3(void *arg)
-{
-	CLMutex g_mutex_for_cond2("test_for_CLConditionVariable_shared_mutex2", MUTEX_USE_SHARED_PTHREAD);
-
-	sleep(2);
-	{
-		CLCriticalSection cs(&g_mutex_for_cond2);
-
-		g_flag_for_cond2 = 1;
-
-		g_i_for_cond2 = 5;
-	}
-	CLConditionVariable cv(&g_cond2);
-
-	EXPECT_TRUE((cv.Wakeup()).IsSuccess());
-
-	return 0;
-}
-
-TEST(CLConditionVariable, Normal_Shared_mutex)
-{
-	pthread_t tid;	
-	pthread_create(&tid, 0, TestThreadForCLConditionVariable3, 0);
-
-	CLMutex g_mutex_for_cond2("test_for_CLConditionVariable_shared_mutex2", MUTEX_USE_SHARED_PTHREAD);
-
-	CLConditionVariable cv(&g_cond2);
-
-	{
-		CLCriticalSection cs(&g_mutex_for_cond2);
-
-		while(g_flag_for_cond2 == 0)
-			EXPECT_TRUE((cv.Wait(&g_mutex_for_cond2)).IsSuccess());
-	}
-
-	EXPECT_EQ(g_i_for_cond2, 5);
-
-	pthread_join(tid, 0);
-}
-
 TEST(CLConditionVariable, Multi_process_for_Shared_Cond)
 {
-	CLSharedMemory sm("test_for_multi_process_for_shared_cond", 16);
-	long *p = (long *)sm.GetAddress();
+	CLSharedMemory *psm = new CLSharedMemory("test_for_multi_process_for_shared_cond", 16);
+	long *p = (long *)(psm->GetAddress());
 	*p = 0;
 
 	long *flag = (long *)(((char *)p) + 8);
@@ -170,6 +126,10 @@ TEST(CLConditionVariable, Multi_process_for_Shared_Cond)
 			EXPECT_TRUE((cv.Wakeup()).IsSuccess());
 		}
 
+		delete psm;
+
+		CLLibExecutiveInitializer::Destroy();
+
 		exit(0);
 	}
 
@@ -187,4 +147,6 @@ TEST(CLConditionVariable, Multi_process_for_Shared_Cond)
 	EXPECT_EQ(*p, 5);
 
 	waitpid(pid, 0, 0);
+
+	delete psm;
 }

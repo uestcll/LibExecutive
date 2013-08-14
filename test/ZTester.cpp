@@ -1,43 +1,38 @@
 #include <gtest/gtest.h>
-#include "CLLibExecutiveInitializer.h"
-#include "CLLogger.h"
+#include "LibExecutive.h"
 
-#define NUM_LIB 300
+#define NUM 30
 
-void* TestThreadForCLLogDestroy(void *arg)
+void* TestThreadForCLLibExecutiveInitializerDestroy(void *arg)
 {	
-	long i = (long)arg;
-	if(i % 10 == 8)
-	{
-		CLLibExecutiveInitializer::Destroy();
-		EXPECT_TRUE(CLLogger::GetInstance() == 0);
-		return 0;
-	}
+	CLLibExecutiveInitializer::Destroy();
 
-	CLLogger::WriteLogMsg("abcdefghijklmnopqrst   ", i);
 	return 0;
 }
 
-TEST(CLLibExecutiveInitializer1, Normal)
+TEST(CLLibExecutiveInitializerDestroy, Normal)
 {
-	pthread_t tid[NUM_LIB];	
-	for(long i = 0; i < NUM_LIB; i++)	
+	pthread_t tid[NUM];	
+	for(long i = 0; i < NUM; i++)	
 	{		
-		pthread_create(&(tid[i]), 0, TestThreadForCLLogDestroy, (void *)i);
+		pthread_create(&(tid[i]), 0, TestThreadForCLLibExecutiveInitializerDestroy, 0);
 	}	
 
-	for(long i = 0; i < NUM_LIB; i++)
+	for(long i = 0; i < NUM; i++)
 	{		
-		pthread_join(tid[i], 0);	
+		pthread_join(tid[i], 0);
 	}
+
+	EXPECT_EQ(CLLogger::GetInstance(), (void *)0);
+	EXPECT_EQ(CLExecutiveNameServer::GetInstance(), (void *)0);
 }
 
-TEST(CLLibExecutiveInitializer1, DestroyAgain)
+TEST(CLLibExecutiveInitializerDestroy, DestroyAgain)
 {
 	EXPECT_FALSE(CLLibExecutiveInitializer::Destroy().IsSuccess());
 }
 
-TEST(CLLibExecutiveInitializer1, InitialAgain)
+TEST(CLLibExecutiveInitializerDestroy, InitialAgain)
 {
 	EXPECT_FALSE(CLLibExecutiveInitializer::Initialize().IsSuccess());
 }

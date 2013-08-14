@@ -6,9 +6,6 @@ class CLMutex;
 class CLCriticalSection
 {
 public:
-	/*
-	出错时构造函数和析构函数将会抛出字符串类型异常
-	*/
 	CLCriticalSection(CLMutex *pMutex);
 	virtual ~CLCriticalSection();
 

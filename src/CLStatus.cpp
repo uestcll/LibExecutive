@@ -10,10 +10,10 @@ CLStatus::~CLStatus()
 {
 }
 
-CLStatus::CLStatus(const CLStatus& s) : m_clReturnCode(m_lReturnCode), m_clErrorCode(m_lErrorCode)
+CLStatus::CLStatus(const CLStatus& status) : m_clReturnCode(m_lReturnCode), m_clErrorCode(m_lErrorCode)
 {
-	m_lReturnCode = s.m_lReturnCode;
-	m_lErrorCode = s.m_lErrorCode;
+	m_lReturnCode = status.m_lReturnCode;
+	m_lErrorCode = status.m_lErrorCode;
 }
 
 bool CLStatus::IsSuccess()

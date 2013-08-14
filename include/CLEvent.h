@@ -10,16 +10,9 @@ using namespace std;
 
 struct SLEventInfo;
 
-/*
-默认情况下，创建一个初始无信号，自动重置信号的事件（用于唤醒一个等待线程）
-在构造函数中，若bSemaphore被设置为true，则调用几次Set，即可唤醒几次或个线程
-*/
 class CLEvent
 {
 public: 
-	/*
-	构造函数和析构函数出错时，会抛出字符串类型异常
-	*/
 	CLEvent( );
 	explicit CLEvent(bool bSemaphore);
 	explicit CLEvent(const char *pstrEventName);
