@@ -285,7 +285,7 @@ TEST(CLMutex, SharedMutexByPthread)
 
 		CLLibExecutiveInitializer::Destroy();
 
-		exit(0);
+		_exit(0);
 	}
 
 	pthread_t tid;

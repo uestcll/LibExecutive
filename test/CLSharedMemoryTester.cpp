@@ -20,7 +20,7 @@ TEST(CLSharedMemory, Normal)
 		}
 
 		CLLibExecutiveInitializer::Destroy();
-		exit(0);
+		_exit(0);
 	}
 
 	CLSharedMemory sm("test_for_shared_memory_normal", sizeof(long));

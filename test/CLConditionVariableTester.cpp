@@ -130,7 +130,7 @@ TEST(CLConditionVariable, Multi_process_for_Shared_Cond)
 
 		CLLibExecutiveInitializer::Destroy();
 
-		exit(0);
+		_exit(0);
 	}
 
 	CLMutex mutex("mutex_for_test_for_multi_process_for_shared_cond", MUTEX_USE_SHARED_PTHREAD);

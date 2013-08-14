@@ -6,10 +6,6 @@
 
 class CLMessageLoopManager;
 
-/*
-该类帮助线程进入消息循环
-构造函数中，pMsgLoopManager从堆中分配，不必调用delete
-*/
 class CLExecutiveFunctionForMsgLoop : public CLExecutiveFunctionProvider
 {
 public:

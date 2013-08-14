@@ -105,7 +105,7 @@ TEST(CLEvent, ResetAutomatically_shared)
 
 		CLLibExecutiveInitializer::Destroy();
 
-		exit(0);
+		_exit(0);
 	}
 
 	EXPECT_TRUE(event.Wait().IsSuccess());
@@ -130,7 +130,7 @@ TEST(CLEvent, Semaphore_shared)
 
 		CLLibExecutiveInitializer::Destroy();
 
-		exit(0);
+		_exit(0);
 	}
 
 	EXPECT_TRUE(event.Wait().IsSuccess());

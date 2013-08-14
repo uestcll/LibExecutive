@@ -99,7 +99,7 @@ TEST(CLSharedConditionVariableAllocator, MultiProcess)
 
 		CLLibExecutiveInitializer::Destroy();
 
-		exit(0);
+		_exit(0);
 	}
 
 	CLMutex mutex(name_mutex, MUTEX_USE_SHARED_PTHREAD);

@@ -135,7 +135,7 @@ TEST(CLLogger, ProcessSafety)
 
 		CLLibExecutiveInitializer::Destroy();
 
-		exit(0);
+		_exit(0);
 	}
 	else
 	{

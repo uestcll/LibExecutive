@@ -3,9 +3,6 @@
 
 #include "CLStatus.h"
 
-/*
-CLExecutiveFunctionProvider类封装了执行体具体的业务功能
-*/
 class CLExecutiveFunctionProvider
 {
 public:
