@@ -7,4 +7,3 @@ CLExecutiveInitialFinishedNotifier::CLExecutiveInitialFinishedNotifier()
 CLExecutiveInitialFinishedNotifier::~CLExecutiveInitialFinishedNotifier()
 {
 }
-

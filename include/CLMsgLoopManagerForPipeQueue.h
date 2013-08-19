@@ -15,9 +15,6 @@ class CLMessageDeserializer;
 class CLMsgLoopManagerForPipeQueue : public CLMessageLoopManager
 {
 public:
-	/*
-	pMsgObserver均应从堆中分配，且不必显示调用delete
-	*/
 	CLMsgLoopManagerForPipeQueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName, int PipeQueueType);
 	virtual ~CLMsgLoopManagerForPipeQueue();
 

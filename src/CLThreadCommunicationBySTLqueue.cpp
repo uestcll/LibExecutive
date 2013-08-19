@@ -2,7 +2,7 @@
 #include "CLMessageQueueBySTLqueue.h"
 #include "CLMessage.h"
 
-CLThreadCommunicationBySTLqueue::CLThreadCommunicationBySTLqueue(CLMessageQueueBySTLqueue*pMsgQueue)
+CLThreadCommunicationBySTLqueue::CLThreadCommunicationBySTLqueue(CLMessageQueueBySTLqueue *pMsgQueue)
 {
 	if(pMsgQueue == 0)
 		throw "In CLThreadCommunicationBySTLqueue::CLThreadCommunicationBySTLqueue(), pMsgQueue error";

@@ -7,4 +7,3 @@ CLExecutiveCommunication::CLExecutiveCommunication()
 CLExecutiveCommunication::~CLExecutiveCommunication()
 {
 }
-

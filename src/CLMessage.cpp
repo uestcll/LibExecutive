@@ -8,4 +8,3 @@ CLMessage::CLMessage(unsigned long lMsgID) : m_clMsgID(m_lMsgID)
 CLMessage::~CLMessage()
 {
 }
-

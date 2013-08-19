@@ -11,9 +11,6 @@ public:
 	CLMessageObserver();
 	virtual ~CLMessageObserver();
 
-	/*
-	需要在初始化中，完成消息处理函数的注册
-	*/
 	virtual CLStatus Initialize(CLMessageLoopManager *pMessageLoop, void* pContext) = 0;
 
 private:

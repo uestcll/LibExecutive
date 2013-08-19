@@ -10,9 +10,6 @@ class CLMessageQueueBySTLqueue;
 class CLThreadCommunicationBySTLqueue : public CLExecutiveCommunication
 {
 public:
-	/*
-	pMsgQueue必须从堆中分配，且不必显示调用delete
-	*/
 	CLThreadCommunicationBySTLqueue(CLMessageQueueBySTLqueue *pMsgQueue);
 	virtual ~CLThreadCommunicationBySTLqueue();
 
@@ -23,7 +20,7 @@ private:
 	CLThreadCommunicationBySTLqueue& operator=(const CLThreadCommunicationBySTLqueue&);
 
 private:
-	CLMessageQueueBySTLqueue*m_pMsgQueue;
+	CLMessageQueueBySTLqueue *m_pMsgQueue;
 };
 
 #endif

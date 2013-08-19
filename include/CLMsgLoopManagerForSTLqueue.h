@@ -9,9 +9,6 @@ class CLMessageQueueBySTLqueue;
 class CLMsgLoopManagerForSTLqueue : public CLMessageLoopManager
 {
 public:
-	/*
-	pMsgObserver均应从堆中分配，且不必显示调用delete
-	*/
 	CLMsgLoopManagerForSTLqueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName);
 	virtual ~CLMsgLoopManagerForSTLqueue();
 

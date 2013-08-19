@@ -583,11 +583,35 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\test\CLExecutiveCommunicationByNamedPipeTester.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\test\CLExecutiveFunctionForMsgLoopTester.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\test\CLLoggerTester.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\test\CLMessageLoopManagerTester.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\test\CLMessageQueueByNamedPipeTester.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\test\CLMessageQueueBySTLqueueTester.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\test\CLMsgLoopManagerForPipeQueueTester.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\test\CLMsgLoopManagerForSTLQueueTester.cpp"
 				>
 			</File>
 			<File
@@ -616,6 +640,10 @@
 			</File>
 			<File
 				RelativePath="..\..\test\CLStatusTester.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\test\CLThreadInitialFinishedNotifierTester.cpp"
 				>
 			</File>
 			<File

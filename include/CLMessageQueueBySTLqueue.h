@@ -8,20 +8,12 @@
 
 class CLMessage;
 
-/*
-该类是线程安全的
-若要和CLMsgLoopManagerForMsgQueue 结合使用，则该类对象需要从堆中分配，且不用调用delete
-*/
 class CLMessageQueueBySTLqueue
 {
 public:
-	/*
-	构造函数和析构函数出错时，会抛出字符串类型的异常
-	*/
 	CLMessageQueueBySTLqueue();
 	virtual ~CLMessageQueueBySTLqueue();
 
-public:
 	CLStatus PushMessage(CLMessage * pMessage);
 	CLMessage* GetMessage();
 

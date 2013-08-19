@@ -40,5 +40,7 @@
 #include "CLSharedMutexImpl.h"
 #include "CLSharedConditionVariableImpl.h"
 #include "CLSharedEventImpl.h"
+#include "CLSharedMsgQueueByNamedPipe.h"
+#include "CLPrivateMsgQueueByNamedPipe.h"
 
 #endif
