@@ -33,9 +33,6 @@ private:
 	static CLStatus Destroy();
 
 private:
-	/*
-	出错时，构造函数和析构函数可能会产生字符串类型异常
-	*/
 	CLExecutiveNameServer();
 	virtual ~CLExecutiveNameServer();
 

@@ -19,59 +19,48 @@ CLExecutiveNameServer::~CLExecutiveNameServer()
 
 CLStatus CLExecutiveNameServer::PostExecutiveMessage(const char* pstrExecutiveName, CLMessage *pMessage)
 {
-	 if(pMessage == 0)
-	 	return CLStatus(-1, 0);
+	if(pMessage == 0)
+		return CLStatus(-1, 0);
 
-	 if((pstrExecutiveName == 0) || (strlen(pstrExecutiveName) == 0))
-	 {
-	 	delete pMessage;
-	 	return CLStatus(-1, 0);
-	 }
-	 
-	 CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
-	 if(pNameServer == 0)
-	 {
-	 	CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), CLExecutiveNameServer::GetInstance error", 0);
+	if((pstrExecutiveName == 0) || (strlen(pstrExecutiveName) == 0))
+	{
 		delete pMessage;
-	 	return CLStatus(-1, 0);
-	 }
+		return CLStatus(-1, 0);
+	}
 
-	 CLExecutiveCommunication* pComm = pNameServer->GetCommunicationPtr(pstrExecutiveName);
-	 if(pComm == 0)
-	 {
-	 	CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pNameServer->GetCommunicationPtr error", 0);
+	CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
+	if(pNameServer == 0)
+	{
+		CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), CLExecutiveNameServer::GetInstance error", 0);
 		delete pMessage;
-	 	return CLStatus(-1, 0);
-	 }	
+		return CLStatus(-1, 0);
+	}
 
-     int flag = 1;
+	CLExecutiveCommunication* pComm = pNameServer->GetCommunicationPtr(pstrExecutiveName);
+	if(pComm == 0)
+	{
+		CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pNameServer->GetCommunicationPtr error", 0);
+		delete pMessage;
+		return CLStatus(-1, 0);
+	}	
 
-     try
-     {
-	    CLStatus s = pComm->PostExecutiveMessage(pMessage);
-        if(!s.IsSuccess())
-            flag = 0;
-        throw "";
-     }
-     catch(...)
-     {
-	    if(!flag)
-	    {
-	 	    CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pComm->PostExecutiveMessage error", 0);
+	CLStatus s = pComm->PostExecutiveMessage(pMessage);
+	if(!s.IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pComm->PostExecutiveMessage error", 0);
 
-		    CLStatus s1 = pNameServer->ReleaseCommunicationPtr(pstrExecutiveName);
-		    if(!s1.IsSuccess())
-			CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pNameServer->ReleaseCommunicationPtr error", 0);
-		
-	 	    return CLStatus(-1, 0);
-	    }
-
-	    CLStatus s2 = pNameServer->ReleaseCommunicationPtr(pstrExecutiveName);
-	    if(!s2.IsSuccess())
+		CLStatus s1 = pNameServer->ReleaseCommunicationPtr(pstrExecutiveName);
+		if(!s1.IsSuccess())
 			CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pNameServer->ReleaseCommunicationPtr error", 0);
 
-	    return CLStatus(0, 0);
-     }
+		return CLStatus(-1, 0);
+	}
+
+	CLStatus s2 = pNameServer->ReleaseCommunicationPtr(pstrExecutiveName);
+	if(!s2.IsSuccess())
+		CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pNameServer->ReleaseCommunicationPtr error", 0);
+
+	return CLStatus(0, 0);
 }
 
 CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLExecutiveCommunication *pExecutiveCommunication)
@@ -198,8 +187,6 @@ CLStatus CLExecutiveNameServer::Destroy()
 	CLMutex mutex(&m_Mutex);
 	CLCriticalSection cs(&mutex);
 	
-	//m_NameTable中的对象应由用户保证释放问题，
-	//即用户必须要保证在程序库反初始化之前调用ReleaseCommunicationPtr
 	delete m_pNameServer;
 
 	m_pNameServer = 0;

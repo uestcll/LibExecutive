@@ -591,6 +591,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\test\CLExecutiveNameServerTester.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\test\CLLoggerTester.cpp"
 				>
 			</File>
@@ -619,6 +623,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\test\CLNonThreadForMsgLoopTester.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\test\CLProcessTester.cpp"
 				>
 			</File>
@@ -640,6 +648,10 @@
 			</File>
 			<File
 				RelativePath="..\..\test\CLStatusTester.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\test\CLThreadForMsgLoopTester.cpp"
 				>
 			</File>
 			<File
