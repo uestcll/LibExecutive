@@ -353,3 +353,108 @@ TEST(CLNonThreadForMsgLoop, Shared_PIPE_QUEUE)
 	EXPECT_EQ(g_for_msg1_se, 1);
 	EXPECT_EQ(g_for_msg2_se, 1);
 }
+
+static const int count = 1000000;
+
+class CLStressTester : public CLExecutiveFunctionProvider
+{
+public:
+	virtual CLStatus RunExecutiveFunction(void* pContext)
+	{
+		for(int i = 0; i < count; i++)
+			EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, new CLMsg1ForCLNonThreadForMsgLoop).IsSuccess());
+	}
+};
+
+class CLStressObserverForCLNonThreadForMsgLoop : public CLMessageObserver
+{
+public:
+	virtual CLStatus Initialize(CLMessageLoopManager *pMessageLoop, void* pContext)
+	{
+		pMessageLoop->Register(1, (CallBackForMessageLoop)(&CLStressObserverForCLNonThreadForMsgLoop::On_1));
+
+		CLThread *pthread = new CLThread(new CLStressTester, false);
+		EXPECT_TRUE(pthread->Run().IsSuccess());
+
+		return CLStatus(0, 0);
+	}
+
+	CLStatus On_1(CLMessage *pm)
+	{
+		CLMsg1ForCLNonThreadForMsgLoop *p = dynamic_cast<CLMsg1ForCLNonThreadForMsgLoop*>(pm);
+		EXPECT_TRUE(p != 0);
+
+		g_for_on1++;
+
+		if(g_for_on1 == count)
+			return CLStatus(QUIT_MESSAGE_LOOP, 0);
+		else
+			return CLStatus(0, 0);
+	}
+};
+
+TEST(CLNonThreadForMsgLoop, STL_QUEUE_STRESS)
+{
+	g_for_on1 = 0;
+	g_for_msg1 = 0;
+
+	CLNonThreadForMsgLoop thread(new CLStressObserverForCLNonThreadForMsgLoop, test_pipe_name, EXECUTIVE_IN_PROCESS_USE_STL_QUEUE);
+	EXPECT_TRUE(thread.Run(0).IsSuccess());
+
+	EXPECT_EQ(g_for_on1, count);
+	EXPECT_EQ(g_for_msg1, count);
+}
+
+TEST(CLNonThreadForMsgLoop, PRIVATE_PIPE_QUEUE_STRESS)
+{
+	g_for_on1 = 0;
+	g_for_msg1 = 0;
+
+	CLNonThreadForMsgLoop thread(new CLStressObserverForCLNonThreadForMsgLoop, test_pipe_name, EXECUTIVE_IN_PROCESS_USE_PIPE_QUEUE);
+	EXPECT_TRUE(thread.Run(0).IsSuccess());
+
+	EXPECT_EQ(g_for_on1, count);
+	EXPECT_EQ(g_for_msg1, count);
+}
+
+class CLStressObserverForCLNonThreadForMsgLoop_Process : public CLMessageObserver
+{
+public:
+	virtual CLStatus Initialize(CLMessageLoopManager *pMessageLoop, void* pContext)
+	{
+		pMessageLoop->Register(1, (CallBackForMessageLoop)(&CLStressObserverForCLNonThreadForMsgLoop_Process::On_1));
+
+		CLProcess *process = new CLProcess(new CLProcessFunctionForExec, false);
+		EXPECT_TRUE((process->Run((void *)"../test_for_exec/test_for_CLNonThreadForMsgLoop_Stress_Testing/main")).IsSuccess());
+
+		return CLStatus(0, 0);
+	}
+
+	CLStatus On_1(CLMessage *pm)
+	{
+		CLMsg1ForCLNonThreadForMsgLoop *p = dynamic_cast<CLMsg1ForCLNonThreadForMsgLoop*>(pm);
+		EXPECT_TRUE(p != 0);
+
+		g_for_on1++;
+
+		if(g_for_on1 == count)
+			return CLStatus(QUIT_MESSAGE_LOOP, 0);
+		else
+			return CLStatus(0, 0);
+	}
+};
+
+TEST(CLNonThreadForMsgLoop, SHARED_PIPE_QUEUE_STRESS)
+{
+	g_for_on1 = 0;
+	g_for_msg1 = 0;
+
+	{
+		CLNonThreadForMsgLoop thread(new CLStressObserverForCLNonThreadForMsgLoop_Process, test_pipe_name, EXECUTIVE_BETWEEN_PROCESS_USE_PIPE_QUEUE);
+		EXPECT_TRUE(thread.RegisterDeserializer(1, new CLMsg1ForCLNonThreadForMsgLoop_Deserializer).IsSuccess());
+		EXPECT_TRUE(thread.Run(0).IsSuccess());
+	}
+
+	EXPECT_EQ(g_for_on1, count);
+	EXPECT_EQ(g_for_msg1, count);
+}
