@@ -4,11 +4,12 @@
 #include "CLStatus.h"
 
 class CLMessage;
+class CLMessageSerializer;
 
 class CLExecutiveCommunication
 {
 public:
-	CLExecutiveCommunication();
+	CLExecutiveCommunication(CLMessageSerializer *pMsgSerializer);
 	virtual ~CLExecutiveCommunication();
 
 	virtual CLStatus PostExecutiveMessage(CLMessage *pMessage) = 0;
@@ -16,6 +17,9 @@ public:
 private:
 	CLExecutiveCommunication(const CLExecutiveCommunication&);
 	CLExecutiveCommunication& operator=(const CLExecutiveCommunication&);
+
+private:
+	CLMessageSerializer *m_pMsgSerializer;
 };
 
 #endif

@@ -13,7 +13,7 @@ struct SLEventInfo;
 class CLEvent
 {
 public: 
-	CLEvent( );
+	CLEvent();
 	explicit CLEvent(bool bSemaphore);
 	explicit CLEvent(const char *pstrEventName);
 	CLEvent(const char *pstrEventName, bool bSemaphore);

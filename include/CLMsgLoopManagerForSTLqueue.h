@@ -3,8 +3,9 @@
 
 #include <string>
 #include "CLMessageLoopManager.h"
+#include "CLEvent.h"
 
-class CLMessageQueueBySTLqueue;
+class CLMessageReceiverFromSTLqueue
 
 class CLMsgLoopManagerForSTLqueue : public CLMessageLoopManager
 {
@@ -23,8 +24,9 @@ private:
 	CLMsgLoopManagerForSTLqueue& operator=(const CLMsgLoopManagerForSTLqueue&);
 
 private:
-	CLMessageQueueBySTLqueue*m_pMsgQueue;
+	CLMessageReceiverFromSTLqueue *m_pMsgReceiver;
 	std::string m_strThreadName;
+	CLEvent m_Event;
 };
 
 #endif

@@ -5,12 +5,13 @@
 #include "CLStatus.h"
 
 class CLMessage;
-class CLMessageQueueBySTLqueue;
+class CLMessageReceiverFromSTLqueue;
+class CLEvent;
 
 class CLThreadCommunicationBySTLqueue : public CLExecutiveCommunication
 {
 public:
-	CLThreadCommunicationBySTLqueue(CLMessageQueueBySTLqueue *pMsgQueue);
+	CLThreadCommunicationBySTLqueue(CLMessageReceiverFromSTLqueue *pMsgReceiver, CLEvent *pEvent);
 	virtual ~CLThreadCommunicationBySTLqueue();
 
 	virtual CLStatus PostExecutiveMessage(CLMessage *pMessage);
@@ -20,7 +21,8 @@ private:
 	CLThreadCommunicationBySTLqueue& operator=(const CLThreadCommunicationBySTLqueue&);
 
 private:
-	CLMessageQueueBySTLqueue *m_pMsgQueue;
+	CLMessageReceiverFromSTLqueue *m_pMsgReceiver;
+	CLEvent *m_pEvent;
 };
 
 #endif
