@@ -362,18 +362,27 @@ public:
 	virtual CLStatus RunExecutiveFunction(void* pContext)
 	{
 		for(int i = 0; i < count; i++)
-			EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, new CLMsg1ForCLNonThreadForMsgLoop).IsSuccess());
+		{
+			CLStatus s = CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, new CLMsg1ForCLNonThreadForMsgLoop);
+			if(!s.IsSuccess())
+			{
+				sleep(1);
+				CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, new CLMsg1ForCLNonThreadForMsgLoop);
+			}
+		}
 	}
 };
 
 class CLStressObserverForCLNonThreadForMsgLoop : public CLMessageObserver
 {
+	CLThread *pthread;
+
 public:
 	virtual CLStatus Initialize(CLMessageLoopManager *pMessageLoop, void* pContext)
 	{
 		pMessageLoop->Register(1, (CallBackForMessageLoop)(&CLStressObserverForCLNonThreadForMsgLoop::On_1));
 
-		CLThread *pthread = new CLThread(new CLStressTester, false);
+		pthread = new CLThread(new CLStressTester, true);
 		EXPECT_TRUE(pthread->Run().IsSuccess());
 
 		return CLStatus(0, 0);
@@ -387,7 +396,10 @@ public:
 		g_for_on1++;
 
 		if(g_for_on1 == count)
+		{
+			pthread->WaitForDeath();
 			return CLStatus(QUIT_MESSAGE_LOOP, 0);
+		}
 		else
 			return CLStatus(0, 0);
 	}
