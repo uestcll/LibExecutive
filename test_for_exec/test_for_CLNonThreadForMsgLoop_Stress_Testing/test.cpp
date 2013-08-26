@@ -60,7 +60,16 @@ int main(int argc, char* argv[])
 		sender.RegisterSerializer(1, new TestMsgForCLExecutiveCommunicationByNamedPipe_PrivateQueueForSelfPostMsgSerializer);
 
 		for(int i = 0; i < 1000000; i++)
-			sender.PostExecutiveMessage(new TestMsgForCLExecutiveCommunicationByNamedPipe_PrivateQueueForSelfPostMsg);
+		{
+			CLStatus s = sender.PostExecutiveMessage(new TestMsgForCLExecutiveCommunicationByNamedPipe_PrivateQueueForSelfPostMsg);
+			if(!s.IsSuccess())
+			{
+			    CLLogger::WriteLogMsg("post error ", i);
+			    sleep(1);
+
+			    sender.PostExecutiveMessage(new TestMsgForCLExecutiveCommunicationByNamedPipe_PrivateQueueForSelfPostMsg);
+			}
+		}
 		
 		throw CLStatus(0, 0);
 	}
