@@ -55,11 +55,27 @@ long CLNamedPipe::GetSizeForAtomWriting()
 CLStatus CLNamedPipe::Read(char *pBuf, unsigned long ulBufSize)
 {
 	long count = read(m_Fd, pBuf, ulBufSize);
-	return CLStatus(count, errno);
+	long err = 0;
+
+	if(count == -1)
+	{
+		err = errno;
+		CLLogger::WriteLogMsg("In CLNamedPipe::Read(), read error", errno);
+	}
+
+	return CLStatus(count, err);
 }
 
 CLStatus CLNamedPipe::Write(char *pBuf, unsigned long ulBufSize)
 {
 	long count = write(m_Fd, pBuf, ulBufSize);
-	return CLStatus(count, errno);
+	long err = 0;
+
+	if(count == -1)
+	{
+		err = errno;
+		CLLogger::WriteLogMsg("In CLNamedPipe::Write(), write error", errno);
+	}
+
+	return CLStatus(count, err);
 }

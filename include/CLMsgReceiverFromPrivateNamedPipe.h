@@ -8,7 +8,7 @@ class CLNamedPipe;
 class CLMsgReceiverFromPrivateNamedPipe : public CLMessageReceiver
 {
 public:
-	CLMsgReceiverFromPrivateNamedPipe(CLMessageDeserializer *pMsgDeserializer, const char *pstrPipeName);
+	CLMsgReceiverFromPrivateNamedPipe(const char *pstrPipeName);
 	virtual ~CLMsgReceiverFromPrivateNamedPipe();
 
 	virtual CLStatus GetMessage(CLMessage **ppMsg);

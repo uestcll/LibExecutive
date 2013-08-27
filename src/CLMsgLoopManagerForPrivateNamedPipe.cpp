@@ -7,7 +7,7 @@
 #include "CLExecutiveNameServer.h"
 #include "CLPrivateExecutiveCommunicationByNamedPipe.h"
 
-CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName, int PipeQueueType) : CLMessageLoopManager(pMsgObserver)
+CLMsgLoopManagerForPrivateNamedPipe::CLMsgLoopManagerForPrivateNamedPipe(CLMessageObserver *pMsgObserver, const char* pstrThreadName, int PipeQueueType) : CLMessageLoopManager(pMsgObserver)
 {
 	if((pstrThreadName == 0) || (strlen(pstrThreadName) == 0))
 		throw "In CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(), pstrThreadName error";
@@ -22,12 +22,12 @@ CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(CLMessageObserver *pM
 		throw "In CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(), PipeQueueType error";
 }
 
-CLMsgLoopManagerForPipeQueue::~CLMsgLoopManagerForPipeQueue()
+CLMsgLoopManagerForPrivateNamedPipe::~CLMsgLoopManagerForPrivateNamedPipe()
 {
 	delete m_pMsgQueue;
 }
 
-CLStatus CLMsgLoopManagerForPipeQueue::Initialize()
+CLStatus CLMsgLoopManagerForPrivateNamedPipe::Initialize()
 {
 	CLPrivateMsgQueuebyNamedPipe *pQueue = dynamic_cast<CLPrivateMsgQueuebyNamedPipe *>(m_pMsgQueue);
 	if(pQueue == 0)
@@ -50,7 +50,7 @@ CLStatus CLMsgLoopManagerForPipeQueue::Initialize()
 	return CLStatus(0, 0);
 }
 
-CLStatus CLMsgLoopManagerForPipeQueue::Uninitialize()
+CLStatus CLMsgLoopManagerForPrivateNamedPipe::Uninitialize()
 {
 	CLPrivateMsgQueuebyNamedPipe *pQueue = dynamic_cast<CLPrivateMsgQueuebyNamedPipe *>(m_pMsgQueue);
 	if(pQueue == 0)
@@ -66,12 +66,12 @@ CLStatus CLMsgLoopManagerForPipeQueue::Uninitialize()
 	return pNameServer->ReleaseCommunicationPtr(m_strThreadName.c_str());
 }
 
-CLMessage* CLMsgLoopManagerForPipeQueue::WaitForMessage()
+CLMessage* CLMsgLoopManagerForPrivateNamedPipe::WaitForMessage()
 {
 	return m_pMsgQueue->GetMessage();
 }
 
-CLStatus CLMsgLoopManagerForPipeQueue::RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer)
+CLStatus CLMsgLoopManagerForPrivateNamedPipe::RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer)
 {
 	CLSharedMsgQueueByNamedPipe *pQueue = dynamic_cast<CLSharedMsgQueueByNamedPipe *>(m_pMsgQueue);
 	if(pQueue != 0)

@@ -8,7 +8,7 @@ using namespace std;
 
 #define FILE_PATH_FOR_NAMED_PIPE "/tmp/"
 
-CLMsgReceiverFromPrivateNamedPipe::CLMsgReceiverFromPrivateNamedPipe(CLMessageDeserializer *pMsgDeserializer, const char *pstrPipeName) : CLMessageReceiver(pMsgDeserializer)
+CLMsgReceiverFromPrivateNamedPipe::CLMsgReceiverFromPrivateNamedPipe(const char *pstrPipeName) : CLMessageReceiver(NULL)
 {
 	string str = FILE_PATH_FOR_NAMED_PIPE;
 	str += pstrPipeName;
@@ -24,10 +24,5 @@ CLMsgReceiverFromPrivateNamedPipe::~CLMsgReceiverFromPrivateNamedPipe()
 
 CLStatus CLMsgReceiverFromPrivateNamedPipe::GetMessage(CLMessage **ppMsg)
 {
-	long bufsize = m_pNamedPipe->GetSizeForAtomWriting();
-	if(bufsize <= 0)
-		return CLStatus(-1, MESSAGE_RECEIVE_ERROR);
-
-	char *pBuf = new char[bufsize];
-	CLStatus s = m_pNamedPipe->Read(pBuf, bufsize);
+	return m_pNamedPipe->Read(ppMsg, sizeof(CLMessage *));
 }
