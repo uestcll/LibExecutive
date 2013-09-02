@@ -1,18 +1,15 @@
 #ifndef CLPrivateExecutiveCommunicationByNamedPipe_H
 #define CLPrivateExecutiveCommunicationByNamedPipe_H
 
-#include "CLExecutiveCommunicationByNamedPipe.h"
+#include "CLExecutiveCommunication.h"
 
-class CLMessage;
-
-class CLPrivateExecutiveCommunicationByNamedPipe : public CLExecutiveCommunicationByNamedPipe
+class CLPrivateExecutiveCommunicationByNamedPipe : public CLExecutiveCommunication
 {
 public:
 	CLPrivateExecutiveCommunicationByNamedPipe(const char *pstrExecutiveName);
 	virtual ~CLPrivateExecutiveCommunicationByNamedPipe();
 
-protected:
-	virtual char *GetMsgBuf(CLMessage *pMsg, unsigned int *pLength);
+	virtual CLStatus PostExecutiveMessage(CLMessage *pMessage) = 0;
 
 private:
 	CLPrivateExecutiveCommunicationByNamedPipe(const CLPrivateExecutiveCommunicationByNamedPipe&);

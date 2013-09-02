@@ -4,13 +4,15 @@
 
 CLThreadCommunicationBySTLqueue::CLThreadCommunicationBySTLqueue(CLMessageReceiverFromSTLqueue *pMsgReceiver, CLEvent *pEvent) : CLExecutiveCommunication(NULL)
 {
-	if(pMsgReceiver == 0)
-		throw "In CLThreadCommunicationBySTLqueue::CLThreadCommunicationBySTLqueue(), pMsgReceiver error";
-
-	if(pEvent == 0)
+	if((pMsgReceiver == 0) || (pEvent == 0))
 	{
-		delete pMsgReceiver;
-		throw "In CLThreadCommunicationBySTLqueue::CLThreadCommunicationBySTLqueue(), pEvent error";
+		if(pMsgReceiver)
+			delete pMsgReceiver;
+
+		if(pEvent)
+			delete pEvent;
+
+		throw "In CLThreadCommunicationBySTLqueue::CLThreadCommunicationBySTLqueue(), pMsgReceiver or pEvent error";
 	}
 	
 	m_pMsgReceiver = pMsgReceiver;
@@ -20,6 +22,7 @@ CLThreadCommunicationBySTLqueue::CLThreadCommunicationBySTLqueue(CLMessageReceiv
 CLThreadCommunicationBySTLqueue::~CLThreadCommunicationBySTLqueue()
 {
 	delete m_pMsgReceiver;
+	delete m_pEvent;
 }
 
 CLStatus CLThreadCommunicationBySTLqueue::PostExecutiveMessage(CLMessage *pMessage)

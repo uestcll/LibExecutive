@@ -4,8 +4,6 @@
 #include <string>
 #include "CLMessageLoopManager.h"
 
-using namespace std;
-
 class CLMsgReceiverFromPrivateNamedPipe;
 
 class CLMsgLoopManagerForPrivateNamedPipe : public CLMessageLoopManager
@@ -26,7 +24,7 @@ private:
 
 private:
 	CLMsgReceiverFromPrivateNamedPipe *m_pMsgQueue;
-	string m_strThreadName;
+	std::string m_strThreadName;
 };
 
 #endif

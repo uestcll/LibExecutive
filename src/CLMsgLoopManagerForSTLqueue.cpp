@@ -4,15 +4,16 @@
 #include "CLExecutiveNameServer.h"
 #include "CLThreadCommunicationBySTLqueue.h"
 #include "CLLogger.h"
+#include "CLEvent.h"
 
-CLMsgLoopManagerForSTLqueue::CLMsgLoopManagerForSTLqueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName) : CLMessageLoopManager(pMsgObserver), m_Event(true)
+CLMsgLoopManagerForSTLqueue::CLMsgLoopManagerForSTLqueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName) : CLMessageLoopManager(pMsgObserver)
 {
 	if((pstrThreadName == 0) || (strlen(pstrThreadName) == 0))
 		throw "In CLMsgLoopManagerForSTLqueue::CLMsgLoopManagerForSTLqueue(), pstrThreadName error";
 		
 	m_strThreadName = pstrThreadName;
-
 	m_pMsgReceiver = new CLMessageReceiverFromSTLqueue;
+	m_pEvent = new CLEvent(true);
 }
 
 CLMsgLoopManagerForSTLqueue::~CLMsgLoopManagerForSTLqueue()
@@ -21,25 +22,31 @@ CLMsgLoopManagerForSTLqueue::~CLMsgLoopManagerForSTLqueue()
 
 CLStatus CLMsgLoopManagerForSTLqueue::Initialize()
 {
-	CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
-	if(pNameServer == 0)
+	try
 	{
-		delete m_pMsgReceiver;
-		m_pMsgReceiver = 0;
-		CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::Initialize(), CLExecutiveNameServer::GetInstance error", 0);
-		return CLStatus(-1, 0);
-	}
+		CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
+		if(pNameServer == 0)
+		{
+			CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::Initialize(), CLExecutiveNameServer::GetInstance error", 0);
+			throw CLStatus(-1, 0);
+		}
 
-	CLStatus s = pNameServer->Register(m_strThreadName.c_str(), new CLThreadCommunicationBySTLqueue(m_pMsgReceiver, &m_Event));
-	if(!s.IsSuccess())
+		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), new CLThreadCommunicationBySTLqueue(m_pMsgReceiver, m_pEvent));
+		if(!s.IsSuccess())
+		{
+			CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::Initialize(), pNameServer->Register error", 0);
+			throw s;
+		}
+
+		return CLStatus(0, 0);
+	}
+	catch(CLStatus& s1)
 	{
 		delete m_pMsgReceiver;
-		m_pMsgReceiver = 0;
-		CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::Initialize(), pNameServer->Register error", 0);
-		return CLStatus(-1, 0);
+		delete m_pEvent;
+
+		return s1;
 	}
-	
-	return CLStatus(0, 0);
 }
 
 CLStatus CLMsgLoopManagerForSTLqueue::Uninitialize()
@@ -56,7 +63,7 @@ CLStatus CLMsgLoopManagerForSTLqueue::Uninitialize()
 	
 CLMessage* CLMsgLoopManagerForSTLqueue::WaitForMessage()
 {
-	CLStatus s = m_Event.Wait();
+	CLStatus s = m_pEvent->Wait();
 	if(!s.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::WaitForMessage(), m_Event.Wait error", 0);

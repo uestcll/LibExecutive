@@ -1,11 +1,11 @@
 #include <string.h>
-#include "CLMsgLoopManagerForPipeQueue.h"
-#include "CLMessageQueueByNamedPipe.h"
+#include "CLMsgLoopManagerForPrivateNamedPipe.h"
+#include "CLMsgReceiverFromPrivateNamedPipe.h"
 #include "CLLogger.h"
-#include "CLSharedMsgQueueByNamedPipe.h"
-#include "CLPrivateMsgQueueByNamedPipe.h"
 #include "CLExecutiveNameServer.h"
 #include "CLPrivateExecutiveCommunicationByNamedPipe.h"
+
+using namespace std;
 
 CLMsgLoopManagerForPrivateNamedPipe::CLMsgLoopManagerForPrivateNamedPipe(CLMessageObserver *pMsgObserver, const char* pstrThreadName, int PipeQueueType) : CLMessageLoopManager(pMsgObserver)
 {
