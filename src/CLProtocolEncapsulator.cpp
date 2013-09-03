@@ -2,7 +2,7 @@
 
 CLProtocolEncapsulator::CLProtocolEncapsulator()
 {
-	m_pNextProtocolEncapsulator = NULL;
+	m_pNextProtocolEncapsulator = 0;
 }
 
 CLProtocolEncapsulator::CLProtocolEncapsulator(CLProtocolEncapsulator *pProtocolEncapsulator)

@@ -21,6 +21,8 @@ public:
 	const char& operator [](int index) const;
 
 	size_t Size();
+	int GetNumberOfIOVec();
+	iovec *GetIOVecArray();
 
 private:
 	char& GetData(int index) const;

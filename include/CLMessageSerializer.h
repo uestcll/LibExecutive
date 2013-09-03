@@ -4,6 +4,7 @@
 #include "CLStatus.h"
 
 class CLMessage;
+class CLIOVectors;
 
 class CLMessageSerializer
 {
@@ -11,7 +12,7 @@ public:
 	CLMessageSerializer();
 	virtual ~CLMessageSerializer();
 
-	virtual CLStatus Serialize(CLMessage *pMsg, unsigned char **ppBuffer, unsigned int *pBufferLength) = 0;
+	virtual CLStatus Serialize(CLMessage *pMsg, CLIOVectors *pIOVectors) = 0;
 
 private:
 	CLMessageSerializer(const CLMessageSerializer&);

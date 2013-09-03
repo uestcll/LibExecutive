@@ -121,3 +121,25 @@ size_t CLIOVectors::Size()
 {
 	return m_nDataLength;
 }
+
+int CLIOVectors::GetNumberOfIOVec()
+{
+	return m_IOVectors.size();
+}
+
+iovec *CLIOVectors::GetIOVecArray()
+{
+	if(m_IOVectors.empty() || m_nDataLength == 0)
+		return 0;
+
+	int n = m_IOVectors.size();
+	iovec *pArray = new iovec[n];
+
+	for(int i = 0; i < n; i++)
+	{
+		pArray[i].iov_base = m_IOVectors[i].iov_base;
+		pArray[i].iov_len = m_IOVectors[i].iov_len;
+	}
+
+	return pArray;
+}
