@@ -3,12 +3,16 @@
 
 #include <string>
 #include "CLMessageLoopManager.h"
+#include "CLEvent.h"
 
-class CLMessageQueueBySTLqueue;
+class CLMessageReceiverBySTLqueue;
 
 class CLMsgLoopManagerForSTLqueue : public CLMessageLoopManager
 {
 public:
+	/*
+	pMsgObserver¾ùÓ¦´Ó¶ÑÖÐ·ÖÅä£¬ÇÒ²»±ØÏÔÊ¾µ÷ÓÃdelete
+	*/
 	CLMsgLoopManagerForSTLqueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName);
 	virtual ~CLMsgLoopManagerForSTLqueue();
 
@@ -23,8 +27,9 @@ private:
 	CLMsgLoopManagerForSTLqueue& operator=(const CLMsgLoopManagerForSTLqueue&);
 
 private:
-	CLMessageQueueBySTLqueue*m_pMsgQueue;
+	CLMessageReceiverBySTLqueue *m_pMsgReceiver;
 	std::string m_strThreadName;
+	CLEvent     m_Event;
 };
 
 #endif
