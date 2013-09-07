@@ -1,9 +1,11 @@
 #include "CLLibExecutiveInitializer.h"
 #include "CLLogger.h"
 #include "CLExecutiveNameServer.h"
-#include "CLSharedMutexAllocator.h"
-#include "CLSharedConditionVariableAllocator.h"
-#include "CLSharedEventAllocator.h"
+#include "CLSharedObjectAllocator.h"
+#include "CLSharedMutexImpl.h"
+#include "CLSharedEventImpl.h"
+#include "CLSharedConditionVariableImpl.h"
+#include <pthread.h>
 
 pthread_mutex_t CLLibExecutiveInitializer::m_MutexForInitializer = PTHREAD_MUTEX_INITIALIZER;
 
@@ -36,21 +38,21 @@ CLStatus CLLibExecutiveInitializer::Initialize()
 		if(!s.IsSuccess())
 			throw s;
 
-		CLStatus s2 = CLSharedMutexAllocator::Create();
+		CLStatus s2 = CLSharedObjectAllocator<CLSharedMutexImpl,pthread_mutex_t>::Create();
 		if(!s2.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error", 0);
 			throw s2;
 		}
 
-		CLStatus s3 = CLSharedConditionVariableAllocator::Create();
+		CLStatus s3 = CLSharedObjectAllocator<CLSharedConditionVariableImpl,pthread_cond_t>::Create();
 		if(!s3.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLLibExecutiveInitializer::Initialize(), CLSharedConditionVariableAllocator::Create error", 0);
 			throw s3;
 		}
 
-		CLStatus s4 = CLSharedEventAllocator::Create();
+		CLStatus s4 = CLSharedObjectAllocator<CLSharedEventImpl,SLEventInfo>::Create();
 		if(!s4.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLLibExecutiveInitializer::Initialize(), CLSharedEventAllocator::Create error", 0);
@@ -108,21 +110,21 @@ CLStatus CLLibExecutiveInitializer::Destroy()
 			throw s1;
 		}
 
-		CLStatus s4 = CLSharedEventAllocator::Destroy();
+		CLStatus s4 = CLSharedObjectAllocator<CLSharedEventImpl,SLEventInfo>::Destroy();
 		if(!s4.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLLibExecutiveInitializer::Destroy(), CLSharedEventAllocator::Destroy error", 0);
 			throw s4;
 		}
 
-		CLStatus s3 = CLSharedConditionVariableAllocator::Destroy();
+		CLStatus s3 = CLSharedObjectAllocator<CLSharedConditionVariableImpl,pthread_cond_t>::Destroy();
 		if(!s3.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLLibExecutiveInitializer::Destroy(), CLSharedConditionVariableAllocator::Destroy error", 0);
 			throw s3;
 		}
 
-		CLStatus s2 = CLSharedMutexAllocator::Destroy();
+		CLStatus s2 = CLSharedObjectAllocator<CLSharedMutexImpl,pthread_mutex_t>::Destroy();
 		if(!s2.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLLibExecutiveInitializer::Destroy(), CLSharedMutexAllocator::Destroy error", 0);

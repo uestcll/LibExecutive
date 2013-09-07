@@ -4,7 +4,9 @@
 #include "CLLogger.h"
 #include "CLMutexByPThread.h"
 #include "CLMutexBySharedPThread.h"
-#include "CLSharedConditionVariableAllocator.h"
+#include "CLSharedObjectAllocator.h"
+#include "CLSharedConditionVariableImpl.h"
+#include <pthread.h>
 
 CLConditionVariable::CLConditionVariable()
 {
@@ -37,7 +39,7 @@ CLConditionVariable::CLConditionVariable(const char* pstrCondName)
 	m_strCondName = pstrCondName;
 	m_bNeededDestroy = false;
 
-	m_pConditionVariable = CLSharedConditionVariableAllocator::Get(pstrCondName);
+	m_pConditionVariable = CLSharedObjectAllocator<CLSharedConditionVariableImpl,pthread_cond_t>::Get(pstrCondName);
 	if(m_pConditionVariable == 0)
 	{
 		CLLogger::WriteLogMsg("In CLConditionVariable::CLConditionVariable(), CLSharedConditionVariableAllocator::Get error", 0);
@@ -61,7 +63,7 @@ CLConditionVariable::~CLConditionVariable()
 
 	if(m_strCondName.length() != 0)
 	{
-		CLStatus s = CLSharedConditionVariableAllocator::Release(m_strCondName.c_str());
+		CLStatus s = CLSharedObjectAllocator<CLSharedConditionVariableImpl,pthread_cond_t>::Release(m_strCondName.c_str());
 		if(!s.IsSuccess())
 			CLLogger::WriteLogMsg("In CLConditionVariable::~CLConditionVariable(), CLSharedConditionVariableAllocator::Release error", 0);
 	}
