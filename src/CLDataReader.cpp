@@ -1,7 +1,7 @@
 #include "CLDataReader.h"
 #include "CLProtoParser.h"
 
-CLDataReader::CLDataReader(int fd, CLProtoParser *pProtoParser, CLMessageReceiver pMsgReceiver)) : m_fd(fd), m_pProtoParser(pProtoParser), m_pMsgReceiver(pMsgReceiver)
+CLDataReader::CLDataReader(int fd, CLProtoParser *pProtoParser, CLMessageReceiver pMsgReceiver)) : m_fd(fd), m_pProtoParser(pProtoParser)
 {
 
 }
@@ -11,63 +11,60 @@ CLDataReader::~CLDataReader()
 
 }
 
-CLStatus CLDataReader::ReadData()
+CLMessage* CLDataReader::ReadDataAndGetMessage()
 {
-	while(1)
+	if(m_bNewData == true)
 	{
-		if(m_bNewData == true)
-		{
-			m_iHeadLength = m_pProtoParser->GetHeaderLength();
-			m_bReadHead = true;
-			m_bNewData = false;
-			m_iCtxLength = 0;
-			m_pHeaderBuffer = new char[m_iHeadLength];
-			m_pCtxBuffer = NULL;
-			m_iReadOffset = 0;
-		}
-		if(m_bReadHead == true)
-		{
-			CLStatus s1 = ReadHeader(m_fd);
-			if(!s1.IsSuccess())
-			{
-				if(s1.m_clReturnCode == READ_ERROR)
-				{
-					if((s1.m_clErrorCode != EWOULDBLOCK) && (s1.m_clErrorCode != EAGAIN) && (s1.m_clErrorCode != EINTR))
-					{
-						CLLogger::WriteLogMsg("In CLDataReader::ReadData, read header error", s1.m_clErrorCode);
-					}
-				}
-				else
-				{
-					CLLogger::WriteLogMsg("In CLDataReader::ReadData, read header end", 0);
-				}
-				return s1;
-			}
-			
-		}
-		if((m_bNewData == false) && (m_bReadHead == false))
-		{
-			CLStatus s2 = ReadContext(m_fd);
-			if(!s2.IsSuccess())
-			{
-				if(s2.m_clReturnCode == READ_ERROR)
-				{
-					if((s2.m_clErrorCode != EWOULDBLOCK) && (s2.m_clErrorCode != EAGAIN) && (s2.m_clErrorCode != EINTR))
-					{
-						CLLogger::WriteLogMsg("In CLDataReader::ReadData, read context error", s2.m_clErrorCode);
-					}
-				}
-				else
-				{
-					CLLogger::WriteLogMsg("In CLDataReader::ReadData, read context end", 0);
-				}
-				return s2;
-			}
-			
-		}
-
+		m_iHeadLength = m_pProtoParser->GetHeaderLength();
+		m_bReadHead = true;
+		m_bNewData = false;
+		m_iCtxLength = 0;
+		m_pHeaderBuffer = new char[m_iHeadLength];
+		m_pCtxBuffer = NULL;
+		m_iReadOffset = 0;
+		m_pMsg = NULL:
 	}
-	return CLStatus(0, 0);
+	if(m_bReadHead == true)
+	{
+		CLStatus s1 = ReadHeader(m_fd);
+		if(!s1.IsSuccess())
+		{
+			if(s1.m_clReturnCode == READ_ERROR)
+			{
+				if((s1.m_clErrorCode != EWOULDBLOCK) && (s1.m_clErrorCode != EAGAIN) && (s1.m_clErrorCode != EINTR))
+				{
+					CLLogger::WriteLogMsg("In CLDataReader::ReadData, read header error", s1.m_clErrorCode);
+				}
+			}
+			else
+			{
+				CLLogger::WriteLogMsg("In CLDataReader::ReadData, read header end", 0);
+			}
+			return NULL;
+		}
+			
+	}
+	if((m_bNewData == false) && (m_bReadHead == false))
+	{
+		CLStatus s2 = ReadContext(m_fd);
+		if(!s2.IsSuccess())
+		{
+			if(s2.m_clReturnCode == READ_ERROR)
+			{
+				if((s2.m_clErrorCode != EWOULDBLOCK) && (s2.m_clErrorCode != EAGAIN) && (s2.m_clErrorCode != EINTR))
+				{
+						CLLogger::WriteLogMsg("In CLDataReader::ReadData, read context error", s2.m_clErrorCode);
+				}
+			}
+			else
+			{
+				CLLogger::WriteLogMsg("In CLDataReader::ReadData, read context end", 0);
+			}
+			return NULL;
+		}
+			
+	}
+	return m_pMsg;
 }
 
 
@@ -93,7 +90,9 @@ CLStatus CLDataReader::ReadHeader(int fd)
 		if(m_iCtxLength == 0)
 		{
 			m_bNewData = true;
-			m_pMsgReceiver->EncapsulateMesage(m_pHeaderBuffer, m_iHeadLength, NULL, 0);
+			m_pMsg = pProtoParser->EncapsulateMesage(m_pHeaderBuffer, m_iHeadLength, NULL, 0);//copy buffer and new msg in encapsulatemsg
+			delete [] m_pHeaderBuffer;
+
 			/// Get Message
 
 		}
@@ -128,7 +127,9 @@ CLStatus CLDataReader::ReadContext(int fd)
 		m_bNewData = true;
 		m_iReadOffset = 0;
 
-		m_pMsgReceiver->EncapsulateMesage(m_pHeaderBuffer, m_iHeadLength, m_pCtxBuffer, m_iCtxLength);
+		m_pMsg = pProtoParser->EncapsulateMesage(m_pHeaderBuffer, m_iHeadLength, m_pCtxBuffer, m_iCtxLength);//copy buffer
+		delete [] m_pHeaderBuffer;
+		delete [] m_pCtxBuffer;
 	}
 
 	return CLStatus(0, 0);

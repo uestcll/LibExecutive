@@ -5,15 +5,15 @@
 #define READ_ERROR -2
 
 class CLProtoParser;
-class CLMessageReceiver;
+
 
 class CLDataReader
 {
 public:
-	CLDataReader(int fd, CLProtoParser *pProtoParser, CLMessageReceiver pMsgReceiver);
+	CLDataReader(int fd, CLProtoParser *pProtoParser);
 	virtual ~CLDataReader();
 
-	virtual int ReadData();
+	virtual CLMessage* ReadDataAndGetMessage();
 
 private:
 	CLDataReader(const CLDataReader&);
@@ -25,7 +25,6 @@ private:
 protected:
 	int m_fd;
 	CLProtoParser *m_pProtoParser;
-	CLMessageReceiver *m_pMsgReceiver;
 
 	bool m_bNewData;
 	bool m_bReadHead;
@@ -36,6 +35,8 @@ protected:
 	int  m_iHeadLength;
 	int  m_iCtxLength;
 	int  m_iReadOffset;
+
+	CLMessage *pMsg;
 
 };
 

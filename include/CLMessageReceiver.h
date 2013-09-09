@@ -1,15 +1,21 @@
 #ifndef CLMESSAGERECEIVER_H
 #define CLMESSAGERECEIVER_H
 
+#include <queue>
+#include <CLMutex.h>
+
 class CLMessage;
+class CLProtoParser;
 
 class CLMessageReceiver
 {
 public:
-	CLMessageReceiver();
+	CLMessageReceiver(CLProtoParser *pProtoParser);
 	virtual ~CLMessageReceiver();
 
-	virtual CLMessage *GetMessage() = 0;
+	CLMessage *GetMessage();
+
+	virtual CLMessage* GetMessageFromChannel() = 0;
 
 	const int& m_ciFd;
 private:
@@ -18,6 +24,10 @@ private:
 
 protected:
 	int m_Fd;
+	
+	CLMutex m_Mutex;
+	CLProtoParser *m_pProtoParser;
+	std::queue<CLMessage*> m_MessageQueue;
 };
 
 #endif

@@ -3,20 +3,13 @@
 #include "CLMessage.h"
 #include "CLLogger.h"
 
-CLMessageReceiverBySTLqueue::CLMessageReceiverBySTLqueue()
+CLMessageReceiverBySTLqueue::CLMessageReceiverBySTLqueue() : CLMessageReceiver(NULL)
 {
 }
 
 CLMessageReceiverBySTLqueue::~CLMessageReceiverBySTLqueue()
 {
-	while(true)
-	{
-		CLMessage *pMsg = GetMessage();
-		if(pMsg == 0)
-			break;
-
-		delete pMsg;
-	}
+	
 }
 
 CLStatus CLMessageReceiverBySTLqueue::PushMessage(CLMessage * pMessage)
@@ -37,22 +30,7 @@ CLStatus CLMessageReceiverBySTLqueue::PushMessage(CLMessage * pMessage)
 	return CLStatus(0, 0);
 }
 
-CLMessage* CLMessageReceiverBySTLqueue::GetMessage()
+CLMessage* CLMessageReceiverBySTLqueue::ReadDataToMessageQueue()
 {
-	try
-	{
-		CLCriticalSection cs(&m_Mutex);
-
-		if(m_MessageQueue.empty())
-			return 0;
-
-		CLMessage *p = m_MessageQueue.front();
-		m_MessageQueue.pop();
-		return p;
-	}
-	catch(const char* str)
-	{
-		CLLogger::WriteLogMsg("In CLMessageReceiverBySTLqueue::GetMessage(), exception arise", 0);
-		return 0;
-	}
+	return NULL;
 }

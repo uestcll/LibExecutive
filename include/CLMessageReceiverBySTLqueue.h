@@ -1,13 +1,9 @@
 #ifndef CLMessageReceiverBySTLqueue_H
 #define CLMessageReceiverBySTLqueue_H
 
-#include <queue>
 #include "CLStatus.h"
-#include "CLMutex.h"
-#include "CLEvent.h"
 #include "CLMessageReceiver.h"
 
-class CLMessage;
 
 /*
 该类是线程安全的
@@ -24,15 +20,13 @@ public:
 
 public:
 	CLStatus PushMessage(CLMessage * pMessage);
-	virtual CLMessage* GetMessage();
+
+	virtual CLMessage* GetMessageFromChannel();
 
 private:
 	CLMessageReceiverBySTLqueue(const CLMessageQueueBySTLqueue&);
 	CLMessageReceiverBySTLqueue& operator=(const CLMessageQueueBySTLqueue&);
 
-private:
-	std::queue<CLMessage*> m_MessageQueue;
-	CLMutex m_Mutex;
 };
 
 #endif
