@@ -3,10 +3,22 @@
 CLIOVectors::CLIOVectors()
 {
 	m_nDataLength = 0;
+	m_bDestroyIOVecs = false;
+}
+
+CLIOVectors::CLIOVectors(bool bDestroyIOVecs)
+{
+	m_nDataLength = 0;
+	m_bDestroyIOVecs = bDestroyIOVecs;
 }
 
 CLIOVectors::~CLIOVectors()
 {
+	if(m_bDestroyIOVecs)
+	{
+		for(int i = 0; i < m_IOVectors.size(); i++)
+			delete [] m_IOVectors[i].iov_base;
+	}
 }
 
 CLStatus CLIOVectors::PushBack(char *pBuffer, size_t nBufferLength)

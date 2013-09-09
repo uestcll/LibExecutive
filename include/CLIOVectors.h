@@ -9,6 +9,7 @@ class CLIOVectors
 {
 public:
 	CLIOVectors();
+	explicit CLIOVectors(bool bDestroyIOVecs);
 	virtual ~CLIOVectors();
 
 	CLStatus PushBack(char *pBuffer, size_t nBufferLength);
@@ -34,6 +35,8 @@ private:
 private:
 	std::deque<struct iovec> m_IOVectors;
 	size_t m_nDataLength;
+
+	bool m_bDestroyIOVecs;
 };
 
 #endif

@@ -22,7 +22,7 @@ private:
 	CLProtocolEncapsulator(const CLProtocolEncapsulator&);
 	CLProtocolEncapsulator& operator=(const CLProtocolEncapsulator&);
 
-private:
+protected:
 	CLProtocolEncapsulator *m_pNextProtocolEncapsulator;
 };
 

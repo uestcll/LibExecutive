@@ -4,22 +4,19 @@
 #include "CLStatus.h"
 
 class CLMessage;
+class CLIOVectors;
 
 class CLMessageDeserializer
 {
 public:
-	CLMessageDeserializer();
-	explicit CLMessageDeserializer(CLMessageDeserializer *pDeserializer);
+	CLMessageDeserializer()
 	virtual ~CLMessageDeserializer();
 
-	virtual CLStatus Deserialize(char *pBuffer, CLMessage **ppMsg) = 0;
+	virtual CLStatus Deserialize(CLIOVectors *pIOVectors, unsigned int Index, unsigned int Length, CLMessage **ppMsg) = 0;
 
 private:
 	CLMessageDeserializer(const CLMessageDeserializer&);
 	CLMessageDeserializer& operator=(const CLMessageDeserializer&);
-
-private:
-	CLMessageDeserializer *m_pNextDeserializer;
 };
 
 #endif

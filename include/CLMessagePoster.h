@@ -15,7 +15,7 @@ class CLMessage;
 class CLMessagePoster
 {
 public:
-	CLMessagePoster(CLDataPoster *pDataPoster, CLProtocolEncapsulator *pProtocolEncapsulator = 0, CLMessageSerializer *pCommonMsgSerializer = 0, CLEvent *pEvent = 0);
+	CLMessagePoster(CLDataPoster *pDataPoster, CLProtocolEncapsulator *pProtocolEncapsulator = 0, CLEvent *pEvent = 0, CLMessageSerializer *pCommonMsgSerializer = 0, bool bMsgDelete = true);
 	virtual ~CLMessagePoster();
 
 	CLStatus RegisterSerializer(unsigned long lMsgID, CLMessageSerializer *pSerializer);
@@ -37,6 +37,7 @@ private:
 	CLDataPoster *m_pDataPoster;
 	uuid_t m_UuidOfPoster;
 	CLEvent *m_pEvent;
+	bool m_bMsgDelete;
 };
 
 #endif

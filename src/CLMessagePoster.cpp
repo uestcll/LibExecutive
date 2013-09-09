@@ -7,7 +7,7 @@
 #include "CLProtocolDataPoster.h"
 #include "CLMessage.h"
 
-CLMessagePoster::CLMessagePoster(CLDataPoster *pDataPoster, CLProtocolEncapsulator *pProtocolEncapsulator, CLMessageSerializer *pCommonMsgSerializer, CLEvent *pEvent)
+CLMessagePoster::CLMessagePoster(CLDataPoster *pDataPoster, CLProtocolEncapsulator *pProtocolEncapsulator, CLEvent *pEvent, CLMessageSerializer *pCommonMsgSerializer, bool bMsgDelete)
 {
 	try
 	{
@@ -18,6 +18,7 @@ CLMessagePoster::CLMessagePoster(CLDataPoster *pDataPoster, CLProtocolEncapsulat
 		m_pProtocolEncapsulator = pProtocolEncapsulator;
 		m_pDataPoster = pDataPoster;
 		m_pEvent = pEvent;
+		m_bMsgDelete = bMsgDelete;
 
 		uuid_generate(m_UuidOfPoster);
 
@@ -139,44 +140,73 @@ CLStatus CLMessagePoster::PostMessage(CLMessage *pMsg, CLPostResultNotifier *pRe
 	if(pMsg == 0)
 		return CLStatus(-1, 0);
 
-	CLIOVectors *pIOV = new CLIOVectors();
+	CLIOVectors *pIOV = new CLIOVectors(true);
 
-	if(m_pCommonSerializer)
+	try
 	{
-		CLStatus s = m_pCommonSerializer->Serialize(pMsg, pIOV);
-		if(!s.IsSuccess())
+		if(m_pCommonSerializer)
 		{
-			CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), m_pCommonSerializer->Serialize() error", 0);
-			delete pIOV;
-			delete pMsg;
-			return s;
+			CLStatus s1 = m_pCommonSerializer->Serialize(pMsg, pIOV);
+			if(!s1.IsSuccess())
+			{
+				CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), m_pCommonSerializer->Serialize() error", 0);
+				throw s1;
+			}
 		}
+		else
+		{
+			map<unsigned long, CLMessageSerializer*>::iterator it = m_SerializerTable.find(pMsg->m_clMsgID);
+			if(it == m_SerializerTable.end())
+			{
+				CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), m_SerializerTable.find() error", 0);
+				throw CLStatus(-1, 0);
+			}
+
+			CLStatus s2 = it->second->Serialize(pMsg, pIOV);
+			if(!s2.IsSuccess())
+			{
+				CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), it->second->Serialize error", 0);
+				throw s2;
+			}
+		}
+
+		if(m_pProtocolEncapsulator)
+		{
+			CLStatus s3 = m_pProtocolEncapsulator->Encapsulate(pIOV);
+			if(!s3.IsSuccess())
+			{
+				CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), m_pProtocolEncapsulator->Encapsulate error", 0);
+				throw s3;
+			}
+		}
+
+		CLProtocolDataPoster *pDataPoster = new CLProtocolDataPoster(m_pDataPoster, pResultNotifier, m_pEvent);
+
+		CLStatus s4 = pDataPoster->PostProtocolData(pIOV);
+		if(!s4.IsSuccess())
+			CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), pDataPoster->PostProtocolData error", 0);
+
+		if(m_bMsgDelete)
+			delete pMsg;
+
+		return s4;
 	}
-	else
+	catch(CLStatus& sn)
 	{
-		map<unsigned long, CLMessageSerializer*>::iterator it = m_SerializerTable.find(pMsg->m_clMsgID);
-		if(it == m_SerializerTable.end())
+		if(pResultNotifier)
 		{
-			CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), m_SerializerTable.find() error", 0);
-			delete pIOV;
-			delete pMsg;
-			return CLStatus(-1, 0);
+			CLStatus s5 = pResultNotifier->Notify(false);
+			if(!s5.IsSuccess())
+				CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), pResultNotifier->Notify error", 0);
+
+			delete pResultNotifier;
 		}
 
-		CLStatus s = it->second->Serialize(pMsg, pIOV);
-		if(!s.IsSuccess())
-		{
-			CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), it->second->Serialize error", 0);
-			delete pIOV;
-			delete pMsg;
-			return s;
-		}
-	}
+		delete pIOV;
 
-	if(m_pProtocolEncapsulator)
-	{
-		CLStatus s = m_pProtocolEncapsulator->Encapsulate(pIOV);
-		//出错处理要重构，通知机制要通知，等通知机制建立好后，最好在通知机制你们删除消息
-		//........................
+		if(m_bMsgDelete)
+			delete pMsg;
+
+		return sn;
 	}
 }

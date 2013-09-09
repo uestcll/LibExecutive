@@ -1,21 +1,26 @@
 #ifndef CLMessageReceiver_H
 #define CLMessageReceiver_H
 
+#include <queue>
 #include "CLStatus.h"
-
-#define MESSAGE_RECEIVE_ERROR 2
-#define MESSAGE_RECEIVE_NOT_ENOUGH 1
 
 class CLMessage;
 class CLMessageDeserializer;
+class CLProtocolDecapsulator;
+class CLDataReceiver;
+class CLIOVectors;
 
+//add initialize and Uninitialize Unregister
 class CLMessageReceiver
 {
 public:
-	CLMessageReceiver(CLMessageDeserializer *pMsgDeserializer);
+	CLMessageReceiver(CLDataReceiver *pDataReceiver, CLMessageDeserializer *pMsgDeserializer, CLProtocolDecapsulator *pProtocolDecapsulator = 0);
 	virtual ~CLMessageReceiver();
 
-	virtual CLStatus GetMessage(CLMessage **ppMsg) = 0;
+	CLStatus GetMessage(std::queue<CLMessage*>& qMsgContainer);
+
+private:
+	CLStatus DeserializeMsg(CLIOVectors *pIOVecs, unsigned int Index, unsigned int Length, std::queue<CLMessage*>& qMsgContainer);
 
 private:
 	CLMessageReceiver(const CLMessageReceiver&);
@@ -23,6 +28,10 @@ private:
 
 private:
 	CLMessageDeserializer *m_pMsgDeserializer;
+	CLDataReceiver *m_pDataReceiver;
+	CLProtocolDecapsulator *m_pProtocolDecapsulator;
+
+	CLIOVectors *m_pIOVecsForPartialData;
 };
 
 #endif

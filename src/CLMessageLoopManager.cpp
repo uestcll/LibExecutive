@@ -14,6 +14,14 @@ CLMessageLoopManager::CLMessageLoopManager(CLMessageObserver *pMessageObserver)
 
 CLMessageLoopManager::~CLMessageLoopManager()
 {
+	while(!m_MessageContainer.empty())
+	{
+		CLMessage *pMsg = m_MessageContainer.front();
+		m_MessageContainer.pop();
+		if(pMsg)
+			delete pMsg;
+	}
+
 	delete m_pMessageObserver;
 }
 
@@ -56,21 +64,38 @@ CLStatus CLMessageLoopManager::EnterMessageLoop(void *pContext)
 	}
 
 	para->pNotifier->NotifyInitialFinished(true);
+
+	bool bQuit = false;
 	
 	while(true)
 	{
-		CLMessage *pMsg = WaitForMessage();
-		if(pMsg == 0)
+		CLStatus s5 = WaitForMessage();
+		if(!s5.IsSuccess())
 		{
-			CLLogger::WriteLogMsg("In CLMessageLoopManager::EnterMessageLoop(), pMsg == 0", 0);
+			CLLogger::WriteLogMsg("In CLMessageLoopManager::EnterMessageLoop(), WaitForMessage error", 0);
 			continue;
 		}
-		
-		CLStatus s3 = DispatchMessage(pMsg);
 
-		delete pMsg;
+		while(!m_MessageContainer.empty())
+		{
+			CLMessage *pMsg = m_MessageContainer.front();
+			m_MessageContainer.pop();
 
-		if(s3.m_clReturnCode == QUIT_MESSAGE_LOOP)
+			if(pMsg)
+			{
+				CLStatus s3 = DispatchMessage(pMsg);
+
+				delete pMsg;
+
+				if(s3.m_clReturnCode == QUIT_MESSAGE_LOOP)
+				{
+					bQuit = true;
+					break;
+				}
+			}
+		}
+
+		if(bQuit)
 			break;
 	}
 

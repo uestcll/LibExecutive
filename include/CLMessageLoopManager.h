@@ -2,6 +2,7 @@
 #define CLMessageLoopManager_H
 
 #include <map>
+#include <queue>
 #include "CLStatus.h"
 
 class CLMessageObserver;
@@ -33,7 +34,7 @@ protected:
 	virtual CLStatus Initialize() = 0;
 	virtual CLStatus Uninitialize() = 0;
 	
-	virtual CLMessage* WaitForMessage() = 0;
+	virtual CLStatus WaitForMessage() = 0;
 	virtual CLStatus DispatchMessage(CLMessage *pMessage);
 
 private:
@@ -43,6 +44,7 @@ private:
 protected:
 	CLMessageObserver *m_pMessageObserver;
 	std::map<unsigned long, CallBackForMessageLoop> m_MsgMappingTable;
+	std::queue<CLMessage*> m_MessageContainer;
 };
 
 #endif
