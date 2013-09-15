@@ -1,8 +1,9 @@
 #include <string.h>
 #include "CLMsgLoopManagerForSTLqueue.h"
-#include "CLMessageReceiverFromSTLqueue.h"
+#include "CLMessageReceiver.h"
+#include "CLDataReceiverBySTLqueue.h"
+#include "CLPointerToMsgDeserializer.h"
 #include "CLExecutiveNameServer.h"
-#include "CLThreadCommunicationBySTLqueue.h"
 #include "CLLogger.h"
 #include "CLEvent.h"
 
@@ -12,7 +13,7 @@ CLMsgLoopManagerForSTLqueue::CLMsgLoopManagerForSTLqueue(CLMessageObserver *pMsg
 		throw "In CLMsgLoopManagerForSTLqueue::CLMsgLoopManagerForSTLqueue(), pstrThreadName error";
 		
 	m_strThreadName = pstrThreadName;
-	m_pMsgReceiver = new CLMessageReceiverFromSTLqueue;
+	m_pMsgReceiver = new CLMessageReceiver(new CLDataReceiverBySTLqueue, new CLPointerToMsgDeserializer);
 	m_pEvent = new CLEvent(true);
 }
 
@@ -31,7 +32,7 @@ CLStatus CLMsgLoopManagerForSTLqueue::Initialize()
 			throw CLStatus(-1, 0);
 		}
 
-		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), new CLThreadCommunicationBySTLqueue(m_pMsgReceiver, m_pEvent));
+		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), new CLExecutiveCommunication(new CLDataPosterBySTLqueue(), 0, m_pEvent, new CLMsgToPointerSerializer, false));
 		if(!s.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::Initialize(), pNameServer->Register error", 0);
@@ -61,17 +62,14 @@ CLStatus CLMsgLoopManagerForSTLqueue::Uninitialize()
 	return pNameServer->ReleaseCommunicationPtr(m_strThreadName.c_str());
 }
 	
-CLMessage* CLMsgLoopManagerForSTLqueue::WaitForMessage()
+CLStatus CLMsgLoopManagerForSTLqueue::WaitForMessage()
 {
 	CLStatus s = m_pEvent->Wait();
 	if(!s.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::WaitForMessage(), m_Event.Wait error", 0);
-		return 0;
+		return CLStatus(-1, 0);
 	}
 
-	CLMessage *pMsg = NULL;
-	m_pMsgReceiver->GetMessage(&pMsg);
-	
-	return pMsg;
+	return m_pMsgReceiver->GetMessage(m_MessageContainer);
 }

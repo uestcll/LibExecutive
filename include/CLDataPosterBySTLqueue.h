@@ -5,7 +5,6 @@
 
 class CLDataReceiverBySTLqueue;
 
-//not implement..................
 class CLDataPosterBySTLqueue : public CLDataPoster
 {
 public:
