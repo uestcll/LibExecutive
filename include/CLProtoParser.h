@@ -3,6 +3,12 @@
 
 class CLMessage;
 
+typedef struct SLBufferForDeserializer
+{
+	long lMsgID;
+	/* data */
+}SLBufferForDeserializer;
+
 class CLProtoParser
 {
 public:
