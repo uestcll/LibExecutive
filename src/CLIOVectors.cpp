@@ -17,7 +17,7 @@ CLIOVectors::~CLIOVectors()
 	if(m_bDestroyIOVecs)
 	{
 		for(int i = 0; i < m_IOVectors.size(); i++)
-			delete [] m_IOVectors[i].iov_base;
+			delete [] ((char *)m_IOVectors[i].iov_base);
 	}
 }
 

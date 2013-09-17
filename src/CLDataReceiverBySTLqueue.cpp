@@ -1,11 +1,18 @@
 #include "CLDataReceiverBySTLqueue.h"
+#include "CLIOVectors.h"
+#include "CLSTLqueue.h"
 #include "CLLogger.h"
-#include "CLCriticalSection.h"
 
 using namespace std;
 
-CLDataReceiverBySTLqueue::CLDataReceiverBySTLqueue()
+#define READ_BUFFER_LEN_FOR_STL_QUEUE 4096
+
+CLDataReceiverBySTLqueue::CLDataReceiverBySTLqueue(CLSTLqueue *pSTLqueue)
 {
+	if(pSTLqueue == 0)
+		throw "In CLDataReceiverBySTLqueue::CLDataReceiverBySTLqueue(), pSTLqueue == 0";
+
+	m_pSTLqueue = pSTLqueue;
 }
 
 CLDataReceiverBySTLqueue::~CLDataReceiverBySTLqueue()
@@ -14,52 +21,42 @@ CLDataReceiverBySTLqueue::~CLDataReceiverBySTLqueue()
 
 CLStatus CLDataReceiverBySTLqueue::GetData(CLIOVectors *pIOVectors, void **ppContext)
 {
+	char *p = new char[READ_BUFFER_LEN_FOR_STL_QUEUE];
+
 	try
 	{
-		CLCriticalSection cs(&m_Mutex);
-
 		*ppContext = 0;
-
-		if(m_DataQueue.empty())
+		
+		CLIOVectors iovectors;
+		CLStatus s1 = iovectors.PushBack(p, READ_BUFFER_LEN_FOR_STL_QUEUE);
+		if(!s1.IsSuccess())
 		{
-			CLLogger::WriteLogMsg("In CLDataReceiverBySTLqueue::GetData(), m_DataQueue.empty error", 0);
-			return CLStatus(-1, RECEIVED_ZERO_BYTE);
+			CLLogger::WriteLogMsg("In CLDataReceiverBySTLqueue::GetData(), iovectors.PushBack error", 0);
+			throw CLStatus(-1, RECEIVED_ERROR);
 		}
 
-		unsigned long *p = new unsigned long[1];
-		*p = m_DataQueue.front();
-		m_DataQueue.pop();
+		CLStatus s2 = m_pSTLqueue->PopData(iovectors, 0, READ_BUFFER_LEN_FOR_STL_QUEUE);
+		if(s2.m_clReturnCode == 0)
+			throw CLStatus(-1, RECEIVED_ZERO_BYTE);
 
-		CLStatus s = pIOVectors->PushBack(p, sizeof(unsigned long));
-		if(!s.IsSuccess())
+		if(!s2.IsSuccess())
 		{
-			delete [] p;
+			CLLogger::WriteLogMsg("In CLDataReceiverBySTLqueue::GetData(), m_pSTLqueue->PopData error", 0);
+			throw CLStatus(-1, RECEIVED_ERROR);
+		}
+
+		CLStatus s3 = pIOVectors->PushBack(p, s2.m_clReturnCode);
+		if(!s3.IsSuccess())
+		{
 			CLLogger::WriteLogMsg("In CLDataReceiverBySTLqueue::GetData(), pIOVectors->PushBack error", 0);
-			return CLStatus(-1, RECEIVED_ERROR);
+			throw CLStatus(-1, RECEIVED_ERROR);
 		}
-
+		
 		return CLStatus(0, 0);
 	}
-	catch(const char* str)
+	catch(CLStatus& s)
 	{
-		CLLogger::WriteLogMsg("In CLDataReceiverBySTLqueue::GetData(), exception arise", 0);
-		return CLStatus(-1, RECEIVED_ERROR);
-	}
-}
-
-CLStatus CLDataReceiverBySTLqueue::PushData(unsigned long ulData)
-{
-	try
-	{
-		CLCriticalSection cs(&m_Mutex);
-
-		m_DataQueue.push(ulData);
-
-		return CLStatus(0, 0);
-	}
-	catch(const char* str)
-	{
-		CLLogger::WriteLogMsg("In CLDataReceiverBySTLqueue::PushData(), exception arise", 0);
-		return CLStatus(-1, 0);
+		delete [] p;
+		return s;
 	}
 }

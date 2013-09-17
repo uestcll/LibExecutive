@@ -12,8 +12,9 @@ public:
 	explicit CLIOVectors(bool bDestroyIOVecs);
 	virtual ~CLIOVectors();
 
-	CLStatus PushBack(char *pBuffer, size_t nBufferLength);
-	CLStatus PushFront(char *pBuffer, size_t nBufferLength);
+	//add features about deleting buffer which user specified
+	CLStatus PushBack(char *pBuffer, size_t nBufferLength/*, bool bDeleted*/);
+	CLStatus PushFront(char *pBuffer, size_t nBufferLength/*, bool bDeleted*/);
 
 	CLStatus PopBack(char **ppBuffer, size_t *pnBufferLength);
 	CLStatus PopFront(char **ppBuffer, size_t *pnBufferLength);

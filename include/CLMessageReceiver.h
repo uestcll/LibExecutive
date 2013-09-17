@@ -30,7 +30,6 @@ private:
 	CLMessageDeserializer *m_pMsgDeserializer;
 	CLDataReceiver *m_pDataReceiver;
 	CLProtocolDecapsulator *m_pProtocolDecapsulator;
-
 	CLIOVectors *m_pIOVecsForPartialData;
 };
 

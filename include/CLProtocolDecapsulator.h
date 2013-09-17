@@ -2,7 +2,6 @@
 #define CLProtocolDecapsulator_H
 
 #include <vector>
-
 #include "CLStatus.h"
 
 class CLIOVectors;
@@ -19,7 +18,7 @@ public:
 	explicit CLProtocolDecapsulator(CLProtocolDecapsulator *pProtocolDecapsulator);
 	virtual ~CLProtocolDecapsulator();
 
-	virtual CLStatus Decapsulate(CLIOVectors *pIOVectors, std::vector<SLMessageScopeInIOVectors>& vMsgsScope, SLMessageScopeInIOVectors *pPartialMsgScope, void *pContext) = 0;
+	virtual CLStatus Decapsulate(CLIOVectors& IOVectors, std::vector<CLIOVectors>& vSerializedMsgs, SLMessageScopeInIOVectors *pPartialMsgScope, void *pContext) = 0;
 
 private:
 	CLProtocolDecapsulator(const CLProtocolDecapsulator&);
