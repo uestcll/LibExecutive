@@ -5,6 +5,12 @@
 #include <sys/uio.h>
 #include "CLStatus.h"
 
+struct SLIOVectorItem
+{
+	struct iovec IOVector;
+	bool bDelete;
+};
+
 class CLIOVectors
 {
 public:
@@ -12,12 +18,15 @@ public:
 	explicit CLIOVectors(bool bDestroyIOVecs);
 	virtual ~CLIOVectors();
 
-	//add features about deleting buffer which user specified
-	CLStatus PushBack(char *pBuffer, size_t nBufferLength/*, bool bDeleted*/);
-	CLStatus PushFront(char *pBuffer, size_t nBufferLength/*, bool bDeleted*/);
+	CLStatus PushBack(char *pBuffer, size_t nBufferLength, bool bDeleted = false);
+	CLStatus PushFront(char *pBuffer, size_t nBufferLength, bool bDeleted = false);
 
 	CLStatus PopBack(char **ppBuffer, size_t *pnBufferLength);
 	CLStatus PopFront(char **ppBuffer, size_t *pnBufferLength);
+
+	CLStatus WriteLong(unsigned int Index, long ulong);
+	CLStatus WriteInt(unsigned int Index, int uint);
+	CLStatus WriteShort(unsigned int Index, short ushort);
 
 	char& operator [](int index);
 	const char& operator [](int index) const;
@@ -28,13 +37,14 @@ public:
 
 private:
 	char& GetData(int index) const;
+	bool IsRangeInAIOVector(unsigned int Index, unsigned int Length, char **ppAddrForIndex) const;
 
 private:
 	CLIOVectors(const CLIOVectors&);
 	CLIOVectors& operator=(const CLIOVectors&);
 
 private:
-	std::deque<struct iovec> m_IOVectors;
+	std::deque<SLIOVectorItem> m_IOVectors;
 	size_t m_nDataLength;
 
 	bool m_bDestroyIOVecs;

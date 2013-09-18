@@ -17,36 +17,41 @@ CLIOVectors::~CLIOVectors()
 	if(m_bDestroyIOVecs)
 	{
 		for(int i = 0; i < m_IOVectors.size(); i++)
-			delete [] ((char *)m_IOVectors[i].iov_base);
+		{
+			if(m_IOVectors[i].bDelete)
+				delete [] ((char *)m_IOVectors[i].IOVector.iov_base);
+		}
 	}
 }
 
-CLStatus CLIOVectors::PushBack(char *pBuffer, size_t nBufferLength)
+CLStatus CLIOVectors::PushBack(char *pBuffer, size_t nBufferLength, bool bDeleted)
 {
 	if((pBuffer == 0) || (nBufferLength == 0))
 		return CLStatus(-1, 0);
 
-	struct iovec io;
-	io.iov_base = pBuffer;
-	io.iov_len = nBufferLength;
+	SLIOVectorItem item;
+	item.IOVector.iov_base = pBuffer;
+	item.IOVector.iov_len = nBufferLength;
+	item.bDelete = bDeleted;
 
-	m_IOVectors.push_back(io);
+	m_IOVectors.push_back(item);
 
 	m_nDataLength += nBufferLength;
 
 	return CLStatus(0, 0);
 }
 
-CLStatus CLIOVectors::PushFront(char *pBuffer, size_t nBufferLength)
+CLStatus CLIOVectors::PushFront(char *pBuffer, size_t nBufferLength, bool bDeleted)
 {
 	if((pBuffer == 0) || (nBufferLength == 0))
 		return CLStatus(-1, 0);
 
-	struct iovec io;
-	io.iov_base = pBuffer;
-	io.iov_len = nBufferLength;
+	SLIOVectorItem item;
+	item.IOVector.iov_base = pBuffer;
+	item.IOVector.iov_len = nBufferLength;
+	item.bDelete = bDeleted;
 
-	m_IOVectors.push_front(io);
+	m_IOVectors.push_front(item);
 
 	m_nDataLength += nBufferLength;
 
@@ -62,10 +67,10 @@ CLStatus CLIOVectors::PopBack(char **ppBuffer, size_t *pnBufferLength)
 		return CLStatus(-1, 0);
 	}
 
-	struct iovec& io = m_IOVectors.back();
-	*ppBuffer = (char *)io.iov_base;
-	*pnBufferLength = io.iov_len;
-
+	SLIOVectorItem item = m_IOVectors.back();
+	*ppBuffer = (char *)item.IOVector.iov_base;
+	*pnBufferLength = item.IOVector.iov_len;
+	
 	m_IOVectors.pop_back();
 
 	m_nDataLength -= *pnBufferLength;
@@ -82,9 +87,9 @@ CLStatus CLIOVectors::PopFront(char **ppBuffer, size_t *pnBufferLength)
 		return CLStatus(-1, 0);
 	}
 
-	struct iovec& io = m_IOVectors.front();
-	*ppBuffer = (char *)io.iov_base;
-	*pnBufferLength = io.iov_len;
+	SLIOVectorItem item = m_IOVectors.front();
+	*ppBuffer = (char *)item.IOVector.iov_base;
+	*pnBufferLength = item.IOVector.iov_len;
 
 	m_IOVectors.pop_front();
 
@@ -118,7 +123,7 @@ char& CLIOVectors::GetData(int index) const
 	int i;
 	for(i = 0; i < m_IOVectors.size(); i++)
 	{
-		position += m_IOVectors[i].iov_len;
+		position += m_IOVectors[i].IOVector.iov_len;
 		if(index < position)
 			break;
 	}
@@ -126,7 +131,7 @@ char& CLIOVectors::GetData(int index) const
 	if(i == m_IOVectors.size())
 		throw "In CLIOVectors::operator [], index is too large error";
 
-	return *((char *)m_IOVectors[i].iov_base + (index - (position - m_IOVectors[i].iov_len)));
+	return *((char *)m_IOVectors[i].IOVector.iov_base + (index - (position - m_IOVectors[i].IOVector.iov_len)));
 }
 
 size_t CLIOVectors::Size()
@@ -149,9 +154,78 @@ iovec *CLIOVectors::GetIOVecArray()
 
 	for(int i = 0; i < n; i++)
 	{
-		pArray[i].iov_base = m_IOVectors[i].iov_base;
-		pArray[i].iov_len = m_IOVectors[i].iov_len;
+		pArray[i].iov_base = m_IOVectors[i].IOVector.iov_base;
+		pArray[i].iov_len = m_IOVectors[i].IOVector.iov_len;
 	}
 
 	return pArray;
+}
+
+CLStatus CLIOVectors::WriteLong(unsigned int Index, long ulong)
+{
+	if(Index + sizeof(long) > Size())
+		return CLStatus(-1, 0);
+
+	char *p = (char *)(&ulong);
+
+	char *pAddrIndex = 0;
+	if(IsRangeInAIOVector(Index, sizeof(long), &pAddrIndex))
+	{
+
+	}
+	else
+	{
+		for(int i = 0; i < sizeof(long); i++)
+			(*this)[Index + i] = p[i];
+	}
+
+
+	
+
+	unsigned long p1 = (unsigned long)(&((*this)[Index + sizeof(unsigned long)]));
+	unsigned long p2 = (unsigned long)(&((*this)[Index]));
+
+	
+
+	if((p2 > p1) || ((p1 - p2) != sizeof(unsigned long)))
+	{
+		for(int i = 0; i < sizeof(long); i++)
+			(*this)[Index + i] = p[i];
+	}
+	else
+	{
+		unsigned long *p3 = (unsigned long *)p2;
+		*p3 = ulong;
+	}
+
+	return CLStatus(0, 0);
+}
+
+CLStatus CLIOVectors::WriteInt(unsigned int Index, int uint)
+{
+
+}
+
+CLStatus CLIOVectors::WriteShort(unsigned int Index, short ushort)
+{
+
+}
+
+bool CLIOVectors::IsRangeInAIOVector(unsigned int Index, unsigned int Length, char **ppAddrForIndex) const
+{
+	int position = 0;
+	int i;
+	for(i = 0; i < m_IOVectors.size(); i++)
+	{
+		position += m_IOVectors[i].IOVector.iov_len;
+		if(Index < position)
+			break;
+	}
+
+	*ppAddrForIndex = (char *)m_IOVectors[i].IOVector.iov_base + (Index - (position - m_IOVectors[i].IOVector.iov_len));
+
+	if(Index + Length > position)
+		return false;
+	else
+		return true;
 }
