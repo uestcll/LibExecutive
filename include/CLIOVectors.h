@@ -24,9 +24,11 @@ public:
 	CLStatus PopBack(char **ppBuffer, size_t *pnBufferLength);
 	CLStatus PopFront(char **ppBuffer, size_t *pnBufferLength);
 
-	CLStatus WriteLong(unsigned int Index, long ulong);
-	CLStatus WriteInt(unsigned int Index, int uint);
-	CLStatus WriteShort(unsigned int Index, short ushort);
+	CLStatus WriteLong(unsigned int Index, long data);
+	CLStatus WriteInt(unsigned int Index, int data);
+	CLStatus WriteShort(unsigned int Index, short data);
+
+	CLStatus PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned int Index, unsigned int Length);
 
 	char& operator [](int index);
 	const char& operator [](int index) const;
@@ -37,7 +39,10 @@ public:
 
 private:
 	char& GetData(int index) const;
-	bool IsRangeInAIOVector(unsigned int Index, unsigned int Length, char **ppAddrForIndex) const;
+	bool IsRangeInAIOVector(unsigned int Index, unsigned int Length, char **ppAddrForIndex, unsigned int *pIOV_Index = 0) const;
+
+	template<typename BasicType>
+	CLStatus WriteBasicTypeDataToIOVectors(unsigned int Index, BasicType data);
 
 private:
 	CLIOVectors(const CLIOVectors&);

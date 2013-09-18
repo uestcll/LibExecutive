@@ -34,13 +34,17 @@ CLStatus CLSTLqueue::PopData(CLIOVectors& IOVectors, unsigned int index, unsigne
 		{
 			unsigned long data = PopOneData();
 
-			//CLIOVectors should do some optimization about write short/int/long to IOVectors or read from
-			char *pdata = (char *)(&data);
-			for(int j = 0; j < sizeof(unsigned long); j++)
-				IOVectors[index + i * sizeof(unsigned long) + j] = pdata[j];
+			int temp_index = index + sizeof(unsigned long) * i;
+
+			CLStatus s = IOVectors.WriteLong(temp_index, data);
+			if(!s.IsSuccess())
+			{
+				CLLogger::WriteLogMsg("In CLSTLqueue::PopData(), IOVectors.WriteLong error", 0);
+				return CLStatus(-1, 0);
+			}
 
 			if(m_DataQueue.empty())
-				return CLStatus((i + 1) * sizeof(unsigned long), 0);
+				return CLStatus(temp_index + sizeof(unsigned long) - index, 0);
 		}
 
 		return CLStatus(length, 0);

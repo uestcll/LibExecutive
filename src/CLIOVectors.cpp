@@ -119,19 +119,10 @@ char& CLIOVectors::GetData(int index) const
 	if(index < 0)
 		throw "In CLIOVectors::operator [], index < 0 error";
 
-	int position = 0;
-	int i;
-	for(i = 0; i < m_IOVectors.size(); i++)
-	{
-		position += m_IOVectors[i].IOVector.iov_len;
-		if(index < position)
-			break;
-	}
+	char *pAddrIndex = 0;
+	IsRangeInAIOVector(index, 1, &pAddrIndex);
 
-	if(i == m_IOVectors.size())
-		throw "In CLIOVectors::operator [], index is too large error";
-
-	return *((char *)m_IOVectors[i].IOVector.iov_base + (index - (position - m_IOVectors[i].IOVector.iov_len)));
+	return *pAddrIndex;
 }
 
 size_t CLIOVectors::Size()
@@ -161,57 +152,22 @@ iovec *CLIOVectors::GetIOVecArray()
 	return pArray;
 }
 
-CLStatus CLIOVectors::WriteLong(unsigned int Index, long ulong)
+CLStatus CLIOVectors::WriteLong(unsigned int Index, long data)
 {
-	if(Index + sizeof(long) > Size())
-		return CLStatus(-1, 0);
-
-	char *p = (char *)(&ulong);
-
-	char *pAddrIndex = 0;
-	if(IsRangeInAIOVector(Index, sizeof(long), &pAddrIndex))
-	{
-
-	}
-	else
-	{
-		for(int i = 0; i < sizeof(long); i++)
-			(*this)[Index + i] = p[i];
-	}
-
-
-	
-
-	unsigned long p1 = (unsigned long)(&((*this)[Index + sizeof(unsigned long)]));
-	unsigned long p2 = (unsigned long)(&((*this)[Index]));
-
-	
-
-	if((p2 > p1) || ((p1 - p2) != sizeof(unsigned long)))
-	{
-		for(int i = 0; i < sizeof(long); i++)
-			(*this)[Index + i] = p[i];
-	}
-	else
-	{
-		unsigned long *p3 = (unsigned long *)p2;
-		*p3 = ulong;
-	}
-
-	return CLStatus(0, 0);
+	return WriteBasicTypeDataToIOVectors<long>(Index, data);
 }
 
-CLStatus CLIOVectors::WriteInt(unsigned int Index, int uint)
+CLStatus CLIOVectors::WriteInt(unsigned int Index, int data)
 {
-
+	return WriteBasicTypeDataToIOVectors<int>(Index, data);
 }
 
-CLStatus CLIOVectors::WriteShort(unsigned int Index, short ushort)
+CLStatus CLIOVectors::WriteShort(unsigned int Index, short data)
 {
-
+	return WriteBasicTypeDataToIOVectors<short>(Index, data);
 }
 
-bool CLIOVectors::IsRangeInAIOVector(unsigned int Index, unsigned int Length, char **ppAddrForIndex) const
+bool CLIOVectors::IsRangeInAIOVector(unsigned int Index, unsigned int Length, char **ppAddrForIndex, unsigned int *pIOV_Index) const
 {
 	int position = 0;
 	int i;
@@ -224,8 +180,68 @@ bool CLIOVectors::IsRangeInAIOVector(unsigned int Index, unsigned int Length, ch
 
 	*ppAddrForIndex = (char *)m_IOVectors[i].IOVector.iov_base + (Index - (position - m_IOVectors[i].IOVector.iov_len));
 
+	if(pIOV_Index != 0)
+		*pIOV_Index = i;
+
 	if(Index + Length > position)
 		return false;
 	else
 		return true;
+}
+
+template<typename BasicType>
+CLStatus CLIOVectors::WriteBasicTypeDataToIOVectors(unsigned int Index, BasicType data)
+{
+	if(Index + sizeof(BasicType) > m_nDataLength)
+		return CLStatus(-1, 0);
+
+	char *pAddrIndex = 0;
+	if(IsRangeInAIOVector(Index, sizeof(BasicType), &pAddrIndex))
+	{
+		*((BasicType *)(pAddrIndex)) = data;
+	}
+	else
+	{
+		char *p = (char *)(&data);
+
+		for(int i = 0; i < sizeof(BasicType); i++)
+			(*this)[Index + i] = p[i];
+	}
+
+	return CLStatus(0, 0);
+}
+
+CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned int Index, unsigned int Length)
+{
+	if((Index + Length) > m_nDataLength)
+		return CLStatus(-1, 0);
+
+	char *pAddrIndex = 0;
+	unsigned int iov_index = 0;
+	if(IsRangeInAIOVector(Index, Length, &pAddrIndex, &iov_index))
+		return IOVectors.PushBack(pAddrIndex, Length, false);
+
+	unsigned long offset = pAddrIndex - (char *)(m_IOVectors[iov_index].IOVector.iov_base);
+	unsigned long leftroom = m_IOVectors[iov_index].IOVector.iov_len - offset;
+	CLStatus s1 = IOVectors.PushBack(pAddrIndex, leftroom, false);
+	if(!s1.IsSuccess())
+		return s1;
+
+	Length = Length - leftroom;
+
+	for(int i = 0; Length != 0; i++)
+	{
+		int room = m_IOVectors[iov_index + i].IOVector.iov_len;
+
+		if(Length <= room)
+			return IOVectors.PushBack((char *)(m_IOVectors[iov_index + i].IOVector.iov_base), Length, false);
+
+		CLStatus s = IOVectors.PushBack((char *)(m_IOVectors[iov_index + i].IOVector.iov_base), room, false);
+		if(!s.IsSuccess())
+			return s;
+
+		Length = Length - room;
+	}
+
+	return CLStatus(-1, 0);
 }
