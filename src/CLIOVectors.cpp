@@ -1,4 +1,5 @@
 #include "CLIOVectors.h"
+#include "ErrorCode.h"
 
 CLIOVectors::CLIOVectors()
 {
@@ -27,7 +28,7 @@ CLIOVectors::~CLIOVectors()
 CLStatus CLIOVectors::PushBack(char *pBuffer, size_t nBufferLength, bool bDeleted)
 {
 	if((pBuffer == 0) || (nBufferLength == 0))
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 
 	SLIOVectorItem item;
 	item.IOVector.iov_base = pBuffer;
@@ -44,7 +45,7 @@ CLStatus CLIOVectors::PushBack(char *pBuffer, size_t nBufferLength, bool bDelete
 CLStatus CLIOVectors::PushFront(char *pBuffer, size_t nBufferLength, bool bDeleted)
 {
 	if((pBuffer == 0) || (nBufferLength == 0))
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 
 	SLIOVectorItem item;
 	item.IOVector.iov_base = pBuffer;
@@ -64,7 +65,7 @@ CLStatus CLIOVectors::PopBack(char **ppBuffer, size_t *pnBufferLength)
 	{
 		*ppBuffer = 0;
 		*pnBufferLength = 0;
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	SLIOVectorItem item = m_IOVectors.back();
@@ -84,7 +85,7 @@ CLStatus CLIOVectors::PopFront(char **ppBuffer, size_t *pnBufferLength)
 	{
 		*ppBuffer = 0;
 		*pnBufferLength = 0;
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	SLIOVectorItem item = m_IOVectors.front();
@@ -193,7 +194,7 @@ template<typename BasicType>
 CLStatus CLIOVectors::WriteBasicTypeDataToIOVectors(unsigned int Index, BasicType data)
 {
 	if(Index + sizeof(BasicType) > m_nDataLength)
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 
 	char *pAddrIndex = 0;
 	if(IsRangeInAIOVector(Index, sizeof(BasicType), &pAddrIndex))
@@ -206,6 +207,43 @@ CLStatus CLIOVectors::WriteBasicTypeDataToIOVectors(unsigned int Index, BasicTyp
 
 		for(int i = 0; i < sizeof(BasicType); i++)
 			(*this)[Index + i] = p[i];
+	}
+
+	return CLStatus(0, 0);
+}
+
+CLStatus CLIOVectors::ReadLong(unsigned int Index, long& data)
+{
+	return ReadBasicTypeDataFromIOVectors<long>(Index, data);
+}
+
+CLStatus CLIOVectors::ReadInt(unsigned int Index, int& data)
+{
+	return ReadBasicTypeDataFromIOVectors<int>(Index, data);
+}
+
+CLStatus CLIOVectors::ReadShort(unsigned int Index, short& data)
+{
+	return ReadBasicTypeDataFromIOVectors<short>(Index, data);
+}
+
+template<typename BasicType>
+CLStatus CLIOVectors::ReadBasicTypeDataFromIOVectors(unsigned int Index, BasicType& data)
+{
+	if(Index + sizeof(BasicType) > m_nDataLength)
+		return CLStatus(-1, NORMAL_ERROR);
+
+	char *pAddrIndex = 0;
+	if(IsRangeInAIOVector(Index, sizeof(BasicType), &pAddrIndex))
+	{
+		data = *((BasicType *)(pAddrIndex));
+	}
+	else
+	{
+		char *p = (char *)(&data);
+
+		for(int i = 0; i < sizeof(BasicType); i++)
+			p[i] = (*this)[Index + i];
 	}
 
 	return CLStatus(0, 0);
@@ -243,5 +281,5 @@ CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned 
 		Length = Length - room;
 	}
 
-	return CLStatus(-1, 0);
+	return CLStatus(-1, NORMAL_ERROR);
 }

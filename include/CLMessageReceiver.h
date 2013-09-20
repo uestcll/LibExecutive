@@ -2,6 +2,7 @@
 #define CLMessageReceiver_H
 
 #include <queue>
+#include <vector>
 #include "CLStatus.h"
 
 class CLMessage;
@@ -20,7 +21,7 @@ public:
 	CLStatus GetMessage(std::queue<CLMessage*>& qMsgContainer);
 
 private:
-	CLStatus DeserializeMsg(CLIOVectors *pIOVecs, unsigned int Index, unsigned int Length, std::queue<CLMessage*>& qMsgContainer);
+	CLStatus Decapsulate(std::vector<CLIOVectors *>& vSerializedMsgs, void *pContext);
 
 private:
 	CLMessageReceiver(const CLMessageReceiver&);

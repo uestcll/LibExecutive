@@ -1,11 +1,10 @@
 #include "CLDataReceiverBySTLqueue.h"
 #include "CLIOVectors.h"
 #include "CLSTLqueue.h"
+#include "ErrorCode.h"
 #include "CLLogger.h"
 
 using namespace std;
-
-#define READ_BUFFER_LEN_FOR_STL_QUEUE 4096
 
 CLDataReceiverBySTLqueue::CLDataReceiverBySTLqueue(CLSTLqueue *pSTLqueue)
 {
@@ -36,7 +35,7 @@ CLStatus CLDataReceiverBySTLqueue::GetData(CLIOVectors *pIOVectors, void **ppCon
 		}
 
 		CLStatus s2 = m_pSTLqueue->PopData(iovectors, 0, READ_BUFFER_LEN_FOR_STL_QUEUE);
-		if(s2.m_clReturnCode == 0)
+		if((!s2.IsSuccess()) && (s2.m_lErrorCode == RECEIVED_ZERO_BYTE))
 			throw CLStatus(-1, RECEIVED_ZERO_BYTE);
 
 		if(!s2.IsSuccess())

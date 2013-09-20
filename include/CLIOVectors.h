@@ -28,6 +28,10 @@ public:
 	CLStatus WriteInt(unsigned int Index, int data);
 	CLStatus WriteShort(unsigned int Index, short data);
 
+	CLStatus ReadLong(unsigned int Index, long& data);
+	CLStatus ReadInt(unsigned int Index, int& data);
+	CLStatus ReadShort(unsigned int Index, short& data);
+
 	CLStatus PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned int Index, unsigned int Length);
 
 	char& operator [](int index);
@@ -43,6 +47,9 @@ private:
 
 	template<typename BasicType>
 	CLStatus WriteBasicTypeDataToIOVectors(unsigned int Index, BasicType data);
+
+	template<typename BasicType>
+	CLStatus ReadBasicTypeDataFromIOVectors(unsigned int Index, BasicType& data);
 
 private:
 	CLIOVectors(const CLIOVectors&);

@@ -18,7 +18,7 @@ public:
 	explicit CLProtocolDecapsulator(CLProtocolDecapsulator *pProtocolDecapsulator);
 	virtual ~CLProtocolDecapsulator();
 
-	virtual CLStatus Decapsulate(CLIOVectors& IOVectors, std::vector<CLIOVectors>& vSerializedMsgs, SLMessageScopeInIOVectors *pPartialMsgScope, void *pContext) = 0;
+	virtual CLStatus Decapsulate(CLIOVectors& IOVectors, std::vector<CLIOVectors *>& vSerializedMsgs, SLMessageScopeInIOVectors *pPartialMsgScope, void *pContext) = 0;
 
 private:
 	CLProtocolDecapsulator(const CLProtocolDecapsulator&);

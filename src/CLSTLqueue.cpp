@@ -2,6 +2,7 @@
 #include "CLLogger.h"
 #include "CLCriticalSection.h"
 #include "CLIOVectors.h"
+#include "ErrorCode.h"
 
 CLSTLqueue::CLSTLqueue()
 {
@@ -21,14 +22,14 @@ unsigned long CLSTLqueue::PopOneData()
 CLStatus CLSTLqueue::PopData(CLIOVectors& IOVectors, unsigned int index, unsigned int length)
 {
 	if((length % sizeof(unsigned long) != 0) || (length == 0))
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 
 	try
 	{
 		CLCriticalSection cs(&m_Mutex);
 
 		if(m_DataQueue.empty())
-			return CLStatus(0, 0);
+			return CLStatus(-1, RECEIVED_ZERO_BYTE);
 
 		for(int i = 0; i < length / sizeof(unsigned long); i++)
 		{
@@ -40,7 +41,7 @@ CLStatus CLSTLqueue::PopData(CLIOVectors& IOVectors, unsigned int index, unsigne
 			if(!s.IsSuccess())
 			{
 				CLLogger::WriteLogMsg("In CLSTLqueue::PopData(), IOVectors.WriteLong error", 0);
-				return CLStatus(-1, 0);
+				return CLStatus(-1, RECEIVED_ERROR);
 			}
 
 			if(m_DataQueue.empty())
@@ -52,7 +53,7 @@ CLStatus CLSTLqueue::PopData(CLIOVectors& IOVectors, unsigned int index, unsigne
 	catch(const char* str)
 	{
 		CLLogger::WriteLogMsg("In CLSTLqueue::PopData(), exception arise", 0);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 }
 
@@ -69,6 +70,6 @@ CLStatus CLSTLqueue::PushData(unsigned long ulData)
 	catch(const char* str)
 	{
 		CLLogger::WriteLogMsg("In CLSTLqueue::PushData(), exception arise", 0);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 }

@@ -5,10 +5,6 @@
 
 class CLIOVectors;
 
-#define RECEIVED_ZERO_BYTE 1
-#define RECEIVED_ERROR 2
-#define RECEIVED_PENDING 3
-
 class CLDataReceiver
 {
 public:

@@ -9,10 +9,10 @@ class CLIOVectors;
 class CLMessageDeserializer
 {
 public:
-	CLMessageDeserializer()
+	CLMessageDeserializer();
 	virtual ~CLMessageDeserializer();
 
-	virtual CLStatus Deserialize(CLIOVectors *pIOVectors, unsigned int Index, unsigned int Length, CLMessage **ppMsg) = 0;
+	virtual CLStatus Deserialize(CLIOVectors *pIOVectors, CLMessage **ppMsg) = 0;
 
 private:
 	CLMessageDeserializer(const CLMessageDeserializer&);
