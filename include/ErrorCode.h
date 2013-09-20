@@ -1,0 +1,16 @@
+#ifndef ErrorCode_H
+#define ErrorCode_H
+
+const int NORMAL_ERROR = 0;
+
+const int RECEIVED_ZERO_BYTE = 10;
+const int RECEIVED_ERROR = 11;
+const int RECEIVED_PENDING = 12;
+
+const int MSG_RECEIVED_ZERO = RECEIVED_ZERO_BYTE;
+const int MSG_RECEIVED_ERROR = RECEIVED_ERROR;
+const int MSG_RECEIVED_PENDING = RECEIVED_PENDING;
+
+const int READ_BUFFER_LEN_FOR_STL_QUEUE = 4096;
+
+#endif
