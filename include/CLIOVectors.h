@@ -1,13 +1,15 @@
 #ifndef CLIOVectors_H
 #define CLIOVectors_H
 
-#include <deque>
+#include <list>
 #include <sys/uio.h>
 #include "CLStatus.h"
 
 struct SLIOVectorItem
 {
 	struct iovec IOVector;
+	unsigned int ValidBeginIndex;
+	unsigned int ValidLength;
 	bool bDelete;
 };
 
@@ -39,11 +41,11 @@ public:
 
 	size_t Size();
 	int GetNumberOfIOVec();
-	iovec *GetIOVecArray();
+	iovec *GetIOVecArray(unsigned int &NumberOfValidIOVec);
 
 private:
 	char& GetData(int index) const;
-	bool IsRangeInAIOVector(unsigned int Index, unsigned int Length, char **ppAddrForIndex, unsigned int *pIOV_Index = 0) const;
+	bool IsRangeInAIOVector(unsigned int Index, unsigned int Length, char **ppAddrForIndex, std::list<SLIOVectorItem>::iterator *pIter = 0) const;
 
 	template<typename BasicType>
 	CLStatus WriteBasicTypeDataToIOVectors(unsigned int Index, BasicType data);
@@ -56,10 +58,9 @@ private:
 	CLIOVectors& operator=(const CLIOVectors&);
 
 private:
-	std::deque<SLIOVectorItem> m_IOVectors;
+	std::list<SLIOVectorItem> m_IOVectors;
 	size_t m_nDataLength;
-
-	bool m_bDestroyIOVecs;
+	size_t m_nValidDataLength;
 };
 
 #endif
