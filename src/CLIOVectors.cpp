@@ -6,7 +6,6 @@ using namespace std;
 CLIOVectors::CLIOVectors()
 {
 	m_nDataLength = 0;
-	m_nValidDataLength = 0;
 }
 
 CLIOVectors::~CLIOVectors()
@@ -28,13 +27,10 @@ CLStatus CLIOVectors::PushBack(char *pBuffer, size_t nBufferLength, bool bDelete
 	item.IOVector.iov_base = pBuffer;
 	item.IOVector.iov_len = nBufferLength;
 	item.bDelete = bDeleted;
-	item.ValidBeginIndex = 0;
-	item.ValidLength = nBufferLength;
 
 	m_IOVectors.push_back(item);
 
 	m_nDataLength += nBufferLength;
-	m_nValidDataLength += nBufferLength;
 
 	return CLStatus(0, 0);
 }
@@ -48,13 +44,10 @@ CLStatus CLIOVectors::PushFront(char *pBuffer, size_t nBufferLength, bool bDelet
 	item.IOVector.iov_base = pBuffer;
 	item.IOVector.iov_len = nBufferLength;
 	item.bDelete = bDeleted;
-	item.ValidBeginIndex = 0;
-	item.ValidLength = nBufferLength;
 
 	m_IOVectors.push_front(item);
 
 	m_nDataLength += nBufferLength;
-	m_nValidDataLength += nBufferLength;
 
 	return CLStatus(0, 0);
 }
@@ -75,7 +68,6 @@ CLStatus CLIOVectors::PopBack(char **ppBuffer, size_t *pnBufferLength)
 	m_IOVectors.pop_back();
 
 	m_nDataLength -= item.IOVector.iov_len;
-	m_nValidDataLength -= item.ValidLength;
 
 	return CLStatus(0, 0);
 }
@@ -96,7 +88,6 @@ CLStatus CLIOVectors::PopFront(char **ppBuffer, size_t *pnBufferLength)
 	m_IOVectors.pop_front();
 
 	m_nDataLength -= item.IOVector.iov_len;
-	m_nValidDataLength -= item.ValidLength;
 
 	return CLStatus(0, 0);
 }
@@ -116,8 +107,8 @@ char& CLIOVectors::GetData(int index) const
 	if(m_IOVectors.empty())
 		throw "In CLIOVectors::operator [], m_IOVectors is empty error";
 
-	if(index >= m_nValidDataLength)
-		throw "In CLIOVectors::operator [], index >= m_nValidDataLength error";
+	if(index >= m_nDataLength)
+		throw "In CLIOVectors::operator [], index >= m_nDataLength error";
 
 	if(index < 0)
 		throw "In CLIOVectors::operator [], index < 0 error";
@@ -130,7 +121,7 @@ char& CLIOVectors::GetData(int index) const
 
 size_t CLIOVectors::Size()
 {
-	return m_nValidDataLength;
+	return m_nDataLength;
 }
 
 int CLIOVectors::GetNumberOfIOVec()
@@ -138,26 +129,19 @@ int CLIOVectors::GetNumberOfIOVec()
 	return m_IOVectors.size();
 }
 
-iovec *CLIOVectors::GetIOVecArray(unsigned int &NumberOfValidIOVec)
+iovec *CLIOVectors::GetIOVecArray()
 {
-	NumberOfValidIOVec = 0;
-
-	if(m_IOVectors.empty() || m_nValidDataLength == 0)
+	if(m_IOVectors.empty() || m_nDataLength == 0)
 		return 0;
 
 	int n = m_IOVectors.size();
 	iovec *pArray = new iovec[n];
 
 	list<SLIOVectorItem>::iterator iter = m_IOVectors.begin();
-	for(; iter != m_IOVectors.end(); iter++)
+	for(int i = 0; iter != m_IOVectors.end(); iter++, i++)
 	{
-		if(iter->ValidLength != 0)
-		{
-			pArray[NumberOfValidIOVec].iov_base = (char *)iter->IOVector.iov_base + iter->ValidBeginIndex;
-			pArray[NumberOfValidIOVec].iov_len = iter->ValidLength;
-
-			NumberOfValidIOVec++;
-		}
+		pArray[i].iov_base = (char *)iter->IOVector.iov_base;
+		pArray[i].iov_len = iter->IOVector.iov_len;
 	}
 	
 	return pArray;
@@ -184,12 +168,12 @@ bool CLIOVectors::IsRangeInAIOVector(unsigned int Index, unsigned int Length, ch
 	list<SLIOVectorItem>::iterator iter = m_IOVectors.begin();
 	for(; iter != m_IOVectors.end(); iter++)
 	{
-		position += iter->ValidLength;
+		position += iter->IOVector.iov_len;
 		if(Index < position)
 			break;
 	}
 
-	*ppAddrForIndex = ((char *)iter->IOVector.iov_base + iter->ValidBeginIndex) + (Index - (position - iter->ValidLength));
+	*ppAddrForIndex = (char *)iter->IOVector.iov_base + (Index - (position - iter->IOVector.iov_len));
 
 	if(pIter != 0)
 		*pIter = iter;
@@ -203,7 +187,7 @@ bool CLIOVectors::IsRangeInAIOVector(unsigned int Index, unsigned int Length, ch
 template<typename BasicType>
 CLStatus CLIOVectors::WriteBasicTypeDataToIOVectors(unsigned int Index, BasicType data)
 {
-	if(Index + sizeof(BasicType) > m_nValidDataLength)
+	if(Index + sizeof(BasicType) > m_nDataLength)
 		return CLStatus(-1, NORMAL_ERROR);
 
 	char *pAddrIndex = 0;
@@ -223,30 +207,17 @@ CLStatus CLIOVectors::WriteBasicTypeDataToIOVectors(unsigned int Index, BasicTyp
 		for(int i = 0; i < sizeof(BasicType); i++)
 		{
 			unsigned long offset = (unsigned long)pAddrIndex - (unsigned long)(it->IOVector.iov_base);
-
-			if(offset >= it->ValidBeginIndex + it->ValidLength)
+			if(offset >= it->IOVector.iov_len)
 			{
 				it++;
+				pAddrIndex = (char *)it->IOVector.iov_base;
 			}
-			//........................
 
-
-			
-			if(offset < it->ValidBeginIndex + it->ValidLength)
-			{
-				*pAddrIndex = p[i];
-				pAddrIndex++;
-			}
-			else
-			{
-				it++;
-			}
+			*pAddrIndex = p[i];
+			pAddrIndex++;
 		}
 
-		
-
-		for(int i = 0; i < sizeof(BasicType); i++)
-			(*this)[Index + i] = p[i];
+		return CLStatus(0, 0);
 	}
 }
 
@@ -272,21 +243,38 @@ CLStatus CLIOVectors::ReadBasicTypeDataFromIOVectors(unsigned int Index, BasicTy
 		return CLStatus(-1, NORMAL_ERROR);
 
 	char *pAddrIndex = 0;
-	if(IsRangeInAIOVector(Index, sizeof(BasicType), &pAddrIndex))
+	list<SLIOVectorItem>::iterator it = m_IOVectors.end();
+	if(IsRangeInAIOVector(Index, sizeof(BasicType), &pAddrIndex, &it))
 	{
 		data = *((BasicType *)(pAddrIndex));
+		return CLStatus(0, 0);
 	}
 	else
 	{
+		if(it == m_IOVectors.end())
+			return CLStatus(-1, NORMAL_ERROR);
+
 		char *p = (char *)(&data);
 
 		for(int i = 0; i < sizeof(BasicType); i++)
-			p[i] = (*this)[Index + i];
-	}
+		{
+			unsigned long offset = (unsigned long)pAddrIndex - (unsigned long)(it->IOVector.iov_base);
+			if(offset >= it->IOVector.iov_len)
+			{
+				it++;
+				pAddrIndex = (char *)it->IOVector.iov_base;
+			}
 
-	return CLStatus(0, 0);
+			p[i] = *pAddrIndex;
+			pAddrIndex++;
+		}
+
+		return CLStatus(0, 0);
+	}
 }
 
+
+//...................
 CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned int Index, unsigned int Length)
 {
 	if((Index + Length) > m_nDataLength)

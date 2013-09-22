@@ -8,8 +8,6 @@
 struct SLIOVectorItem
 {
 	struct iovec IOVector;
-	unsigned int ValidBeginIndex;
-	unsigned int ValidLength;
 	bool bDelete;
 };
 
@@ -26,6 +24,9 @@ public:
 	CLStatus PopBack(char **ppBuffer, size_t *pnBufferLength);
 	CLStatus PopFront(char **ppBuffer, size_t *pnBufferLength);
 
+	char& operator [](int index);
+	const char& operator [](int index) const;
+
 	CLStatus WriteLong(unsigned int Index, long data);
 	CLStatus WriteInt(unsigned int Index, int data);
 	CLStatus WriteShort(unsigned int Index, short data);
@@ -36,12 +37,9 @@ public:
 
 	CLStatus PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned int Index, unsigned int Length);
 
-	char& operator [](int index);
-	const char& operator [](int index) const;
-
 	size_t Size();
 	int GetNumberOfIOVec();
-	iovec *GetIOVecArray(unsigned int &NumberOfValidIOVec);
+	iovec *GetIOVecArray();
 
 private:
 	char& GetData(int index) const;
@@ -60,7 +58,6 @@ private:
 private:
 	std::list<SLIOVectorItem> m_IOVectors;
 	size_t m_nDataLength;
-	size_t m_nValidDataLength;
 };
 
 #endif
