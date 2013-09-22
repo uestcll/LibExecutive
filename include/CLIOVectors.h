@@ -24,16 +24,8 @@ public:
 	CLStatus PopBack(char **ppBuffer, size_t *pnBufferLength);
 	CLStatus PopFront(char **ppBuffer, size_t *pnBufferLength);
 
-	char& operator [](int index);
-	const char& operator [](int index) const;
-
-	CLStatus WriteLong(unsigned int Index, long data);
-	CLStatus WriteInt(unsigned int Index, int data);
-	CLStatus WriteShort(unsigned int Index, short data);
-
-	CLStatus ReadLong(unsigned int Index, long& data);
-	CLStatus ReadInt(unsigned int Index, int& data);
-	CLStatus ReadShort(unsigned int Index, short& data);
+	CLStatus WriteBlock(unsigned int Index, char *pBuf, unsigned int Length);
+	CLStatus ReadBlock(unsigned int Index, char *pBuf, unsigned int Length);
 
 	CLStatus PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned int Index, unsigned int Length);
 
@@ -42,14 +34,8 @@ public:
 	iovec *GetIOVecArray();
 
 private:
-	char& GetData(int index) const;
-	bool IsRangeInAIOVector(unsigned int Index, unsigned int Length, char **ppAddrForIndex, std::list<SLIOVectorItem>::iterator *pIter = 0) const;
-
-	template<typename BasicType>
-	CLStatus WriteBasicTypeDataToIOVectors(unsigned int Index, BasicType data);
-
-	template<typename BasicType>
-	CLStatus ReadBasicTypeDataFromIOVectors(unsigned int Index, BasicType& data);
+	bool IsRangeInAIOVector(unsigned int Index, unsigned int Length, char **ppAddrForIndex, std::list<SLIOVectorItem>::iterator *pIter = 0);
+	CLStatus TransferBlock(bool bWriteIntoIOVectors, unsigned int Index, char *pBuf, unsigned int Length);
 
 private:
 	CLIOVectors(const CLIOVectors&);
