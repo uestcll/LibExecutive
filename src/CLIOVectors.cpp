@@ -1,6 +1,7 @@
 #include <memory.h>
 #include "CLIOVectors.h"
 #include "ErrorCode.h"
+#include "CLIteratorForIOVectors.h"
 
 using namespace std;
 
@@ -93,14 +94,47 @@ CLStatus CLIOVectors::PopFront(char **ppBuffer, size_t *pnBufferLength)
 	return CLStatus(0, 0);
 }
 
+CLStatus CLIOVectors::GetIterator(unsigned int Index, CLIteratorForIOVectors& Iter)
+{
+	if(Index >= m_nDataLength)
+		return CLStatus(-1, 0);
+
+	GetIndexPosition(Index, &(Iter.m_pData), &(Iter.m_Iter));
+	Iter.m_Index = Index;
+
+	return CLStatus(0, 0);
+}
+
+CLStatus CLIOVectors::WriteBlock(CLIteratorForIOVectors& Iter, char *pBuf, unsigned Length)
+{
+	if((Iter.m_pData == 0) || (Iter.m_Iter == m_IOVectors.end()))
+		return CLStatus(-1, NORMAL_ERROR);
+
+	char *pEndData = 0;
+	CLStatus s = TransferBlock(true, Iter.m_pData, Iter.m_Iter, pBuf, Length, &pEndData);
+	if(s.IsSuccess())
+	{
+		Iter.m_pData = pEndData;
+		return CLStatus(0, 0);
+	}
+	else
+		return CLStatus(-1, NORMAL_ERROR);
+}
+
+CLStatus CLIOVectors::ReadBlock(CLIteratorForIOVectors& Iter, char *pBuf, unsigned Length)
+{
+	//parameter valid???
+	//........................
+}
+
 CLStatus CLIOVectors::WriteBlock(unsigned int Index, char *pBuf, unsigned int Length)
 {
-	return TransferBlock(true, Index, pBuf, Length);
+	return TransferBlockByIndex(true, Index, pBuf, Length);
 }
 
 CLStatus CLIOVectors::ReadBlock(unsigned int Index, char *pBuf, unsigned int Length)
 {
-	return TransferBlock(false, Index, pBuf, Length);
+	return TransferBlockByIndex(false, Index, pBuf, Length);
 }
 
 CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned int Index, unsigned int Length)
@@ -138,6 +172,17 @@ CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned 
 	return CLStatus(-1, NORMAL_ERROR);
 }
 
+CLStatus CLIOVectors::PushBackIOVector(CLIOVectors& IOVectors)
+{
+	list<SLIOVectorItem>::iterator it = IOVectors.m_IOVectors.begin();
+	for(; it != IOVectors.m_IOVectors.end(); it++)
+	{
+		m_IOVectors.push_back(*it);
+	}
+
+	return CLStatus(0, 0);
+}
+
 size_t CLIOVectors::Size()
 {
 	return m_nDataLength;
@@ -166,7 +211,18 @@ iovec *CLIOVectors::GetIOVecArray()
 	return pArray;
 }
 
-bool CLIOVectors::IsRangeInAIOVector(unsigned int Index, unsigned int Length, char **ppAddrForIndex, std::list<SLIOVectorItem>::iterator *pIter)
+bool CLIOVectors::IsRangeInAIOVector(char *pAddr, unsigned int Length, std::list<SLIOVectorItem>::iterator& CurrentIter)
+{
+	unsigned long offset = (unsigned long)pAddr - (unsigned long)(CurrentIter->IOVector.iov_base);
+	unsigned long leftroom = it->IOVector.iov_len - offset;
+	
+	if(Length <= leftroom)
+		return true;
+	else
+		return false;
+}
+
+void CLIOVectors::GetIndexPosition(unsigned int Index, char **ppAddrForIndex, std::list<SLIOVectorItem>::iterator *pIter)
 {
 	int position = 0;
 	list<SLIOVectorItem>::iterator iter = m_IOVectors.begin();
@@ -179,65 +235,94 @@ bool CLIOVectors::IsRangeInAIOVector(unsigned int Index, unsigned int Length, ch
 
 	*ppAddrForIndex = (char *)iter->IOVector.iov_base + (Index - (position - iter->IOVector.iov_len));
 
-	if(pIter != 0)
-		*pIter = iter;
-
-	if(Index + Length > position)
-		return false;
-	else
-		return true;
+	*pIter = iter;
 }
 
-CLStatus CLIOVectors::TransferBlock(bool bWriteIntoIOVectors, unsigned int Index, char *pBuf, unsigned int Length)
+CLStatus CLIOVectors::TransferBlock(bool bWriteIntoIOVectors, char *pAddrInIOVector, std::list<SLIOVectorItem>::iterator& CurrentIter, char *pBuf, unsigned int Length, char **ppEndAddrInIOVector)
 {
-	if(Index + Length > m_nDataLength)
-		return CLStatus(-1, NORMAL_ERROR);
-
-	char *pAddrIndex = 0;
-	list<SLIOVectorItem>::iterator it;
-	if(IsRangeInAIOVector(Index, Length, &pAddrIndex, &it))
+	if(IsRangeInAIOVector(pAddrInIOVector, Length, CurrentIter))
 	{
 		if(bWriteIntoIOVectors)
-			memcpy(pAddrIndex, pBuf, Length);
+			memcpy(pAddrInIOVector, pBuf, Length);
 		else
-			memcpy(pBuf, pAddrIndex, Length);
+			memcpy(pBuf, pAddrInIOVector, Length);
+
+		if(ppEndAddrInIOVector != 0)
+		{
+			if((pAddrInIOVector + Length - (char *)(CurrentIter->IOVector.iov_base)) == CurrentIter->IOVector.iov_len)
+			{
+				CurrentIter++;
+				if(CurrentIter != m_IOVectors.end())
+					*ppEndAddrInIOVector = (char *)(CurrentIter->IOVector.iov_base);
+				else
+					*ppEndAddrInIOVector = 0;
+			}
+			else
+				*ppEndAddrInIOVector = pAddrInIOVector + Length;
+		}
 
 		return CLStatus(0, 0);
 	}
 
-	unsigned long offset = (unsigned long)pAddrIndex - (unsigned long)(it->IOVector.iov_base);
-	unsigned long leftroom = it->IOVector.iov_len - offset;
+	unsigned long offset = (unsigned long)pAddrInIOVector - (unsigned long)(CurrentIter->IOVector.iov_base);
+	unsigned long leftroom = CurrentIter->IOVector.iov_len - offset;
 
 	if(bWriteIntoIOVectors)
-		memcpy(pAddrIndex, pBuf, leftroom);
+		memcpy(pAddrInIOVector, pBuf, leftroom);
 	else
-		memcpy(pBuf, pAddrIndex, leftroom);
+		memcpy(pBuf, pAddrInIOVector, leftroom);
 
 	Length = Length - leftroom;
 	pBuf = pBuf + leftroom;
 
 	for(int i = 0; Length != 0; i++)
 	{
-		it++;
-		int room = it->IOVector.iov_len;
+		CurrentIter++;
+		int room = CurrentIter->IOVector.iov_len;
 		if(Length <= room)
 		{
 			if(bWriteIntoIOVectors)
-				memcpy((char *)it->IOVector.iov_base, pBuf, Length);
+				memcpy((char *)CurrentIter->IOVector.iov_base, pBuf, Length);
 			else
-				memcpy(pBuf, (char *)it->IOVector.iov_base, Length);
+				memcpy(pBuf, (char *)CurrentIter->IOVector.iov_base, Length);
+
+			if(ppEndAddrInIOVector != 0)
+			{
+				if(Length == room)
+				{
+					CurrentIter++;
+					if(CurrentIter != m_IOVectors.end())
+						*ppEndAddrInIOVector = (char *)CurrentIter->IOVector.iov_base;
+					else
+						*ppEndAddrInIOVector = 0;
+				}
+				else
+					*ppEndAddrInIOVector = (char *)CurrentIter->IOVector.iov_base + Length;
+			}
 
 			return CLStatus(0, 0);
 		}
 
 		if(bWriteIntoIOVectors)
-			memcpy((char *)it->IOVector.iov_base, pBuf, room);
+			memcpy((char *)CurrentIter->IOVector.iov_base, pBuf, room);
 		else
-			memcpy(pBuf, (char *)it->IOVector.iov_base, room);
+			memcpy(pBuf, (char *)CurrentIter->IOVector.iov_base, room);
 
 		Length = Length - room;
 		pBuf = pBuf + room;
 	}
 
 	return CLStatus(-1, NORMAL_ERROR);
+}
+
+CLStatus CLIOVectors::TransferBlockByIndex(bool bWriteIntoIOVectors, unsigned int Index, char *pBuf, unsigned int Length)
+{
+	if(Index + Length > m_nDataLength)
+		return CLStatus(-1, NORMAL_ERROR);
+
+	char *pAddrInIOVecotr;
+	list<SLIOVectorItem>::iterator it;
+	GetIndexPosition(Index, &pAddrInIOVecotr, &it);
+
+	return TransferBlock(bWriteIntoIOVectors, pAddrInIOVecotr, it, pBuf, Length);
 }

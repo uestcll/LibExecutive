@@ -5,6 +5,8 @@
 #include <sys/uio.h>
 #include "CLStatus.h"
 
+class CLIteratorForIOVectors;
+
 struct SLIOVectorItem
 {
 	struct iovec IOVector;
@@ -13,6 +15,8 @@ struct SLIOVectorItem
 
 class CLIOVectors
 {
+	friend class CLIteratorForIOVectors;
+
 public:
 	CLIOVectors();
 	explicit CLIOVectors(bool bDestroyIOVecs);
@@ -24,18 +28,26 @@ public:
 	CLStatus PopBack(char **ppBuffer, size_t *pnBufferLength);
 	CLStatus PopFront(char **ppBuffer, size_t *pnBufferLength);
 
+	CLStatus GetIterator(unsigned int Index, CLIteratorForIOVectors& Iter);
+	CLStatus WriteBlock(CLIteratorForIOVectors& Iter, char *pBuf, unsigned Length);
+	CLStatus ReadBlock(CLIteratorForIOVectors& Iter, char *pBuf, unsigned Length);
+
 	CLStatus WriteBlock(unsigned int Index, char *pBuf, unsigned int Length);
 	CLStatus ReadBlock(unsigned int Index, char *pBuf, unsigned int Length);
 
 	CLStatus PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned int Index, unsigned int Length);
+
+	CLStatus PushBackIOVector(CLIOVectors& IOVectors);
 
 	size_t Size();
 	int GetNumberOfIOVec();
 	iovec *GetIOVecArray();
 
 private:
-	bool IsRangeInAIOVector(unsigned int Index, unsigned int Length, char **ppAddrForIndex, std::list<SLIOVectorItem>::iterator *pIter = 0);
-	CLStatus TransferBlock(bool bWriteIntoIOVectors, unsigned int Index, char *pBuf, unsigned int Length);
+	bool IsRangeInAIOVector(char *pAddr, unsigned int Length, std::list<SLIOVectorItem>::iterator& CurrentIter);
+	void GetIndexPosition(unsigned int Index, char **ppAddrForIndex, std::list<SLIOVectorItem>::iterator *pIter);
+	CLStatus TransferBlock(bool bWriteIntoIOVectors, char *pAddrInIOVector, std::list<SLIOVectorItem>::iterator& CurrentIter, char *pBuf, unsigned int Length, char **ppEndAddrInIOVector = 0);
+	CLStatus TransferBlockByIndex(bool bWriteIntoIOVectors, unsigned int Index, char *pBuf, unsigned int Length);
 
 private:
 	CLIOVectors(const CLIOVectors&);
