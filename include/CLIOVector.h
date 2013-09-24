@@ -1,12 +1,13 @@
 #ifndef CLIOVECTOR_H
 #define CLIOVECTOR_H
 
-#include <vector>
+#include <deque>
 #include <sys/uio.h>
 #include "CLLog.h"
 #include "CLStatus.h"
 
-//实现一个环形的缓冲区
+//实现一个逻辑连续的缓冲区
+//是否要引入引用计数
 class CLIOVector
 {
 public:
@@ -19,13 +20,16 @@ public:
 	CLStatus PopBack(char** pBuffer, int* bufLen);
 	CLStatus PopFront(char** pBuffer, int* bufLen);
 
-	int IOVecNum();
-	int Size();
+	char* GetBufPtr(int index);
+
+	int IOVecNum();//iovec item num
+	int Length();//all buffer Length
+
+	const char& operator[](const int &index);
 
 private:
-	char
-private:
-	std::vector<struct iovec> m_vecIOBuf;
+	int m_iDataLength;
+	std::deque<struct iovec> m_ioVecQueue;;
 };
 
 #endif

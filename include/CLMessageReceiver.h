@@ -4,6 +4,13 @@
 #include <queue>
 #include <CLMutex.h>
 
+typedef struct _serialized_msg
+{
+	unsigned long m_lMsgID;
+	CLIOVector m_MsgIOVec;
+}SLSerializedMsg;
+
+class CLIOVector;
 class CLMessage;
 class CLProtoParser;
 class CLDataReceiver;
@@ -29,6 +36,7 @@ protected:
 	CLDataReceiver *m_pDataReceiver;
 
 	std::queue<CLMessage*> m_MessageQueue;
+	CLIOVector *m_pIOBufVec;
 };
 
 #endif

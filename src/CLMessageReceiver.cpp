@@ -1,4 +1,9 @@
 #include "CLMessageReceiver.h"
+#include "CLStatus.h"
+#include "CLLogger.h"
+#include "CLIOVector.h"
+
+using namespace std;
 
 CLMessageReceiver::CLMessageReceiver(CLProtoParser *pProtoParser, CLDataReceiver *pDataReceiver)
 {
@@ -16,6 +21,7 @@ CLMessageReceiver::CLMessageReceiver(CLProtoParser *pProtoParser, CLDataReceiver
 		m_pProtoParser = pProtoParser;
 		m_pDataReceiver = pDataReceiver;
 		m_pMsgDeserializerManager = pMsgDeserializerManager;
+		m_pIOBufVec = new CLIOVector();
 	}
 	catch(const char* s)
 	{
@@ -72,6 +78,19 @@ CLMessageReceiver::~CLMessageReceiver()
 
 CLMessage* CLMessageReceiver::GetMessage()
 {
+	CLStatus s = m_pDataReceiver->GetDataIOVec(m_pIOBufVec);
+
+	if(!s.IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pDataReceiver->GetDataIOVec() error", 0);
+		return PopMessage();
+	}
+
+	vector<SLSerializedMsg> pSerializedMsgVec;//存储协议解析切割完成，反序列化之前的一个个的协议。
+	CLIOVector *pRestBufVec;
+
+	m_pProtoParser->Decapsulate(m_pIOBufVec, pSerializedMsgVec, &pRestBufVec);
+	
 	try
 	{
 		while(1)
@@ -103,4 +122,16 @@ CLMessage* CLMessageReceiver::GetMessage()
 		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), exception arise", 0);
 		return 0;
 	}
+}
+
+CLMessage* CLMessageReceiver::PopMessage()
+{
+	CLCriticalSection cs(&m_Mutex);
+
+	if(m_MessageQueue.empty())
+		return 0;
+
+	CLMessage *p = m_MessageQueue.front();
+	m_MessageQueue.pop();
+	return p;	
 }
