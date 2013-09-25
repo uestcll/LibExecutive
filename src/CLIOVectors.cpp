@@ -1,4 +1,5 @@
 #include <memory.h>
+#include <vector>
 #include "CLIOVectors.h"
 #include "ErrorCode.h"
 #include "CLIteratorForIOVectors.h"
@@ -131,8 +132,10 @@ CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned 
 		return CLStatus(-1, 0);
 
 	char *pAddrIndex = 0;
-	list<SLIOVectorItem>::iterator it = m_IOVectors.end();
-	if(IsRangeInAIOVector(Index, Length, &pAddrIndex, &it))
+	list<SLIOVectorItem>::iterator it;
+	GetIndexPosition(Index, &pAddrIndex, &it);
+
+	if(IsRangeInAIOVector(pAddrIndex, Length, it))
 		return IOVectors.PushBack(pAddrIndex, Length, false);
 
 	unsigned long offset = (unsigned long)pAddrIndex - (unsigned long)(it->IOVector.iov_base);
@@ -143,7 +146,7 @@ CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned 
 
 	Length = Length - leftroom;
 
-	for(int i = 0; Length != 0; i++)
+	while(true)
 	{
 		it++;
 		int room = it->IOVector.iov_len;
@@ -156,8 +159,6 @@ CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned 
 
 		Length = Length - room;
 	}
-
-	return CLStatus(-1, NORMAL_ERROR);
 }
 
 CLStatus CLIOVectors::PushBackIOVector(CLIOVectors& IOVectors)
@@ -168,6 +169,11 @@ CLStatus CLIOVectors::PushBackIOVector(CLIOVectors& IOVectors)
 		m_IOVectors.push_back(*it);
 	}
 
+	return CLStatus(0, 0);
+}
+
+CLStatus CLIOVectors::DifferenceBetweenIOVectors(CLIOVectors& Operand, CLIOVectors& Difference)
+{
 	return CLStatus(0, 0);
 }
 
@@ -202,7 +208,7 @@ iovec *CLIOVectors::GetIOVecArray()
 bool CLIOVectors::IsRangeInAIOVector(char *pAddr, unsigned int Length, std::list<SLIOVectorItem>::iterator& CurrentIter)
 {
 	unsigned long offset = (unsigned long)pAddr - (unsigned long)(CurrentIter->IOVector.iov_base);
-	unsigned long leftroom = it->IOVector.iov_len - offset;
+	unsigned long leftroom = CurrentIter->IOVector.iov_len - offset;
 	
 	if(Length <= leftroom)
 		return true;
@@ -265,7 +271,7 @@ CLStatus CLIOVectors::TransferBlock(bool bWriteIntoIOVectors, char *pAddrInIOVec
 	Length = Length - leftroom;
 	pBuf = pBuf + leftroom;
 
-	for(int i = 0; Length != 0; i++)
+	while(true)
 	{
 		CurrentIter++;
 		if(CurrentIter == m_IOVectors.end())
@@ -342,4 +348,20 @@ CLStatus CLIOVectors::TransferBlockByIterator(bool bWriteIntoIOVectors, CLIterat
 	}
 	else
 		return CLStatus(-1, NORMAL_ERROR);
+}
+
+bool CLIOVectors::IsTwoRangesOverlap(iovec& Range1, iovec& Range2, iovec& Overlap)
+{
+	unsigned long start1 = (unsigned long)Range1.iov_base;
+	unsigned long end1 = start1 + Range1.iov_len - 1;
+
+	unsigned long start2 = (unsigned long)Range2.iov_base;
+	unsigned long end2 = start2 + Range2.iov_len - 1;
+
+	if((end1 < start2) || (end2 < start1))
+		return false;
+
+	//............
+
+	return true;
 }

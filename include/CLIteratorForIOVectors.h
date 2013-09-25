@@ -4,8 +4,6 @@
 #include <list>
 #include "CLStatus.h"
 
-struct SLIOVectorItem;
-
 class CLIteratorForIOVectors
 {
 	friend class CLIOVectors;

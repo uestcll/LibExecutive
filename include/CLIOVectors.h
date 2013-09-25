@@ -27,7 +27,6 @@ public:
 	CLStatus PopBack(char **ppBuffer, size_t *pnBufferLength);
 	CLStatus PopFront(char **ppBuffer, size_t *pnBufferLength);
 
-	//read and write operation return -1 or number of bytes readed or writed
 	CLStatus GetIterator(unsigned int Index, CLIteratorForIOVectors& Iter);
 	CLStatus WriteBlock(CLIteratorForIOVectors& Iter, char *pBuf, unsigned Length);
 	CLStatus ReadBlock(CLIteratorForIOVectors& Iter, char *pBuf, unsigned Length);
@@ -39,16 +38,22 @@ public:
 
 	CLStatus PushBackIOVector(CLIOVectors& IOVectors);
 
+	CLStatus DifferenceBetweenIOVectors(CLIOVectors& Operand, CLIOVectors& Difference);
+
 	size_t Size();
 	int GetNumberOfIOVec();
 	iovec *GetIOVecArray();
 
 private:
 	bool IsRangeInAIOVector(char *pAddr, unsigned int Length, std::list<SLIOVectorItem>::iterator& CurrentIter);
+
 	void GetIndexPosition(unsigned int Index, char **ppAddrForIndex, std::list<SLIOVectorItem>::iterator *pIter);
+
 	CLStatus TransferBlock(bool bWriteIntoIOVectors, char *pAddrInIOVector, std::list<SLIOVectorItem>::iterator& CurrentIter, char *pBuf, unsigned int Length, char **ppEndAddrInIOVector = 0);
 	CLStatus TransferBlockByIndex(bool bWriteIntoIOVectors, unsigned int Index, char *pBuf, unsigned int Length);
 	CLStatus TransferBlockByIterator(bool bWriteIntoIOVectors, CLIteratorForIOVectors& Iter, char *pBuf, unsigned Length);
+
+	bool IsTwoRangesOverlap(iovec& Range1, iovec& Range2, iovec& Overlap);
 
 private:
 	CLIOVectors(const CLIOVectors&);
