@@ -19,7 +19,6 @@ class CLIOVectors
 
 public:
 	CLIOVectors();
-	explicit CLIOVectors(bool bDestroyIOVecs);
 	virtual ~CLIOVectors();
 
 	CLStatus PushBack(char *pBuffer, size_t nBufferLength, bool bDeleted = false);
@@ -28,6 +27,7 @@ public:
 	CLStatus PopBack(char **ppBuffer, size_t *pnBufferLength);
 	CLStatus PopFront(char **ppBuffer, size_t *pnBufferLength);
 
+	//read and write operation return -1 or number of bytes readed or writed
 	CLStatus GetIterator(unsigned int Index, CLIteratorForIOVectors& Iter);
 	CLStatus WriteBlock(CLIteratorForIOVectors& Iter, char *pBuf, unsigned Length);
 	CLStatus ReadBlock(CLIteratorForIOVectors& Iter, char *pBuf, unsigned Length);
@@ -48,6 +48,7 @@ private:
 	void GetIndexPosition(unsigned int Index, char **ppAddrForIndex, std::list<SLIOVectorItem>::iterator *pIter);
 	CLStatus TransferBlock(bool bWriteIntoIOVectors, char *pAddrInIOVector, std::list<SLIOVectorItem>::iterator& CurrentIter, char *pBuf, unsigned int Length, char **ppEndAddrInIOVector = 0);
 	CLStatus TransferBlockByIndex(bool bWriteIntoIOVectors, unsigned int Index, char *pBuf, unsigned int Length);
+	CLStatus TransferBlockByIterator(bool bWriteIntoIOVectors, CLIteratorForIOVectors& Iter, char *pBuf, unsigned Length);
 
 private:
 	CLIOVectors(const CLIOVectors&);
