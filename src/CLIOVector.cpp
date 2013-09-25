@@ -132,3 +132,20 @@ const char& CLIOVector::operator[](const int& index)
 	return buf[0];
 }
 
+CLStatus CLIOVector::FreeAll()
+{
+	if(m_ioVecQueue.empty())
+	{
+		return CLStatus(0, 0);
+	}
+
+	std::deque<struct iovec>::iterator it = m_ioVecQueue.begin();
+	for(; it != m_ioVecQueue.end(); it++)
+	{
+		delete [] it->iov_base;
+		it->iov_base = NULL;
+	}
+
+	return CLStatus(0, 0);
+
+}

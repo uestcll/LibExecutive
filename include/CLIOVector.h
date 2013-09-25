@@ -20,6 +20,8 @@ public:
 	CLStatus PopBack(char** pBuffer, int* bufLen);
 	CLStatus PopFront(char** pBuffer, int* bufLen);
 
+	CLStatus FreeAll();
+
 	char* GetBufPtr(int index);
 
 	int IOVecNum();//iovec item num
@@ -29,7 +31,7 @@ public:
 
 private:
 	int m_iDataLength;
-	std::deque<struct iovec> m_ioVecQueue;;
+	std::deque<struct iovec> m_ioVecQueue;
 };
 
 #endif
