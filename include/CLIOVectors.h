@@ -41,6 +41,8 @@ public:
 
 	CLStatus DifferenceBetweenIOVectors(CLIOVectors& Operand, CLIOVectors& Difference);
 
+	bool IsRangeOverlap(iovec& Range);
+
 	size_t Size();
 	int GetNumberOfIOVec();
 	iovec *GetIOVecArray();
@@ -54,8 +56,8 @@ private:
 	CLStatus TransferBlockByIndex(bool bWriteIntoIOVectors, unsigned int Index, char *pBuf, unsigned int Length);
 	CLStatus TransferBlockByIterator(bool bWriteIntoIOVectors, CLIteratorForIOVectors& Iter, char *pBuf, unsigned Length);
 
-	void DifferenceBetweenRanges(iovec& Range1, iovec& Range2, vector<iovec>& vResults);
-	void DifferenceBetweenRangeAndIOVector(iovec& Range, CLIOVectors& IOVector, vector<iovec>& vResult);
+	void DifferenceBetweenRanges(iovec& Range1, iovec& Range2, std::vector<iovec>& vResults);
+	void DifferenceBetweenRangeAndIOVector(iovec& Range, CLIOVectors& IOVector, std::vector<iovec>& vResult);
 
 private:
 	CLIOVectors(const CLIOVectors&);
