@@ -174,6 +174,19 @@ CLStatus CLIOVectors::PushBackIOVector(CLIOVectors& IOVectors)
 
 CLStatus CLIOVectors::DifferenceBetweenIOVectors(CLIOVectors& Operand, CLIOVectors& Difference)
 {
+	vector<iovec> vTmp;
+
+	list<SLIOVectorItem>::iterator iter = m_IOVectors.begin();
+	for(; iter != m_IOVectors.end(); iter++)
+	{
+		DifferenceBetweenRangeAndIOVector(iter->IOVector, Operand, vTmp);
+		
+		for(int i = 0; i < vTmp.size(); i++)
+			Difference.PushBack((char *)(vTmp[i].iov_base), vTmp[i].iov_len, false);
+
+		vTmp.clear();
+	}
+
 	return CLStatus(0, 0);
 }
 
@@ -350,18 +363,81 @@ CLStatus CLIOVectors::TransferBlockByIterator(bool bWriteIntoIOVectors, CLIterat
 		return CLStatus(-1, NORMAL_ERROR);
 }
 
-bool CLIOVectors::IsTwoRangesOverlap(iovec& Range1, iovec& Range2, iovec& Overlap)
+void CLIOVectors::DifferenceBetweenRanges(iovec& Range1, iovec& Range2, vector<iovec>& vResults)
 {
-	unsigned long start1 = (unsigned long)Range1.iov_base;
-	unsigned long end1 = start1 + Range1.iov_len - 1;
+	unsigned long s1 = (unsigned long)Range1.iov_base;
+	unsigned long e1 = s1 + Range1.iov_len - 1;
 
-	unsigned long start2 = (unsigned long)Range2.iov_base;
-	unsigned long end2 = start2 + Range2.iov_len - 1;
+	unsigned long s2 = (unsigned long)Range2.iov_base;
+	unsigned long e2 = s2 + Range2.iov_len - 1;
 
-	if((end1 < start2) || (end2 < start1))
-		return false;
+	if((e1 < s2) || (e2 < s1))
+	{
+		vResults.push_back(Range1);
+		return;
+	}
 
-	//............
+	if((s1 < s2) && (s2 <= e1) && (e1 <= e2))
+	{
+		iovec tmp;
+		tmp.iov_base = s1;
+		tmp.iov_len = s2 - s1;
+		vResults.push_back(tmp);
+		return;
+	}
 
-	return true;
+	if((e2 < e1) && (e2 >= s1) && (s2 <= s1))
+	{
+		iovec tmp;
+		tmp.iov_base = e2 + 1;
+		tmp.iov_len = e1 - e2;
+		vResults.push_back(tmp);
+		return;
+	}
+
+	if((s1 >= s2) && (e1 <= e2))
+		return;
+
+	if((s1 < s2) && (e2 < e1))
+	{
+		iovec tmp;
+		tmp.iov_base = s1;
+		tmp.iov_len = s2 - s1;
+		vResults.push_back(tmp);
+
+		tmp.iov_base = e2 + 1;
+		tmp.iov_len = e1 - e2;
+		vResults.push_back(tmp);
+		return;
+	}
+
+	return;
+}
+
+void CLIOVectors::DifferenceBetweenRangeAndIOVector(iovec& Range, CLIOVectors& IOVector, vector<iovec>& vResult)
+{
+	vector<iovec> *pvtest = new vector<iovec>;
+	pvtest->push_back(Range);
+
+	vector<iovec> *pTmp = new vector<iovec>;
+
+	list<SLIOVectorItem>::iterator iter = IOVector.m_IOVectors.begin();
+	for(; iter != IOVector.m_IOVectors.end; iter++)
+	{
+		for(int i = 0; i < pvtest->size(); i++)
+		{
+			DifferenceBetweenRanges((*pvtest)[i], iter->IOVector, pTmp);
+		}
+
+		vector<iovec> *p = pvtest;
+		pvtest = pTmp;
+		pTmp = p;
+
+		pTmp->clear();
+	}
+
+	vResult = *pvtest;
+
+	delete pTmp;
+	delete pvtest;
 }

@@ -3,6 +3,7 @@
 
 #include <list>
 #include <sys/uio.h>
+#include <vector>
 #include "CLStatus.h"
 
 class CLIteratorForIOVectors;
@@ -53,7 +54,8 @@ private:
 	CLStatus TransferBlockByIndex(bool bWriteIntoIOVectors, unsigned int Index, char *pBuf, unsigned int Length);
 	CLStatus TransferBlockByIterator(bool bWriteIntoIOVectors, CLIteratorForIOVectors& Iter, char *pBuf, unsigned Length);
 
-	bool IsTwoRangesOverlap(iovec& Range1, iovec& Range2, iovec& Overlap);
+	void DifferenceBetweenRanges(iovec& Range1, iovec& Range2, vector<iovec>& vResults);
+	void DifferenceBetweenRangeAndIOVector(iovec& Range, CLIOVectors& IOVector, vector<iovec>& vResult);
 
 private:
 	CLIOVectors(const CLIOVectors&);
