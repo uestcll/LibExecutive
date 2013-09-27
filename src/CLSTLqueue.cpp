@@ -3,6 +3,7 @@
 #include "CLCriticalSection.h"
 #include "CLIOVectors.h"
 #include "ErrorCode.h"
+#include "CLIteratorForIOVectors.h"
 
 CLSTLqueue::CLSTLqueue()
 {
@@ -19,10 +20,14 @@ unsigned long CLSTLqueue::PopOneData()
 	return l;
 }
 
-CLStatus CLSTLqueue::PopData(CLIOVectors& IOVectors, unsigned int index, unsigned int length)
+CLStatus CLSTLqueue::PopData(CLIOVectors& IOVectors)
 {
-	if((length % sizeof(unsigned long) != 0) || (length == 0))
+	unsigned int length = IOVectors.Size();
+	if(length < sizeof(unsigned long))
+	{
+		CLLogger::WriteLogMsg("In CLSTLqueue::PopData(), IOVectors.Size error", 0);
 		return CLStatus(-1, NORMAL_ERROR);
+	}
 
 	try
 	{
@@ -30,6 +35,24 @@ CLStatus CLSTLqueue::PopData(CLIOVectors& IOVectors, unsigned int index, unsigne
 
 		if(m_DataQueue.empty())
 			return CLStatus(-1, RECEIVED_ZERO_BYTE);
+
+		unsigned int BytesRead = 0;
+
+		CLIteratorForIOVectors iter;
+		CLStatus s1 = IOVectors.GetIterator(0, &iter);
+		if(!s1.IsSuccess())
+			return CLStatus(-1, NORMAL_ERROR);
+
+		//.................
+		for(; iter != )
+		{
+			if((length - BytesRead) < sizeof(unsigned long))
+				return CLStatus(BytesRead, 0);
+
+			unsigned long data = PopOneData();
+		}
+
+
 
 		for(int i = 0; i < length / sizeof(unsigned long); i++)
 		{

@@ -13,7 +13,7 @@ public:
 	CLSTLqueue();
 	virtual ~CLSTLqueue();
 
-	CLStatus PopData(CLIOVectors& IOVectors, unsigned int index, unsigned int length);
+	CLStatus PopData(CLIOVectors& IOVectors);
 	CLStatus PushData(unsigned long ulData);
 
 private:

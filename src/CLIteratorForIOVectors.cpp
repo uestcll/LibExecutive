@@ -1,6 +1,7 @@
 #include "CLIOVectors.h"
 #include "CLIteratorForIOVectors.h"
 #include "ErrorCode.h"
+#include "CLLogger.h"
 
 CLIteratorForIOVectors::CLIteratorForIOVectors()
 {
@@ -15,7 +16,10 @@ CLIteratorForIOVectors::~CLIteratorForIOVectors()
 CLStatus CLIteratorForIOVectors::Add(unsigned int steps)
 {
 	if((m_pData == 0) || (m_pIOVectors == 0) || (m_Iter == m_pIOVectors->end()))
+	{
+		CLLogger::WriteLogMsg("In CLIteratorForIOVectors::Add(), m_pData == 0 and so on", 0);
 		return CLStatus(-1, NORMAL_ERROR);
+	}
 
 	if(steps == 0)
 		return CLStatus(0, 0);
@@ -52,7 +56,10 @@ CLStatus CLIteratorForIOVectors::Add(unsigned int steps)
 CLStatus CLIteratorForIOVectors::Sub(unsigned int steps)
 {
 	if((m_pData == 0) || (m_pIOVectors == 0) || (m_Iter == m_pIOVectors->end()))
+	{
+		CLLogger::WriteLogMsg("In CLIteratorForIOVectors::Sub(), m_pData == 0 and so on", 0);
 		return CLStatus(-1, NORMAL_ERROR);
+	}
 
 	if(steps == 0)
 		return CLStatus(0, 0);

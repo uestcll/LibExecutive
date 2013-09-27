@@ -3,6 +3,7 @@
 #include "CLIOVectors.h"
 #include "ErrorCode.h"
 #include "CLIteratorForIOVectors.h"
+#include "CLLogger.h"
 
 using namespace std;
 
@@ -24,7 +25,10 @@ CLIOVectors::~CLIOVectors()
 CLStatus CLIOVectors::PushBack(char *pBuffer, size_t nBufferLength, bool bDeleted)
 {
 	if((pBuffer == 0) || (nBufferLength == 0))
+	{
+		CLLogger::WriteLogMsg("In CLIOVectors::PushBack(), pBuffer == 0 or nBufferLength == 0", 0);
 		return CLStatus(-1, NORMAL_ERROR);
+	}
 
 	SLIOVectorItem item;
 	item.IOVector.iov_base = pBuffer;
@@ -41,7 +45,10 @@ CLStatus CLIOVectors::PushBack(char *pBuffer, size_t nBufferLength, bool bDelete
 CLStatus CLIOVectors::PushFront(char *pBuffer, size_t nBufferLength, bool bDeleted)
 {
 	if((pBuffer == 0) || (nBufferLength == 0))
+	{
+		CLLogger::WriteLogMsg("In CLIOVectors::PushFront(), pBuffer == 0 or nBufferLength == 0", 0);
 		return CLStatus(-1, NORMAL_ERROR);
+	}
 
 	SLIOVectorItem item;
 	item.IOVector.iov_base = pBuffer;
@@ -61,6 +68,8 @@ CLStatus CLIOVectors::PopBack(char **ppBuffer, size_t *pnBufferLength)
 	{
 		*ppBuffer = 0;
 		*pnBufferLength = 0;
+
+		CLLogger::WriteLogMsg("In CLIOVectors::PopBack(), m_IOVectors.empty", 0);
 		return CLStatus(-1, NORMAL_ERROR);
 	}
 
@@ -81,6 +90,8 @@ CLStatus CLIOVectors::PopFront(char **ppBuffer, size_t *pnBufferLength)
 	{
 		*ppBuffer = 0;
 		*pnBufferLength = 0;
+
+		CLLogger::WriteLogMsg("In CLIOVectors::PopFront(), m_IOVectors.empty", 0);
 		return CLStatus(-1, NORMAL_ERROR);
 	}
 
@@ -98,7 +109,10 @@ CLStatus CLIOVectors::PopFront(char **ppBuffer, size_t *pnBufferLength)
 CLStatus CLIOVectors::GetIterator(unsigned int Index, CLIteratorForIOVectors& Iter)
 {
 	if(Index >= m_nDataLength)
+	{
+		CLLogger::WriteLogMsg("In CLIOVectors::GetIterator(), Index >= m_nDataLength", 0);
 		return CLStatus(-1, 0);
+	}
 
 	GetIndexPosition(Index, &(Iter.m_pData), &(Iter.m_Iter));
 	Iter.m_pIOVectors = &m_IOVectors;
@@ -129,7 +143,10 @@ CLStatus CLIOVectors::ReadBlock(unsigned int Index, char *pBuf, unsigned int Len
 CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned int Index, unsigned int Length)
 {
 	if((Index + Length) > m_nDataLength)
+	{
+		CLLogger::WriteLogMsg("In CLIOVectors::PushBackRangeToAIOVector(), (Index + Length) > m_nDataLength", 0);
 		return CLStatus(-1, 0);
+	}
 
 	char *pAddrIndex = 0;
 	list<SLIOVectorItem>::iterator it;
@@ -142,7 +159,10 @@ CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned 
 	unsigned long leftroom = it->IOVector.iov_len - offset;
 	CLStatus s1 = IOVectors.PushBack(pAddrIndex, leftroom, false);
 	if(!s1.IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLIOVectors::PushBackRangeToAIOVector(), IOVectors.PushBack 1 error", 0);
 		return s1;
+	}
 
 	Length = Length - leftroom;
 
@@ -155,7 +175,10 @@ CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned 
 
 		CLStatus s2 = IOVectors.PushBack((char *)it->IOVector.iov_base, room, false);
 		if(!s2.IsSuccess())
+		{
+			CLLogger::WriteLogMsg("In CLIOVectors::PushBackRangeToAIOVector(), IOVectors.PushBack 2 error", 0);
 			return s2;
+		}
 
 		Length = Length - room;
 	}
@@ -222,7 +245,10 @@ int CLIOVectors::GetNumberOfIOVec()
 iovec *CLIOVectors::GetIOVecArray()
 {
 	if(m_IOVectors.empty() || m_nDataLength == 0)
+	{
+		CLLogger::WriteLogMsg("In CLIOVectors::GetIOVecArray(), m_IOVectors.empty() or m_nDataLength == 0", 0);
 		return 0;
+	}
 
 	int n = m_IOVectors.size();
 	iovec *pArray = new iovec[n];
@@ -347,14 +373,15 @@ CLStatus CLIOVectors::TransferBlock(bool bWriteIntoIOVectors, char *pAddrInIOVec
 		Length = Length - room;
 		pBuf = pBuf + room;
 	}
-
-	return CLStatus(-1, NORMAL_ERROR);
 }
 
 CLStatus CLIOVectors::TransferBlockByIndex(bool bWriteIntoIOVectors, unsigned int Index, char *pBuf, unsigned int Length)
 {
 	if(Index >= m_nDataLength)
+	{
+		CLLogger::WriteLogMsg("In CLIOVectors::TransferBlockByIndex(), Index >= m_nDataLength error", 0);
 		return CLStatus(-1, NORMAL_ERROR);
+	}
 
 	char *pAddrInIOVecotr;
 	list<SLIOVectorItem>::iterator it;
@@ -369,7 +396,10 @@ CLStatus CLIOVectors::TransferBlockByIterator(bool bWriteIntoIOVectors, CLIterat
 		(Iter.m_Iter == m_IOVectors.end()) || 
 		(pBuf == 0) || 
 		(Length == 0))
+	{
+		CLLogger::WriteLogMsg("In CLIOVectors::TransferBlockByIterator(), Iter.m_pData == 0 and so on", 0);
 		return CLStatus(-1, NORMAL_ERROR);
+	}
 
 	char *pEndData = 0;
 	CLStatus s = TransferBlock(bWriteIntoIOVectors, Iter.m_pData, Iter.m_Iter, pBuf, Length, &pEndData);
@@ -379,7 +409,10 @@ CLStatus CLIOVectors::TransferBlockByIterator(bool bWriteIntoIOVectors, CLIterat
 		return s;
 	}
 	else
+	{
+		CLLogger::WriteLogMsg("In CLIOVectors::TransferBlockByIterator(), TransferBlock error", 0);
 		return CLStatus(-1, NORMAL_ERROR);
+	}
 }
 
 void CLIOVectors::DifferenceBetweenRanges(iovec& Range1, iovec& Range2, std::vector<iovec>& vResults)
