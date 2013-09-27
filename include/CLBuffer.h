@@ -17,12 +17,12 @@ public:
 	CLStatus DataStartIndex(const int& newIndex);
 
 	const int& UsedBufferLen();
-	CLStatus UsedBufferLen(const int& newUsedLen);
+	CLStatus AddUsedBufferLen(const int& addUsedLen);
 
 	char* GetDataPtr();
-	char* GetDataPtr(int index);
+	CLIOVector* GetDataPtr(int index, int len);
 
-	CLStatus GetBufPtr(char** pBuf, int restLen);
+	CLStatus GetRestBufPtr(char** pBuf, int restLen); //得到空闲buffer的头指针，并得到可以存储数据的空闲buffer长度
 private:
 	CLIOVector *m_pIOBufferVec;
 

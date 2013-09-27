@@ -54,7 +54,7 @@ char* CLBuffer::GetDataPtr()
 	return m_pIOBufferVec->GetBufPtr(m_iDataStartIndex);
 }
 
-CLStatus CLBuffer::GetBufPtr(char** pBuf, int *restLen)
+CLStatus CLBuffer::GetRestBufPtr(char** pBuf, int *restLen)
 {
 	if(m_iUsedBufferLen == m_iSumBufferLen)
 	{
@@ -69,5 +69,17 @@ CLStatus CLBuffer::GetBufPtr(char** pBuf, int *restLen)
 	*pBuf = m_pIOBufferVec->GetBufPtr(m_iUsedBufferLen);
 	*restLen = m_iSumBufferLen - m_iUsedBufferLen;
 
+	return CLStatus(0, 0);
+}
+
+	
+const int& CLBuffer::UsedBufferLen()
+{
+	return m_iUsedBufferLen;
+}
+
+CLStatus CLBuffer::AddUsedBufferLen(const int& addUsedLen)
+{
+	m_iUsedBufferLen += addUsedLen;
 	return CLStatus(0, 0);
 }

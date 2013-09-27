@@ -2,7 +2,8 @@
 #include "CLStatus.h"
 #include "CLLogger.h"
 #include "CLIOVector.h"
-
+#include "CLBuffer.h"
+// iovector 提供返回连续空间的长度值 CLBuffer返回一个根据长度和索引iovector 协议解析器返回的不变，其中每个iovec的len都有。所以好反序列化
 using namespace std;
 
 CLMessageReceiver::CLMessageReceiver(CLProtoParser *pProtoParser, CLDataReceiver *pDataReceiver)
@@ -21,7 +22,7 @@ CLMessageReceiver::CLMessageReceiver(CLProtoParser *pProtoParser, CLDataReceiver
 		m_pProtoParser = pProtoParser;
 		m_pDataReceiver = pDataReceiver;
 		m_pMsgDeserializerManager = pMsgDeserializerManager;
-		m_pIOBufVec = new CLIOVector();
+		m_pDataBuffer = new CLBuffer();
 	}
 	catch(const char* s)
 	{
@@ -78,49 +79,22 @@ CLMessageReceiver::~CLMessageReceiver()
 
 CLMessage* CLMessageReceiver::GetMessage()
 {
-	CLStatus s = m_pDataReceiver->GetDataIOVec(m_pIOBufVec);
+	CLStatus s1 = m_pDataReceiver->GetData(m_pDataBuffer);
 
-	if(!s.IsSuccess())
+	if(!s1.IsSuccess())
 	{
-		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pDataReceiver->GetDataIOVec() error", 0);
+		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pDataReceiver->GetData() error", 0);
 		return PopMessage();
 	}
 
 	vector<SLSerializedMsg> pSerializedMsgVec;//存储协议解析切割完成，反序列化之前的一个个的协议。
 	CLIOVector *pRestBufVec;
 
-	m_pProtoParser->Decapsulate(m_pIOBufVec, pSerializedMsgVec, &pRestBufVec);
-	
-	try
+	CLStatus s2 = m_pProtoParser->Decapsulate(m_pDataBuffer, pSerialBufferec);
+	if(!s2.IsSuccess())
 	{
-		while(1)
-		{
-			CLMessage* pMsg = GetMessageFromChannel();
-			if(pMsg == NULL)
-			{
-				break;
-			}
-			{
-				CLCriticalSection cs(&m_Mutex);
-				m_MessageQueue.push(pMessage);
-			}
-		}
-
-		{
-			CLCriticalSection cs(&m_Mutex);
-
-			if(m_MessageQueue.empty())
-				return 0;
-
-			CLMessage *p = m_MessageQueue.front();
-			m_MessageQueue.pop();
-			return p;
-		}
-	}
-	catch(const char* str)
-	{
-		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), exception arise", 0);
-		return 0;
+		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(0, m_pProtoParser->Decapsulate(), error", 0);
+		return PopMessage();
 	}
 }
 

@@ -14,6 +14,7 @@ class CLIOVector;
 class CLMessage;
 class CLProtoParser;
 class CLDataReceiver;
+class CLBuffer;
 
 class CLMessageReceiver
 {
@@ -22,12 +23,11 @@ public:
 	virtual ~CLMessageReceiver();
 
 	CLMessage *GetMessage();
-
-	virtual CLMessage* GetMessageFromChannel() = 0;
-
 private:
 	CLMessageReceiver(const CLMessageReceiver&);
 	CLMessageReceiver& operator=(const CLMessageReceiver&);
+
+	CLMessage* PopMessage();
 
 protected:
 	
@@ -36,7 +36,7 @@ protected:
 	CLDataReceiver *m_pDataReceiver;
 
 	std::queue<CLMessage*> m_MessageQueue;
-	CLIOVector *m_pIOBufVec;
+	CLBuffer *m_pDataBuffer;
 };
 
 #endif
