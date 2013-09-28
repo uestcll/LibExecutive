@@ -15,7 +15,7 @@ CLIteratorForIOVectors::~CLIteratorForIOVectors()
 
 CLStatus CLIteratorForIOVectors::Add(unsigned int steps)
 {
-	if((m_pData == 0) || (m_pIOVectors == 0) || (m_Iter == m_pIOVectors->end()))
+	if(IsEnd())
 	{
 		CLLogger::WriteLogMsg("In CLIteratorForIOVectors::Add(), m_pData == 0 and so on", 0);
 		return CLStatus(-1, NORMAL_ERROR);
@@ -55,7 +55,7 @@ CLStatus CLIteratorForIOVectors::Add(unsigned int steps)
 
 CLStatus CLIteratorForIOVectors::Sub(unsigned int steps)
 {
-	if((m_pData == 0) || (m_pIOVectors == 0) || (m_Iter == m_pIOVectors->end()))
+	if(IsEnd())
 	{
 		CLLogger::WriteLogMsg("In CLIteratorForIOVectors::Sub(), m_pData == 0 and so on", 0);
 		return CLStatus(-1, NORMAL_ERROR);
@@ -90,4 +90,12 @@ CLStatus CLIteratorForIOVectors::Sub(unsigned int steps)
 
 		steps = steps - m_Iter->IOVector.iov_len;
 	}
+}
+
+bool CLIteratorForIOVectors::IsEnd()
+{
+	if((m_pData == 0) || (m_pIOVectors == 0) || (m_Iter == m_pIOVectors->end()))
+		return true;
+	else
+		return false;
 }

@@ -15,6 +15,8 @@ public:
 	CLStatus Add(unsigned int steps);
 	CLStatus Sub(unsigned int steps);
 
+	bool IsEnd();
+
 private:
 	CLIteratorForIOVectors(const CLIteratorForIOVectors&);
 	CLIteratorForIOVectors& operator=(const CLIteratorForIOVectors&);

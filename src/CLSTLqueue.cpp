@@ -41,37 +41,29 @@ CLStatus CLSTLqueue::PopData(CLIOVectors& IOVectors)
 		CLIteratorForIOVectors iter;
 		CLStatus s1 = IOVectors.GetIterator(0, &iter);
 		if(!s1.IsSuccess())
-			return CLStatus(-1, NORMAL_ERROR);
-
-		//.................
-		for(; iter != )
 		{
-			if((length - BytesRead) < sizeof(unsigned long))
-				return CLStatus(BytesRead, 0);
-
-			unsigned long data = PopOneData();
+			CLLogger::WriteLogMsg("In CLSTLqueue::PopData(), IOVectors.GetIterator error", 0);
+			return CLStatus(-1, NORMAL_ERROR);
 		}
 
-
-
-		for(int i = 0; i < length / sizeof(unsigned long); i++)
+		while(true)
 		{
 			unsigned long data = PopOneData();
-
-			int temp_index = index + sizeof(unsigned long) * i;
-
-			CLStatus s = IOVectors.WriteLong(temp_index, data);
-			if(!s.IsSuccess())
+			CLStatus s2 = IOVectors.WriteBlock(iter, (char *)(&data), sizeof(unsigned long));
+			if(!s2.IsSuccess())
 			{
-				CLLogger::WriteLogMsg("In CLSTLqueue::PopData(), IOVectors.WriteLong error", 0);
-				return CLStatus(-1, RECEIVED_ERROR);
+				CLLogger::WriteLogMsg("In CLSTLqueue::PopData(), IOVectors.WriteBlock error", 0);
+				if(BytesRead == 0)
+					return CLStatus(-1, NORMAL_ERROR);
+				else
+					return CLStatus(BytesRead, 0);
 			}
 
-			if(m_DataQueue.empty())
-				return CLStatus(temp_index + sizeof(unsigned long) - index, 0);
-		}
+			BytesRead += sizeof(unsigned long);
 
-		return CLStatus(length, 0);
+			if(((length - BytesRead) < sizeof(unsigned long)) || m_DataQueue.empty())
+				return CLStatus(BytesRead, 0);
+		}
 	}
 	catch(const char* str)
 	{
@@ -82,6 +74,7 @@ CLStatus CLSTLqueue::PopData(CLIOVectors& IOVectors)
 
 CLStatus CLSTLqueue::PushData(unsigned long ulData)
 {
+	//..............
 	try
 	{
 		CLCriticalSection cs(&m_Mutex);
