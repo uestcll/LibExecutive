@@ -4,7 +4,7 @@
 #include "CLStatus.h"
 
 class CLIOVector;
-
+//提供接口 得到从哪里开始 多长的字符串。如果是连续的，就返回指针。不是就拷贝一份成为连续的。
 class CLBuffer
 {
 public:
@@ -20,9 +20,9 @@ public:
 	CLStatus AddUsedBufferLen(const int& addUsedLen);
 
 	char* GetDataPtr();
-	CLIOVector* GetDataPtr(int index, int len);
+	CLIOVector* GetDataPtr(const int& index, const int& len);
 
-	CLStatus GetRestBufPtr(char** pBuf, int restLen); //得到空闲buffer的头指针，并得到可以存储数据的空闲buffer长度
+	CLStatus GetRestBufPtr(char** pBuf, int& restLen); //得到空闲buffer的头指针，并得到可以存储数据的空闲buffer长度
 private:
 	CLIOVector *m_pIOBufferVec;
 

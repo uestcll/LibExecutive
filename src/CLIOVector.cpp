@@ -100,7 +100,7 @@ CLStatus CLIOVector::PopFront(char** pBuffer, int* bufLen)
 	return CLStatus(0, 0);
 }
 
-char* CLIOVector::GetBufPtr(int index)
+int CLIOVector::GetBufPtr(int index, char** pBufffer)
 {
 	int position = 0;
 	deque<struct iovec>::iterator it = m_ioVecQueue.begin();
@@ -112,9 +112,12 @@ char* CLIOVector::GetBufPtr(int index)
 	}
 
 	char* buf = it->iov_base;
-	char* ptr = buf + (index - position + it->iov_len);
-	return ptr;
+	*pBuffer = buf + (index - position + it->iov_len);
+	int continuousBufLen = position - index;
+	return continuousBufLen;
 }
+
+
 
 int CLIOVector::Length()
 {

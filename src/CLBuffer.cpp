@@ -44,11 +44,11 @@ CLStatus CLBuffer::DataStartIndex(const int& newIndex)
 	return CLStatus(0, 0);
 }
 
-char* CLBuffer::GetDataPtr(int index)
+CLIOVector* CLBuffer::GetDataPtr(const int& index, const int& len)
 {
-	return m_pIOBufferVec->GetBufPtr(index);
+	CLIOVector *pIOVec = new CLIOVector();
+	
 }
-
 char* CLBuffer::GetDataPtr()
 {
 	return m_pIOBufferVec->GetBufPtr(m_iDataStartIndex);

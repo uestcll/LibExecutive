@@ -22,7 +22,7 @@ public:
 
 	CLStatus FreeAll();
 
-	char* GetBufPtr(int index);
+	int GetBufPtr(int index, char** pBufffer); //返回值为index开始的连续空间的长度 index是从0开始的。
 
 	int IOVecNum();//iovec item num
 	int Length();//all buffer Length
