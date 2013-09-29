@@ -1,7 +1,7 @@
 #include "CLBuffer.h"
 #include "CLIOVector.h"
 // usedbufferlen 还需要设置和获得
-CLBuffer::CLBuffer()
+CLBuffer::CLBuffer(int itemSize) : m_iItemSize(itemSize), m_ciDataStartIndex(m_iDataStartIndex), m_ciUsedBufferLen(m_iUsedBufferLen)
 {
 	m_pIOBufferVec = new CLIOVector;
 
@@ -32,9 +32,9 @@ CLStatus CLBuffer::NewBuffer(int size)
 	return CLStatus(0, 0);
 }
 
-const int& CLBuffer::DataStartIndex()
+const int& CLBuffer::DataStartIndex() const 
 {
-	return  m_iDataStartIndex;
+	return  m_ciDataStartIndex;
 }
 
 CLStatus CLBuffer::DataStartIndex(const int& newIndex)
@@ -44,21 +44,57 @@ CLStatus CLBuffer::DataStartIndex(const int& newIndex)
 	return CLStatus(0, 0);
 }
 
-CLIOVector* CLBuffer::GetDataPtr(const int& index, const int& len)
+/*CLIOVector* CLBuffer::GetDataPtr(const int& index, const int& len)
 {
 	CLIOVector *pIOVec = new CLIOVector();
 	
-}
+}*/
+
 char* CLBuffer::GetDataPtr()
 {
 	return m_pIOBufferVec->GetBufPtr(m_iDataStartIndex);
+}
+
+CLStatus CLBuffer::ReadData(char* &pBuffer, const int& index, const int& len)
+{
+	char* pBuf;
+	int continuiousLen;
+	continuiousLen = m_pIOBufferVec->GetBufPtr(index, &pBuf);
+	if(continuiousLen >= len)
+	{
+		pBuffer = pBuf;
+		return CLStatus(0, 0);
+	}
+	else
+	{
+		int nread = continuiousLen;
+		int nstart = index + continuiousLen;
+	
+		while(nread != len)
+		{
+		
+			continuiousLen = m_pIOBufferVec->GetBufPtr(nstart, &pBuf);
+			if(continuiousLen < (len - nread)))
+			{
+				memcpy(pBuffer + nread, pBuf, continuiousLen);
+				nread += continuiousLen;
+				nstart += continuiousLen;
+			}
+			else 
+			{
+				memcpy(pBuffer + nread, pBuf, (len - nread));
+				nread = len;
+				return CLStatus(0, 0);
+			}
+		}
+	}
 }
 
 CLStatus CLBuffer::GetRestBufPtr(char** pBuf, int *restLen)
 {
 	if(m_iUsedBufferLen == m_iSumBufferLen)
 	{
-		CLStatus s = NewBuffer(DEAFULT_BUFFER_LENGTH);
+		CLStatus s = NewBuffer(m_iItemSize);
 		if(!s.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLBuffer::GetBufPtr(), new buffer error", 0);
@@ -71,11 +107,10 @@ CLStatus CLBuffer::GetRestBufPtr(char** pBuf, int *restLen)
 
 	return CLStatus(0, 0);
 }
-
 	
-const int& CLBuffer::UsedBufferLen()
+const int& CLBuffer::UsedBufferLen() const
 {
-	return m_iUsedBufferLen;
+	return m_ciUsedBufferLen;
 }
 
 CLStatus CLBuffer::AddUsedBufferLen(const int& addUsedLen)

@@ -1,12 +1,14 @@
 #include "CLMessageReceiver.h"
 #include "CLStatus.h"
 #include "CLLogger.h"
-#include "CLIOVector.h"
+#include "CLMsgDeserializerManager.h"
+#include "CLProtoParser.h"
 #include "CLBuffer.h"
-// iovector 提供返回连续空间的长度值 CLBuffer返回一个根据长度和索引iovector 协议解析器返回的不变，其中每个iovec的len都有。所以好反序列化
+
+// iovector 提供返回连续空间的长度值 CLBuffer根据分配了空间的buf，和指定的对应长度，返回该buf的值。
 using namespace std;
 
-CLMessageReceiver::CLMessageReceiver(CLProtoParser *pProtoParser, CLDataReceiver *pDataReceiver)
+CLMessageReceiver::CLMessageReceiver(CLDataReceiver *pDataReceiver, CLProtoParser *pProtoParser, CLMsgDeserializerManager *pMsgDeserializerManager)
 {
 	try
 	{
@@ -44,7 +46,6 @@ CLMessageReceiver::CLMessageReceiver(CLProtoParser *pProtoParser, CLDataReceiver
 		}
 
 		throw s;
-
 	}
 }
 
@@ -87,15 +88,36 @@ CLMessage* CLMessageReceiver::GetMessage()
 		return PopMessage();
 	}
 
-	vector<SLSerializedMsg> pSerializedMsgVec;//存储协议解析切割完成，反序列化之前的一个个的协议。
-	CLIOVector *pRestBufVec;
+	int readLen = (int)s1.m_clReturnCode;
+	if(readLen == 0)
+	{
+		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), Getdata len = 0", 0);
+		return PopMessage();
+	}
 
-	CLStatus s2 = m_pProtoParser->Decapsulate(m_pDataBuffer, pSerialBufferec);
+	m_pDataBuffer->AddUsedBufferLen(readLen);
+
+	vector<SLSerializedMsgScope> pSerializedMsgScopeVec;//存储协议解析切割完成，反序列化之前的一个个的协议。
+	
+	int decapsulateStartIndex = m_pDataBuffer->DataStartIndex();
+
+	CLStatus s2 = m_pProtoParser->Decapsulate(m_pDataBuffer, decapsulateStartIndex, pSerializedMsgScopeVec);
 	if(!s2.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(0, m_pProtoParser->Decapsulate(), error", 0);
 		return PopMessage();
 	}
+
+	int decapsulateLen = (int)(s2.m_clReturnCode);
+	m_pDataBuffer->DataStartIndex(decapsulateStartIndex + decapsulateLen);
+
+	CLStatus s3 = m_pMsgDeserializerManager->Deserializer(m_pDataBuffer, pSerializedMsgScopeVec, m_MessageQueue);
+	if(!s3.IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pMsgDeserializerManager->Deserializer() error", 0);
+	}
+
+	return PopMessage();
 }
 
 CLMessage* CLMessageReceiver::PopMessage()

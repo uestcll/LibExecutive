@@ -7,19 +7,22 @@
 typedef struct _serialized_msg
 {
 	unsigned long m_lMsgID;
-	CLIOVector m_MsgIOVec;
-}SLSerializedMsg;
+	int m_iStartIndex;
+	int m_iLength;
+	
+}SLSerializedMsgScope;
 
-class CLIOVector;
+
 class CLMessage;
 class CLProtoParser;
 class CLDataReceiver;
 class CLBuffer;
+class CLMsgDeserializerManager;
 
 class CLMessageReceiver
 {
 public:
-	CLMessageReceiver(CLProtoParser *pProtoParser, CLDataReceiver *pDataReceiver);
+	CLMessageReceiver(CLDataReceiver *pDataReceiver, CLProtoParser *pProtoParser, CLMsgDeserializerManager *pMsgDeserializerManager);
 	virtual ~CLMessageReceiver();
 
 	CLMessage *GetMessage();
@@ -34,6 +37,7 @@ protected:
 	CLMutex m_Mutex;
 	CLProtoParser *m_pProtoParser;
 	CLDataReceiver *m_pDataReceiver;
+	CLMsgDeserializerManager *m_pMsgDeserializerManager;
 
 	std::queue<CLMessage*> m_MessageQueue;
 	CLBuffer *m_pDataBuffer;
