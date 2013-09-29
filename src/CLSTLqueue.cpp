@@ -39,7 +39,7 @@ CLStatus CLSTLqueue::PopData(CLIOVectors& IOVectors)
 		unsigned int BytesRead = 0;
 
 		CLIteratorForIOVectors iter;
-		CLStatus s1 = IOVectors.GetIterator(0, &iter);
+		CLStatus s1 = IOVectors.GetIterator(0, iter);
 		if(!s1.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLSTLqueue::PopData(), IOVectors.GetIterator error", 0);
@@ -74,7 +74,6 @@ CLStatus CLSTLqueue::PopData(CLIOVectors& IOVectors)
 
 CLStatus CLSTLqueue::PushData(unsigned long ulData)
 {
-	//..............
 	try
 	{
 		CLCriticalSection cs(&m_Mutex);

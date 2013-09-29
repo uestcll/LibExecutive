@@ -28,7 +28,7 @@ public:
 	CLStatus PopBack(char **ppBuffer, size_t *pnBufferLength);
 	CLStatus PopFront(char **ppBuffer, size_t *pnBufferLength);
 
-	CLStatus GetIterator(unsigned int Index, CLIteratorForIOVectors& Iter);
+	void GetIterator(unsigned int Index, CLIteratorForIOVectors& Iter);
 	CLStatus WriteBlock(CLIteratorForIOVectors& Iter, char *pBuf, unsigned Length);
 	CLStatus ReadBlock(CLIteratorForIOVectors& Iter, char *pBuf, unsigned Length);
 
@@ -37,9 +37,9 @@ public:
 
 	CLStatus PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned int Index, unsigned int Length);
 
-	CLStatus PushBackIOVector(CLIOVectors& IOVectors);
+	void PushBackIOVector(CLIOVectors& IOVectors);
 
-	CLStatus DifferenceBetweenIOVectors(CLIOVectors& Operand, CLIOVectors& Difference);
+	void DifferenceBetweenIOVectors(CLIOVectors& Operand, CLIOVectors& Difference);
 
 	bool IsRangeOverlap(iovec& Range);
 
@@ -58,6 +58,9 @@ private:
 
 	void DifferenceBetweenRanges(iovec& Range1, iovec& Range2, std::vector<iovec>& vResults);
 	void DifferenceBetweenRangeAndIOVector(iovec& Range, CLIOVectors& IOVector, std::vector<iovec>& vResult);
+
+	CLStatus PushBufferAtFrontOrBack(char *pBuffer, size_t nBufferLength, bool bDeleted, bool bAtFront);
+	CLStatus PopBufferAtFrontOrBack(char **ppBuffer, size_t *pnBufferLength, bool bAtFront);
 
 private:
 	CLIOVectors(const CLIOVectors&);
