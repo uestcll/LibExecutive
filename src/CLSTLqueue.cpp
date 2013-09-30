@@ -39,24 +39,16 @@ CLStatus CLSTLqueue::PopData(CLIOVectors& IOVectors)
 		unsigned int BytesRead = 0;
 
 		CLIteratorForIOVectors iter;
-		CLStatus s1 = IOVectors.GetIterator(0, iter);
-		if(!s1.IsSuccess())
-		{
-			CLLogger::WriteLogMsg("In CLSTLqueue::PopData(), IOVectors.GetIterator error", 0);
-			return CLStatus(-1, NORMAL_ERROR);
-		}
+		IOVectors.GetIterator(0, iter);
 
 		while(true)
 		{
 			unsigned long data = PopOneData();
-			CLStatus s2 = IOVectors.WriteBlock(iter, (char *)(&data), sizeof(unsigned long));
-			if(!s2.IsSuccess())
+			CLStatus s = IOVectors.WriteBlock(iter, (char *)(&data), sizeof(unsigned long));
+			if((!s.IsSuccess()) || (s.m_clReturnCode != sizeof(unsigned long)))
 			{
 				CLLogger::WriteLogMsg("In CLSTLqueue::PopData(), IOVectors.WriteBlock error", 0);
-				if(BytesRead == 0)
-					return CLStatus(-1, NORMAL_ERROR);
-				else
-					return CLStatus(BytesRead, 0);
+				return CLStatus(-1, NORMAL_ERROR);
 			}
 
 			BytesRead += sizeof(unsigned long);

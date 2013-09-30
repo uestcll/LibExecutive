@@ -20,7 +20,6 @@ CLStatus CLIteratorForIOVectors::Add(unsigned int steps)
 		CLLogger::WriteLogMsg("In CLIteratorForIOVectors::Add(), IsEnd error", 0);
 		return CLStatus(-1, NORMAL_ERROR);
 	}
-	//.............
 
 	if(steps == 0)
 		return CLStatus(0, 0);

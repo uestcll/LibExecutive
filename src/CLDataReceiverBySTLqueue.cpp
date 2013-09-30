@@ -18,44 +18,13 @@ CLDataReceiverBySTLqueue::~CLDataReceiverBySTLqueue()
 {
 }
 
-CLStatus CLDataReceiverBySTLqueue::GetData(CLIOVectors *pIOVectors, void **ppContext)
+CLStatus CLDataReceiverBySTLqueue::GetData(CLIOVectors& IOVectors, void **ppContext)
 {
-	char *p = new char[READ_BUFFER_LEN_FOR_STL_QUEUE];
+	*ppContext = 0;
 
-	try
-	{
-		*ppContext = 0;
-		
-		CLIOVectors iovectors;
-		CLStatus s1 = iovectors.PushBack(p, READ_BUFFER_LEN_FOR_STL_QUEUE);
-		if(!s1.IsSuccess())
-		{
-			CLLogger::WriteLogMsg("In CLDataReceiverBySTLqueue::GetData(), iovectors.PushBack error", 0);
-			throw CLStatus(-1, RECEIVED_ERROR);
-		}
+	CLStatus s = m_pSTLqueue->PopData(IOVectors);
+	if((!s.IsSuccess()) && (s.m_clErrorCode == NORMAL_ERROR))
+		CLLogger::WriteLogMsg("In CLDataReceiverBySTLqueue::GetData(), m_pSTLqueue->PopData error", 0);
 
-		CLStatus s2 = m_pSTLqueue->PopData(iovectors, 0, READ_BUFFER_LEN_FOR_STL_QUEUE);
-		if((!s2.IsSuccess()) && (s2.m_lErrorCode == RECEIVED_ZERO_BYTE))
-			throw CLStatus(-1, RECEIVED_ZERO_BYTE);
-
-		if(!s2.IsSuccess())
-		{
-			CLLogger::WriteLogMsg("In CLDataReceiverBySTLqueue::GetData(), m_pSTLqueue->PopData error", 0);
-			throw CLStatus(-1, RECEIVED_ERROR);
-		}
-
-		CLStatus s3 = pIOVectors->PushBack(p, s2.m_clReturnCode);
-		if(!s3.IsSuccess())
-		{
-			CLLogger::WriteLogMsg("In CLDataReceiverBySTLqueue::GetData(), pIOVectors->PushBack error", 0);
-			throw CLStatus(-1, RECEIVED_ERROR);
-		}
-		
-		return CLStatus(0, 0);
-	}
-	catch(CLStatus& s)
-	{
-		delete [] p;
-		return s;
-	}
+	return s;
 }
