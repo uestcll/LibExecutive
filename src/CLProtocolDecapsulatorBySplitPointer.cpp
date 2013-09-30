@@ -1,5 +1,6 @@
 #include "CLProtocolDecapsulatorBySplitPointer.h"
 #include "CLIOVectors.h"
+#include "CLIteratorForIOVectors.h"
 #include "CLLogger.h"
 #include "ErrorCode.h"
 
@@ -11,22 +12,38 @@ CLProtocolDecapsulatorBySplitPointer::~CLProtocolDecapsulatorBySplitPointer()
 {
 }
 
-CLStatus CLProtocolDecapsulatorBySplitPointer::Decapsulate(CLIOVectors& IOVectors, std::vector<CLIOVectors *>& vSerializedMsgs, SLMessageScopeInIOVectors *pPartialMsgScope, void *pContext)
+CLStatus CLProtocolDecapsulatorBySplitPointer::Decapsulate(CLIOVectors& IOVectorsForData, std::vector<CLIOVectors& >& vSerializedMsgs, CLIOVectors& IOVectorForPartialData, void *pContext)
 {
-	pPartialMsgScope->Index = 0;
-	pPartialMsgScope->Length = 0;
-
-	size_t length = IOVectors.Size();
+	size_t length = IOVectorsForData.Size();
 	if((length == 0) || (length % sizeof(long) != 0))
 	{
 		CLLogger::WriteLogMsg("In CLProtocolDecapsulatorBySplitPointer::Decapsulate(), length error", 0);
 		return CLStatus(-1, NORMAL_ERROR);
 	}
 
+	CLIteratorForIOVectors iter;
+	IOVectorsForData.GetIterator(0, iter);
+
+	for(; !iter.IsEnd(); )
+	{
+		unsigned long data;
+		CLStatus s1 = IOVectorsForData.ReadBlock(iter, (char *)&data, sizeof(unsigned long));
+		if((!s1.IsSuccess()) || (s1.m_clReturnCode != sizeof(unsigned long)))
+		{
+			CLLogger::WriteLogMsg("In CLProtocolDecapsulatorBySplitPointer::Decapsulate(), IOVectorsForData.ReadBlock error", 0);
+			//......
+		}
+
+		CLIOVectors *pio = new CLIOVectors;
+		pio//.....................
+
+		vSerializedMsgs.push_back(*pio);
+	}
+
 	for(int i = 0; i < length;)
 	{
 		CLIOVectors *pio = new CLIOVectors;
-		CLStatus s = IOVectors.PushBackRangeToAIOVector(*pio, i, sizeof(long));
+		CLStatus s = IOVectorsForData.PushBackRangeToAIOVector(*pio, i, sizeof(long));
 		if(!s.IsSuccess())
 		{
 			delete pio;

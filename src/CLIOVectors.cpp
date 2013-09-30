@@ -113,6 +113,69 @@ CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned 
 	}
 }
 
+//MODIFY ITER ACCORDING LENGTH...................
+CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, CLIteratorForIOVectors& Iter, unsigned int Length)
+{
+	if(Iter.IsEnd() || (Length == 0))
+	{
+		CLLogger::WriteLogMsg("In CLIOVectors::PushBackRangeToAIOVector(), Iter error or Length == 0", 0);
+		return CLStatus(-1, NORMAL_ERROR);
+	}
+
+	if(IsRangeInAIOVector(iter.m_pData, Length, iter.m_Iter))
+	{
+		if(IOVectors.PushBack(iter.m_pData, Length, false).IsSuccess())
+			return CLStatus(Length, 0);
+		else
+		{
+			CLLogger::WriteLogMsg("In CLIOVectors::PushBackRangeToAIOVector(), IOVectors.PushBack 1 error", 0);
+			return CLStatus(-1, NORMAL_ERROR);
+		}
+	}
+
+	unsigned int OriginalLength = Length;
+
+	unsigned long offset = (unsigned long)iter.m_pData - (unsigned long)(iter.m_Iter->IOVector.iov_base);
+	unsigned long leftroom = iter.m_Iter->IOVector.iov_len - offset;
+	if(!(IOVectors.PushBack(iter.m_pData, leftroom, false).IsSuccess()))
+	{
+		CLLogger::WriteLogMsg("In CLIOVectors::PushBackRangeToAIOVector(), IOVectors.PushBack 2 error", 0);
+		return CLStatus(-1, NORMAL_ERROR);
+	}
+
+	Length = Length - leftroom;
+
+	while(true)
+	{
+		iter.m_Iter++;
+		if(Iter.m_Iter == m_IOVectors.end())
+		{
+			Iter.m_pData = 0;
+			return CLStatus(OriginalLength - Length, 0);
+		}
+
+		int room = iter.m_Iter->IOVector.iov_len;
+		if(Length <= room)
+		{
+			if(!(IOVectors.PushBack((char *)iter.m_Iter->IOVector.iov_base, Length, false).IsSuccess()))
+			{
+				CLLogger::WriteLogMsg("In CLIOVectors::PushBackRangeToAIOVector(), IOVectors.PushBack 3 error", 0);
+				return CLStatus(-1, NORMAL_ERROR);
+			}
+			else
+				return CLStatus(OriginalLength, 0);
+		}
+
+		if(!(IOVectors.PushBack((char *)iter.m_Iter->IOVector.iov_base, room, false).IsSuccess()))
+		{
+			CLLogger::WriteLogMsg("In CLIOVectors::PushBackRangeToAIOVector(), IOVectors.PushBack 4 error", 0);
+			return CLStatus(-1, NORMAL_ERROR);
+		}
+
+		Length = Length - room;
+	}
+}
+
 void CLIOVectors::PushBackIOVector(CLIOVectors& IOVectors)
 {
 	list<SLIOVectorItem>::iterator it = IOVectors.m_IOVectors.begin();

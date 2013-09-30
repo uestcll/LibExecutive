@@ -36,6 +36,7 @@ public:
 	CLStatus ReadBlock(unsigned int Index, char *pBuf, unsigned int Length);
 
 	CLStatus PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned int Index, unsigned int Length);
+	CLStatus PushBackRangeToAIOVector(CLIOVectors& IOVectors, CLIteratorForIOVectors& Iter, unsigned int Length);
 
 	void PushBackIOVector(CLIOVectors& IOVectors);
 
