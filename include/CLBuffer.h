@@ -22,6 +22,7 @@ public:
 
 	char* GetDataPtr();
 	//CLIOVector* GetDataPtr(const int& index, const int& len);
+	CLStatus WriteData(char* &pBuffer, const int& len);
 	CLStatus ReadData(char* &pBuffer, const int& index, const int& len);
 
 	CLStatus GetRestBufPtr(char** pBuf, int& restLen); //得到空闲buffer的头指针，并得到可以存储数据的空闲buffer长度

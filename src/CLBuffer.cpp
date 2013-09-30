@@ -90,6 +90,49 @@ CLStatus CLBuffer::ReadData(char* &pBuffer, const int& index, const int& len)
 	}
 }
 
+CLStatus CLBuffer::WriteData(char* pBuffer, const int& len)
+{
+	char* pBuf;
+	int bufLen;
+	CLStatus s = GetRestBufPtr(&pBuf, &bufLen);
+	if(!s.IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLBuffer::WriteData(), GetRestBufPtr error", 0);
+		return s;
+	}
+
+	if(len <= bufLen)
+	{
+		 memcpy(pBuf, pBuffer, len);
+		 return CLStatus(0， 0);
+	}
+	else
+	{
+		int nwrite = 0;
+		while(nwrite != len)
+		{
+			if(bufLen <　(len - nwrite))
+			{
+				memcpy(pBuf, pBuffer + nwrite, bufLen);	
+				nwrite += bufLen;
+				CLStatus s1 = GetRestBufPtr(&pBuf, &bufLen);//buflen change to a new space len, pBuf alse
+				if(!s1.IsSuccess())
+				{
+					CLLogger::WriteLogMsg("In CLBuffer::WriteData(), GetRestBufPtr two error", 0);
+					return s1;
+				}
+			}
+			else
+			{
+				memcpy(pBuf, pBuffer + nwrite, (len - nwrite));
+				nwrite = len;
+			}
+		}
+	}
+
+	return CLStatus(0, 0);
+}
+
 CLStatus CLBuffer::GetRestBufPtr(char** pBuf, int *restLen)
 {
 	if(m_iUsedBufferLen == m_iSumBufferLen)
@@ -97,7 +140,7 @@ CLStatus CLBuffer::GetRestBufPtr(char** pBuf, int *restLen)
 		CLStatus s = NewBuffer(m_iItemSize);
 		if(!s.IsSuccess())
 		{
-			CLLogger::WriteLogMsg("In CLBuffer::GetBufPtr(), new buffer error", 0);
+			CLLogger::WriteLogMsg("In CLBuffer::GetRestBufPtr(), new buffer error", 0);
 			return s;
 		}
 	}
