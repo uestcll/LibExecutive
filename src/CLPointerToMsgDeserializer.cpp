@@ -12,7 +12,7 @@ CLPointerToMsgDeserializer::~CLPointerToMsgDeserializer()
 {
 }
 
-CLStatus CLPointerToMsgDeserializer::Deserialize(CLIOVectors *pIOVectors, CLMessage **ppMsg)
+CLStatus CLPointerToMsgDeserializer::Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, /*......*/)
 {
 	if(pIOVectors->Size() != sizeof(CLMessage *))
 	{

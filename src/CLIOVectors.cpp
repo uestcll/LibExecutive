@@ -81,39 +81,9 @@ CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned 
 	if(iter.IsEnd())
 		return CLStatus(-1, NORMAL_ERROR);
 
-	if(IsRangeInAIOVector(iter.m_pData, Length, iter.m_Iter))
-		return IOVectors.PushBack(iter.m_pData, Length, false);
-
-	unsigned long offset = (unsigned long)iter.m_pData - (unsigned long)(iter.m_Iter->IOVector.iov_base);
-	unsigned long leftroom = iter.m_Iter->IOVector.iov_len - offset;
-	CLStatus s1 = IOVectors.PushBack(iter.m_pData, leftroom, false);
-	if(!s1.IsSuccess())
-	{
-		CLLogger::WriteLogMsg("In CLIOVectors::PushBackRangeToAIOVector(), IOVectors.PushBack 1 error", 0);
-		return s1;
-	}
-
-	Length = Length - leftroom;
-
-	while(true)
-	{
-		iter.m_Iter++;
-		int room = iter.m_Iter->IOVector.iov_len;
-		if(Length <= room)
-			return IOVectors.PushBack((char *)iter.m_Iter->IOVector.iov_base, Length, false);
-
-		CLStatus s2 = IOVectors.PushBack((char *)iter.m_Iter->IOVector.iov_base, room, false);
-		if(!s2.IsSuccess())
-		{
-			CLLogger::WriteLogMsg("In CLIOVectors::PushBackRangeToAIOVector(), IOVectors.PushBack 2 error", 0);
-			return s2;
-		}
-
-		Length = Length - room;
-	}
+	return PushBackRangeToAIOVector(IOVectors, iter, Length);
 }
 
-//MODIFY ITER ACCORDING LENGTH...................
 CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, CLIteratorForIOVectors& Iter, unsigned int Length)
 {
 	if(Iter.IsEnd() || (Length == 0))
@@ -122,10 +92,23 @@ CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, CLIterato
 		return CLStatus(-1, NORMAL_ERROR);
 	}
 
-	if(IsRangeInAIOVector(iter.m_pData, Length, iter.m_Iter))
+	if(IsRangeInAIOVector(Iter.m_pData, Length, Iter.m_Iter))
 	{
-		if(IOVectors.PushBack(iter.m_pData, Length, false).IsSuccess())
+		if(IOVectors.PushBack(Iter.m_pData, Length, false).IsSuccess())
+		{
+			if((Iter.m_pData - (char *)Iter.m_Iter->IOVector.iov_base + Length) == Iter.m_Iter->IOVector.iov_len)
+			{
+				Iter.m_Iter++;
+				if(Iter.m_Iter != m_IOVectors.end())
+					Iter.m_pData = (char *)Iter.m_Iter->IOVector.iov_base;
+				else
+					Iter.m_pData = 0;
+			}
+			else
+				Iter.m_pData = Iter.m_pData + Length;
+
 			return CLStatus(Length, 0);
+		}
 		else
 		{
 			CLLogger::WriteLogMsg("In CLIOVectors::PushBackRangeToAIOVector(), IOVectors.PushBack 1 error", 0);
@@ -135,9 +118,9 @@ CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, CLIterato
 
 	unsigned int OriginalLength = Length;
 
-	unsigned long offset = (unsigned long)iter.m_pData - (unsigned long)(iter.m_Iter->IOVector.iov_base);
-	unsigned long leftroom = iter.m_Iter->IOVector.iov_len - offset;
-	if(!(IOVectors.PushBack(iter.m_pData, leftroom, false).IsSuccess()))
+	unsigned long offset = (unsigned long)Iter.m_pData - (unsigned long)(Iter.m_Iter->IOVector.iov_base);
+	unsigned long leftroom = Iter.m_Iter->IOVector.iov_len - offset;
+	if(!(IOVectors.PushBack(Iter.m_pData, leftroom, false).IsSuccess()))
 	{
 		CLLogger::WriteLogMsg("In CLIOVectors::PushBackRangeToAIOVector(), IOVectors.PushBack 2 error", 0);
 		return CLStatus(-1, NORMAL_ERROR);
@@ -147,26 +130,39 @@ CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, CLIterato
 
 	while(true)
 	{
-		iter.m_Iter++;
+		Iter.m_Iter++;
 		if(Iter.m_Iter == m_IOVectors.end())
 		{
 			Iter.m_pData = 0;
 			return CLStatus(OriginalLength - Length, 0);
 		}
 
-		int room = iter.m_Iter->IOVector.iov_len;
+		int room = Iter.m_Iter->IOVector.iov_len;
 		if(Length <= room)
 		{
-			if(!(IOVectors.PushBack((char *)iter.m_Iter->IOVector.iov_base, Length, false).IsSuccess()))
+			if(!(IOVectors.PushBack((char *)Iter.m_Iter->IOVector.iov_base, Length, false).IsSuccess()))
 			{
 				CLLogger::WriteLogMsg("In CLIOVectors::PushBackRangeToAIOVector(), IOVectors.PushBack 3 error", 0);
 				return CLStatus(-1, NORMAL_ERROR);
 			}
 			else
+			{
+				if(Length == room)
+				{
+					Iter.m_Iter++;
+					if(Iter.m_Iter != m_IOVectors.end())
+						Iter.m_pData = (char *)Iter.m_Iter->IOVector.iov_base;
+					else
+						Iter.m_pData = 0;
+				}
+				else
+					Iter.m_pData = Iter.m_pData + Length;
+
 				return CLStatus(OriginalLength, 0);
+			}
 		}
 
-		if(!(IOVectors.PushBack((char *)iter.m_Iter->IOVector.iov_base, room, false).IsSuccess()))
+		if(!(IOVectors.PushBack((char *)Iter.m_Iter->IOVector.iov_base, room, false).IsSuccess()))
 		{
 			CLLogger::WriteLogMsg("In CLIOVectors::PushBackRangeToAIOVector(), IOVectors.PushBack 4 error", 0);
 			return CLStatus(-1, NORMAL_ERROR);

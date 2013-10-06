@@ -4,6 +4,8 @@
 #include "CLLogger.h"
 #include "ErrorCode.h"
 
+using namespace std;
+
 CLProtocolDecapsulatorBySplitPointer::CLProtocolDecapsulatorBySplitPointer() : CLProtocolDecapsulator(0)
 {
 }
@@ -12,49 +14,40 @@ CLProtocolDecapsulatorBySplitPointer::~CLProtocolDecapsulatorBySplitPointer()
 {
 }
 
-CLStatus CLProtocolDecapsulatorBySplitPointer::Decapsulate(CLIOVectors& IOVectorsForData, std::vector<CLIOVectors& >& vSerializedMsgs, CLIOVectors& IOVectorForPartialData, void *pContext)
+CLStatus CLProtocolDecapsulatorBySplitPointer::Decapsulate(CLIOVectors& IOVectorsForData, unsigned int Length, std::vector<CLIOVectors *>& vSerializedMsgs, CLIOVectors& IOVectorForPartialData, void *pContext)
 {
-	size_t length = IOVectorsForData.Size();
-	if((length == 0) || (length % sizeof(long) != 0))
+	if((Length < sizeof(unsigned long)) || (Length > IOVectorsForData.Size()) || (Length % sizeof(unsigned long) != 0))
 	{
-		CLLogger::WriteLogMsg("In CLProtocolDecapsulatorBySplitPointer::Decapsulate(), length error", 0);
+		CLLogger::WriteLogMsg("In CLProtocolDecapsulatorBySplitPointer::Decapsulate(), Length error", 0);
 		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	CLIteratorForIOVectors iter;
 	IOVectorsForData.GetIterator(0, iter);
 
-	for(; !iter.IsEnd(); )
+	while(true)
 	{
-		unsigned long data;
-		CLStatus s1 = IOVectorsForData.ReadBlock(iter, (char *)&data, sizeof(unsigned long));
-		if((!s1.IsSuccess()) || (s1.m_clReturnCode != sizeof(unsigned long)))
+		CLIOVectors *pTmp = new CLIOVectors;
+		CLStatus s = IOVectorsForData.PushBackRangeToAIOVector(*pTmp, iter, sizeof(unsigned long));
+		if(!s.IsSuccess() || s.m_clReturnCode != sizeof(unsigned long))
 		{
-			CLLogger::WriteLogMsg("In CLProtocolDecapsulatorBySplitPointer::Decapsulate(), IOVectorsForData.ReadBlock error", 0);
-			//......
-		}
+			delete pTmp;
+			
+			CLLogger::WriteLogMsg("In CLProtocolDecapsulatorBySplitPointer::Decapsulate(), PushBackRangeToAIOVector error", 0);
+			
+			for(int i = 0; i < vSerializedMsgs.size(); i++)
+				delete vSerializedMsgs[i];
 
-		CLIOVectors *pio = new CLIOVectors;
-		pio//.....................
+			vSerializedMsgs.clear();
 
-		vSerializedMsgs.push_back(*pio);
-	}
-
-	for(int i = 0; i < length;)
-	{
-		CLIOVectors *pio = new CLIOVectors;
-		CLStatus s = IOVectorsForData.PushBackRangeToAIOVector(*pio, i, sizeof(long));
-		if(!s.IsSuccess())
-		{
-			delete pio;
-			CLLogger::WriteLogMsg("In CLProtocolDecapsulatorBySplitPointer::Decapsulate(), IOVectors.PushBackRangeToAIOVector error", 0);
 			return CLStatus(-1, NORMAL_ERROR);
 		}
 
-		vSerializedMsgs.push_back(pio);
+		vSerializedMsgs.push_back(pTmp);
 
-		i += sizeof(long);
+		Length = Length - sizeof(unsigned long);
+
+		if(Length < sizeof(unsigned long))
+			return CLStatus(0, 0);
 	}
-
-	return CLStatus(0, 0);
 }
