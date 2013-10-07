@@ -172,6 +172,48 @@ CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, CLIterato
 	}
 }
 
+CLStatus CLIOVectors::FindIOVectors(CLIOVectors& IOVectors, bool bDelete)
+{
+	if(IOVectors.GetNumberOfIOVec() == 0)
+		return CLStatus(0, 0);
+
+	list<SLIOVectorItem>::iterator it_target = m_IOVectors.begin();
+	list<SLIOVectorItem>::iterator it_source = IOVectors.m_IOVectors.begin();
+
+	vector<list<SLIOVectorItem>::iterator> v;
+
+	for(; it_target != m_IOVectors.end(); ++it_target)
+	{
+		if((it_source->IOVector.iov_base == it_target->IOVector.iov_base) && (it_source->IOVector.iov_len == it_target->IOVector.iov_len))
+		{
+			v.push_back(it_target);
+			++it_source;
+
+			if(it_source == IOVectors.m_IOVectors.end())
+				break;
+		}
+	}
+
+	if(v.size() != IOVectors.GetNumberOfIOVec())
+	{
+		CLLogger::WriteLogMsg("In CLIOVectors::FindIOVector(), GetNumberOfIOVec error", 0);
+		return CLStatus(-1, NORMAL_ERROR);
+	}
+
+	if(bDelete)
+	{
+		for(int i = 0; i < v.size(); i++)
+		{
+			if(v[i]->bDelete)
+				delete [] ((char *)v[i]->IOVector.iov_base);
+
+			m_IOVectors.erase(v[i]);
+		}
+	}
+
+	return CLStatus(0, 0);
+}
+
 void CLIOVectors::PushBackIOVector(CLIOVectors& IOVectors)
 {
 	list<SLIOVectorItem>::iterator it = IOVectors.m_IOVectors.begin();

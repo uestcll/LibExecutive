@@ -8,15 +8,25 @@ class CLIOVectors;
 class CLBufferManager
 {
 public:
-	CLBufferManager(unsigned int ThresholdForStep = 1024, unsigned int StepSize = 4096, unsigned int DefaultBufferSize = 4096);
+	CLBufferManager();
+	CLBufferManager(unsigned int ThresholdForReduce, unsigned int ThresholdForStep, unsigned int StepSize, unsigned int DefaultBufferSize);
 	virtual ~CLBufferManager();
 
 	void AddOccupiedIOVector(CLIOVectors& IOVector);
 	CLStatus ReleaseOccupiedIOVector(CLIOVectors& IOVector);
 
+	CLStatus GetEmptyIOVector(CLIOVectors& IOVector);
+
+	void GetPartialDataIOVector(CLIOVectors& IOVector);
+	void SetPartialDataIOVector(CLIOVectors& IOVector);
+
+	void AddIOVectorToOverallView(CLIOVectors& IOVector);
+
 private:
 	CLBufferManager(const CLBufferManager&);
 	CLBufferManager& operator=(const CLBufferManager&);
+
+	void Initialize(unsigned int ThresholdForReduce, unsigned int ThresholdForStep, unsigned int StepSize, unsigned int DefaultBufferSize);
 
 private:
 	CLIOVectors *m_pOverallView;
@@ -25,6 +35,7 @@ private:
 
 	unsigned int m_StepSize;
 	unsigned int m_ThresholdForStep;
+	unsigned int m_ThresholdForReduce;
 };
 
 #endif

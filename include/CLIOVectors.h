@@ -38,6 +38,8 @@ public:
 	CLStatus PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned int Index, unsigned int Length);
 	CLStatus PushBackRangeToAIOVector(CLIOVectors& IOVectors, CLIteratorForIOVectors& Iter, unsigned int Length);
 
+	CLStatus FindIOVectors(CLIOVectors& IOVectors, bool bDelete);
+
 	void PushBackIOVector(CLIOVectors& IOVectors);
 
 	void DifferenceBetweenIOVectors(CLIOVectors& Operand, CLIOVectors& Difference);
