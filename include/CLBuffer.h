@@ -6,6 +6,13 @@
 
 class CLIOVector;
 //提供接口 得到从哪里开始 多长的字符串。如果是连续的，就返回指针。不是就拷贝一份成为连续的。
+/*
+buffer新想法：
+new 多个iovectors
+datareadvec
+usedbuffervec
+保存这两个印象，最开始的都是马上能用的，用完就pop出去。这样就不用每次都去buffer里面用index索引
+*/
 class CLBuffer
 {
 public:

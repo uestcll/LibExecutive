@@ -17,12 +17,12 @@ class CLMessage;
 class CLProtoParser;
 class CLDataReceiver;
 class CLBuffer;
-class CLMsgDeserializerManager;
+class CLMessageDeserializer;
 
 class CLMessageReceiver
 {
 public:
-	CLMessageReceiver(CLDataReceiver *pDataReceiver, CLProtoParser *pProtoParser, CLMsgDeserializerManager *pMsgDeserializerManager);
+	CLMessageReceiver(CLDataReceiver *pDataReceiver, CLProtoParser *pProtoParser, CLMessageDeserializer *pMsgDeserializer);
 	virtual ~CLMessageReceiver();
 
 	CLMessage *GetMessage();
@@ -37,7 +37,7 @@ protected:
 	CLMutex m_Mutex;
 	CLProtoParser *m_pProtoParser;
 	CLDataReceiver *m_pDataReceiver;
-	CLMsgDeserializerManager *m_pMsgDeserializerManager;
+	CLMessageDeserializer *m_pMsgDeserializer;
 
 	std::queue<CLMessage*> m_MessageQueue;
 	CLBuffer *m_pDataBuffer;

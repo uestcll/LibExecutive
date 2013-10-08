@@ -1,14 +1,14 @@
 #include "CLMessageReceiver.h"
 #include "CLStatus.h"
 #include "CLLogger.h"
-#include "CLMsgDeserializerManager.h"
+#include "CLMessageDeserializer.h"
 #include "CLProtoParser.h"
 #include "CLBuffer.h"
 
 // iovector 提供返回连续空间的长度值 CLBuffer根据分配了空间的buf，和指定的对应长度，返回该buf的值。
 using namespace std;
 
-CLMessageReceiver::CLMessageReceiver(CLDataReceiver *pDataReceiver, CLProtoParser *pProtoParser, CLMsgDeserializerManager *pMsgDeserializerManager)
+CLMessageReceiver::CLMessageReceiver(CLDataReceiver *pDataReceiver, CLProtoParser *pProtoParser, CLMessageDeserializer *pMsgDeserializer)
 {
 	try
 	{
@@ -16,14 +16,14 @@ CLMessageReceiver::CLMessageReceiver(CLDataReceiver *pDataReceiver, CLProtoParse
 		{
 			throw "In CLMessageReceiver::CLMessageReceiver(), pDataReceiver = NULL";
 		}
-		if(pMsgDeserializerManager == NULL)
+		if(pMsgDeserializer == NULL)
 		{
 			throw "In CLMessageReceiver::CLMessageReceiver(), pMsgDeserializerManager = NULL";
 		}
 
 		m_pProtoParser = pProtoParser;
 		m_pDataReceiver = pDataReceiver;
-		m_pMsgDeserializerManager = pMsgDeserializerManager;
+		m_pMsgDeserializer = pMsgDeserializer;
 		m_pDataBuffer = new CLBuffer();
 	}
 	catch(const char* s)
@@ -39,10 +39,10 @@ CLMessageReceiver::CLMessageReceiver(CLDataReceiver *pDataReceiver, CLProtoParse
 			delete m_pDataReceiver;
 			m_pDataReceiver = NULL;
 		}
-		if(m_pMsgDeserializerManager != NULL)
+		if(m_pMsgDeserializer != NULL)
 		{
-			delete m_pMsgDeserializerManager;
-			m_pMsgDeserializerManager = NULL;
+			delete m_pMsgDeserializer;
+			m_pMsgDeserializer = NULL;
 		}
 
 		throw s;
@@ -62,10 +62,10 @@ CLMessageReceiver::~CLMessageReceiver()
 		delete m_pDataReceiver;
 		m_pDataReceiver = NULL;
 	}
-	if(m_pMsgDeserializerManager != NULL)
+	if(m_pMsgDeserializer != NULL)
 	{
-		delete m_pMsgDeserializerManager;
-		m_pMsgDeserializerManager = NULL;
+		delete m_pMsgDeserializer;
+		m_pMsgDeserializer = NULL;
 	}
 
 	while(true)
@@ -97,26 +97,39 @@ CLMessage* CLMessageReceiver::GetMessage()
 
 	m_pDataBuffer->AddUsedBufferLen(readLen);*/ //this part complete in data receiver
 
-	vector<SLSerializedMsgScope> SerializedMsgScopeVec;//存储协议解析切割完成，反序列化之前的一个个的协议。
-	
-	int decapsulateStartIndex = m_pDataBuffer->DataStartIndex();
 
 	if(m_pProtoParser != NULL)
-	CLStatus s2 = m_pProtoParser->Decapsulate(m_pDataBuffer, decapsulateStartIndex, SerializedMsgScopeVec);
-	if(!s2.IsSuccess())
 	{
-		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(0, m_pProtoParser->Decapsulate(), error", 0);
-		return PopMessage();
+		vector<SLSerializedMsgScope> SerializedMsgScopeVec;//存储协议解析切割完成，反序列化之前的一个个的协议。
+	
+		//int decapsulateStartIndex = m_pDataBuffer->DataStartIndex();
+
+		CLStatus s2 = m_pProtoParser->Decapsulate(m_pDataBuffer, /*decapsulateStartIndex,*/ SerializedMsgScopeVec);//get and add data startindex in Decapsulate(0)
+		if(!s2.IsSuccess())
+		{
+			CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(0, m_pProtoParser->Decapsulate(), error", 0);
+			return PopMessage();
+		}
+
+		//int decapsulateLen = (int)(s2.m_clReturnCode);
+		//m_pDataBuffer->DataStartIndex(decapsulateStartIndex + decapsulateLen);
+
+		CLStatus s3 = m_pMsgDeserializer->Deserializer(m_pDataBuffer, SerializedMsgScopeVec, m_MessageQueue);
+		if(!s3.IsSuccess())
+		{
+			CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pMsgDeserializer->Deserializer() error", 0);
+		}
 	}
-
-	int decapsulateLen = (int)(s2.m_clReturnCode);
-	m_pDataBuffer->DataStartIndex(decapsulateStartIndex + decapsulateLen);
-
-	CLStatus s3 = m_pMsgDeserializerManager->Deserializer(m_pDataBuffer, SerializedMsgScopeVec, m_MessageQueue);
-	if(!s3.IsSuccess())
+	else
 	{
-		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pMsgDeserializerManager->Deserializer() error", 0);
+		CLStatus s4 = m_pMsgDeserializer->Deserializer(m_pDataBuffer, (vector<SLSerializedMsgScope>)0, m_MessageQueue); //new SLSerializedMsgScop :datastart --usedlen
+		//cause this is no protoparser ,so use 0 to point protoparse and scope, and in deserializer:get data start and add startindex in deserializer
+		if(!s4.IsSuccess())
+		{
+			CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pMsgDeserializer->Deserializer() error", 0);
+		}
 	}
+	
 
 	return PopMessage();
 }

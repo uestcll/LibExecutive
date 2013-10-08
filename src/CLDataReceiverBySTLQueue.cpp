@@ -26,7 +26,7 @@ CLStatus CLDataReceiverBySTLQueue::GetData(CLBuffer *pBuffer)
         CLStatus s = pBuffer->WriteData((char*)&pMsg, sizeof(CLMessage*));//in pbuffer->writedata the usedlen is added ,so here dont need to return the added len in status
         if(!s.IsSuccess())
         {
-            CLLogger::WRiteLogMsg("In CLDataReceiverBySTLQueue::GetData(), pBuffer WriteData error", 0);
+            CLLogger::WriteLogMsg("In CLDataReceiverBySTLQueue::GetData(), pBuffer WriteData error", 0);
             return s;
         }
     }
