@@ -3,6 +3,7 @@
 #include "CLIteratorForIOVectors.h"
 #include "CLLogger.h"
 #include "ErrorCode.h"
+#include "CLBufferManager.h"
 
 using namespace std;
 
@@ -14,7 +15,7 @@ CLProtocolDecapsulatorBySplitPointer::~CLProtocolDecapsulatorBySplitPointer()
 {
 }
 
-CLStatus CLProtocolDecapsulatorBySplitPointer::Decapsulate(CLIOVectors& IOVectorsForData, unsigned int Length, std::vector<CLIOVectors *>& vSerializedMsgs, CLIOVectors& IOVectorForPartialData, void *pContext)
+CLStatus CLProtocolDecapsulatorBySplitPointer::Decapsulate(CLIOVectors& IOVectorsForData, unsigned int Length, std::vector<CLIOVectors *>& vSerializedMsgs, CLBufferManager& BufferManager, void *pContext)
 {
 	if((Length < sizeof(unsigned long)) || (Length > IOVectorsForData.Size()) || (Length % sizeof(unsigned long) != 0))
 	{

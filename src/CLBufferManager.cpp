@@ -27,13 +27,16 @@ void CLBufferManager::Initialize(unsigned int ThresholdForReduce, unsigned int T
 	m_StepSize = StepSize;
 	m_ThresholdForStep = ThresholdForStep;
 	m_ThresholdForReduce = ThresholdForReduce;
+	m_DefaultBufferSize = DefaultBufferSize;
 
 	m_pOverallView = new CLIOVectors;
 	m_pOccupiedView = new CLIOVectors;
 	m_pPartialDataView = new CLIOVectors;
 
-	char *p = new char [DefaultBufferSize];
-	m_pOverallView->PushBack(p, DefaultBufferSize, true);
+	char *p = new char [m_DefaultBufferSize];
+	m_pOverallView->PushBack(p, m_DefaultBufferSize, true);
+
+	m_bNeedDestroy = false;
 }
 
 CLBufferManager::~CLBufferManager()
@@ -59,6 +62,11 @@ CLStatus CLBufferManager::ReleaseOccupiedIOVector(CLIOVectors& IOVector)
 	if(!s.IsSuccess())
 		CLLogger::WriteLogMsg("In CLBufferManager::ReleaseOccupiedIOVector(), FindIOVectors error", 0);
 
+	if(m_bNeedDestroy && (m_pOccupiedView->Size() == 0))
+	{
+		delete this;
+	}
+
 	return s;
 }
 
@@ -81,7 +89,25 @@ CLStatus CLBufferManager::GetEmptyIOVector(CLIOVectors& IOVector)
 	if(IOVector.Size() >= m_ThresholdForReduce)
 	{
 		iovec* pIO = m_pOverallView->GetIOVecArray();
-		//for()...................
+		int num = m_pOverallView->GetNumberOfIOVec();
+
+		for(int i = num - 1; i >= 0; i--)
+		{
+			if(tmp.IsRangeOverlap(pIO[i]))
+				continue;
+
+			if((IOVector.Size() - pIO[i].iov_len) <= m_DefaultBufferSize)
+				continue;
+
+			CLIOVectors del_iov;
+			del_iov.PushBack((char *)pIO[i].iov_base, pIO[i].iov_len, false);
+
+			//performance????
+			m_pOverallView->FindIOVectors(del_iov, true);
+			IOVector.FindIOVectors(del_iov, true);
+		}
+
+		return CLStatus(0, 0);
 	}
 
 	return CLStatus(0, 0);
@@ -104,4 +130,14 @@ void CLBufferManager::SetPartialDataIOVector(CLIOVectors& IOVector)
 void CLBufferManager::AddIOVectorToOverallView(CLIOVectors& IOVector)
 {
 	m_pOverallView->PushBackIOVector(IOVector);
+}
+
+void CLBufferManager::SetDestroyFlag()
+{
+	m_bNeedDestroy = true;
+	
+	if(m_pPartialDataView)
+		delete m_pPartialDataView;
+
+	m_pPartialDataView = 0;
 }

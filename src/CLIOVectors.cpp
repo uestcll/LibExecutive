@@ -207,6 +207,8 @@ CLStatus CLIOVectors::FindIOVectors(CLIOVectors& IOVectors, bool bDelete)
 			if(v[i]->bDelete)
 				delete [] ((char *)v[i]->IOVector.iov_base);
 
+			m_nDataLength = m_nDataLength - v[i]->IOVector.iov_len;
+
 			m_IOVectors.erase(v[i]);
 		}
 	}

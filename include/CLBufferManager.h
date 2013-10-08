@@ -22,6 +22,8 @@ public:
 
 	void AddIOVectorToOverallView(CLIOVectors& IOVector);
 
+	void SetDestroyFlag();
+
 private:
 	CLBufferManager(const CLBufferManager&);
 	CLBufferManager& operator=(const CLBufferManager&);
@@ -36,6 +38,9 @@ private:
 	unsigned int m_StepSize;
 	unsigned int m_ThresholdForStep;
 	unsigned int m_ThresholdForReduce;
+	unsigned int m_DefaultBufferSize;
+
+	bool m_bNeedDestroy;
 };
 
 #endif

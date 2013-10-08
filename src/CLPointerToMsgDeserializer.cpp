@@ -3,6 +3,7 @@
 #include "CLMessage.h"
 #include "CLLogger.h"
 #include "ErrorCode.h"
+#include "CLBufferManager.h"
 
 CLPointerToMsgDeserializer::CLPointerToMsgDeserializer()
 {
@@ -12,21 +13,21 @@ CLPointerToMsgDeserializer::~CLPointerToMsgDeserializer()
 {
 }
 
-CLStatus CLPointerToMsgDeserializer::Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, /*......*/)
+CLStatus CLPointerToMsgDeserializer::Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager)
 {
-	if(pIOVectors->Size() != sizeof(CLMessage *))
+	if(IOVectors.Size() != sizeof(CLMessage *))
 	{
 		*ppMsg = 0;
-		CLLogger::WriteLogMsg("In CLPointerToMsgDeserializer::Deserialize(), pIOVectors->Size error", 0);
+		CLLogger::WriteLogMsg("In CLPointerToMsgDeserializer::Deserialize(), IOVectors.Size error", 0);
 		return CLStatus(-1, NORMAL_ERROR);
 	}
 
-	long addr = 0;
-	CLStatus s = pIOVectors->ReadLong(0, addr);
-	if((!s.IsSuccess()) || (addr == 0))
+	unsigned long addr = 0;
+	CLStatus s = IOVectors.ReadBlock(0, (char *)(&addr), sizeof(unsigned long));
+	if((!s.IsSuccess()) || (s.m_clReturnCode != sizeof(unsigned long)) || (addr == 0))
 	{
 		*ppMsg = 0;
-		CLLogger::WriteLogMsg("In CLPointerToMsgDeserializer::Deserialize(), pIOVectors->ReadLong error", 0);
+		CLLogger::WriteLogMsg("In CLPointerToMsgDeserializer::Deserialize(), IOVectors.ReadBlock error", 0);
 		return CLStatus(-1, NORMAL_ERROR);
 	}
 

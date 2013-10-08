@@ -9,7 +9,7 @@ public:
 	CLProtocolDecapsulatorBySplitPointer();
 	virtual ~CLProtocolDecapsulatorBySplitPointer();
 
-	virtual CLStatus Decapsulate(CLIOVectors& IOVectorsForData, unsigned int Length, std::vector<CLIOVectors *>& vSerializedMsgs, CLIOVectors& IOVectorForPartialData, void *pContext);
+	virtual CLStatus Decapsulate(CLIOVectors& IOVectorsForData, unsigned int Length, std::vector<CLIOVectors *>& vSerializedMsgs, CLBufferManager& BufferManager, void *pContext);
 
 private:
 	CLProtocolDecapsulatorBySplitPointer(const CLProtocolDecapsulatorBySplitPointer&);
