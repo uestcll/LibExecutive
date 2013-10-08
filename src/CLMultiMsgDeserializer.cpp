@@ -2,6 +2,7 @@
 #include "CLIOVectors.h"
 #include "CLLogger.h"
 #include "ErrorCode.h"
+#include "CLBufferManager.h"
 
 using namespace std;
 
@@ -44,31 +45,31 @@ CLStatus CLMultiMsgDeserializer::UnregisterDeserializer(unsigned long lMsgID)
 	}
 }
 
-CLStatus CLMultiMsgDeserializer::Deserialize(CLIOVectors *pIOVectors, CLMessage **ppMsg)
+CLStatus CLMultiMsgDeserializer::Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager)
 {
 	const unsigned int HeadLength = sizeof(int);
 	const unsigned int MsgIDLength = sizeof(long);
 
-	if(pIOVectors->Size() < HeadLength + MsgIDLength)
+	if(IOVectors.Size() < HeadLength + MsgIDLength)
 	{
 		*ppMsg = 0;
-		CLLogger::WriteLogMsg("In CLMultiMsgDeserializer::Deserialize(), pIOVectors->Size() error", 0);
+		CLLogger::WriteLogMsg("In CLMultiMsgDeserializer::Deserialize(), IOVectors.Size() error", 0);
 		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	unsigned long MsgID;
-	CLStatus s = pIOVectors->ReadLong(HeadLength, (long &)MsgID);
-	if(!s.IsSuccess())
+	CLStatus s = IOVectors.ReadBlock(HeadLength, (char *)(&MsgID), sizeof(long));
+	if(!s.IsSuccess() || (s.m_clReturnCode != sizeof(long)))
 	{
 		*ppMsg = 0;
-		CLLogger::WriteLogMsg("In CLMultiMsgDeserializer::Deserialize(), pIOVectors->ReadLong error", 0);
+		CLLogger::WriteLogMsg("In CLMultiMsgDeserializer::Deserialize(), IOVectors.ReadBlock error", 0);
 		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	map<unsigned long, CLMessageDeserializer*>::iterator it = m_DeserializerTable.find(MsgID);
 	if(it != m_DeserializerTable.end())
 	{
-		CLStatus s = it->second->Deserialize(pIOVectors, ppMsg);
+		CLStatus s = it->second->Deserialize(IOVectors, ppMsg, BufferManager);
 		if(!s.IsSuccess())
 		{
 			*ppMsg = 0;

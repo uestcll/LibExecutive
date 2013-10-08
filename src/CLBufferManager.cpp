@@ -140,4 +140,7 @@ void CLBufferManager::SetDestroyFlag()
 		delete m_pPartialDataView;
 
 	m_pPartialDataView = 0;
+
+	if(m_pOccupiedView->Size() == 0)
+		delete this;
 }
