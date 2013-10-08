@@ -8,7 +8,7 @@ class CLSTLQueue;
 class CLDataReceiverBySTLQueue : public CLDataReceiver
 {
 public:
-	CLDataReceiverBySTLQueue(CLSTLQueue dataSTLQueue);
+	CLDataReceiverBySTLQueue(CLSTLQueue* pDataSTLQueue);
 	virtual ~CLDataReceiverBySTLQueue();
 
 	virtual CLStatus GetData(CLBuffer *pBuffer);
@@ -18,7 +18,7 @@ private:
 	CLDataReceiverBySTLQueue& operator=(const CLDataReceiverBySTLQueue&);
 
 private:
-	CLSTLQueue m_dataSTLQueue;
+	CLSTLQueue* m_pDataSTLQueue;
 };
 
 #endif

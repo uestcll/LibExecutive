@@ -104,6 +104,7 @@ CLStatus CLBuffer::WriteData(char* pBuffer, const int& len)
 	if(len <= bufLen)
 	{
 		 memcpy(pBuf, pBuffer, len);
+		 m_iUsedBufferLen += len;
 		 return CLStatus(0， 0);
 	}
 	else
@@ -129,7 +130,7 @@ CLStatus CLBuffer::WriteData(char* pBuffer, const int& len)
 			}
 		}
 	}
-
+	m_iUsedBufferLen += len;
 	return CLStatus(0, 0);
 }
 

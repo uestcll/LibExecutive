@@ -88,20 +88,21 @@ CLMessage* CLMessageReceiver::GetMessage()
 		return PopMessage();
 	}
 
-	int readLen = (int)s1.m_clReturnCode;
+	/*int readLen = (int)s1.m_clReturnCode;
 	if(readLen == 0)
 	{
 		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), Getdata len = 0", 0);
 		return PopMessage();
 	}
 
-	m_pDataBuffer->AddUsedBufferLen(readLen);
+	m_pDataBuffer->AddUsedBufferLen(readLen);*/ //this part complete in data receiver
 
-	vector<SLSerializedMsgScope> pSerializedMsgScopeVec;//存储协议解析切割完成，反序列化之前的一个个的协议。
+	vector<SLSerializedMsgScope> SerializedMsgScopeVec;//存储协议解析切割完成，反序列化之前的一个个的协议。
 	
 	int decapsulateStartIndex = m_pDataBuffer->DataStartIndex();
 
-	CLStatus s2 = m_pProtoParser->Decapsulate(m_pDataBuffer, decapsulateStartIndex, pSerializedMsgScopeVec);
+	if(m_pProtoParser != NULL)
+	CLStatus s2 = m_pProtoParser->Decapsulate(m_pDataBuffer, decapsulateStartIndex, SerializedMsgScopeVec);
 	if(!s2.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(0, m_pProtoParser->Decapsulate(), error", 0);
@@ -111,7 +112,7 @@ CLMessage* CLMessageReceiver::GetMessage()
 	int decapsulateLen = (int)(s2.m_clReturnCode);
 	m_pDataBuffer->DataStartIndex(decapsulateStartIndex + decapsulateLen);
 
-	CLStatus s3 = m_pMsgDeserializerManager->Deserializer(m_pDataBuffer, pSerializedMsgScopeVec, m_MessageQueue);
+	CLStatus s3 = m_pMsgDeserializerManager->Deserializer(m_pDataBuffer, SerializedMsgScopeVec, m_MessageQueue);
 	if(!s3.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pMsgDeserializerManager->Deserializer() error", 0);

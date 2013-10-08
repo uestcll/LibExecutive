@@ -4,21 +4,24 @@
 #include <iostream>
 #include <queue>
 #include "CLStatus.h"
+#include "CLMutex.h"
 
 using namespace std;
 
-template <typename T>
+class CLMessage;
+
 class CLSTLQueue
 {
 public:
 	CLSTLQueue();
 	virtual ~CLSTLQueue();
 
-	T PopItem();
-	CLStatus PushItem(T item);
+	CLMessage* PopMessage();
+	CLStatus PushMessage(CLMessage* pMsg);
 	 
 private:
-	queue<T> m_DataQueue; 
+    CLMutex m_MutexForQueue;
+	queue<CLMessage*> m_MsgQueue; 
 };
 
 #endif
