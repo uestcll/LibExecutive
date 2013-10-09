@@ -1,6 +1,7 @@
 #include "CLMsgToPointerSerializer.h"
-#include "CLLogger.h"
 #include "CLIOVectors.h"
+#include "CLLogger.h"
+#include "ErrorCode.h"
 
 CLMsgToPointerSerializer::CLMsgToPointerSerializer()
 {
@@ -13,17 +14,15 @@ CLMsgToPointerSerializer::~CLMsgToPointerSerializer()
 CLStatus CLMsgToPointerSerializer::Serialize(CLMessage *pMsg, CLIOVectors *pIOVectors)
 {
 	if((pMsg == 0) || (pIOVectors == 0))
-		return CLStatus(-1, 0);
-
-	char *p = new char[sizeof(CLMessage *)];
-	*((long *)p) = (long)pMsg;
-
-	CLStatus s = pIOVectors->PushBack(p, sizeof(CLMessage *));
-	if(!s.IsSuccess())
 	{
-		CLLogger::WriteLogMsg("In CLMsgToPointerSerializer::Serialize(), pIOVectors->PushBack error", 0);
-		return s;
+		CLLogger::WriteLogMsg("In CLMsgToPointerSerializer::Serialize(), parameters error", 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
+	char *p = new char[sizeof(CLMessage *)];
+	*((unsigned long *)p) = (unsigned long)pMsg;
+
+	pIOVectors->PushBack(p, sizeof(CLMessage *));
+	
 	return CLStatus(0, 0);
 }

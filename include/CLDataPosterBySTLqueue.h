@@ -3,15 +3,15 @@
 
 #include "CLDataPoster.h"
 
-class CLDataReceiverBySTLqueue;
+class CLSTLqueue;
 
 class CLDataPosterBySTLqueue : public CLDataPoster
 {
 public:
-	CLDataPosterBySTLqueue(CLDataReceiverBySTLqueue *pDataReceiverBySTLqueue);
+	CLDataPosterBySTLqueue(CLSTLqueue *pSTLqueue);
 	virtual ~CLDataPosterBySTLqueue();
 
-	virtual CLStatus Initialize();
+	virtual CLStatus Initialize(void *pContext);
 	virtual CLStatus Uninitialize();
 
 	virtual CLStatus PostData(CLIOVectors *pIOVectors);
@@ -21,7 +21,7 @@ private:
 	CLDataPosterBySTLqueue& operator=(const CLDataPosterBySTLqueue&);
 
 private:
-	CLDataReceiverBySTLqueue *m_pDataReceiverBySTLqueue;
+	CLSTLqueue *m_pSTLqueue;
 };
 
 #endif

@@ -3,13 +3,29 @@
 #include "CLPostResultNotifier.h"
 #include "CLDataPoster.h"
 #include "CLLogger.h"
+#include "ErrorCode.h"
 
 CLProtocolDataPoster::CLProtocolDataPoster(CLDataPoster *pDataPoster, CLPostResultNotifier *pResultNotifier, CLEvent *pEvent)
 {
-	m_pDataPoster = pDataPoster;
-	m_pEvent = pEvent;
-	m_pResultNotifer = pResultNotifier;
-	m_pIOVectors = 0;
+	try
+	{
+		if((pDataPoster == 0) || (pResultNotifier == 0))
+			throw "In CLProtocolDataPoster::CLProtocolDataPoster(), parameters error";
+
+		m_pDataPoster = pDataPoster;
+		m_pEvent = pEvent;
+		m_pResultNotifer = pResultNotifier;
+		m_pIOVectors = 0;
+	}
+	catch(const char *s)
+	{
+		CLLogger::WriteLogMsg(s, 0);
+
+		if(pResultNotifier)
+			pResultNotifier->Notify(false);
+
+		throw s;
+	}
 }
 
 CLProtocolDataPoster::~CLProtocolDataPoster()
@@ -19,7 +35,7 @@ CLProtocolDataPoster::~CLProtocolDataPoster()
 CLStatus CLProtocolDataPoster::Initialize()
 {
 	CLStatus s = m_pDataPoster->Initialize();
-	if(!s.IsSuccess() && s.m_clErrorCode == POSTER_INITIALIZE_PENDING)
+	if(!s.IsSuccess() && s.m_clErrorCode == DATA_POSTER_POST_PENDING)
 		return s;
 
 	bool result = true;
@@ -34,8 +50,6 @@ CLStatus CLProtocolDataPoster::Initialize()
 		CLStatus s1 = m_pResultNotifer->Notify(result);
 		if(!s1.IsSuccess())
 			CLLogger::WriteLogMsg("In CLProtocolDataPoster::Initialize(), m_pResultNotifer->Notify error", 0);
-
-		delete m_pResultNotifer;
 	}
 
 	delete this;
@@ -50,8 +64,6 @@ CLStatus CLProtocolDataPoster::NotifyIntialFinished(bool bResult)
 		CLStatus s = m_pResultNotifer->Notify(bResult);
 		if(!s.IsSuccess())
 			CLLogger::WriteLogMsg("In CLProtocolDataPoster::NotifyIntialFinished(), m_pResultNotifer->Notify error", 0);
-
-		delete m_pResultNotifer;
 	}
 
 	delete this;
@@ -70,10 +82,11 @@ CLStatus CLProtocolDataPoster::Uninitialize()
 	return s;
 }
 
+//............................
 CLStatus CLProtocolDataPoster::PostProtocolData(CLIOVectors *pIOVectors)
 {
 	CLStatus s = m_pDataPoster->PostData(pIOVectors);
-	if(!s.IsSuccess() && s.m_clErrorCode == POSTER_POST_PENDING)
+	if(!s.IsSuccess() && s.m_clErrorCode == DATA_POSTER_POST_PENDING)
 	{
 		m_pIOVectors = pIOVectors;
 		return s;

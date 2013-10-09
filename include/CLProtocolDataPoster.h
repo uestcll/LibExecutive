@@ -11,7 +11,7 @@ class CLIOVectors;
 class CLProtocolDataPoster
 {
 public:
-	CLProtocolDataPoster(CLDataPoster *pDataPoster, CLPostResultNotifier *pResultNotifier = 0, CLEvent *pEvent = 0);
+	CLProtocolDataPoster(CLDataPoster *pDataPoster, CLPostResultNotifier *pResultNotifier, CLEvent *pEvent);
 	virtual ~CLProtocolDataPoster();
 
 	CLStatus Initialize();
