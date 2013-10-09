@@ -1,3 +1,4 @@
+#include <vector>
 #include "CLMessageReceiver.h"
 #include "CLStatus.h"
 #include "CLLogger.h"
@@ -100,11 +101,12 @@ CLMessage* CLMessageReceiver::GetMessage()
 
 	if(m_pProtoParser != NULL)
 	{
-		vector<SLSerializedMsgScope> SerializedMsgScopeVec;//存储协议解析切割完成，反序列化之前的一个个的协议。
+		vector<CLIOVector *> vSerializedMsgs;
+		//vector<SLSerializedMsgScope> SerializedMsgScopeVec;//存储协议解析切割完成，反序列化之前的一个个的协议。
 	
 		//int decapsulateStartIndex = m_pDataBuffer->DataStartIndex();
 
-		CLStatus s2 = m_pProtoParser->Decapsulate(m_pDataBuffer, /*decapsulateStartIndex,*/ SerializedMsgScopeVec);//get and add data startindex in Decapsulate(0)
+		CLStatus s2 = m_pProtoParser->Decapsulate(m_pDataBuffer, /*decapsulateStartIndex,*/ vSerializedMsgs);//get and add data startindex in Decapsulate()
 		if(!s2.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(0, m_pProtoParser->Decapsulate(), error", 0);
@@ -114,23 +116,37 @@ CLMessage* CLMessageReceiver::GetMessage()
 		//int decapsulateLen = (int)(s2.m_clReturnCode);
 		//m_pDataBuffer->DataStartIndex(decapsulateStartIndex + decapsulateLen);
 
-		CLStatus s3 = m_pMsgDeserializer->Deserializer(m_pDataBuffer, SerializedMsgScopeVec, m_MessageQueue);
-		if(!s3.IsSuccess())
+		for (int i = 0; i < vSerializedMsgs.size(); ++i)
 		{
-			CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pMsgDeserializer->Deserializer() error", 0);
+			CLMessage *pMessage = 0;
+			CLStatus s3 = m_pMsgDeserializer->Deserializer(*(vSerializedMsgs[i]), &pMessage);
+			if(!s3.IsSuccess() || pMessage == 0)
+			{
+				CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pMsgDeserializer->Deserializer() error or msg = 0", 0);
+				return PopMessage();
+			}
+			m_MessageQueue.push(pMessage);
 		}
-	}
+	}	
 	else
 	{
-		CLStatus s4 = m_pMsgDeserializer->Deserializer(m_pDataBuffer, (vector<SLSerializedMsgScope>)0, m_MessageQueue); //new SLSerializedMsgScop :datastart --usedlen
-		//cause this is no protoparser ,so use 0 to point protoparse and scope, and in deserializer:get data start and add startindex in deserializer
-		if(!s4.IsSuccess())
+		CLIOVector dataIOVec;
+		m_pDataBuffer->GetDataIOVecs(dataIOVec);
+
+		CLMessage *pMessage = 0;
+		CLStatus s4 = m_pMsgDeserializer->Deserializer(dataIOVec, &pMessage);//!！注意这里的dataIOVec中可能对应了多条消息，怎么搞呢？ //new SLSerializedMsgScop :datastart --usedlen
+		//deal with the dataindex change in Deserializer
+		// cause this is no protoparser ,so use 0 to point protoparse and scope, and in deserializer:get data start and add startindex in deserializer
+		if(!s4.IsSuccess() || pMessage == 0)
 		{
-			CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pMsgDeserializer->Deserializer() error", 0);
+			CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pMsgDeserializer->Deserializer() error error or msg = 0", 0);
+			return PopMessage();
 		}
+		m_pDataBuffer->AddDataStartIndex(s4.m_clReturnCode);
+		m_MessageQueue.push(pMessage);
+		
 	}
 	
-
 	return PopMessage();
 }
 

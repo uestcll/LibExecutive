@@ -162,3 +162,27 @@ CLStatus CLBuffer::AddUsedBufferLen(const int& addUsedLen)
 	m_iUsedBufferLen += addUsedLen;
 	return CLStatus(0, 0);
 }
+
+CLStatus CLBuffer::AddDataStartIndex(cosnt int& addDataLen)
+{
+	m_iDataStartIndex += addDataLen;
+	return CLStatus(0, 0);
+}
+
+CLStatus CLBuffer::GetIOVecs(int index, int len, CLIOVector& IOVector)
+{
+	CLStatus s = m_pIOBufferVec->GetIOVecs(index, len, IOVector);
+
+	if(!s.IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLBuffer::GetIOVecs(), error", 0);
+		return s;
+	}
+
+	return CLStatus(0, 0);
+}
+
+CLStatus CLBuffer::GetDataIOVecs(CLIOVector& IOVector)
+{
+	return m_pIOBufferVec->GetIOVecs(m_iDataStartIndex, m_iUsedBufferLen - m_iDataStartIndex, IOVector);
+}

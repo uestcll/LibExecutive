@@ -23,6 +23,7 @@ public:
 	
 	const int& DataStartIndex() const;
 	CLStatus DataStartIndex(const int& newIndex);
+	CLStatus AddDataStartIndex(cosnt int& addDataLen);
 
 	const int& UsedBufferLen() const;
 	CLStatus AddUsedBufferLen(const int& addUsedLen);
@@ -33,6 +34,12 @@ public:
 	CLStatus ReadData(char* &pBuffer, const int& index, const int& len);
 
 	CLStatus GetRestBufPtr(char** pBuf, int& restLen); //得到空闲buffer的头指针，并得到可以存储数据的空闲buffer长度
+	
+	CLStatus GetIOVecs(int index, int len, CLIOVector& IOVector);
+	CLStatus GetDataIOVecs(CLIOVector& IOVector);
+	//CLIOVector GetEmptyIOVecs();
+	//CLIOVector GetDataIOVecs();
+
 
 public:
 	const int& m_ciDataStartIndex;

@@ -117,7 +117,34 @@ int CLIOVector::GetBufPtr(int index, char** pBufffer)
 	return continuousBufLen;
 }
 
+CLStatus CLIOVector::GetIOVecs(int index, int len, CLIOVector& IOVector)
+{
+	int position = 0;
+	deque<struct iovec>::iterator it = m_ioVecQueue.begin();
+	for(; it <= m_ioVecQueue.end(); it++)
+	{
+		position += it->iov_len;
+		if(position > index)
+			break;
+	}
 
+	char* pBuffer = it->iov_base + (index - position + it->iov_len);
+	int itemLen = position - index;
+	int length = itemLen;
+
+	while(length < len)
+	{
+		IOVector.PushBack(&pBuffer, itemLen);
+		it++;
+		pBuffer = it->iov_base;
+		itemLen = it->iov_len;
+		length += it->iov_len;
+	}
+
+	IOVector.PushBack(&pBuffer, len - (length - itemLen));
+
+	return CLStatus(0, 0);
+}
 
 int CLIOVector::Length()
 {
