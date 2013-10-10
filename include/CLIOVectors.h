@@ -51,6 +51,9 @@ public:
 	int GetNumberOfIOVec();
 	iovec *GetIOVecArray();
 
+	void Clear();
+	CLStatus GetIndex(CLIteratorForIOVectors& Iter, unsigned int& Index);
+
 private:
 	bool IsRangeInAIOVector(char *pAddr, unsigned int Length, std::list<SLIOVectorItem>::iterator& CurrentIter);
 

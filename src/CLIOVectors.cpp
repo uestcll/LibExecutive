@@ -291,6 +291,53 @@ iovec *CLIOVectors::GetIOVecArray()
 	return pArray;
 }
 
+void CLIOVectors::Clear()
+{
+	list<SLIOVectorItem>::iterator it = m_IOVectors.begin();
+	for(; it != m_IOVectors.end(); ++it)
+	{
+		if(it->bDelete)
+			delete (char *)it->IOVector.iov_base;
+	}
+
+	m_IOVectors.clear();
+}
+
+CLStatus CLIOVectors::GetIndex(CLIteratorForIOVectors& Iter, unsigned int& Index)
+{
+	if(Iter.IsEnd() || (Iter.m_pIOVectors != &m_IOVectors))
+	{
+		CLLogger::WriteLogMsg("In CLIOVectors::GetIndex(), Iter error", 0);
+		return CLStatus(-1, NORMAL_ERROR);
+	}
+
+	unsigned int num = 0;
+	list<SLIOVectorItem>::iterator it= m_IOVectors.begin();
+	for(; it != m_IOVectors.end(); ++it)
+	{
+		if(it == Iter.m_Iter)
+			break;
+
+		num += it->IOVector.iov_len;
+	}
+
+	if(it == m_IOVectors.end())
+	{
+		CLLogger::WriteLogMsg("In CLIOVectors::GetIndex(), it error", 0);
+		return CLStatus(-1, NORMAL_ERROR);
+	}
+
+	unsigned long offset = (unsigned long)Iter.m_pData - (unsigned long)it->IOVector.iov_base;
+	if(offset >= it->IOVector.iov_len)
+	{
+		CLLogger::WriteLogMsg("In CLIOVectors::GetIndex(), offset error", 0);
+		return CLStatus(-1, NORMAL_ERROR);
+	}
+
+	Index = num + offset;
+	return CLStatus(0, 0);
+}
+
 bool CLIOVectors::IsRangeInAIOVector(char *pAddr, unsigned int Length, std::list<SLIOVectorItem>::iterator& CurrentIter)
 {
 	unsigned long offset = (unsigned long)pAddr - (unsigned long)(CurrentIter->IOVector.iov_base);
