@@ -1,4 +1,6 @@
+#include <cstring>
 #include "CLIOVector.h"
+
 
 using namespace std;
 
@@ -179,4 +181,70 @@ CLStatus CLIOVector::FreeAll()
 
 	return CLStatus(0, 0);
 
+}
+
+
+CLStatus CLIOVector::ReadData(char* &pBuffer, const int& index, const int& len)
+{
+	char* pBuf;
+	int continuiousLen;
+	continuiousLen = GetBufPtr(index, &pBuf);
+	if(continuiousLen >= len)
+	{
+		pBuffer = pBuf;
+		return CLStatus(0, 0);
+	}
+	else
+	{
+		int nread = continuiousLen;
+		int nstart = index + continuiousLen;
+	
+		while(nread != len)
+		{
+			continuiousLen = GetBufPtr(nstart, &pBuf);
+			if(continuiousLen < (len - nread))
+			{
+				memcpy(pBuffer + nread, pBuf, continuiousLen);
+				nread += continuiousLen;
+				nstart += continuiousLen;
+			}
+			else 
+			{
+				memcpy(pBuffer + nread, pBuf, (len - nread));
+				nread = len;
+				return CLStatus(0, 0);
+			}
+		}
+	}
+}
+
+CLStatus CLIOVector::WriteData(char* pBuffer, const int& index, const int& len)
+{
+	char* pBuf;
+	int bufLen = GetBufPtr(index, &pBuf);
+
+	if(len <= bufLen)
+	{
+		 memcpy(pBuf, pBuffer, len);
+		 return CLStatus(0, 0);
+	}
+	else
+	{
+		int nwrite = 0;
+		while(nwrite != len)
+		{
+			if(bufLen < (len - nwrite))
+			{
+				memcpy(pBuf, pBuffer + nwrite, bufLen);	
+				nwrite += bufLen;
+				bufLen = GetBufPtr(index, &pBuf);//buflen change to a new space len, pBuf alse
+			}
+			else
+			{
+				memcpy(pBuf, pBuffer + nwrite, (len - nwrite));
+				nwrite = len;
+			}
+		}
+	}
+	return CLStatus(0, 0);
 }

@@ -7,6 +7,13 @@ CLBuffer::CLBuffer(int itemSize) : m_iItemSize(itemSize), m_ciDataStartIndex(m_i
 	m_pIOBufferVec = new CLIOVector;
 
 	m_iSumBufferLen = m_iDataStartIndex = m_iUsedBufferLen = 0;
+
+	CLStatus s = NewBuffer(itemSize);
+	if(!s.IsSuccess())
+	{
+			throw "In CLBuffer::CLBuffer(int itemSize) new buffer error!";
+	}
+	
 }
 
 CLBuffer::~CLBuffer()
@@ -58,79 +65,29 @@ CLStatus CLBuffer::DataStartIndex(const int& newIndex)
 
 CLStatus CLBuffer::ReadData(char* &pBuffer, const int& index, const int& len)
 {
-	char* pBuf;
-	int continuiousLen;
-	continuiousLen = m_pIOBufferVec->GetBufPtr(index, &pBuf);
-	if(continuiousLen >= len)
-	{
-		pBuffer = pBuf;
-		return CLStatus(0, 0);
-	}
-	else
-	{
-		int nread = continuiousLen;
-		int nstart = index + continuiousLen;
-	
-		while(nread != len)
-		{
-		
-			continuiousLen = m_pIOBufferVec->GetBufPtr(nstart, &pBuf);
-			if(continuiousLen < (len - nread))
-			{
-				memcpy(pBuffer + nread, pBuf, continuiousLen);
-				nread += continuiousLen;
-				nstart += continuiousLen;
-			}
-			else 
-			{
-				memcpy(pBuffer + nread, pBuf, (len - nread));
-				nread = len;
-				return CLStatus(0, 0);
-			}
-		}
-	}
+	return m_pIOBufferVec->ReadData(pBuffer, index, len);
 }
 
 CLStatus CLBuffer::WriteData(char* pBuffer, const int& len)
 {
-	char* pBuf;
-	int bufLen;
-	CLStatus s = GetRestBufPtr(&pBuf, bufLen);
-	if(!s.IsSuccess())
+	int restBufLen = m_iSumBufferLen - m_iUsedBufferLen;
+	int diff = len - restBufLen;
+	if(diff > 0)
 	{
-		CLLogger::WriteLogMsg("In CLBuffer::WriteData(), GetRestBufPtr error", 0);
-		return s;
+		CLStatus s = NewBuffer(diff);
+		if(!s.IsSuccess())
+		{
+			CLLogger::WriteLogMsg("In CLBuffer::WriteData(), NewBuffer(0) error", 0);
+			return s;
+		}		
 	}
 
-	if(len <= bufLen)
+	CLStatus s1 = m_pIOBufferVec->WriteData(pBuffer, m_iUsedBufferLen, len);
+	if(!s1.IsSuccess())
 	{
-		 memcpy(pBuf, pBuffer, len);
-		 m_iUsedBufferLen += len;
-		 return CLStatus(0, 0);
-	}
-	else
-	{
-		int nwrite = 0;
-		while(nwrite != len)
-		{
-			if(bufLen < (len - nwrite))
-			{
-				memcpy(pBuf, pBuffer + nwrite, bufLen);	
-				nwrite += bufLen;
-				CLStatus s1 = GetRestBufPtr(&pBuf, bufLen);//buflen change to a new space len, pBuf alse
-				if(!s1.IsSuccess())
-				{
-					CLLogger::WriteLogMsg("In CLBuffer::WriteData(), GetRestBufPtr two error", 0);
-					return s1;
-				}
-			}
-			else
-			{
-				memcpy(pBuf, pBuffer + nwrite, (len - nwrite));
-				nwrite = len;
-			}
-		}
-	}
+		CLLogger::WriteLogMsg("In CLBuffer::WriteData(), m_pIOBufferVec->WriteData() error", 0);
+		return s1;
+	}	
 	m_iUsedBufferLen += len;
 	return CLStatus(0, 0);
 }

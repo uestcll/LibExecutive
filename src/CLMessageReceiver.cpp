@@ -85,7 +85,7 @@ CLMessageReceiver::~CLMessageReceiver()
 
 CLMessage* CLMessageReceiver::GetMessage()
 {
-	CLStatus s1 = m_pDataReceiver->GetData(m_pDataBuffer);
+	CLStatus s1 = m_pDataReceiver->GetData(m_pDataBuffer); //deal with the usedlen in getdata()
 
 	if(!s1.IsSuccess())
 	{
