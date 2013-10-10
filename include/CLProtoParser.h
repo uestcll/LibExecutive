@@ -1,7 +1,10 @@
 #ifndef CLPROTOPARSER_H
 #define CLPROTOPARSER_H
 
+#include <vector>
 #include "CLStatus.h"
+
+using namespace std;
 
 class CLMessage;
 class CLBuffer;

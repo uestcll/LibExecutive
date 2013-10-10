@@ -100,7 +100,7 @@ CLStatus CLIOVector::PopFront(char** pBuffer, int* bufLen)
 	return CLStatus(0, 0);
 }
 
-int CLIOVector::GetBufPtr(int index, char** pBufffer)
+int CLIOVector::GetBufPtr(int index, char** pBuffer)
 {
 	int position = 0;
 	deque<struct iovec>::iterator it = m_ioVecQueue.begin();
@@ -111,7 +111,7 @@ int CLIOVector::GetBufPtr(int index, char** pBufffer)
 			break;
 	}
 
-	char* buf = it->iov_base;
+	char* buf = (char*)(it->iov_base);
 	*pBuffer = buf + (index - position + it->iov_len);
 	int continuousBufLen = position - index;
 	return continuousBufLen;
@@ -128,20 +128,20 @@ CLStatus CLIOVector::GetIOVecs(int index, int len, CLIOVector& IOVector)
 			break;
 	}
 
-	char* pBuffer = it->iov_base + (index - position + it->iov_len);
+	char* pBuffer = (char*)(it->iov_base) + (index - position + it->iov_len);
 	int itemLen = position - index;
 	int length = itemLen;
 
 	while(length < len)
 	{
-		IOVector.PushBack(&pBuffer, itemLen);
+		IOVector.PushBack(pBuffer, itemLen);
 		it++;
-		pBuffer = it->iov_base;
+		pBuffer = (char*)(it->iov_base);
 		itemLen = it->iov_len;
 		length += it->iov_len;
 	}
 
-	IOVector.PushBack(&pBuffer, len - (length - itemLen));
+	IOVector.PushBack(pBuffer, len - (length - itemLen));
 
 	return CLStatus(0, 0);
 }
@@ -158,7 +158,8 @@ int CLIOVector::IOVecNum()
 
 const char& CLIOVector::operator[](const int& index)
 {
-	char* buf = GetBufPtr(index);
+	char* buf;
+	int len = GetBufPtr(index, &buf);
 	return buf[0];
 }
 
@@ -172,7 +173,7 @@ CLStatus CLIOVector::FreeAll()
 	std::deque<struct iovec>::iterator it = m_ioVecQueue.begin();
 	for(; it != m_ioVecQueue.end(); it++)
 	{
-		delete [] it->iov_base;
+		delete [] (char *)(it->iov_base);
 		it->iov_base = NULL;
 	}
 

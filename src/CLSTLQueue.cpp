@@ -25,11 +25,11 @@ CLMessage* CLSTLQueue::PopMessage()
 {
     try
     {
-        CLCriticalSection(&m_MutexForQueue);
+        CLCriticalSection cs(&m_MutexForQueue);
         if(m_MsgQueue.empty())
             return 0;
         CLMessage* p = m_MsgQueue.front();
-        m_MsgQueue.Pop();
+        m_MsgQueue.pop();
 
         return p;
     }
@@ -44,9 +44,9 @@ CLStatus CLSTLQueue::PushMessage(CLMessage* pMsg)
 {
     try
     {
-        CLCriticalSection(&m_MutexForQueue);
+        CLCriticalSection cs(&m_MutexForQueue);
 
-        m_MsgQueue.Push(pMsg);
+        m_MsgQueue.push(pMsg);
 
     }
     catch(const char* str)
