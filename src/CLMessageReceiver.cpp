@@ -5,6 +5,10 @@
 #include "CLMessageDeserializer.h"
 #include "CLProtoParser.h"
 #include "CLBuffer.h"
+#include "CLDataReceiver.h"
+#include "CLMessage.h"
+#include "CLIOVector.h"
+#include "CLCriticalSection.h"
 
 // iovector 提供返回连续空间的长度值 CLBuffer根据分配了空间的buf，和指定的对应长度，返回该buf的值。
 using namespace std;

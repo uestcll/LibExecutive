@@ -1,3 +1,4 @@
+#include <cstring>
 #include "CLBuffer.h"
 #include "CLIOVector.h"
 // usedbufferlen 还需要设置和获得
@@ -50,10 +51,10 @@ CLStatus CLBuffer::DataStartIndex(const int& newIndex)
 	
 }*/
 
-char* CLBuffer::GetDataPtr()
-{
-	return m_pIOBufferVec->GetBufPtr(m_iDataStartIndex);
-}
+// char* CLBuffer::GetDataPtr()
+// {
+// 	m_pIOBufferVec->GetBufPtr(m_iDataStartIndex);
+// }
 
 CLStatus CLBuffer::ReadData(char* &pBuffer, const int& index, const int& len)
 {
@@ -74,7 +75,7 @@ CLStatus CLBuffer::ReadData(char* &pBuffer, const int& index, const int& len)
 		{
 		
 			continuiousLen = m_pIOBufferVec->GetBufPtr(nstart, &pBuf);
-			if(continuiousLen < (len - nread)))
+			if(continuiousLen < (len - nread))
 			{
 				memcpy(pBuffer + nread, pBuf, continuiousLen);
 				nread += continuiousLen;
@@ -94,7 +95,7 @@ CLStatus CLBuffer::WriteData(char* pBuffer, const int& len)
 {
 	char* pBuf;
 	int bufLen;
-	CLStatus s = GetRestBufPtr(&pBuf, &bufLen);
+	CLStatus s = GetRestBufPtr(&pBuf, bufLen);
 	if(!s.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLBuffer::WriteData(), GetRestBufPtr error", 0);
@@ -105,18 +106,18 @@ CLStatus CLBuffer::WriteData(char* pBuffer, const int& len)
 	{
 		 memcpy(pBuf, pBuffer, len);
 		 m_iUsedBufferLen += len;
-		 return CLStatus(0， 0);
+		 return CLStatus(0, 0);
 	}
 	else
 	{
 		int nwrite = 0;
 		while(nwrite != len)
 		{
-			if(bufLen <　(len - nwrite))
+			if(bufLen < (len - nwrite))
 			{
 				memcpy(pBuf, pBuffer + nwrite, bufLen);	
 				nwrite += bufLen;
-				CLStatus s1 = GetRestBufPtr(&pBuf, &bufLen);//buflen change to a new space len, pBuf alse
+				CLStatus s1 = GetRestBufPtr(&pBuf, bufLen);//buflen change to a new space len, pBuf alse
 				if(!s1.IsSuccess())
 				{
 					CLLogger::WriteLogMsg("In CLBuffer::WriteData(), GetRestBufPtr two error", 0);
@@ -134,7 +135,7 @@ CLStatus CLBuffer::WriteData(char* pBuffer, const int& len)
 	return CLStatus(0, 0);
 }
 
-CLStatus CLBuffer::GetRestBufPtr(char** pBuf, int *restLen)
+CLStatus CLBuffer::GetRestBufPtr(char** pBuf, int &restLen)
 {
 	if(m_iUsedBufferLen == m_iSumBufferLen)
 	{
@@ -146,8 +147,9 @@ CLStatus CLBuffer::GetRestBufPtr(char** pBuf, int *restLen)
 		}
 	}
 
-	*pBuf = m_pIOBufferVec->GetBufPtr(m_iUsedBufferLen);
-	*restLen = m_iSumBufferLen - m_iUsedBufferLen;
+	int continueLen = m_pIOBufferVec->GetBufPtr(m_iUsedBufferLen, pBuf);
+	
+	restLen = m_iSumBufferLen - m_iUsedBufferLen; //here the continueLen is equals to restLen, should identify in debugging
 
 	return CLStatus(0, 0);
 }
@@ -163,7 +165,7 @@ CLStatus CLBuffer::AddUsedBufferLen(const int& addUsedLen)
 	return CLStatus(0, 0);
 }
 
-CLStatus CLBuffer::AddDataStartIndex(cosnt int& addDataLen)
+CLStatus CLBuffer::AddDataStartIndex(const int& addDataLen)
 {
 	m_iDataStartIndex += addDataLen;
 	return CLStatus(0, 0);

@@ -27,7 +27,7 @@ private:
 	CLMsgLoopManagerForSTLqueue& operator=(const CLMsgLoopManagerForSTLqueue&);
 
 private:
-	CLMessageReceiverBySTLqueue *m_pMsgReceiver;
+	CLMessageReceiver *m_pMsgReceiver;
 	std::string m_strThreadName;
 	CLEvent     m_Event;
 };

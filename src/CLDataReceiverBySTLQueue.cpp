@@ -1,5 +1,8 @@
 #include "CLDataReceiverBySTLQueue.h"
 #include "CLLogger.h"
+#include "CLSTLQueue.h"
+#include "CLMessage.h"
+#include "CLBuffer.h"
 
 CLDataReceiverBySTLQueue::CLDataReceiverBySTLQueue(CLSTLQueue* pDataSTLQueue)
 {

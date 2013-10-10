@@ -1,6 +1,27 @@
-libexecutive.a : CLConditionVariable.o CLCriticalSection.o CLEvent.o CLExecutive.o CLExecutiveCommunication.o CLExecutiveCommunicationByNamedPipe.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessageSerializer.o CLMsgLoopManagerForPipeQueue.o CLMsgLoopManagerForSTLqueue.o CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o CLNonThreadForMsgLoop.o CLPrivateExecutiveCommunicationByNamedPipe.o CLProcess.o CLProcessFunctionForExec.o CLSharedConditionVariableAllocator.o CLSharedConditionVariableImpl.o CLSharedEventAllocator.o CLSharedEventImpl.o CLSharedExecutiveCommunicationByNamedPipe.o CLSharedMemory.o CLSharedMutexAllocator.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLStatus.o CLThread.o CLThreadCommunicationBySTLqueue.o CLThreadForMsgLoop.o CLThreadInitialFinishedNotifier.o 
-	ar -rc libexecutive.a CLConditionVariable.o CLCriticalSection.o CLEvent.o CLExecutive.o CLExecutiveCommunication.o CLExecutiveCommunicationByNamedPipe.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessageSerializer.o CLMsgLoopManagerForPipeQueue.o CLMsgLoopManagerForSTLqueue.o CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o CLNonThreadForMsgLoop.o CLPrivateExecutiveCommunicationByNamedPipe.o  CLProcess.o CLProcessFunctionForExec.o CLSharedConditionVariableAllocator.o CLSharedConditionVariableImpl.o CLSharedEventAllocator.o CLSharedEventImpl.o CLSharedExecutiveCommunicationByNamedPipe.o CLSharedMemory.o CLSharedMutexAllocator.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLStatus.o CLThread.o CLThreadCommunicationBySTLqueue.o CLThreadForMsgLoop.o CLThreadInitialFinishedNotifier.o CLBuffer.o CLDataReceiver.o CLDataReceiverBySTLQueue.o CLMessageReciever.o CLIOVector.o CLSTLQueue.o
+libexecutive.a : CLConditionVariable.o CLCriticalSection.o CLEvent.o CLExecutive.o CLExecutiveCommunication.o CLExecutiveCommunicationByNamedPipe.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessageSerializer.o   CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o CLPrivateExecutiveCommunicationByNamedPipe.o CLProcess.o CLProcessFunctionForExec.o CLSharedConditionVariableAllocator.o CLSharedConditionVariableImpl.o CLSharedEventAllocator.o CLSharedEventImpl.o CLSharedExecutiveCommunicationByNamedPipe.o CLSharedMemory.o CLSharedMutexAllocator.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLStatus.o CLThread.o CLThreadInitialFinishedNotifier.o  CLBuffer.o CLDataReceiver.o CLDataReceiverBySTLQueue.o CLMessageReceiver.o CLIOVector.o CLSTLQueue.o
+	ar -rc libexecutive.a CLConditionVariable.o CLCriticalSection.o CLEvent.o CLExecutive.o CLExecutiveCommunication.o CLExecutiveCommunicationByNamedPipe.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessageSerializer.o  CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o  CLPrivateExecutiveCommunicationByNamedPipe.o  CLProcess.o CLProcessFunctionForExec.o CLSharedConditionVariableAllocator.o CLSharedConditionVariableImpl.o CLSharedEventAllocator.o CLSharedEventImpl.o CLSharedExecutiveCommunicationByNamedPipe.o CLSharedMemory.o CLSharedMutexAllocator.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLStatus.o CLThread.o CLThreadInitialFinishedNotifier.o CLBuffer.o CLDataReceiver.o CLDataReceiverBySTLQueue.o CLMessageReceiver.o CLIOVector.o CLSTLQueue.o
 	rm *.o
+
+
+CLBuffer.o : ./src/CLBuffer.cpp
+	g++ -o CLBuffer.o -c ./src/CLBuffer.cpp -I./include -g
+
+CLDataReceiver.o : ./src/CLDataReceiver.cpp
+	g++ -o CLDataReceiver.o -c ./src/CLDataReceiver.cpp -I./include -g
+
+CLDataReceiverBySTLQueue.o : ./src/CLDataReceiverBySTLQueue.cpp
+	g++ -o CLDataReceiverBySTLQueue.o -c ./src/CLDataReceiverBySTLQueue.cpp -I./include -g
+
+CLIOVector.o : ./src/CLIOVector.cpp
+	g++ -o CLIOVector.o -c ./src/CLIOVector.cpp -I./include -g
+
+CLMessageReceiver.o : ./src/CLMessageReceiver.cpp
+	g++ -o CLMessageReceiver.o -c ./src/CLMessageReceiver.cpp -I./include -g
+
+CLSTLQueue.o : ./src/CLSTLQueue.cpp
+	g++ -o CLSTLQueue.o -c ./src/CLSTLQueue.cpp -I./include -g
+
+
 
 CLConditionVariable.o : ./src/CLConditionVariable.cpp
 	g++ -o CLConditionVariable.o -c ./src/CLConditionVariable.cpp -I./include -g
@@ -53,11 +74,11 @@ CLMessageObserver.o : ./src/CLMessageObserver.cpp
 CLMessageSerializer.o : ./src/CLMessageSerializer.cpp
 	g++ -o CLMessageSerializer.o -c ./src/CLMessageSerializer.cpp -I./include -g
 
-CLMsgLoopManagerForPipeQueue.o : ./src/CLMsgLoopManagerForPipeQueue.cpp
-	g++ -o CLMsgLoopManagerForPipeQueue.o -c ./src/CLMsgLoopManagerForPipeQueue.cpp -I./include -g
+# CLMsgLoopManagerForPipeQueue.o : ./src/CLMsgLoopManagerForPipeQueue.cpp
+	# g++ -o CLMsgLoopManagerForPipeQueue.o -c ./src/CLMsgLoopManagerForPipeQueue.cpp -I./include -g
 
-CLMsgLoopManagerForSTLqueue.o : ./src/CLMsgLoopManagerForSTLqueue.cpp
-	g++ -o CLMsgLoopManagerForSTLqueue.o -c ./src/CLMsgLoopManagerForSTLqueue.cpp -I./include -g
+# CLMsgLoopManagerForSTLqueue.o : ./src/CLMsgLoopManagerForSTLqueue.cpp
+	# g++ -o CLMsgLoopManagerForSTLqueue.o -c ./src/CLMsgLoopManagerForSTLqueue.cpp -I./include -g
 
 CLMutex.o : ./src/CLMutex.cpp
 	g++ -o CLMutex.o -c ./src/CLMutex.cpp -I./include -g
@@ -77,8 +98,8 @@ CLMutexBySharedPThread.o : ./src/CLMutexBySharedPThread.cpp
 CLMutexInterface.o : ./src/CLMutexInterface.cpp
 	g++ -o CLMutexInterface.o -c ./src/CLMutexInterface.cpp -I./include -g
 
-CLNonThreadForMsgLoop.o : ./src/CLNonThreadForMsgLoop.cpp
-	g++ -o CLNonThreadForMsgLoop.o -c ./src/CLNonThreadForMsgLoop.cpp -I./include -g
+# CLNonThreadForMsgLoop.o : ./src/CLNonThreadForMsgLoop.cpp
+	# g++ -o CLNonThreadForMsgLoop.o -c ./src/CLNonThreadForMsgLoop.cpp -I./include -g
 
 CLPrivateExecutiveCommunicationByNamedPipe.o : ./src/CLPrivateExecutiveCommunicationByNamedPipe.cpp
 	g++ -o CLPrivateExecutiveCommunicationByNamedPipe.o -c ./src/CLPrivateExecutiveCommunicationByNamedPipe.cpp -I./include -g
@@ -122,31 +143,14 @@ CLStatus.o : ./src/CLStatus.cpp
 CLThread.o : ./src/CLThread.cpp
 	g++ -o CLThread.o -c ./src/CLThread.cpp -I./include -g
 
-CLThreadCommunicationBySTLqueue.o : ./src/CLThreadCommunicationBySTLqueue.cpp
-	g++ -o CLThreadCommunicationBySTLqueue.o -c ./src/CLThreadCommunicationBySTLqueue.cpp -I./include -g
+# CLThreadCommunicationBySTLqueue.o : ./src/CLThreadCommunicationBySTLqueue.cpp
+	# g++ -o CLThreadCommunicationBySTLqueue.o -c ./src/CLThreadCommunicationBySTLqueue.cpp -I./include -g
 
-CLThreadForMsgLoop.o : ./src/CLThreadForMsgLoop.cpp
-	g++ -o CLThreadForMsgLoop.o -c ./src/CLThreadForMsgLoop.cpp -I./include -g
+# CLThreadForMsgLoop.o : ./src/CLThreadForMsgLoop.cpp
+	# g++ -o CLThreadForMsgLoop.o -c ./src/CLThreadForMsgLoop.cpp -I./include -g
 
 CLThreadInitialFinishedNotifier.o : ./src/CLThreadInitialFinishedNotifier.cpp
 	g++ -o CLThreadInitialFinishedNotifier.o -c ./src/CLThreadInitialFinishedNotifier.cpp -I./include -g
 
-CLBuffer.o : ./src/CLBuffer.cpp
-	g++ -o CLBuffer.o -c ./src/CLBuffer.cpp -I./include -g
-
-CLDataReceiver.o : ./src/CLDataReceiver.cpp
-	g++ -o CLDataReceiver.o -c ./src/CLDataReceiver.cpp -I./include -g
-
-CLDataReceiverBySTLQueue.o : ./src/CLDataReceiverBySTLQueue.cpp
-	g++ -o CLDataReceiverBySTLQueue.o -c ./src/CLDataReceiverBySTLQueue.cpp -I./include -g
-
-CLIOVector.o : ./src/CLIOVector.cpp
-	g++ -o CLIOVector.o -c ./src/CLIOVector.cpp -I./include -g
-
-CLMessageReceiver.o : ./src/CLMessageReceiver.cpp
-	g++ -o CLMessageReceiver.o -c ./src/CLMessageReceiver.cpp -I./include -g
-
-CLSTLQueue.o : ./src/CLSTLQueue.cpp
-	g++ -o CLSTLQueue.o -c ./src/CLSTLQueue.cpp -I./include -g
 
 

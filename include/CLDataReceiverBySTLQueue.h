@@ -4,6 +4,7 @@
 #include "CLDataReceiver.h"
 
 class CLSTLQueue;
+class CLBuffer;
 
 class CLDataReceiverBySTLQueue : public CLDataReceiver
 {
