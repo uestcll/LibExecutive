@@ -123,7 +123,7 @@ CLMessage* CLMessageReceiver::GetMessage()
 		for (int i = 0; i < vSerializedMsgs.size(); ++i)
 		{
 			CLMessage *pMessage = 0;
-			CLStatus s3 = m_pMsgDeserializer->Deserializer(*(vSerializedMsgs[i]), &pMessage);
+			CLStatus s3 = m_pMsgDeserializer->Deserialize(*(vSerializedMsgs[i]), &pMessage);
 			if(!s3.IsSuccess() || pMessage == 0)
 			{
 				CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pMsgDeserializer->Deserializer() error or msg = 0", 0);
@@ -138,7 +138,7 @@ CLMessage* CLMessageReceiver::GetMessage()
 		m_pDataBuffer->GetDataIOVecs(dataIOVec);
 
 		CLMessage *pMessage = 0;
-		CLStatus s4 = m_pMsgDeserializer->Deserializer(dataIOVec, &pMessage);//!！注意这里的dataIOVec中可能对应了多条消息，怎么搞呢？ //new SLSerializedMsgScop :datastart --usedlen
+		CLStatus s4 = m_pMsgDeserializer->Deserialize(dataIOVec, &pMessage);//!！注意这里的dataIOVec中可能要对应多条消息，怎么搞呢？ //new SLSerializedMsgScop :datastart --usedlen
 		//deal with the dataindex change in Deserializer
 		// cause this is no protoparser ,so use 0 to point protoparse and scope, and in deserializer:get data start and add startindex in deserializer
 		if(!s4.IsSuccess() || pMessage == 0)

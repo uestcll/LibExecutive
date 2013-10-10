@@ -7,6 +7,7 @@
 
 class CLMessage;
 class CLBuffer;
+class CLIOVector;
 
 class CLMessageDeserializer
 {
@@ -14,7 +15,7 @@ public:
 	CLMessageDeserializer();
 	virtual ~CLMessageDeserializer();
 
-	virtual CLStatus Deserialize(CLBuffer *pBuffer, std::vector<SLSerializedMsgScope> sScope, std::queue<CLMessage*>) = 0;
+	virtual CLStatus Deserialize(CLIOVector dataVec, CLMessage **pMsg) = 0;
 
 private:
 	CLMessageDeserializer(const CLMessageDeserializer&);
