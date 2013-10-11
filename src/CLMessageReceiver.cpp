@@ -93,15 +93,11 @@ CLMessage* CLMessageReceiver::GetMessage()
 		return PopMessage();
 	}
 
-	/*int readLen = (int)s1.m_clReturnCode;
-	if(readLen == 0)
+	int readLen = (int)s1.m_clReturnCode;
+	if(readLen != 0)
 	{
-		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), Getdata len = 0", 0);
-		return PopMessage();
+		m_pDataBuffer->AddUsedBufferLen(readLen);//stl queue ,return`s readlen is 0 cause it use pdatabuffer->writedata(0)
 	}
-
-	m_pDataBuffer->AddUsedBufferLen(readLen);*/ //this part complete in data receiver
-
 
 	if(m_pProtoParser != NULL)
 	{
