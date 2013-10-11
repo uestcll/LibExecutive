@@ -4,21 +4,14 @@
 #include "CLStatus.h"
 #include "CLLogger.h"
 
-CLDataReceiverByNamedPipe::CLDataReceiverByNamedPipe(CLNamedPipe *pNamedPipe)
+CLDataReceiverByNamedPipe::CLDataReceiverByNamedPipe(const char *pStrPipeName) : m_NamedPipe(pStrPipeName, PIPE_FOR_READ)
 {
-	if(pNamedPipe == 0)
-		throw "In CLDataReceiverByNamedPipe::CLDataReceiverByNamedPipe(), pNamedPipe is 0";
 
-	m_pNamedPipe = pNamedPipe;
 }
 
 CLDataReceiverByNamedPipe::~CLDataReceiverByNamedPipe()
 {
-	if(m_pNamedPipe != NULL)
-	{
-		delete m_pNamedPipe;
-		m_pNamedPipe = NULL;
-	}
+
 }
 
 CLStatus CLDataReceiverByNamedPipe::GetData(CLBuffer *pBuffer)
@@ -37,10 +30,10 @@ CLStatus CLDataReceiverByNamedPipe::GetData(CLBuffer *pBuffer)
 			return s1;
 		}		
 		
-		CLStatus s2 = m_pNamedPipe->ReadData(pBuf, restSumLen);
+		CLStatus s2 = m_NamedPipe.Read(pBuf, restSumLen);
 		if(!s2.IsSuccess())
 		{
-			CLLogger::WriteLogMsg("In CLDataReceiverByNamedPipe::GetData(), m_pNamedPipe->ReadData error", 0);
+			CLLogger::WriteLogMsg("In CLDataReceiverByNamedPipe::GetData(), m_NamedPipe->ReadData error", 0);
 			return s2;
 		}
 		long len = s2.m_clReturnCode;
