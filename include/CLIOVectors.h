@@ -14,7 +14,6 @@ struct SLIOVectorItem
 	bool bDelete;
 };
 
-//add clear operation
 class CLIOVectors
 {
 	friend class CLIteratorForIOVectors;

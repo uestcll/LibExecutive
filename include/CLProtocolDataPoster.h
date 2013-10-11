@@ -7,6 +7,7 @@ class CLEvent;
 class CLDataPoster;
 class CLPostResultNotifier;
 class CLIOVectors;
+class CLIteratorForIOVectors;
 
 class CLProtocolDataPoster
 {
@@ -19,6 +20,7 @@ public:
 	CLStatus Uninitialize();
 
 	CLStatus PostProtocolData(CLIOVectors *pIOVectors);
+	CLStatus PostLeftProtocolData();
 	CLStatus NotifyPostFinished(bool bResult);
 
 private:
@@ -26,10 +28,12 @@ private:
 	CLProtocolDataPoster& operator=(const CLProtocolDataPoster&);
 
 private:
-	CLEvent *m_pEvent;
 	CLPostResultNotifier *m_pResultNotifer;
 	CLDataPoster *m_pDataPoster;
 	CLIOVectors *m_pIOVectors;
+	CLIteratorForIOVectors *m_pIterProtocolData;
+
+	CLEvent *m_pEvent;
 };
 
 #endif

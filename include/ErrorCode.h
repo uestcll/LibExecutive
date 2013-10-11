@@ -19,4 +19,10 @@ const int DATA_POSTER_INITIALIZE_ERROR = 0;
 const int DATA_POSTER_POST_PENDING = 1;
 const int DATA_POSTER_POST_ERROR = 0;
 
+const int MSG_POST_INIT_SUCCESS = 0;
+const int MSG_POST_INIT_FAILURE = -1;
+const int MSG_POST_SUCCESS = 0;
+const int MSG_POST_PARTIAL = 1;
+const int MSG_POST_FAILURE = -1;
+
 #endif

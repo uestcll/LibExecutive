@@ -4,17 +4,19 @@
 #include "CLLogger.h"
 #include "ErrorCode.h"
 
-CLDataPosterBySTLqueue::CLDataPosterBySTLqueue(CLSTLqueue *pSTLqueue)
+CLDataPosterBySTLqueue::CLDataPosterBySTLqueue(CLSTLqueue *pSTLqueue, bool bNeedDestroy)
 {
 	if(pSTLqueue == 0)
 		throw "In CLDataPosterBySTLqueue::CLDataPosterBySTLqueue(), pSTLqueue == 0";
 
 	m_pSTLqueue = pSTLqueue;
+	m_bNeedDestroy = bNeedDestroy;
 }
 
 CLDataPosterBySTLqueue::~CLDataPosterBySTLqueue()
 {
-	delete m_pSTLqueue;
+	if(m_bNeedDestroy)
+		delete m_pSTLqueue;
 }
 
 CLStatus CLDataPosterBySTLqueue::Initialize(void *pContext)
@@ -50,4 +52,9 @@ CLStatus CLDataPosterBySTLqueue::PostData(CLIOVectors *pIOVectors)
 		CLLogger::WriteLogMsg("In CLDataPosterBySTLqueue::PostData(), m_pSTLqueue->PushData error", 0);
 		return CLStatus(-1, DATA_POSTER_POST_ERROR);
 	}
+}
+
+CLDataPoster* CLDataPosterBySTLqueue::Copy()
+{
+	return new CLDataPosterBySTLqueue(m_pSTLqueue, false);
 }
