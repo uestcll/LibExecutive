@@ -19,7 +19,6 @@ public:
 public:
 	CLStatus Decapsulate(CLBuffer* pBuffer, vector<CLIOVector *> vSerializedMsgs);
 
-protected:
 	virtual CLStatus DecapsulateMsg(CLBuffer *pBuffer, int& decapsulateStartIndex, vector<CLIOVector *> vSerializedMsgs) = 0;
 
 };
