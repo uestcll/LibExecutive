@@ -27,7 +27,7 @@ public:
 	int GetBufPtr(int index, char** pBufffer); //返回值为index开始的连续空间的长度 index是从0开始的。
 
 	CLStatus WriteData(char* pBuffer, const int& index, const int& len);
-	CLStatus ReadData(char* &pBuffer, const int& index, const int& len);
+	CLStatus ReadData(char* pBuffer, const int& index, const int& len);
 
 	int IOVecNum();//iovec item num
 	int Length();//all buffer Length

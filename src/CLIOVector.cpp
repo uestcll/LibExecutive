@@ -184,14 +184,16 @@ CLStatus CLIOVector::FreeAll()
 }
 
 
-CLStatus CLIOVector::ReadData(char* &pBuffer, const int& index, const int& len)
+CLStatus CLIOVector::ReadData(char* pBuffer, const int& index, const int& len)
 {
 	char* pBuf;
 	int continuiousLen;
 	continuiousLen = GetBufPtr(index, &pBuf);
+
 	if(continuiousLen >= len)
 	{
-		pBuffer = pBuf;
+		//pBuffer = pBuf;
+		memcpy(pBuffer, pBuf, len);
 		return CLStatus(0, 0);
 	}
 	else
