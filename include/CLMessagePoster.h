@@ -9,17 +9,20 @@ class CLMessageSerializer;
 class CLProtocolEncapsulator;
 class CLDataPoster;
 class CLEvent;
-class CLPostResultNotifier;
+class CLDataPostResultNotifier;
+class CLInitialDataPostChannelNotifier;
+class CLDataPostChannelMaintainer;
 class CLMessage;
+class CLProtocolDataPoster;
 
 class CLMessagePoster
 {
 public:
-	CLMessagePoster(CLDataPoster *pDataPoster, CLProtocolEncapsulator *pProtocolEncapsulator = 0, CLEvent *pEvent = 0, CLMessageSerializer *pCommonMsgSerializer = 0, bool bMsgDelete = true);
+	CLMessagePoster(CLMessageSerializer *pMsgSerializer, CLProtocolEncapsulator *pProtocolEncapsulator, CLDataPostChannelMaintainer *pChannelMaintainer, CLEvent *pEvent);
 	virtual ~CLMessagePoster();
 
-	CLStatus Initialize(CLPostResultNotifier *pResultNotifier = 0);
-	CLStatus Uninitialize();
+	CLStatus Initialize(CLInitialDataPostChannelNotifier *pNotifier, void *pContext);
+	CLStatus Uninitialize(void *pContext);
 
 	CLStatus PostMessage(CLMessage *pMsg, CLPostResultNotifier *pResultNotifier = 0);
 
@@ -28,13 +31,14 @@ private:
 	CLMessagePoster& operator=(const CLMessagePoster&);
 
 private:
-	CLMessageSerializer *m_pCommonSerializer;
-	std::map<unsigned long, CLMessageSerializer*> m_SerializerTable;
+	CLMessageSerializer *m_pSerializer;
 	CLProtocolEncapsulator *m_pProtocolEncapsulator;
-	CLDataPoster *m_pDataPoster;
-	uuid_t m_UuidOfPoster;
+	CLDataPostChannelMaintainer *m_pChannelMaintainer;
 	CLEvent *m_pEvent;
-	bool m_bMsgDelete;
+
+	uuid_t m_UuidOfPoster;
+
+	bool m_bInitial;
 };
 
 #endif

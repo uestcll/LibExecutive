@@ -8,10 +8,10 @@ class CLSTLqueue;
 class CLDataPostChannelBySTLqueueMaintainer : public CLDataPostChannelMaintainer
 {
 public:
-	CLDataPostChannelBySTLqueueMaintainer(CLSTLqueue *pSTLqueue, CLInitialDataPostChannelNotifier *pNotifier);
+	explicit CLDataPostChannelBySTLqueueMaintainer(CLSTLqueue *pSTLqueue);
 	virtual ~CLDataPostChannelBySTLqueueMaintainer();
 
-	virtual CLStatus Initialize(void *pContext);
+	virtual CLStatus Initialize(CLInitialDataPostChannelNotifier *pNotifier, void *pContext);
 	virtual CLStatus Uninitialize(void *pContext);
 
 	virtual CLDataPoster* GetDataPoster();

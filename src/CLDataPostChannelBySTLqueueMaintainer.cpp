@@ -4,7 +4,7 @@
 #include "CLInitialDataPostChannelNotifier.h"
 #include "ErrorCode.h"
 
-CLDataPostChannelBySTLqueueMaintainer::CLDataPostChannelBySTLqueueMaintainer(CLSTLqueue *pSTLqueue, CLInitialDataPostChannelNotifier *pNotifier) : CLDataPostChannelMaintainer(pNotifier)
+CLDataPostChannelBySTLqueueMaintainer::CLDataPostChannelBySTLqueueMaintainer(CLSTLqueue *pSTLqueue)
 {
 	if(pSTLqueue == 0)
 		throw "In CLDataPostChannelBySTLqueueMaintainer::CLDataPostChannelBySTLqueueMaintainer(), pSTLqueue == 0";
@@ -17,13 +17,12 @@ CLDataPostChannelBySTLqueueMaintainer::~CLDataPostChannelBySTLqueueMaintainer()
 	delete m_pSTLqueue;
 }
 
-CLStatus CLDataPostChannelBySTLqueueMaintainer::Initialize(void *pContext)
+CLStatus CLDataPostChannelBySTLqueueMaintainer::Initialize(CLInitialDataPostChannelNotifier *pNotifier, void *pContext)
 {
-	if(m_pNotifier)
+	if(pNotifier)
 	{
-		m_pNotifier->Notify(DATA_POSTER_INITIALIZE_SUCCESS);
-		delete m_pNotifier;
-		m_pNotifier = 0;
+		pNotifier->Notify(DATA_POSTER_INITIALIZE_SUCCESS);
+		delete pNotifier;
 	}
 
 	return CLStatus(0, 0);

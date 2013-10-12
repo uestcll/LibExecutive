@@ -1,9 +1,8 @@
 #include "CLDataPostChannelMaintainer.h"
 #include "CLInitialDataPostChannelNotifier.h"
 
-CLDataPostChannelMaintainer::CLDataPostChannelMaintainer(CLInitialDataPostChannelNotifier *pNotifier)
+CLDataPostChannelMaintainer::CLDataPostChannelMaintainer()
 {
-	m_pNotifier = pNotifier;
 }
 
 CLDataPostChannelMaintainer::~CLDataPostChannelMaintainer()

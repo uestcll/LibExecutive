@@ -9,10 +9,10 @@ class CLDataPoster;
 class CLDataPostChannelMaintainer
 {
 public:
-	explicit CLDataPostChannelMaintainer(CLInitialDataPostChannelNotifier *pNotifier);
+	CLDataPostChannelMaintainer();
 	virtual ~CLDataPostChannelMaintainer();
 
-	virtual CLStatus Initialize(void *pContext) = 0;
+	virtual CLStatus Initialize(CLInitialDataPostChannelNotifier *pNotifier, void *pContext) = 0;
 	virtual CLStatus Uninitialize(void *pContext) = 0;
 
 	virtual CLDataPoster* GetDataPoster() = 0;
@@ -20,9 +20,6 @@ public:
 private:
 	CLDataPostChannelMaintainer(const CLDataPostChannelMaintainer&);
 	CLDataPostChannelMaintainer& operator=(const CLDataPostChannelMaintainer&);
-
-protected:
-	CLInitialDataPostChannelNotifier *m_pNotifier;
 };
 
 #endif
