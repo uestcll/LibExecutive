@@ -3,37 +3,38 @@
 
 #include "CLStatus.h"
 
+class CLDataPostResultNotifier;
 class CLEvent;
 class CLDataPoster;
-class CLPostResultNotifier;
 class CLIOVectors;
 class CLIteratorForIOVectors;
 
 class CLProtocolDataPoster
 {
 public:
-	CLProtocolDataPoster(CLDataPoster *pDataPoster, CLPostResultNotifier *pResultNotifier, CLEvent *pEvent);
+	CLProtocolDataPoster();
 	virtual ~CLProtocolDataPoster();
 
-	CLStatus Initialize();
-	CLStatus NotifyIntialFinished(bool bResult);
-	CLStatus Uninitialize();
+	CLStatus SetParameters(CLDataPoster *pDataPoster, CLDataPostResultNotifier *pResultNotifier, CLEvent *pEvent);
+	bool IsSetParameters();
 
 	CLStatus PostProtocolData(CLIOVectors *pIOVectors);
 	CLStatus PostLeftProtocolData();
-	CLStatus NotifyPostFinished(bool bResult);
 
 private:
 	CLProtocolDataPoster(const CLProtocolDataPoster&);
 	CLProtocolDataPoster& operator=(const CLProtocolDataPoster&);
 
 private:
-	CLPostResultNotifier *m_pResultNotifer;
+	CLDataPostResultNotifier *m_pResultNotifer;
 	CLDataPoster *m_pDataPoster;
+	CLEvent *m_pEvent;
+
 	CLIOVectors *m_pIOVectors;
 	CLIteratorForIOVectors *m_pIterProtocolData;
+	unsigned int m_LeftLength;
 
-	CLEvent *m_pEvent;
+	bool m_bSetParameters;
 };
 
 #endif

@@ -4,7 +4,7 @@
 #include "CLStatus.h"
 
 class CLIOVectors;
-class CLProtocolDataPoste;
+class CLProtocolDataPoster;
 
 class CLDataPoster
 {
@@ -12,13 +12,9 @@ public:
 	CLDataPoster();
 	virtual ~CLDataPoster();
 
-	virtual CLStatus Initialize(void *pContext) = 0;
-	virtual CLStatus Uninitialize() = 0;
-
 	virtual CLStatus PostData(CLIOVectors *pIOVectors) = 0;
+	
 	virtual CLStatus PostDelayedData(CLIOVectors *pIOVectors);
-
-	virtual CLDataPoster* Copy() = 0;
 
 	void SetProtocolDataPoster(CLProtocolDataPoster *pProtocolDataPoster);
 
