@@ -125,7 +125,7 @@ CLMessage* CLMessageReceiver::GetMessage()
 				CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pMsgDeserializer->Deserializer() error or msg = 0", 0);
 				return PopMessage();
 			}
-			m_MessageQueue.push(pMessage);
+			m_MessageQueue.push(pMessage); 
 		}
 	}	
 	else

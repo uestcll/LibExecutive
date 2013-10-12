@@ -55,14 +55,36 @@ CLStatus CLMultiMsgDeserializer::Deserialize(CLIOVector dataVec, CLMessage **pMs
 
 CLStatus CLMultiMsgDeserializer::RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer)
 {
+	if(pDeserializer == 0)
+	{
+		CLLogger::WriteLogMsg("In CLMultiMsgDeserializer::RegisterDeserializer(), pDeserializer is 0", 0);
+		return CLStatus(-1, 0);
+	}
 
+	map<unsigned long, CLMessageDeserializer*>::iterator it = m_DeserializerTable.find(lMsgID);
+	if(it != m_DeserializerTable.end())
+	{
+		CLLogger::WriteLogMsg("In CLMultiMsgDeserializer::RegisterDeserializer(), the msgID pDeserializer is exist", 0);
+		return CLStatus(-1, 0);
+	}
 
+	m_DeserializerTable[lMsgID] = pDeserializer;
 
 	return CLStatus(0, 0);
 }
 
 CLStatus CLMultiMsgDeserializer::UnRegisterDeserializer(unsigned long lMsgID)
 {
+	map<unsigned long, CLMessageDeserializer*>::iterator it = m_DeserializerTable.find(lMsgID);
+
+	if(it == m_DeserializerTable.end())
+	{
+		CLLogger::WriteLogMsg("In CLMultiMsgDeserializer::UnRegisterDeserializer(), the msgId Deserialize is not exist", 0);
+		return CLStatus(-1, 0);
+	}
+
+	delete it->second;
+	m_DeserializerTable.erase(it);
 
 	return CLStatus(0, 0);
 }
