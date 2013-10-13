@@ -63,7 +63,7 @@ CLStatus CLBuffer::DataStartIndex(const int& newIndex)
 // 	m_pIOBufferVec->GetBufPtr(m_iDataStartIndex);
 // }
 
-CLStatus CLBuffer::ReadData(char* &pBuffer, const int& index, const int& len)
+CLStatus CLBuffer::ReadData(char* pBuffer, const int& index, const int& len)
 {
 	return m_pIOBufferVec->ReadData(pBuffer, index, len);
 }

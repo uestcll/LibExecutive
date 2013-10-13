@@ -27,6 +27,14 @@ CLProtoParser.o : ./src/CLProtoParser.cpp
 CLPointerMsgDeserializer.o : ./src/CLPointerMsgDeserializer.cpp
 	g++ -o CLPointerMsgDeserializer.o -c ./src/CLPointerMsgDeserializer.cpp -I ./include -g
 
+CLDataReceiverByNamedPipe.o : ./src/CLDataReceiverByNamedPipe.cpp
+	g++ -o CLDataReceiverByNamedPipe.o -c ./src/CLDataReceiverByNamedPipe.cpp -I ./include -g
+
+CLNamedPipe.o : ./src/CLNamedPipe.cpp
+	g++ -o CLNamedPipe.o -c ./src/CLNamedPipe.cpp -I ./include -g
+
+CLProtoParserForSharedPipe.o : ./src/CLProtoParserForSharedPipe.cpp
+	g++ -o CLProtoParserForSharedPipe.o -c ./src/CLProtoParserForSharedPipe.cpp -I ./include -g
 
 CLConditionVariable.o : ./src/CLConditionVariable.cpp
 	g++ -o CLConditionVariable.o -c ./src/CLConditionVariable.cpp -I./include -g

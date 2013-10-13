@@ -19,7 +19,7 @@ public:
 public:
 	CLStatus Decapsulate(CLBuffer* pBuffer, vector<CLIOVector *> vSerializedMsgs);
 
-	virtual CLStatus DecapsulateMsg(CLBuffer *pBuffer, int& decapsulateStartIndex, vector<CLIOVector *> vSerializedMsgs) = 0;
+	virtual CLStatus DecapsulateMsg(CLIOVector& dataVec, vector<CLIOVector *> vSerializedMsgs) = 0;
 
 };
 

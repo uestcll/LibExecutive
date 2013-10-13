@@ -172,17 +172,35 @@ CLStatus CLIOVector::FreeAll()
 		return CLStatus(0, 0);
 	}
 
-	std::deque<struct iovec>::iterator it = m_ioVecQueue.begin();
-	for(; it != m_ioVecQueue.end(); it++)
+	while(1)
 	{
-		delete [] (char *)(it->iov_base);
-		it->iov_base = NULL;
+		char *pBuf;
+		int len;
+		CLStatus s = PopBack(&pBuf, &len);
+		if(pBuf == 0)
+			break;
+		delete []pBuf;
 	}
+	// std::deque<struct iovec>::iterator it = m_ioVecQueue.begin();
+	// for(; it != m_ioVecQueue.end(); it++)
+	// {
+	// 	delete [] (char *)(it->iov_base);
+	// 	it->iov_base = NULL;
+	// }
 
 	return CLStatus(0, 0);
 
 }
 
+CLStatus CLIOVector::PopAll()
+{
+	while(!m_ioVecQueue.empty())
+	{
+		m_ioVecQueue.pop_back();
+	}
+
+	return CLStatus(0, 0);
+}
 
 CLStatus CLIOVector::ReadData(char* pBuffer, const int& index, const int& len)
 {

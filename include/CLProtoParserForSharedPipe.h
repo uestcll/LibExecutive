@@ -9,7 +9,7 @@ public:
 	CLProtoParserForSharedPipe();
 	virtual ~CLProtoParserForSharedPipe();
 
-	virtual CLStatus DecapsulateMsg(CLBuffer *pBuffer, int& decapsulateStartIndex, vector<CLIOVector *> vSerializedMsgs);
+	virtual CLStatus DecapsulateMsg(CLIOVector& dataVec, vector<CLIOVector *> vSerializedMsgs);
 };
 
 #endif

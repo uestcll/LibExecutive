@@ -21,6 +21,7 @@ public:
 	CLStatus PopFront(char** pBuffer, int* bufLen);
 
 	CLStatus FreeAll();
+	CLStatus PopAll()
 
 	CLStatus GetIOVecs(int index, int len, CLIOVector& IOVector);
 	
