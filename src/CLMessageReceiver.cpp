@@ -86,7 +86,8 @@ CLMessageReceiver::~CLMessageReceiver()
 CLMessage* CLMessageReceiver::GetMessage()
 {
 	CLStatus s1 = m_pDataReceiver->GetData(m_pDataBuffer); //deal with the usedlen in getdata()
-
+// get data by iovec, push into databuffer!!!
+	
 	if(!s1.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pDataReceiver->GetData() error", 0);

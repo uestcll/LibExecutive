@@ -4,13 +4,13 @@
 #include <queue>
 #include <CLMutex.h>
 
-typedef struct _serialized_msg
-{
-	unsigned long m_lMsgID;
-	int m_iStartIndex;
-	int m_iLength;
+// typedef struct _serialized_msg
+// {
+// 	unsigned long m_lMsgID;
+// 	int m_iStartIndex;
+// 	int m_iLength;
 	
-}SLSerializedMsgScope;
+// }SLSerializedMsgScope;
 
 
 class CLMessage;
@@ -39,7 +39,7 @@ protected:
 	CLDataReceiver *m_pDataReceiver;
 	CLMessageDeserializer *m_pMsgDeserializer;
 
-	std::queue<CLMessage*> m_MessageQueue;
+	std::queue<CLMessage*> m_MessageQueue;//!!!!!!put into msgloop manager!!!
 	CLBuffer *m_pDataBuffer;
 };
 

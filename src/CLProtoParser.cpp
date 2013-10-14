@@ -2,6 +2,7 @@
 #include "CLBuffer.h"
 #include "CLLogger.h"
 #include "CLIOVector.h"
+//加密 解密!!!!!!!!!!!!
 
 CLProtoParser::CLProtoParser()
 {
@@ -31,7 +32,7 @@ CLStatus CLProtoParser::Decapsulate(CLBuffer* pBuffer, vector<CLIOVector *> vSer
 		return s1;
 	}
 	// int decapsulateLen = (int)(s.m_clReturnCode);
-	pBuffer->DataStartIndex(decapsulateStartIndex + s.m_clReturnCode);
+	pBuffer->DataStartIndex(decapsulateStartIndex + s1.m_clReturnCode);
 
 	return CLStatus(0, 0);
 }

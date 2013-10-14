@@ -12,7 +12,7 @@ CLDataReceiverByNamedPipe::~CLDataReceiverByNamedPipe()
 {
 
 }
-
+// no break!!!
 CLStatus CLDataReceiverByNamedPipe::GetData(CLBuffer *pBuffer)
 {
 	char *pBuf = 0;
@@ -37,7 +37,7 @@ CLStatus CLDataReceiverByNamedPipe::GetData(CLBuffer *pBuffer)
 		}
 		long len = s2.m_clReturnCode;
 		readLen += len;
-		if(restSumLen > (int)len || len ==0)
+		if(restSumLen > len || len ==0)
 		{
 			break;
 		}
