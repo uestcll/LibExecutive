@@ -35,7 +35,7 @@ CLProtocolDataPoster::~CLProtocolDataPoster()
 		delete m_pResultNotifer;
 }
 
-CLStatus CLProtocolDataPoster::SetParameters(CLDataPoster *pDataPoster, CLDataPostResultNotifier *pResultNotifier, CLEvent *pEvent)
+void CLProtocolDataPoster::SetParameters(CLDataPoster *pDataPoster, CLDataPostResultNotifier *pResultNotifier, CLEvent *pEvent)
 {
 	m_pDataPoster = pDataPoster;
 	m_pEvent = pEvent;
@@ -100,7 +100,6 @@ CLStatus CLProtocolDataPoster::PostProtocolData(CLIOVectors *pIOVectors)
 		m_pIOVectors->GetIterator(s.m_clReturnCode, *m_pIterProtocolData);
 		m_LeftLength = pIOVectors->Size() - s.m_clReturnCode;
 
-		m_pResultNotifer->Notify(DATA_POSTER_POST_PARTIAL);
 		return CLStatus(-1, DATA_POSTER_POST_PARTIAL);
 	}
 
@@ -151,8 +150,6 @@ CLStatus CLProtocolDataPoster::PostLeftProtocolData()
 	{
 		m_pIterProtocolData->Add(s.m_clReturnCode);
 		m_LeftLength = m_LeftLength - s.m_clReturnCode;
-
-		m_pResultNotifer->Notify(DATA_POSTER_POST_PARTIAL);
 
 		return CLStatus(-1, DATA_POSTER_POST_PARTIAL);
 	}

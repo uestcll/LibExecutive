@@ -9,6 +9,8 @@
 #include "CLDataPostChannelMaintainer.h"
 #include "CLDataPostResultNotifier.h"
 #include "CLInitialDataPostChannelNotifier.h"
+#include "ErrorCode.h"
+#include "CLIOVectors.h"
 
 CLMessagePoster::CLMessagePoster(CLMessageSerializer *pMsgSerializer, CLProtocolEncapsulator *pProtocolEncapsulator, CLDataPostChannelMaintainer *pChannelMaintainer, CLEvent *pEvent)
 {
@@ -61,106 +63,123 @@ CLMessagePoster::~CLMessagePoster()
 
 CLStatus CLMessagePoster::Initialize(CLInitialDataPostChannelNotifier *pNotifier, void *pContext)
 {
+	if(pNotifier == 0)
+		return CLStatus(-1, MSG_INITIALIZE_ERROR);
+
+	if(m_bInitial)
+	{
+		pNotifier->Notify(MSG_INITIALIZE_SUCCESS);
+		delete pNotifier;
+		return CLStatus(0, 0);
+	}
+
+	m_bInitial = true;
+
 	if(m_pProtocolEncapsulator)
 	{
 		CLStatus s = m_pProtocolEncapsulator->Initialize(m_UuidOfPoster);
 		if(!s.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLMessagePoster::Initialize(), m_pProtocolEncapsulator->Initialize error", 0);
-			return s;
+			return CLStatus(-1, MSG_INITIALIZE_ERROR);
 		}
 	}
 
 	CLStatus s1 = m_pChannelMaintainer->Initialize(pNotifier, pContext);
-	//process return value..........
+	if(!s1.IsSuccess() && (s1.m_clErrorCode == DATA_POSTER_INITIALIZE_ERROR))
+	{
+		CLLogger::WriteLogMsg("In CLMessagePoster::Initialize(), m_pChannelMaintainer->Initialize error", 0);
+		delete  this;
+	}
+
+	return s1;
 }
 
-CLStatus CLMessagePoster::Uninitialize()
+CLStatus CLMessagePoster::Uninitialize(void *pContext)
 {
-	CLProtocolDataPoster *pDataPoster = new CLProtocolDataPoster(m_pDataPoster, 0, m_pEvent);
-
-	CLStatus s1 = pDataPoster->Uninitialize();
+	CLStatus s1 = m_pChannelMaintainer->Uninitialize(pContext);
 	if(!s1.IsSuccess())
-		CLLogger::WriteLogMsg("In CLMessagePoster::Uninitialize(), pDataPoster->Uninitialize() error", 0);
+	{
+		CLLogger::WriteLogMsg("In CLMessagePoster::Uninitialize(), m_pChannelMaintainer->Uninitialize() error", 0);
+		return s1;
+	}
 
 	if(m_pProtocolEncapsulator)
 	{
 		CLStatus s2 = m_pProtocolEncapsulator->Uninitialize();
 		if(!s2.IsSuccess())
+		{
 			CLLogger::WriteLogMsg("In CLMessagePoster::Uninitialize(), m_pProtocolEncapsulator->Uninitialize() error", 0);
-
-		if(s1.IsSuccess() && s2.IsSuccess())
-			return CLStatus(0, 0);
-		else
-			return CLStatus(-1, 0);
+			return s2;
+		}
 	}
 
-	if(s1.IsSuccess())
-		return CLStatus(0, 0);
-	else
-		return CLStatus(-1, 0);
+	return CLStatus(0, 0);
 }
 
-CLStatus CLMessagePoster::PostMessage(CLMessage *pMsg, CLPostResultNotifier *pResultNotifier)
+CLStatus CLMessagePoster::PostMessage(CLMessage *pMsg, CLDataPostResultNotifier *pResultNotifier, CLProtocolDataPoster *pDataPoster)
 {
-	if(pMsg == 0)
-		return CLStatus(-1, 0);
+	if((pMsg == 0) || (pResultNotifier == 0) || (pDataPoster == 0) || pDataPoster->IsSetParameters())
+		return CLStatus(-1, MSG_POST_ERROR);
 
-	CLIOVectors *pIOV = new CLIOVectors(true);
+	pResultNotifier->SetMsg(pMsg);
+
+	CLIOVectors *pIOV = new CLIOVectors();
 
 	try
 	{
-		if(m_pCommonSerializer)
+		CLStatus s1 = m_pSerializer->Serialize(pMsg, pIOV);
+		if(!s1.IsSuccess())
 		{
-			CLStatus s1 = m_pCommonSerializer->Serialize(pMsg, pIOV);
-			if(!s1.IsSuccess())
-			{
-				CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), m_pCommonSerializer->Serialize() error", 0);
-				throw s1;
-			}
-		}
-		else
-		{
-
+			CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), m_pSerializer->Serialize() error", 0);
+			throw CLStatus(-1, MSG_POST_ERROR);
 		}
 
 		if(m_pProtocolEncapsulator)
 		{
-			CLStatus s3 = m_pProtocolEncapsulator->Encapsulate(pIOV);
-			if(!s3.IsSuccess())
+			CLStatus s2 = m_pProtocolEncapsulator->Encapsulate(pIOV);
+			if(!s2.IsSuccess())
 			{
 				CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), m_pProtocolEncapsulator->Encapsulate error", 0);
-				throw s3;
+				throw CLStatus(-1, MSG_POST_ERROR);
 			}
 		}
 
-		CLProtocolDataPoster *pDataPoster = new CLProtocolDataPoster(m_pDataPoster, pResultNotifier, m_pEvent);
+		CLDataPoster *ptmp = m_pChannelMaintainer->GetDataPoster();
+		if(ptmp == 0)
+		{
+			CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), m_pChannelMaintainer->GetDataPoster error", 0);
+			throw CLStatus(-1, MSG_POST_ERROR);
+		}
 
-		CLStatus s4 = pDataPoster->PostProtocolData(pIOV);
-		if(!s4.IsSuccess())
+		ptmp->SetProtocolDataPoster(pDataPoster);
+
+		pDataPoster->SetParameters(ptmp, pResultNotifier, m_pEvent);
+		CLStatus s3 = pDataPoster->PostProtocolData(pIOV);
+		if(!s3.IsSuccess() && (s3.m_clErrorCode == DATA_POSTER_POST_ERROR))
 			CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), pDataPoster->PostProtocolData error", 0);
 
-		if(m_bMsgDelete)
-			delete pMsg;
-
-		return s4;
+		return s3;
 	}
-	catch(CLStatus& sn)
+	catch(CLStatus& s)
 	{
-		if(pResultNotifier)
-		{
-			CLStatus s5 = pResultNotifier->Notify(false);
-			if(!s5.IsSuccess())
-				CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), pResultNotifier->Notify error", 0);
-
-			delete pResultNotifier;
-		}
+		pResultNotifier->Notify(DATA_POSTER_POST_ERROR);
+		delete pResultNotifier;
 
 		delete pIOV;
 
-		if(m_bMsgDelete)
-			delete pMsg;
-
-		return sn;
+		return s;
 	}
+}
+
+CLStatus CLMessagePoster::PostLeftMessage(CLProtocolDataPoster *pDataPoster)
+{
+	if((pDataPoster == 0) || (pDataPoster->IsSetParameters() == false))
+		return CLStatus(-1, MSG_POST_ERROR);
+
+	CLStatus s = pDataPoster->PostLeftProtocolData();
+	if(!s.IsSuccess() && (s.m_clErrorCode == DATA_POSTER_POST_ERROR))
+		CLLogger::WriteLogMsg("In CLMessagePoster::PostLeftMessage(), pDataPoster->PostLeftProtocolData error", 0);
+
+	return s;
 }

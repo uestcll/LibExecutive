@@ -19,11 +19,8 @@ CLDataPostChannelBySTLqueueMaintainer::~CLDataPostChannelBySTLqueueMaintainer()
 
 CLStatus CLDataPostChannelBySTLqueueMaintainer::Initialize(CLInitialDataPostChannelNotifier *pNotifier, void *pContext)
 {
-	if(pNotifier)
-	{
-		pNotifier->Notify(DATA_POSTER_INITIALIZE_SUCCESS);
-		delete pNotifier;
-	}
+	pNotifier->Notify(DATA_POSTER_INITIALIZE_SUCCESS);
+	delete pNotifier;
 
 	return CLStatus(0, 0);
 }

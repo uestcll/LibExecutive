@@ -24,7 +24,8 @@ public:
 	CLStatus Initialize(CLInitialDataPostChannelNotifier *pNotifier, void *pContext);
 	CLStatus Uninitialize(void *pContext);
 
-	CLStatus PostMessage(CLMessage *pMsg, CLPostResultNotifier *pResultNotifier = 0);
+	CLStatus PostMessage(CLMessage *pMsg, CLDataPostResultNotifier *pResultNotifier, CLProtocolDataPoster *pDataPoster);
+	CLStatus PostLeftMessage(CLProtocolDataPoster *pDataPoster);
 
 private:
 	CLMessagePoster(const CLMessagePoster&);
