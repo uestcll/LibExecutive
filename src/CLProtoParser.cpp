@@ -1,6 +1,7 @@
 #include "CLProtoParser.h"
 #include "CLBuffer.h"
 #include "CLLogger.h"
+#include "CLIOVector.h"
 
 CLProtoParser::CLProtoParser()
 {
@@ -16,7 +17,7 @@ CLStatus CLProtoParser::Decapsulate(CLBuffer* pBuffer, vector<CLIOVector *> vSer
 {	
 	int decapsulateStartIndex = pBuffer->DataStartIndex();
 	CLIOVector dataVec;
-	CLStatus s = GetDataIOVecs(dataVec);
+	CLStatus s = pBuffer->GetDataIOVecs(dataVec);
 	if(!s.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLProtoParser::Decapsulate(), GetDataIOVecs() error", 0);

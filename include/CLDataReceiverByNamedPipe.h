@@ -2,14 +2,14 @@
 #define CLDATARECEIVERBYNAMEDPIPE_H
 
 #include "CLDataReceiver.h"
+#include "CLNamedPipe.h"
 
 class CLBuffer;
-Class CLNamedPipe;
 
-class CLDataReceiverByNamedPipe : public CLDataReceiverByNamedPipe
+class CLDataReceiverByNamedPipe : public CLDataReceiver
 {
 public:
-	CLDataReceiverByNamedPipe(CLNamedPipe *pNamedPipe);
+	CLDataReceiverByNamedPipe(const char *pStrPipeName);
 	virtual ~CLDataReceiverByNamedPipe();
 
 	virtual CLStatus GetData(CLBuffer *pBuffer);
@@ -19,7 +19,7 @@ private:
 	CLDataReceiverByNamedPipe& operator=(const CLDataReceiverByNamedPipe&);
 
 private:
-	CLNamedPipe *m_pNamedPipe;
+	CLNamedPipe m_NamedPipe;
 
 };
 

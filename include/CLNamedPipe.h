@@ -4,6 +4,9 @@
 #include <string>
 #include "CLStatus.h"
 
+#define PIPE_FOR_READ 20
+#define PIPE_FOR_WRITE 30
+#define FILE_PATH_FOR_NAMED_PIPE "/tmp/"
 
 using namespace std;
 

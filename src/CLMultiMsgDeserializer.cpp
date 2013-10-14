@@ -1,5 +1,6 @@
 #include "CLMultiMsgDeserializer.h"
 #include "CLLogger.h"
+#include "CLIOVector.cpp"
 
 CLMultiMsgDeserializer::CLMultiMsgDeserializer()
 {

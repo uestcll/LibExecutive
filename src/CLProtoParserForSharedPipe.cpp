@@ -1,4 +1,5 @@
 #include "CLProtoParserForSharedPipe.h"
+#include "CLIOVector.h"
 
 CLProtoParserForSharedPipe::CLProtoParserForSharedPipe()
 {
@@ -15,7 +16,7 @@ CLStatus CLProtoParserForSharedPipe::DecapsulateMsg(CLIOVector& dataVec, vector<
 	int startIndex = 0;
 	int ctxLen = 0;
 	int headLen = sizeof(int);
-	int wholeLen = dataVec.Length(0;)
+	int wholeLen = dataVec.Length();
 
 	CLIOVector restDataVec = dataVec;
 
@@ -34,10 +35,10 @@ CLStatus CLProtoParserForSharedPipe::DecapsulateMsg(CLIOVector& dataVec, vector<
 			{
 				CLIOVector *pOneSerializedMsg = new CLIOVector();
 				startIndex += headLen;
-				restDataVec.GetIOVec(startIndex, ctxLen, *pOneSerializedMsg);				
+				restDataVec.GetIOVecs(startIndex, ctxLen, *pOneSerializedMsg);				
 				startIndex += ctxLen;
 				restDataVec.PopAll();
-				dataVec.GetIOVec(startIndex, wholeLen - startIndex, restDataVec);
+				dataVec.GetIOVecs(startIndex, wholeLen - startIndex, restDataVec);
 			}
 		}
 	}

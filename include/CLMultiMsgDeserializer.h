@@ -26,3 +26,5 @@ private:
 	map<unsigned long, CLMessageDeserializer*> m_DeserializerTable;
 
 };
+
+#endif

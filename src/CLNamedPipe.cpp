@@ -7,9 +7,7 @@
 #include "CLNamedPipe.h"
 #include "CLStatus.h"
 
-#define PIPE_FOR_READ 20
-#define PIPE_FOR_WRITE 30
-#define FILE_PATH_FOR_NAMED_PIPE "/tmp/"
+
 
 CLNamedPipe::CLNamedPipe(const char* pStrPipeName, int flag)
 {
@@ -66,7 +64,7 @@ CLStatus CLNamedPipe::Read(char *pBuf, int length)
 		return CLStatus(-1, errno);
 	}
 
-	return CLStatus(readLen, 0)
+	return CLStatus(readLen, 0);
 }
 
 CLStatus CLNamedPipe::Write(char *pBuf, int length)

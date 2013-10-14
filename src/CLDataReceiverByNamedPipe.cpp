@@ -1,5 +1,4 @@
 #include "CLDataReceiverByNamedPipe.h"
-#include "CLNamedPipe.h"
 #include "CLBuffer.h"
 #include "CLStatus.h"
 #include "CLLogger.h"
