@@ -6,12 +6,12 @@
 #include <pthread.h>
 #include "CLStatus.h"
 
-class CLExecutiveCommunication;
+class CLMessagePoster;
 class CLMessage;
 
 struct SLExecutiveCommunicationPtrCount
 {
-	CLExecutiveCommunication *pExecutiveCommunication;
+	CLMessagePoster *pMsgPoster;
 	unsigned int nCount;
 };
 
@@ -24,8 +24,8 @@ public:
 	friend class CLLibExecutiveInitializer;
 
 public:
-	CLStatus Register(const char* strExecutiveName, CLExecutiveCommunication *pExecutiveCommunication);
-	CLExecutiveCommunication* GetCommunicationPtr(const char* strExecutiveName);
+	CLStatus Register(const char* strExecutiveName, CLMessagePoster *pExecutiveCommunication);
+	CLMessagePoster* GetCommunicationPtr(const char* strExecutiveName);
 	CLStatus ReleaseCommunicationPtr(const char* strExecutiveName);
 
 private:

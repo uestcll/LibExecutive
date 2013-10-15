@@ -2,8 +2,6 @@
 #include "CLLogger.h"
 #include "CLIOVectors.h"
 
-#define PIPE_READ_BUFFER_LENGTH 4096
-
 CLDataReceiverByNamedPipe::CLDataReceiverByNamedPipe(const char *pstrNamedPipe) : m_NamedPipe(pstrNamedPipe)
 {
 }
@@ -12,9 +10,12 @@ CLDataReceiverByNamedPipe::~CLDataReceiverByNamedPipe()
 {
 }
 
-CLStatus CLDataReceiverByNamedPipe::GetData(CLIOVectors *pIOVectors, void **ppContext)
+CLStatus CLDataReceiverByNamedPipe::GetData(CLIOVectors& IOVectors, void **ppContext)
 {
-	char *pBuffer = new char[PIPE_READ_BUFFER_LENGTH];
+	(int)(*ppContext) = m_NamedPipe.GetFd();
+	m_NamedPipe->GetSizeForAtomWriting()
+
+	
 	CLStatus s = m_NamedPipe->Read(pBuffer, PIPE_READ_BUFFER_LENGTH);
 	if(s.IsSuccess())
 	{

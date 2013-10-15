@@ -3,12 +3,18 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/uio.h>
 #include "CLLogger.h"
 #include "CLNamedPipe.h"
+#include "ErrorCode.h"
+#include "CLIOVectors.h"
+#include "CLCriticalSection.h"
 
 using namespace std;
 
-CLNamedPipe::CLNamedPipe(const char *pstrNamedPipe)
+#define MUTEX_FOR_NAMED_PIPE_CLNAMEDPIPE "Mutex_For_Named_Pipe_CLNamedPipe"
+
+CLNamedPipe::CLNamedPipe(const char *pstrNamedPipe) : m_Mutex(MUTEX_FOR_NAMED_PIPE_CLNAMEDPIPE, MUTEX_USE_SHARED_PTHREAD)
 {
 	if((pstrNamedPipe == NULL) || (strlen(pstrNamedPipe) == 0))
 		throw "In CLNamedPipe::CLNamedPipe(), pstrPipeName error";
@@ -52,30 +58,70 @@ long CLNamedPipe::GetSizeForAtomWriting()
 	return m_lSizeForAtomWriting;
 }
 
-CLStatus CLNamedPipe::Read(char *pBuf, unsigned long ulBufSize)
+CLStatus CLNamedPipe::Read(CLIOVectors& IOVectors)
 {
-	long count = read(m_Fd, pBuf, ulBufSize);
+	if(IOVectors.Size() <= m_lSizeForAtomWriting)
+	{
+		return UnsaftyRead(IOVectors);
+	}
+	else
+	{
+		CLCriticalSection cs(&m_Mutex);
+
+		return UnsaftyRead(IOVectors);
+	}
+}
+
+CLStatus CLNamedPipe::Write(CLIOVectors& IOVectors)
+{
+	if(IOVectors.Size() <= m_lSizeForAtomWriting)
+	{
+		return UnsaftyWrite(IOVectors);
+	}
+	else
+	{
+		CLCriticalSection cs(&m_Mutex);
+
+		return UnsaftyWrite(IOVectors);
+	}
+}
+
+CLStatus CLNamedPipe::UnsaftyRead(CLIOVectors& IOVectors)
+{
+	struct iovec *iov = IOVectors.GetIOVecArray();
+	if(iov == 0)
+		return CLStatus(-1, NORMAL_ERROR);
+
+	long count = readv(m_Fd, iov, IOVectors.GetNumberOfIOVec());
 	long err = 0;
 
 	if(count == -1)
 	{
 		err = errno;
-		CLLogger::WriteLogMsg("In CLNamedPipe::Read(), read error", errno);
+		CLLogger::WriteLogMsg("In CLNamedPipe::Read(), readv error", errno);
 	}
+
+	delete [] iov;
 
 	return CLStatus(count, err);
 }
 
-CLStatus CLNamedPipe::Write(char *pBuf, unsigned long ulBufSize)
+CLStatus CLNamedPipe::UnsaftyWrite(CLIOVectors& IOVectors)
 {
-	long count = write(m_Fd, pBuf, ulBufSize);
+	struct iovec *iov = IOVectors.GetIOVecArray();
+	if(iov == 0)
+		return CLStatus(-1, NORMAL_ERROR);
+
+	long count = writev(m_Fd, iov, IOVectors.GetNumberOfIOVec());
 	long err = 0;
 
 	if(count == -1)
 	{
 		err = errno;
-		CLLogger::WriteLogMsg("In CLNamedPipe::Write(), write error", errno);
+		CLLogger::WriteLogMsg("In CLNamedPipe::Write(), writev error", errno);
 	}
+
+	delete [] iov;
 
 	return CLStatus(count, err);
 }

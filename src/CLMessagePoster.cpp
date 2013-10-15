@@ -119,15 +119,20 @@ CLStatus CLMessagePoster::Uninitialize(void *pContext)
 
 CLStatus CLMessagePoster::PostMessage(CLMessage *pMsg, CLDataPostResultNotifier *pResultNotifier, CLProtocolDataPoster *pDataPoster)
 {
-	if((pMsg == 0) || (pResultNotifier == 0) || (pDataPoster == 0) || pDataPoster->IsSetParameters())
-		return CLStatus(-1, MSG_POST_ERROR);
-
-	pResultNotifier->SetMsg(pMsg);
-
-	CLIOVectors *pIOV = new CLIOVectors();
+	CLIOVectors *pIOV = 0;
 
 	try
 	{
+		if(pResultNotifier == 0)
+			throw CLStatus(-1, MSG_POST_ERROR);
+
+		pResultNotifier->SetMsg(pMsg);
+
+		if((pMsg == 0) || (pDataPoster == 0) || (pDataPoster->IsSetParameters()))
+			throw CLStatus(-1, MSG_POST_ERROR);
+
+		pIOV = new CLIOVectors();
+
 		CLStatus s1 = m_pSerializer->Serialize(pMsg, pIOV);
 		if(!s1.IsSuccess())
 		{
@@ -163,10 +168,22 @@ CLStatus CLMessagePoster::PostMessage(CLMessage *pMsg, CLDataPostResultNotifier 
 	}
 	catch(CLStatus& s)
 	{
-		pResultNotifier->Notify(DATA_POSTER_POST_ERROR);
-		delete pResultNotifier;
+		if(pResultNotifier == 0)
+		{
+			if(pMsg)
+				delete pMsg;
+		}
+		else
+		{
+			pResultNotifier->Notify(MSG_POST_ERROR);
+			delete pResultNotifier;
+		}
 
-		delete pIOV;
+		if(pDataPoster)
+			delete pDataPoster;
+
+		if(pIOV)
+			delete pIOV;
 
 		return s;
 	}
@@ -175,7 +192,12 @@ CLStatus CLMessagePoster::PostMessage(CLMessage *pMsg, CLDataPostResultNotifier 
 CLStatus CLMessagePoster::PostLeftMessage(CLProtocolDataPoster *pDataPoster)
 {
 	if((pDataPoster == 0) || (pDataPoster->IsSetParameters() == false))
+	{
+		if(pDataPoster)
+			delete pDataPoster;
+
 		return CLStatus(-1, MSG_POST_ERROR);
+	}
 
 	CLStatus s = pDataPoster->PostLeftProtocolData();
 	if(!s.IsSuccess() && (s.m_clErrorCode == DATA_POSTER_POST_ERROR))

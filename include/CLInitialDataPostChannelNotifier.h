@@ -9,7 +9,11 @@ public:
 	CLInitialDataPostChannelNotifier();
 	virtual ~CLInitialDataPostChannelNotifier();
 
-	virtual CLStatus Notify(int Result) = 0;
+	virtual CLStatus Notify(int Result);
+
+protected:
+	virtual CLStatus NotifySuccess();
+	virtual CLStatus NotifyFailure();
 
 private:
 	CLInitialDataPostChannelNotifier(const CLInitialDataPostChannelNotifier&);

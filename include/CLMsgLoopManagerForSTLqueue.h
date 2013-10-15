@@ -6,6 +6,8 @@
 
 class CLMessageReceiver;
 class CLEvent;
+class CLBufferManager;
+class CLSTLqueue;
 
 class CLMsgLoopManagerForSTLqueue : public CLMessageLoopManager
 {
@@ -24,9 +26,10 @@ private:
 	CLMsgLoopManagerForSTLqueue& operator=(const CLMsgLoopManagerForSTLqueue&);
 
 private:
-	CLMessageReceiver *m_pMsgReceiver;
 	std::string m_strThreadName;
+	CLMessageReceiver *m_pMsgReceiver;
 	CLEvent *m_pEvent;
+	CLSTLqueue *m_pSTLqueue;
 };
 
 #endif

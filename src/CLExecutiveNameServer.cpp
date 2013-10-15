@@ -2,9 +2,12 @@
 #include "CLExecutiveNameServer.h"
 #include "CLCriticalSection.h"
 #include "CLLogger.h"
-#include "CLExecutiveCommunication.h"
+#include "ErrorCode.h"
+#include "CLMessagePoster.h"
 #include "CLMessage.h"
 #include "CLMutex.h"
+#include "CLDataPostResultNotifier.h"
+#include "CLProtocolDataPoster.h"
 
 CLExecutiveNameServer* CLExecutiveNameServer::m_pNameServer = 0;
 pthread_mutex_t CLExecutiveNameServer::m_Mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -36,7 +39,7 @@ CLStatus CLExecutiveNameServer::PostExecutiveMessage(const char* pstrExecutiveNa
 		return CLStatus(-1, 0);
 	}
 
-	CLExecutiveCommunication* pComm = pNameServer->GetCommunicationPtr(pstrExecutiveName);
+	CLMessagePoster* pComm = pNameServer->GetCommunicationPtr(pstrExecutiveName);
 	if(pComm == 0)
 	{
 		CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pNameServer->GetCommunicationPtr error", 0);
@@ -44,8 +47,8 @@ CLStatus CLExecutiveNameServer::PostExecutiveMessage(const char* pstrExecutiveNa
 		return CLStatus(-1, 0);
 	}	
 
-	CLStatus s = pComm->PostExecutiveMessage(pMessage);
-	if(!s.IsSuccess())
+	CLStatus s = pComm->PostMessage(pMessage, new CLDataPostResultNotifier, new CLProtocolDataPoster());
+	if(!s.IsSuccess() && (s.m_clErrorCode == MSG_POST_ERROR))
 	{
 		CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pComm->PostExecutiveMessage error", 0);
 
@@ -63,7 +66,7 @@ CLStatus CLExecutiveNameServer::PostExecutiveMessage(const char* pstrExecutiveNa
 	return CLStatus(0, 0);
 }
 
-CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLExecutiveCommunication *pExecutiveCommunication)
+CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLMessagePoster *pExecutiveCommunication)
 {
 	if(pExecutiveCommunication == 0)
 		return CLStatus(-1, 0);
@@ -92,7 +95,7 @@ CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLExecuti
 	}
 	
 	SLExecutiveCommunicationPtrCount *p = new SLExecutiveCommunicationPtrCount;
-	p->pExecutiveCommunication = pExecutiveCommunication;
+	p->pMsgPoster = pExecutiveCommunication;
 	p->nCount = 1;
 	
 	m_NameTable[strExecutiveName] = p;
@@ -100,7 +103,7 @@ CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLExecuti
 	return CLStatus(0, 0);
 }
 
-CLExecutiveCommunication* CLExecutiveNameServer::GetCommunicationPtr(const char* strExecutiveName)
+CLMessagePoster* CLExecutiveNameServer::GetCommunicationPtr(const char* strExecutiveName)
 {
 	if((strExecutiveName == 0) || (strlen(strExecutiveName) == 0))
 		return 0;
@@ -123,7 +126,7 @@ CLExecutiveCommunication* CLExecutiveNameServer::GetCommunicationPtr(const char*
 
 	it->second->nCount++;
 
-	return it->second->pExecutiveCommunication;
+	return it->second->pMsgPoster;
 }
 
 CLStatus CLExecutiveNameServer::ReleaseCommunicationPtr(const char* strExecutiveName)
@@ -131,7 +134,7 @@ CLStatus CLExecutiveNameServer::ReleaseCommunicationPtr(const char* strExecutive
 	if((strExecutiveName == 0) || (strlen(strExecutiveName) == 0))
 		return CLStatus(-1, 0);
 
-	CLExecutiveCommunication *pTmp = 0;
+	CLMessagePoster *pTmp = 0;
 	
 	{
 		CLMutex mutex(&m_Mutex);	
@@ -154,7 +157,7 @@ CLStatus CLExecutiveNameServer::ReleaseCommunicationPtr(const char* strExecutive
 
 		if(it->second->nCount == 0)
 		{
-			pTmp = it->second->pExecutiveCommunication;
+			pTmp = it->second->pMsgPoster;
 			delete it->second;
 			m_NameTable.erase(it);
 		}

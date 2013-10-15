@@ -9,11 +9,16 @@ class CLDataPostResultNotifier
 {
 public:
 	CLDataPostResultNotifier();
+	explicit CLDataPostResultNotifier(bool bDeleteMsg);
 	virtual ~CLDataPostResultNotifier();
 
-	virtual CLStatus Notify(int Result) = 0;
+	virtual CLStatus Notify(int Result);
 
 	void SetMsg(CLMessage *pMsg);
+
+protected:
+	virtual CLStatus NotifySuccess();
+	virtual CLStatus NotifyFailure();
 
 private:
 	CLDataPostResultNotifier(const CLDataPostResultNotifier&);
@@ -21,6 +26,7 @@ private:
 
 protected:
 	CLMessage *m_pMsg;
+	bool m_bDeleteMsg;
 };
 
 #endif

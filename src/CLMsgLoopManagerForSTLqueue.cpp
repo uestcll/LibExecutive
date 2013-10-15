@@ -6,6 +6,12 @@
 #include "CLExecutiveNameServer.h"
 #include "CLLogger.h"
 #include "CLEvent.h"
+#include "ErrorCode.h"
+#include "CLBufferManager.h"
+#include "CLSTLqueue.h"
+#include "CLMessagePoster.h"
+#include "CLMsgToPointerSerializer.h"
+#include "CLDataPostChannelBySTLqueueMaintainer.h"
 
 CLMsgLoopManagerForSTLqueue::CLMsgLoopManagerForSTLqueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName) : CLMessageLoopManager(pMsgObserver)
 {
@@ -13,12 +19,15 @@ CLMsgLoopManagerForSTLqueue::CLMsgLoopManagerForSTLqueue(CLMessageObserver *pMsg
 		throw "In CLMsgLoopManagerForSTLqueue::CLMsgLoopManagerForSTLqueue(), pstrThreadName error";
 		
 	m_strThreadName = pstrThreadName;
-	m_pMsgReceiver = new CLMessageReceiver(new CLDataReceiverBySTLqueue, new CLPointerToMsgDeserializer);
 	m_pEvent = new CLEvent(true);
+	m_pSTLqueue = new CLSTLqueue();
+
+	m_pMsgReceiver = new CLMessageReceiver(new CLBufferManager(), new CLDataReceiverBySTLqueue(m_pSTLqueue), new CLPointerToMsgDeserializer());
 }
 
 CLMsgLoopManagerForSTLqueue::~CLMsgLoopManagerForSTLqueue()
 {
+	delete m_pMsgReceiver;
 }
 
 CLStatus CLMsgLoopManagerForSTLqueue::Initialize()
@@ -32,7 +41,7 @@ CLStatus CLMsgLoopManagerForSTLqueue::Initialize()
 			throw CLStatus(-1, 0);
 		}
 
-		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), new CLExecutiveCommunication(new CLDataPosterBySTLqueue(), 0, m_pEvent, new CLMsgToPointerSerializer, false));
+		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), new CLMessagePoster(new CLMsgToPointerSerializer, 0, new CLDataPostChannelBySTLqueueMaintainer(m_pSTLqueue), m_pEvent));
 		if(!s.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::Initialize(), pNameServer->Register error", 0);
@@ -43,9 +52,7 @@ CLStatus CLMsgLoopManagerForSTLqueue::Initialize()
 	}
 	catch(CLStatus& s1)
 	{
-		delete m_pMsgReceiver;
 		delete m_pEvent;
-
 		return s1;
 	}
 }
