@@ -37,6 +37,7 @@ public:
 	
 	CLStatus GetIOVecs(int index, int len, CLIOVector& IOVector);
 	CLStatus GetDataIOVecs(CLIOVector& IOVector);
+	CLStatus PushBackIOVecs(CLIOVector& IOVector);
 	//CLIOVector GetEmptyIOVecs();
 	//CLIOVector GetDataIOVecs();
 

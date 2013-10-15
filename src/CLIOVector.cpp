@@ -268,3 +268,15 @@ CLStatus CLIOVector::WriteData(char* pBuffer, const int& index, const int& len)
 	}
 	return CLStatus(0, 0);
 }
+
+CLStatus CLIOVector::PushBackIOVecs(CLIOVector& IOVector)
+{
+	deque<struct iovec>::iterator it = IOVector.m_ioVecQueue.begin();
+
+	while(it != IOVector.m_ioVecQueue.end())
+	{
+		this->m_ioVecQueue.push_back(*it);
+		it++;
+	}
+	return CLStatus(0, 0);
+}

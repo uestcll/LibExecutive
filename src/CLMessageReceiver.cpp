@@ -85,8 +85,10 @@ CLMessageReceiver::~CLMessageReceiver()
 
 CLMessage* CLMessageReceiver::GetMessage()
 {
-	CLStatus s1 = m_pDataReceiver->GetData(m_pDataBuffer); //deal with the usedlen in getdata()
-// get data by iovec, push into databuffer!!!
+	CLIOVector dataBufVec;
+	CLStatus s1 = m_pDataReceiver->GetData(dataBufVec);
+		// CLStatus s1 = m_pDataReceiver->GetData(m_pDataBuffer); //deal with the usedlen in getdata()
+	// get data by iovec, push into databuffer!!!
 	
 	if(!s1.IsSuccess())
 	{
@@ -94,11 +96,13 @@ CLMessage* CLMessageReceiver::GetMessage()
 		return PopMessage();
 	}
 
-	int readLen = (int)s1.m_clReturnCode;
-	if(readLen != 0)
-	{
-		m_pDataBuffer->AddUsedBufferLen(readLen);//stl queue ,return`s readlen is 0 cause it use pdatabuffer->writedata(0)
-	}
+	// int readLen = (int)s1.m_clReturnCode;
+	// if(readLen != 0)
+	// {
+	// 	m_pDataBuffer->AddUsedBufferLen(readLen);//stl queue ,return`s readlen is 0 cause it use pdatabuffer->writedata(0)
+	// }
+
+	m_pDataBuffer->PushBackIOVecs(dataBufVec);
 
 	if(m_pProtoParser != NULL)
 	{
