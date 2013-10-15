@@ -8,12 +8,12 @@ CLBuffer::CLBuffer(int itemSize) : m_iItemSize(itemSize), m_ciDataStartIndex(m_i
 
 	m_iSumBufferLen = m_iDataStartIndex = m_iUsedBufferLen = 0;
 
-	// CLStatus s = NewBuffer(itemSize);
-	// if(!s.IsSuccess())
-	// {
-	// 		throw "In CLBuffer::CLBuffer(int itemSize) new buffer error!";
-	// }
-	// use the iovector , to push back into clbuffer,so do not need to new buffer at first
+	CLStatus s = NewBuffer(itemSize);
+	if(!s.IsSuccess())
+	{
+			throw "In CLBuffer::CLBuffer(int itemSize) new buffer error!";
+	}
+	use the iovector , to push back into clbuffer,so do not need to new buffer at first
 }
 
 CLBuffer::~CLBuffer()
@@ -148,13 +148,26 @@ CLStatus CLBuffer::GetDataIOVecs(CLIOVector& IOVector)
 
 CLStatus CLBuffer::PushBackIOVecs(CLIOVector& IOVector)
 {
-	CLStatus s = m_pIOBufferVec->PushBackIOVecs(IOVector);
-
-	if(!s.IsSuccess())
+	if(m_iUsedBufferLen == m_iSumBufferLen)
 	{
-		CLLogger::WriteLogMsg("In CLBuffer::PushBackIOVecs(), error", 0);
-		return s;
+		CLStatus s = m_pIOBufferVec->PushBackIOVecs(IOVector);
+
+		if(!s.IsSuccess())
+		{
+			CLLogger::WriteLogMsg("In CLBuffer::PushBackIOVecs(), error", 0);
+			return s;
+		}
 	}
+	else
+	{
+		CLStatus s1 = m_pIOBufferVec->PushIOVecs(m_iUsedBufferLen, IOVector);
+		if(!s1.IsSuccess())
+		{
+			CLLogger::WriteLogMsg("In CLBuffer::PushIOVecs(), error", 0);
+			return s1;
+		}
+	}
+
 	m_iUsedBufferLen += IOVector.Length();
 	m_iSumBufferLen += IOVector.Length();
 

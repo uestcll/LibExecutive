@@ -83,17 +83,18 @@ CLMessageReceiver::~CLMessageReceiver()
 	}
 }
 
-CLMessage* CLMessageReceiver::GetMessage()
+CLStatus CLMessageReceiver::GetMessage(queue<CLMessage*> MessageQueue)
 {
-	CLIOVector dataBufVec;
-	CLStatus s1 = m_pDataReceiver->GetData(dataBufVec);
+	CLIOVector revDataBufVec;
+	CLStatus s1 = m_pDataReceiver->GetData(revDataBufVec);
 		// CLStatus s1 = m_pDataReceiver->GetData(m_pDataBuffer); //deal with the usedlen in getdata()
 	// get data by iovec, push into databuffer!!!
 	
 	if(!s1.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pDataReceiver->GetData() error", 0);
-		return PopMessage();
+		return s1;
+		// return PopMessage();
 	}
 
 	// int readLen = (int)s1.m_clReturnCode;
@@ -102,7 +103,12 @@ CLMessage* CLMessageReceiver::GetMessage()
 	// 	m_pDataBuffer->AddUsedBufferLen(readLen);//stl queue ,return`s readlen is 0 cause it use pdatabuffer->writedata(0)
 	// }
 
-	m_pDataBuffer->PushBackIOVecs(dataBufVec);
+	CLStatus s = m_pDataBuffer->PushBackIOVecs(revDataBufVec);
+	if(!s.IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pDataBuffer->PushBackIOVecs() error", 0);
+		return s;
+	}
 
 	if(m_pProtoParser != NULL)
 	{
@@ -115,7 +121,7 @@ CLMessage* CLMessageReceiver::GetMessage()
 		if(!s2.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(0, m_pProtoParser->Decapsulate(), error", 0);
-			return PopMessage();
+			return s2;
 		}
 
 		//int decapsulateLen = (int)(s2.m_clReturnCode);
@@ -128,9 +134,9 @@ CLMessage* CLMessageReceiver::GetMessage()
 			if(!s3.IsSuccess() || pMessage == 0)
 			{
 				CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pMsgDeserializer->Deserializer() error or msg = 0", 0);
-				return PopMessage();
+				return s3;
 			}
-			m_MessageQueue.push(pMessage); 
+			MessageQueue.push(pMessage); 
 		}
 	}	
 	else
@@ -148,21 +154,20 @@ CLMessage* CLMessageReceiver::GetMessage()
 			return PopMessage();
 		}
 		m_pDataBuffer->AddDataStartIndex(s4.m_clReturnCode);
-		m_MessageQueue.push(pMessage);
-		
+		MessageQueue.push(pMessage);		
 	}
 	
-	return PopMessage();
+	return CLStatus(0, 0);
 }
 
-CLMessage* CLMessageReceiver::PopMessage()
-{
-	CLCriticalSection cs(&m_Mutex);
+// CLMessage* CLMessageReceiver::PopMessage()
+// {
+// 	CLCriticalSection cs(&m_Mutex);
 
-	if(m_MessageQueue.empty())
-		return 0;
+// 	if(m_MessageQueue.empty())
+// 		return 0;
 
-	CLMessage *p = m_MessageQueue.front();
-	m_MessageQueue.pop();
-	return p;	
-}
+// 	CLMessage *p = m_MessageQueue.front();
+// 	m_MessageQueue.pop();
+// 	return p;	
+// }

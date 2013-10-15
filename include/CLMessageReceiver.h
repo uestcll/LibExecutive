@@ -25,21 +25,21 @@ public:
 	CLMessageReceiver(CLDataReceiver *pDataReceiver, CLProtoParser *pProtoParser, CLMessageDeserializer *pMsgDeserializer);
 	virtual ~CLMessageReceiver();
 
-	CLMessage *GetMessage();
+	CLStatus GetMessage(std::queue<CLMessage*> MessageQueue);
 private:
 	CLMessageReceiver(const CLMessageReceiver&);
 	CLMessageReceiver& operator=(const CLMessageReceiver&);
 
-	CLMessage* PopMessage();
+	// CLMessage* PopMessage();
 
 protected:
 	
-	CLMutex m_Mutex;
+	// CLMutex m_Mutex;
 	CLProtoParser *m_pProtoParser;
 	CLDataReceiver *m_pDataReceiver;
 	CLMessageDeserializer *m_pMsgDeserializer;
 
-	std::queue<CLMessage*> m_MessageQueue;//!!!!!!put into msgloop manager!!!
+	// std::queue<CLMessage*> m_MessageQueue;//!!!!!!put into msgloop manager!!!
 	CLBuffer *m_pDataBuffer;
 };
 

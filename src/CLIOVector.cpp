@@ -269,6 +269,28 @@ CLStatus CLIOVector::WriteData(char* pBuffer, const int& index, const int& len)
 	return CLStatus(0, 0);
 }
 
+CLStatus CLIOVector::PushIOVecs(int index, CLIOVector& IOVector) //最好写一个从哪里开始到最后都pop出来的iovec！！！要写一个由index得到该index所在iterator位置的接口！！！
+{
+	CLIOVector tmpBakIOVec;
+	CLIOVector tmpFrtIOVec;
+
+	CLStatus s1 = GetIOVecs(index, m_iDataLength - index, tmpBakIOVec)
+	CLStatus s2 = GetIOVecs(0, index, tmpFrtIOVec);
+	if(!s1.IsSuccess() || !s2.IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLIOVector::PushIOVecs(), GetIOVecs() error", 0);
+		return s2;
+	}
+
+	tmpFrtIOVec.PushBackIOVecs(IOVector);
+
+	tmpFrtIOVec.PushBackIOVecs(tmpBakIOVec);
+
+	this->PopAll();
+	
+	return (this->PushBackIOVecs(tmpFrtIOVec));
+}
+
 CLStatus CLIOVector::PushBackIOVecs(CLIOVector& IOVector)
 {
 	deque<struct iovec>::iterator it = IOVector.m_ioVecQueue.begin();
