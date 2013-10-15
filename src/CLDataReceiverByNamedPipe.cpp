@@ -5,7 +5,7 @@
 
 CLDataReceiverByNamedPipe::CLDataReceiverByNamedPipe(const char *pStrPipeName) : m_NamedPipe(pStrPipeName, PIPE_FOR_READ)
 {
-	m_lMaxSize = m_NamedPipe.GetAtomWriteSize();
+	m_lMaxSizeForPipe = m_NamedPipe.GetAtomWriteSize();
 }
 
 CLDataReceiverByNamedPipe::~CLDataReceiverByNamedPipe()
@@ -38,7 +38,7 @@ CLStatus CLDataReceiverByNamedPipe::GetData(CLBuffer *pBuffer)
 		}
 		long len = s2.m_clReturnCode;
 		readLen += len;
-		if(restSumLen > len || len ==0 || readLen >= m_lMaxSize)
+		if(restSumLen > len || len ==0 || readLen >= m_lMaxSizeForPipe)
 		{
 			break;
 		}

@@ -274,7 +274,7 @@ CLStatus CLIOVector::PushIOVecs(int index, CLIOVector& IOVector) //最好写一�
 	CLIOVector tmpBakIOVec;
 	CLIOVector tmpFrtIOVec;
 
-	CLStatus s1 = GetIOVecs(index, m_iDataLength - index, tmpBakIOVec)
+	CLStatus s1 = GetIOVecs(index, m_iDataLength - index, tmpBakIOVec);
 	CLStatus s2 = GetIOVecs(0, index, tmpFrtIOVec);
 	if(!s1.IsSuccess() || !s2.IsSuccess())
 	{
@@ -287,7 +287,7 @@ CLStatus CLIOVector::PushIOVecs(int index, CLIOVector& IOVector) //最好写一�
 	tmpFrtIOVec.PushBackIOVecs(tmpBakIOVec);
 
 	this->PopAll();
-	
+
 	return (this->PushBackIOVecs(tmpFrtIOVec));
 }
 

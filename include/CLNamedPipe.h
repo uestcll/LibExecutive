@@ -16,11 +16,14 @@ public:
 	CLNamedPipe(const char* pStrPipeName, int flag);
 	virtual ~CLNamedPipe();
 
+	long GetAtomWriteSize();
+
 	CLStatus Read(char *pBuf, int length);
 	CLStatus Write(char *pBuf, int length);
 
 private:
 	string m_strPipeName;
+	long m_lAtomWriteSize;
 	int m_Fd;
 };
 

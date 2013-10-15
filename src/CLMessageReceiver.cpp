@@ -73,21 +73,21 @@ CLMessageReceiver::~CLMessageReceiver()
 		m_pMsgDeserializer = NULL;
 	}
 
-	while(true)
-	{
-		CLMessage *pMsg = GetMessage();
-		if(pMsg == 0)
-			break;
+	// while(true)
+	// {
+	// 	CLMessage *pMsg = PopMessage();
+	// 	if(pMsg == 0)
+	// 		break;
 
-		delete pMsg;
-	}
+	// 	delete pMsg;
+	// }
 }
 
 CLStatus CLMessageReceiver::GetMessage(queue<CLMessage*> MessageQueue)
 {
 	CLIOVector revDataBufVec;
-	CLStatus s1 = m_pDataReceiver->GetData(revDataBufVec);
-		// CLStatus s1 = m_pDataReceiver->GetData(m_pDataBuffer); //deal with the usedlen in getdata()
+	// CLStatus s1 = m_pDataReceiver->GetData(revDataBufVec);
+	CLStatus s1 = m_pDataReceiver->GetData(m_pDataBuffer); //deal with the usedlen in getdata()
 	// get data by iovec, push into databuffer!!!
 	
 	if(!s1.IsSuccess())
@@ -97,11 +97,11 @@ CLStatus CLMessageReceiver::GetMessage(queue<CLMessage*> MessageQueue)
 		// return PopMessage();
 	}
 
-	// int readLen = (int)s1.m_clReturnCode;
-	// if(readLen != 0)
-	// {
-	// 	m_pDataBuffer->AddUsedBufferLen(readLen);//stl queue ,return`s readlen is 0 cause it use pdatabuffer->writedata(0)
-	// }
+	int readLen = (int)s1.m_clReturnCode;
+	if(readLen != 0)
+	{
+		m_pDataBuffer->AddUsedBufferLen(readLen);//stl queue ,return`s readlen is 0 cause it use pdatabuffer->writedata(0)
+	}
 
 	CLStatus s = m_pDataBuffer->PushBackIOVecs(revDataBufVec);
 	if(!s.IsSuccess())
@@ -151,7 +151,7 @@ CLStatus CLMessageReceiver::GetMessage(queue<CLMessage*> MessageQueue)
 		if(!s4.IsSuccess() || pMessage == 0)
 		{
 			CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pMsgDeserializer->Deserializer() error error or msg = 0", 0);
-			return PopMessage();
+			return s4;
 		}
 		m_pDataBuffer->AddDataStartIndex(s4.m_clReturnCode);
 		MessageQueue.push(pMessage);		

@@ -8,12 +8,13 @@ CLBuffer::CLBuffer(int itemSize) : m_iItemSize(itemSize), m_ciDataStartIndex(m_i
 
 	m_iSumBufferLen = m_iDataStartIndex = m_iUsedBufferLen = 0;
 
-	CLStatus s = NewBuffer(itemSize);
-	if(!s.IsSuccess())
-	{
-			throw "In CLBuffer::CLBuffer(int itemSize) new buffer error!";
-	}
-	use the iovector , to push back into clbuffer,so do not need to new buffer at first
+	// CLStatus s = NewBuffer(itemSize);
+	// if(!s.IsSuccess())
+	// {
+	// 		throw "In CLBuffer::CLBuffer(int itemSize) new buffer error!";
+	// }
+	//use the iovector , to push back into clbuffer,so do not need to new buffer at first
+	//or user to call the func NewBuffer themselves
 }
 
 CLBuffer::~CLBuffer()
@@ -32,7 +33,7 @@ CLStatus CLBuffer::NewBuffer(int size)
 	CLStatus s = m_pIOBufferVec->PushBack(p, size);
 	if(!s.IsSuccess())
 	{
-		CLLogger::WriteLogMsg("In CLBuffer::NewBuffer(), bufferiovec pushback error", 0);20
+		CLLogger::WriteLogMsg("In CLBuffer::NewBuffer(), bufferiovec pushback error", 0);
 		return CLStatus(-1, 0);
 	}
 	m_iSumBufferLen += size;

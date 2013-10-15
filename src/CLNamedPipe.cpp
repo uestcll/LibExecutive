@@ -23,6 +23,12 @@ CLNamedPipe::CLNamedPipe(const char* pStrPipeName, int flag)
 		throw "In CLNamedPipe::CLNamedPipe(), mkfifo error";
 	}
 
+	m_lAtomWriteSize = pathconf(m_strPipeName.c_str(), _PC_PIPE_BUF);
+	if(m_lAtomWriteSize == -1)
+	{
+		CLLogger::WriteLogMsg("In CLNamedPipe::CLNamedPipe(), pathconf error", errno);
+		m_lAtomWriteSize = 1000;
+	}
 	if(flag == PIPE_FOR_READ)
 	{
 		m_Fd = open(m_strPipeName.c_str(), O_RDONLY | O_NONBLOCK);
@@ -80,4 +86,9 @@ CLStatus CLNamedPipe::Write(char *pBuf, int length)
 	}
 
 	return CLStatus(writeLen, 0);	
+}
+
+long CLNamedPipe::GetAtomWriteSize()
+{
+	return m_lAtomWriteSize;
 }

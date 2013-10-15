@@ -20,6 +20,7 @@ private:
 
 private:
 	CLNamedPipe m_NamedPipe;
+	long m_lMaxSizeForPipe;
 
 };
 
