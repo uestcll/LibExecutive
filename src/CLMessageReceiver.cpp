@@ -85,7 +85,7 @@ CLMessageReceiver::~CLMessageReceiver()
 
 CLStatus CLMessageReceiver::GetMessage(queue<CLMessage*> MessageQueue)
 {
-	CLIOVector revDataBufVec;
+	//CLIOVector revDataBufVec;
 	// CLStatus s1 = m_pDataReceiver->GetData(revDataBufVec);
 	CLStatus s1 = m_pDataReceiver->GetData(m_pDataBuffer); //deal with the usedlen in getdata()
 	// get data by iovec, push into databuffer!!!
@@ -103,12 +103,12 @@ CLStatus CLMessageReceiver::GetMessage(queue<CLMessage*> MessageQueue)
 		m_pDataBuffer->AddUsedBufferLen(readLen);//stl queue ,return`s readlen is 0 cause it use pdatabuffer->writedata(0)
 	}
 
-	CLStatus s = m_pDataBuffer->PushBackIOVecs(revDataBufVec);
-	if(!s.IsSuccess())
-	{
-		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pDataBuffer->PushBackIOVecs() error", 0);
-		return s;
-	}
+	// CLStatus s = m_pDataBuffer->PushBackIOVecs(revDataBufVec);
+	// if(!s.IsSuccess())
+	// {
+	// 	CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pDataBuffer->PushBackIOVecs() error", 0);
+	// 	return s;
+	// }
 
 	if(m_pProtoParser != NULL)
 	{
@@ -120,7 +120,7 @@ CLStatus CLMessageReceiver::GetMessage(queue<CLMessage*> MessageQueue)
 		CLStatus s2 = m_pProtoParser->Decapsulate(m_pDataBuffer, /*decapsulateStartIndex,*/ vSerializedMsgs);//get and add data startindex in Decapsulate()
 		if(!s2.IsSuccess())
 		{
-			CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(0, m_pProtoParser->Decapsulate(), error", 0);
+			CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pProtoParser->Decapsulate(), error", 0);
 			return s2;
 		}
 

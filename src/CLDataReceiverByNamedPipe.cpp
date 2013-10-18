@@ -38,7 +38,7 @@ CLStatus CLDataReceiverByNamedPipe::GetData(CLBuffer *pBuffer)
 		}
 		long len = s2.m_clReturnCode;
 		readLen += len;
-		if(restSumLen > len || len ==0 || readLen >= m_lMaxSizeForPipe)
+		if(restSumLen > len || len == 0 || readLen >= m_lMaxSizeForPipe)
 		{
 			break;
 		}
