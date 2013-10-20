@@ -9,15 +9,30 @@
 #include "ErrorCode.h"
 #include "CLIOVectors.h"
 #include "CLCriticalSection.h"
+#include "CLMutex.h"
 
 using namespace std;
 
-#define MUTEX_FOR_NAMED_PIPE_CLNAMEDPIPE "Mutex_For_Named_Pipe_CLNamedPipe"
+CLNamedPipe::CLNamedPipe(const char *pstrNamedPipe)
+{
+	if(InitialNamedPipe(pstrNamedPipe).IsSuccess())
+		m_pMutex = 0;
+	else
+		throw "In CLNamedPipe::CLNamedPipe(), InitialNamedPipe error";
+}
 
-CLNamedPipe::CLNamedPipe(const char *pstrNamedPipe) : m_Mutex(MUTEX_FOR_NAMED_PIPE_CLNAMEDPIPE, MUTEX_USE_SHARED_PTHREAD)
+CLNamedPipe::CLNamedPipe(const char* pstrNamedPipe, const char *pstrMutexName)
+{
+	if(InitialNamedPipe(pstrNamedPipe).IsSuccess())
+		m_pMutex = new CLMutex(pstrMutexName, MUTEX_USE_SHARED_PTHREAD);
+	else
+		throw "In CLNamedPipe::CLNamedPipe(), InitialNamedPipe error";
+}
+
+CLStatus CLNamedPipe::InitialNamedPipe(const char *pstrNamedPipe)
 {
 	if((pstrNamedPipe == NULL) || (strlen(pstrNamedPipe) == 0))
-		throw "In CLNamedPipe::CLNamedPipe(), pstrPipeName error";
+		return CLStatus(-1, NORMAL_ERROR);
 
 	m_strNamedPipe = pstrNamedPipe;
 
@@ -25,21 +40,23 @@ CLNamedPipe::CLNamedPipe(const char *pstrNamedPipe) : m_Mutex(MUTEX_FOR_NAMED_PI
 	if(m_lSizeForAtomWriting == -1)
 	{
 		CLLogger::WriteLogMsg("In CLNamedPipe::CLNamedPipe(), pathconf error", errno);
-		throw "In CLNamedPipe::CLNamedPipe(), pathconf error";
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	if((mkfifo(m_strNamedPipe.c_str(), S_IRUSR | S_IWUSR) == -1) && (errno != EEXIST))
 	{
 		CLLogger::WriteLogMsg("In CLNamedPipe::CLNamedPipe(), mkfifo error", errno);
-		throw "In CLNamedPipe::CLNamedPipe(), mkfifo error";
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	m_Fd = open(m_strNamedPipe.c_str(), O_RDONLY | O_NONBLOCK);
 	if(m_Fd == -1)
 	{
 		CLLogger::WriteLogMsg("In CLNamedPipe::CLNamedPipe(), open error", errno);
-		throw "In CLNamedPipe::CLNamedPipe(), open error";
+		return CLStatus(-1, NORMAL_ERROR);
 	}
+
+	return CLStatus(0, 0);
 }
 
 CLNamedPipe::~CLNamedPipe()
@@ -60,28 +77,28 @@ long CLNamedPipe::GetSizeForAtomWriting()
 
 CLStatus CLNamedPipe::Read(CLIOVectors& IOVectors)
 {
-	if(IOVectors.Size() <= m_lSizeForAtomWriting)
+	if(m_pMutex)
 	{
+		CLCriticalSection cs(m_pMutex);
+
 		return UnsaftyRead(IOVectors);
 	}
 	else
 	{
-		CLCriticalSection cs(&m_Mutex);
-
 		return UnsaftyRead(IOVectors);
 	}
 }
 
 CLStatus CLNamedPipe::Write(CLIOVectors& IOVectors)
 {
-	if(IOVectors.Size() <= m_lSizeForAtomWriting)
+	if(m_pMutex)
 	{
+		CLCriticalSection cs(m_pMutex);
+
 		return UnsaftyWrite(IOVectors);
 	}
 	else
 	{
-		CLCriticalSection cs(&m_Mutex);
-
 		return UnsaftyWrite(IOVectors);
 	}
 }

@@ -2,15 +2,16 @@
 #define CLNamedPipe_H
 
 #include <string>
-#include "CLMutex.h"
 #include "CLStatus.h"
 
+class CLMutex;
 class CLIOVectors;
 
 class CLNamedPipe
 {
 public:
-	CLNamedPipe(const char *pstrNamedPipe);
+	explicit CLNamedPipe(const char *pstrNamedPipe);
+	CLNamedPipe(const char* pstrNamedPipe, const char *pstrMutexName);
 	virtual ~CLNamedPipe();
 
 	int GetFd();
@@ -20,6 +21,8 @@ public:
 	CLStatus Write(CLIOVectors& IOVectors);
 
 private:
+	CLStatus InitialNamedPipe(const char *pstrNamedPipe);
+
 	CLStatus UnsaftyRead(CLIOVectors& IOVectors);
 	CLStatus UnsaftyWrite(CLIOVectors& IOVectors);
 
@@ -32,7 +35,7 @@ private:
 	int m_Fd;
 	long m_lSizeForAtomWriting;
 
-	CLMutex m_Mutex;
+	CLMutex *m_pMutex;
 };
 
 #endif

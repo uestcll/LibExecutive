@@ -10,7 +10,7 @@ public:
 	CLDataReceiverByNamedPipe(const char *pstrNamedPipe);
 	virtual ~CLDataReceiverByNamedPipe();
 
-	virtual CLStatus GetData(CLIOVectors& IOVectors, void **ppContext)
+	virtual CLStatus GetData(CLIOVectors& IOVectors, void **ppContext);
 
 private:
 	CLDataReceiverByNamedPipe(const CLDataReceiverByNamedPipe&);
