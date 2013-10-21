@@ -11,9 +11,9 @@ CLDataReceiverByNamedPipe::~CLDataReceiverByNamedPipe()
 {
 }
 
-CLStatus CLDataReceiverByNamedPipe::GetData(CLIOVectors& IOVectors, void **ppContext)
+CLStatus CLDataReceiverByNamedPipe::GetData(CLIOVectors& IOVectors, void *pContext)
 {
-	(int)(*ppContext) = m_NamedPipe.GetFd();
+	*((int *)pContext) = m_NamedPipe.GetFd();
 
 	CLStatus s = m_NamedPipe.Read(IOVectors);
 	if(s.m_clReturnCode > 0)

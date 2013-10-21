@@ -18,9 +18,9 @@ CLDataReceiverBySTLqueue::~CLDataReceiverBySTLqueue()
 {
 }
 
-CLStatus CLDataReceiverBySTLqueue::GetData(CLIOVectors& IOVectors, void **ppContext)
+CLStatus CLDataReceiverBySTLqueue::GetData(CLIOVectors& IOVectors, void *pContext)
 {
-	*ppContext = 0;
+	*pContext = 0;
 
 	CLStatus s = m_pSTLqueue->PopData(IOVectors);
 	if((!s.IsSuccess()) && (s.m_clErrorCode == NORMAL_ERROR))

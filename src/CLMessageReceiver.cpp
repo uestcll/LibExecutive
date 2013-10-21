@@ -66,8 +66,8 @@ CLStatus CLMessageReceiver::GetMessage(std::queue<CLMessage*>& qMsgContainer)
 	CLIOVectors ReceiveIOVec;
 	m_pBufferManager->GetEmptyIOVector(ReceiveIOVec);
 
-	void *pContext = 0;
-	CLStatus s1 = m_pDataReceiver->GetData(ReceiveIOVec, &pContext);
+	long Context = 0;
+	CLStatus s1 = m_pDataReceiver->GetData(ReceiveIOVec, &Context);
 	if(!s1.IsSuccess())
 	{
 		if(s1.m_clReturnCode != RECEIVED_ZERO_BYTE)
@@ -87,7 +87,7 @@ CLStatus CLMessageReceiver::GetMessage(std::queue<CLMessage*>& qMsgContainer)
 	if(m_pProtocolDecapsulator)
 	{
 		vector<CLIOVectors *> vSerializedMsgs;
-		CLStatus s2 = m_pProtocolDecapsulator->Decapsulate(DataIOVec, length, vSerializedMsgs, *m_pBufferManager, pContext);
+		CLStatus s2 = m_pProtocolDecapsulator->Decapsulate(DataIOVec, length, vSerializedMsgs, *m_pBufferManager, &Context);
 		if(!s2.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pProtocolDecapsulator->Decapsulate error", 0);

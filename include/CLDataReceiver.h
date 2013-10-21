@@ -11,7 +11,7 @@ public:
 	CLDataReceiver();
 	virtual ~CLDataReceiver();
 
-	virtual CLStatus GetData(CLIOVectors& IOVectors, void **ppContext) = 0;
+	virtual CLStatus GetData(CLIOVectors& IOVectors, void *pContext) = 0;
 
 private:
 	CLDataReceiver(const CLDataReceiver&);

@@ -11,7 +11,7 @@ public:
 	explicit CLDataReceiverBySTLqueue(CLSTLqueue *pSTLqueue);
 	virtual ~CLDataReceiverBySTLqueue();
 
-	virtual CLStatus GetData(CLIOVectors& IOVectors, void **ppContext);
+	virtual CLStatus GetData(CLIOVectors& IOVectors, void *pContext);
 
 private:
 	CLDataReceiverBySTLqueue(const CLDataReceiverBySTLqueue&);
