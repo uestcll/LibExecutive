@@ -10,6 +10,8 @@
 
 using namespace std;
 
+class CLIOVector;
+
 class CLNamedPipe
 {
 public:
@@ -21,6 +23,8 @@ public:
 	CLStatus Read(char *pBuf, int length);
 	CLStatus Write(char *pBuf, int length);
 
+	CLStatus ReadVecs(CLIOVector dataVec);
+	CLStatus WriteVecs(CLIOVector dataVec);
 private:
 	string m_strPipeName;
 	long m_lAtomWriteSize;
