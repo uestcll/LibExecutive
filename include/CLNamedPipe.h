@@ -10,8 +10,7 @@ class CLIOVectors;
 class CLNamedPipe
 {
 public:
-	explicit CLNamedPipe(const char *pstrNamedPipe);
-	CLNamedPipe(const char* pstrNamedPipe, const char *pstrMutexName);
+	CLNamedPipe(const char* pstrNamedPipe, bool bReader, const char *pstrMutexName);
 	virtual ~CLNamedPipe();
 
 	int GetFd();
@@ -21,7 +20,8 @@ public:
 	CLStatus Write(CLIOVectors& IOVectors);
 
 private:
-	CLStatus InitialNamedPipe(const char *pstrNamedPipe);
+	CLStatus InitialReader();
+	CLStatus InitialWriter();
 
 	CLStatus UnsaftyRead(CLIOVectors& IOVectors);
 	CLStatus UnsaftyWrite(CLIOVectors& IOVectors);
@@ -34,7 +34,7 @@ private:
 	std::string m_strNamedPipe;
 	int m_Fd;
 	long m_lSizeForAtomWriting;
-
+	bool m_bReader;
 	CLMutex *m_pMutex;
 };
 

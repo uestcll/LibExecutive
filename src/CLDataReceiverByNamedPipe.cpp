@@ -3,7 +3,7 @@
 #include "CLIOVectors.h"
 #include "ErrorCode.h"
 
-CLDataReceiverByNamedPipe::CLDataReceiverByNamedPipe(const char *pstrNamedPipe) : m_NamedPipe(pstrNamedPipe)
+CLDataReceiverByNamedPipe::CLDataReceiverByNamedPipe(const char *pstrNamedPipe) : m_NamedPipe(pstrNamedPipe, true, 0)
 {
 }
 

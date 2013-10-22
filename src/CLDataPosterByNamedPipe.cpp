@@ -1,38 +1,36 @@
 #include "CLDataPosterByNamedPipe.h"
+#include "CLNamedPipe.h"
+#include "CLLogger.h"
+#include "ErrorCode.h"
 
-CLDataPosterByNamedPipe::CLDataPosterByNamedPipe(const char *pstrNamedPipe) : m_NamedPipe(pstrNamedPipe)
+CLDataPosterByNamedPipe::CLDataPosterByNamedPipe(CLNamedPipe *pNamedPipe)
 {
+	m_pNamedPipe = pNamedPipe;
 }
 
 CLDataPosterByNamedPipe::~CLDataPosterByNamedPipe()
 {
 }
 
-CLStatus CLDataPosterByNamedPipe::Initialize()
-{
-	return CLStatus(0, 0);
-}
-
-CLStatus CLDataPosterByNamedPipe::Uninitialize()
-{
-	return CLStatus(0, 0);
-}
-
-//bug
 CLStatus CLDataPosterByNamedPipe::PostData(CLIOVectors *pIOVectors)
 {
-	char *pBuffer = 0;
-	size_t len_buffer = 0;
+	if((pIOVectors == 0) || (pIOVectors->Size() == 0))
+		return CLStatus(-1, DATA_POSTER_POST_ERROR);
 
-	CLStatus s = pIOVectors->PopFront(&pBuffer, &len_buffer);
-	if(s.IsSuccess())
+	CLStatus s = m_pNamedPipe->Write(*pIOVectors);
+	if(!s.IsSuccess())
 	{
-		CLStatus s1 = m_NamedPipe->Write(pBuffer, len_buffer);
-		if(s1.IsSuccess())
-			return CLStatus(0, 0);
+		CLLogger::WriteLogMsg("In CLDataPosterByNamedPipe::PostData, m_pNamedPipe->Write error", 0);
+		return CLStatus(-1, DATA_POSTER_POST_ERROR);
 	}
 
-	delete pIOVectors;
+	if(s.m_clReturnCode == 0)
+		return CLStatus(-1, DATA_POSTER_POST_PENDING);
+	else
+		return s;
+}
 
-	return CLStatus(-1, POSTER_POST_ERROR);
+CLStatus CLDataPosterByNamedPipe::PostDelayedData(CLIOVectors *pIOVectors)
+{
+	return PostData(pIOVectors);
 }

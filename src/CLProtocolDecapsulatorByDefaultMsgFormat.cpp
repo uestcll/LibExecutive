@@ -1,4 +1,7 @@
 #include "CLProtocolDecapsulatorByDefaultMsgFormat.h"
+#include "CLIOVectors.h"
+#include "CLIteratorForIOVectors.h"
+#include "CLBufferManager.h"
 #include "ErrorCode.h"
 #include "CLLogger.h"
 
@@ -41,29 +44,39 @@ CLStatus CLProtocolDecapsulatorByDefaultMsgFormat::Decapsulate(CLIOVectors& IOVe
 
 	while(true)
 	{
-		IsDataComplete(IOVectorsForData, LeftLength, iter);
+		if((LeftLength == 0) || (iter.IsEnd()))
+			return CLStatus(0, 0);
 
-		CLIOVectors *pTmp = new CLIOVectors;
-		CLStatus s = IOVectorsForData.PushBackRangeToAIOVector(*pTmp, iter, sizeof(unsigned long));
-		if(!s.IsSuccess() || s.m_clReturnCode != sizeof(unsigned long))
+		int r = IsDataComplete(IOVectorsForData, LeftLength, iter);
+		if(r == -2)
+			return CLStatus(-1, NORMAL_ERROR);
+
+		if(r == -1)
 		{
-			delete pTmp;
+			CLIOVectors partial;
+			CLStatus s = IOVectorsForData.PushBackRangeToAIOVector(partial, iter, IOVectorsForData.Size());
+			if(!s.IsSuccess())
+			{
+				CLLogger::WriteLogMsg("In CLProtocolDecapsulatorByDefaultMsgFormat::Decapsulate(), IOVectorsForData.PushBackRangeToAIOVector error", 0);
+				return CLStatus(-1, NORMAL_ERROR);
+			}
 
-			CLLogger::WriteLogMsg("In CLProtocolDecapsulatorBySplitPointer::Decapsulate(), PushBackRangeToAIOVector error", 0);
+			BufferManager.SetPartialDataIOVector(partial);
+			return CLStatus(0, 0);
+		}
 
-			for(int i = 0; i < vSerializedMsgs.size(); i++)
-				delete vSerializedMsgs[i];
-
-			vSerializedMsgs.clear();
-
+		CLIOVectors *ptmp = new CLIOVectors;
+		CLStatus s1 = IOVectorsForData.PushBackRangeToAIOVector(*ptmp, iter, r);
+		if(!s1.IsSuccess())
+		{
+			delete ptmp;
+			CLLogger::WriteLogMsg("In CLProtocolDecapsulatorByDefaultMsgFormat::Decapsulate(), IOVectorsForData.PushBackRangeToAIOVector 2 error", 0);
 			return CLStatus(-1, NORMAL_ERROR);
 		}
 
-		vSerializedMsgs.push_back(pTmp);
+		vSerializedMsgs.push_back(ptmp);
 
-		Length = Length - sizeof(unsigned long);
-
-		if(Length < sizeof(unsigned long))
-			return CLStatus(0, 0);
+		iter.Add(r);
+		LeftLength = LeftLength - r;
 	}
 }

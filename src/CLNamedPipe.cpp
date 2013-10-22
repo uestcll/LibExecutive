@@ -13,26 +13,10 @@
 
 using namespace std;
 
-CLNamedPipe::CLNamedPipe(const char *pstrNamedPipe)
-{
-	if(InitialNamedPipe(pstrNamedPipe).IsSuccess())
-		m_pMutex = 0;
-	else
-		throw "In CLNamedPipe::CLNamedPipe(), InitialNamedPipe error";
-}
-
-CLNamedPipe::CLNamedPipe(const char* pstrNamedPipe, const char *pstrMutexName)
-{
-	if(InitialNamedPipe(pstrNamedPipe).IsSuccess())
-		m_pMutex = new CLMutex(pstrMutexName, MUTEX_USE_SHARED_PTHREAD);
-	else
-		throw "In CLNamedPipe::CLNamedPipe(), InitialNamedPipe error";
-}
-
-CLStatus CLNamedPipe::InitialNamedPipe(const char *pstrNamedPipe)
+CLNamedPipe::CLNamedPipe(const char* pstrNamedPipe, bool bReader, const char *pstrMutexName)
 {
 	if((pstrNamedPipe == NULL) || (strlen(pstrNamedPipe) == 0))
-		return CLStatus(-1, NORMAL_ERROR);
+		throw "In CLNamedPipe::CLNamedPipe(), pstrNamedPipe error";
 
 	m_strNamedPipe = pstrNamedPipe;
 
@@ -40,19 +24,52 @@ CLStatus CLNamedPipe::InitialNamedPipe(const char *pstrNamedPipe)
 	if(m_lSizeForAtomWriting == -1)
 	{
 		CLLogger::WriteLogMsg("In CLNamedPipe::CLNamedPipe(), pathconf error", errno);
-		return CLStatus(-1, NORMAL_ERROR);
+		throw "In CLNamedPipe::CLNamedPipe(), pathconf error";
 	}
 
+	m_bReader = bReader;
+
+	if(m_bReader)
+	{
+		if(!InitialReader().IsSuccess())
+			throw "In CLNamedPipe::CLNamedPipe(), InitialReader error";
+	}
+	else
+	{
+		if(!InitialWriter().IsSuccess())
+			throw "In CLNamedPipe::CLNamedPipe(), InitialWriter error";
+	}
+	
+	if((pstrMutexName != 0) && (strlen(pstrMutexName) != 0))
+		m_pMutex = new CLMutex(pstrMutexName, MUTEX_USE_SHARED_PTHREAD);
+	else
+		m_pMutex = 0;
+}
+
+CLStatus CLNamedPipe::InitialReader()
+{
 	if((mkfifo(m_strNamedPipe.c_str(), S_IRUSR | S_IWUSR) == -1) && (errno != EEXIST))
 	{
-		CLLogger::WriteLogMsg("In CLNamedPipe::CLNamedPipe(), mkfifo error", errno);
+		CLLogger::WriteLogMsg("In CLNamedPipe::InitialReader(), mkfifo error", errno);
 		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	m_Fd = open(m_strNamedPipe.c_str(), O_RDONLY | O_NONBLOCK);
 	if(m_Fd == -1)
 	{
-		CLLogger::WriteLogMsg("In CLNamedPipe::CLNamedPipe(), open error", errno);
+		CLLogger::WriteLogMsg("In CLNamedPipe::InitialReader(), open error", errno);
+		return CLStatus(-1, NORMAL_ERROR);
+	}
+
+	return CLStatus(0, 0);
+}
+
+CLStatus CLNamedPipe::InitialWriter()
+{
+	m_Fd = open(m_strNamedPipe.c_str(), O_WRONLY | O_NONBLOCK);
+	if(m_Fd == -1)
+	{
+		CLLogger::WriteLogMsg("In CLNamedPipe::InitialWriter(), open error", errno);
 		return CLStatus(-1, NORMAL_ERROR);
 	}
 
@@ -63,6 +80,9 @@ CLNamedPipe::~CLNamedPipe()
 {
 	if(close(m_Fd) == -1)
 		CLLogger::WriteLogMsg("In CLNamedPipe::~CLNamedPipe(), close error", errno);
+
+	if(m_pMutex)
+		delete m_pMutex;
 }
 
 int CLNamedPipe::GetFd()
@@ -77,6 +97,9 @@ long CLNamedPipe::GetSizeForAtomWriting()
 
 CLStatus CLNamedPipe::Read(CLIOVectors& IOVectors)
 {
+	if(!m_bReader)
+		return CLStatus(-1, NORMAL_ERROR);
+
 	if(m_pMutex)
 	{
 		CLCriticalSection cs(m_pMutex);
@@ -91,6 +114,9 @@ CLStatus CLNamedPipe::Read(CLIOVectors& IOVectors)
 
 CLStatus CLNamedPipe::Write(CLIOVectors& IOVectors)
 {
+	if(m_bReader)
+		return CLStatus(-1, NORMAL_ERROR);
+
 	if(m_pMutex)
 	{
 		CLCriticalSection cs(m_pMutex);
