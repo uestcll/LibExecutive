@@ -2,6 +2,7 @@
 #include "CLBuffer.h"
 #include "CLStatus.h"
 #include "CLLogger.h"
+#include "CLIOVector.h"
 
 CLDataReceiverByNamedPipe::CLDataReceiverByNamedPipe(const char *pStrPipeName) : m_NamedPipe(pStrPipeName, PIPE_FOR_READ)
 {
@@ -15,11 +16,31 @@ CLDataReceiverByNamedPipe::~CLDataReceiverByNamedPipe()
 // no break!!!
 CLStatus CLDataReceiverByNamedPipe::GetData(CLBuffer *pBuffer)
 {
-	char *pBuf = 0;
-	int restSumLen = 0;
+	
 	long readLen = 0;
 
+	CLIOVector IOVec;
 
+	CLStatus s1 = pBuffer->GetRestIOVecs(IOVec);
+	if(!s1.IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLDataReceiverByNamedPipe::GetData(), pBuffer->GetRestIOVecs error", 0);
+		return s1;
+	}
+
+	CLStatus s2 = m_NamedPipe.ReadVecs(IOVec);
+	if(!s2.IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLDataReceiverByNamedPipe::GetData(), m_NamedPipe->ReadData error", 0);
+		return s2;
+	}
+	long len = s2.m_clReturnCode;
+	readLen += len;
+
+
+	/*
+	char *pBuf = 0;
+	int restSumLen = 0;
 	while(1)
 	{
 		CLStatus s1 = pBuffer->GetRestBufPtr(&pBuf, restSumLen);
@@ -43,6 +64,6 @@ CLStatus CLDataReceiverByNamedPipe::GetData(CLBuffer *pBuffer)
 			break;
 		}
 	}
-	
+	*/
 	return CLStatus(readLen, 0);
 }

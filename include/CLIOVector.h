@@ -33,6 +33,8 @@ public:
 	CLStatus WriteData(char* pBuffer, const int& index, const int& len);
 	CLStatus ReadData(char* pBuffer, const int& index, const int& len);
 
+	struct iovec* GetIOVecStructs();
+
 	int IOVecNum();//iovec item num
 	int Length();//all buffer Length
 

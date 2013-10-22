@@ -3,6 +3,7 @@
 
 #include "CLStatus.h"
 #define DEAFULT_BUFFER_LENGTH 4096
+#define MINIMUN_BUFFER_LENGTH 512
 
 class CLIOVector;
 //提供接口 得到从哪里开始 多长的字符串。如果是连续的，就返回指针。不是就拷贝一份成为连续的。
@@ -36,11 +37,14 @@ public:
 	CLStatus GetRestBufPtr(char** pBuf, int& restLen); //得到空闲buffer的头指针，并得到可以存储数据的空闲buffer长度
 	
 	CLStatus GetIOVecs(int index, int len, CLIOVector& IOVector);
+	CLStatus GetRestIOVecs(CLIOVector& IOVector);
 	CLStatus GetDataIOVecs(CLIOVector& IOVector);
 	CLStatus PushBackIOVecs(CLIOVector& IOVector);
 	//CLIOVector GetEmptyIOVecs();
 	//CLIOVector GetDataIOVecs();
 
+private:
+	CLStatus CLBuffer::CheckForRestBuffer();
 
 public:
 	const int& m_ciDataStartIndex;

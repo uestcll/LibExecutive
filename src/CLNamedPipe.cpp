@@ -6,27 +6,72 @@
 #include "CLLogger.h"
 #include "CLNamedPipe.h"
 #include "CLStatus.h"
-
-
+#include "CLIOVector.h"
 
 CLNamedPipe::CLNamedPipe(const char* pStrPipeName, int flag)
 {
+	try
+	{
+		CLStatus s = Initialize(pStrPipeName, flag);
+		if(!s.IsSuccess())
+		{
+			throw s;
+		}
+		m_pMutexForNamedPipe = new CLMutex();
+	}
+	catch(CLStatus& s)
+	{
+		CLLogger::WriteLogMsg("In CLNamedPipe::CLNamedPipe(), Initialize() error", 0);
+	}
+}	
+
+CLNamedPipe::CLNamedPipe(const char* pStrPipeName, const char* pstrMutexName, int flag)
+{
+	try
+	{
+		CLStatus s = Initialize(pStrPipeName, flag);
+		if(!s.IsSuccess())
+		{
+			throw s;
+		}
+		m_pMutexForNamedPipe = new CLMutex(pstrMutexName, MUTEX_USE_SHARED_PTHREAD);
+	}
+	catch(CLStatus& s)
+	{
+		CLLogger::WriteLogMsg("In CLNamedPipe::CLNamedPipe(), Initialize() error", 0);
+	}
+}
+
+CLNamedPipe::~CLNamedPipe()
+{
+	if(m_pMutexForNamedPipe != 0)
+	{
+		delete m_pMutexForNamedPipe;
+		m_pMutexForNamedPipe = 0;
+	}	
+}
+
+CLStatus CLNamedPipe::Initialize(const char* pStrPipeName, int flag)
+{
 	if(pStrPipeName == NULL || strlen(pStrPipeName) == 0)
-		throw "In CLNamedPipe::CLNamedPipe(), pStrPipeName is NULL or len is 0";
+	{	
+		CLLogger::WriteLogMsg("In CLNamedPipe::Initialize(), pStrPipeName is NULL or len is 0", 0);
+		return CLStatus(-1, 0);
+	}
 
 	m_strPipeName = FILE_PATH_FOR_NAMED_PIPE;
 	m_strPipeName += pStrPipeName;
 
 	if((mkfifo(m_strPipeName.c_str(), S_IRUSR | S_IWUSR) == -1) && (errno != EEXIST))
 	{
-		CLLogger::WriteLogMsg("In CLNamedPipe::CLNamedPipe(), mkfifo error", errno);
-		throw "In CLNamedPipe::CLNamedPipe(), mkfifo error";
+		CLLogger::WriteLogMsg("In CLNamedPipe::Initialize(), mkfifo error", errno);
+		return CLStatus(-1, 0);
 	}
 
 	m_lAtomWriteSize = pathconf(m_strPipeName.c_str(), _PC_PIPE_BUF);
 	if(m_lAtomWriteSize == -1)
 	{
-		CLLogger::WriteLogMsg("In CLNamedPipe::CLNamedPipe(), pathconf error", errno);
+		CLLogger::WriteLogMsg("In CLNamedPipe::Initialize(), pathconf error", errno);
 		m_lAtomWriteSize = 1000;
 	}
 	if(flag == PIPE_FOR_READ)
@@ -34,8 +79,8 @@ CLNamedPipe::CLNamedPipe(const char* pStrPipeName, int flag)
 		m_Fd = open(m_strPipeName.c_str(), O_RDONLY | O_NONBLOCK);
 		if(m_Fd == -1)
 		{
-			CLLogger::WriteLogMsg("In CLNamedPipe::CLNamedPipe(), for read open error", errno);
-			throw "In CLNamedPipe::CLNamedPipe(), for read open error";
+			CLLogger::WriteLogMsg("In CLNamedPipe::Initialize(), for read open error", errno);
+			return CLStatus(-1, 0);
 		}
 	}
 	else if(flag == PIPE_FOR_WRITE)
@@ -43,19 +88,16 @@ CLNamedPipe::CLNamedPipe(const char* pStrPipeName, int flag)
 		m_Fd = open(m_strPipeName.c_str(), O_WRONLY | O_NONBLOCK);
 		if(m_Fd == -1)
 		{
-			CLLogger::WriteLogMsg("In CLNamedPipe::CLNamedPipe(), for write open error", errno);
-			throw "In CLNamedPipe::CLNamedPipe(), for write open error";
+			CLLogger::WriteLogMsg("In CLNamedPipe::Initialize(), for write open error", errno);
+			return CLStatus(-1, 0);
 		}
 	}
 	else
 	{
-		throw "In CLNamedPipe::CLNamedPipe(), flag is error";
+		return CLStatus(-1, 0);
 	}
-}	
 
-CLNamedPipe::~CLNamedPipe()
-{
-
+	return CLStatus(0, 0);
 }
 
 CLStatus CLNamedPipe::Read(char *pBuf, int length)
@@ -91,4 +133,30 @@ CLStatus CLNamedPipe::Write(char *pBuf, int length)
 long CLNamedPipe::GetAtomWriteSize()
 {
 	return m_lAtomWriteSize;
+}
+
+CLStatus CLNamedPipe::ReadVecs(CLIOVector& dataVec)
+{
+	int readLen = 0;
+
+	struct iovec *pDataVecs = dataVec.GetIOVecStructs();
+	if(pDataVecs == NULL)
+	{
+		CLLogger::WriteLogMsg("In CLNamedPipe::ReadVecs(), dataVec.GetIOVecStructs() error", 0);
+		return CLStatus(-1, /*EMPTY_SPACE*/0);
+	}
+
+	readLen = readv(m_Fd, pDataVecs, dataVec.IOVecNum());
+	if(-1 == readLen)
+	{
+		CLLogger::WriteLogMsg("In CLNamedPipe::ReadVecs(), readv() error", 0);
+		return CLStatus(-1, 0);
+	}
+
+	return CLStatus(readLen, 0);
+}
+
+CLStatus WriteVecs(CLIOVector& dataVec)
+{
+
 }

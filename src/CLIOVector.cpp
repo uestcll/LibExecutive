@@ -144,6 +144,42 @@ CLStatus CLIOVector::GetIOVecs(int index, int len, CLIOVector& IOVector)
 	}
 
 	IOVector.PushBack(pBuffer, len - (length - itemLen));
+	//for test ..not used
+	// if(index < 0 || index > m_iDataLength || len <= 0)
+	// 	return CLStatus(-1, 0);
+
+	// int position = 0;
+	// deque<struct iovec>::iterator startIt;
+	// deque<struct iovec>::iterator endIt;
+
+	// deque<struct iovec>::iterator it = m_ioVecQueue.begin();
+	// for(; it <= m_ioVecQueue.end(); it++)
+	// {
+	// 	position += it->iov_len;
+	// 	if(position > index)
+	// 	{
+	// 		startIt = it;
+	// 		if(index + len <= position)
+	// 		{
+	// 			IOVector.PushBack((char*)(startIt->iov_base) + (index - position + startIt->iov_len), len);
+	// 			return CLStatus(0, 0); 
+	// 		}
+	// 		break;
+	// 	}
+		
+	// }
+	// it = startIt + 1;
+	// for(; it <= m_ioVecQueue.end(); it++)
+	// {
+	// 	position += it->iov_len;
+	// 	if(position >= (index + len)
+	// 	{
+	// 		endIt = it;
+	// 		break;
+	// 	}
+	// }
+
+	// CLIOVector 
 
 	return CLStatus(0, 0);
 }
@@ -301,4 +337,24 @@ CLStatus CLIOVector::PushBackIOVecs(CLIOVector& IOVector)
 		it++;
 	}
 	return CLStatus(0, 0);
+}
+
+struct iovec* CLIOVector::GetIOVecStructs()
+{
+	int num = m_ioVecQueue.size();
+	if(num == 0)
+	{
+		return NULL;
+	}
+	struct iovec* pSIOVecs = new struct iovec [num];
+
+	deque<struct iovec>::iterator it = m_ioVecQueue.begin();
+
+	for(int i = 0; i < num; i++)
+	{	
+		pSIOVecs[i].iov_base = it->iov_base;
+		pSIOVecs[i].iov_len = it->iov_len;		
+	}
+
+	return pSIOVecs;
 }

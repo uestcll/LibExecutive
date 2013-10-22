@@ -95,14 +95,10 @@ CLStatus CLBuffer::WriteData(char* pBuffer, const int& len)
 
 CLStatus CLBuffer::GetRestBufPtr(char** pBuf, int &restLen)
 {
-	if(m_iUsedBufferLen == m_iSumBufferLen)
+	if(!CheckForRestBuffer().IsSuccess())
 	{
-		CLStatus s = NewBuffer(m_iItemSize);
-		if(!s.IsSuccess())
-		{
-			CLLogger::WriteLogMsg("In CLBuffer::GetRestBufPtr(), new buffer error", 0);
-			return s;
-		}
+		CLLogger::WriteLogMsg("In CLBuffer::GetRestBufPtr(), CheckForRestBuffer() error", 0);
+		return CLStatus(-1, 0);
 	}
 
 	int continueLen = m_pIOBufferVec->GetBufPtr(m_iUsedBufferLen, pBuf);
@@ -145,6 +141,32 @@ CLStatus CLBuffer::GetIOVecs(int index, int len, CLIOVector& IOVector)
 CLStatus CLBuffer::GetDataIOVecs(CLIOVector& IOVector)
 {
 	return m_pIOBufferVec->GetIOVecs(m_iDataStartIndex, m_iUsedBufferLen - m_iDataStartIndex, IOVector);
+}
+
+CLStatus CLBuffer::GetRestIOVecs(CLIOVector& IOVector)
+{
+	if(!CheckForRestBuffer().IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLBuffer::GetRestIOVecs(), CheckForRestBuffer() error", 0);
+		return CLStatus(-1, 0);
+	}
+
+	return m_pIOBufferVec->GetIOVecs(m_iUsedBufferLen, m_iSumBufferLen - m_iUsedBufferLen, IOVector);
+}
+
+CLStatus CLBuffer::CheckForRestBuffer()
+{
+	if(m_iUsedBufferLen == m_iSumBufferLen || (m_iSumBufferLen - m_iUsedBufferLen) <= MINIMUN_BUFFER_LENGTH)
+	{
+		CLStatus s = NewBuffer(m_iItemSize);
+		if(!s.IsSuccess())
+		{
+			CLLogger::WriteLogMsg("In CLBuffer::GetRestIOVecs(), new buffer error", 0);
+			return s;
+		}
+	}
+
+	return CLStatus(0, 0);
 }
 
 CLStatus CLBuffer::PushBackIOVecs(CLIOVector& IOVector)
