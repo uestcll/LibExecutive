@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/uio.h>
 #include "CLLogger.h"
 #include "CLNamedPipe.h"
 #include "CLStatus.h"
@@ -156,7 +157,22 @@ CLStatus CLNamedPipe::ReadVecs(CLIOVector& dataVec)
 	return CLStatus(readLen, 0);
 }
 
-CLStatus WriteVecs(CLIOVector& dataVec)
+CLStatus CLNamedPipe::WriteVecs(CLIOVector& dataVec)
 {
+	int writeLen = 0;
+	struct iovec *pDataVecs = dataVec.GetIOVecStructs();
+	if(pDataVecs == NULL)
+	{
+		CLLogger::WriteLogMsg("In CLNamedPipe::WriteVecs(), dataVec.GetIOVecStructs() error", 0);
+		return CLStatus(-1, /*EMPTY_SPACE*/0);
+	}
 
+	writeLen = writev(m_Fd, pDataVecs, dataVec.IOVecNum());
+	if(-1 == writeLen)
+	{
+		CLLogger::WriteLogMsg("In CLNamedPipe::WriteVecs(), writev() error", 0);
+		return CLStatus(-1, 0);
+	}
+
+	return CLStatus(writeLen, 0);
 }

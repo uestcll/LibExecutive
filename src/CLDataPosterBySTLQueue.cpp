@@ -21,22 +21,22 @@ CLStatus CLDataPosterBySTLQueue::PostData(CLIOVector dataVec)
 	if(dataVec.length() < msgLen)
 	{
 		CLLogger::WriteLogMsg("In CLDataPosterBySTLQueue::PostData(), dataVec length is < msgLen", 0);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, POST_DATA_BUF_ERROR);
 	}
 
 	CLStatus s = dataVec.ReadData((char*)&pMsg, 0, msgLen);
 	if(!s.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLDataPosterBySTLQueue::PostData(), dataVec.ReadData() error", 0);
-		return s;
+		return CLStatus(-1, 0);
 	}
 
 	CLStatus s1 = m_Queue.PushMessage(pMsg);
 	if(!s1.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLDataPosterBySTLQueue::PostData(), m_Queue.PushMessage error", 0);
-		return s1;
+		return CLStatus(-1, POST_DATA_ERROR);
 	}
 
-	return CLStatus(sizeof(pMsg), 0);//send msg success, and notify the channelmaitainer to delete CLDataPoster and free dataVec
+	return CLStatus(sizeof(pMsg), POST_DATA_COMPLETE);//send msg success, and notify the channelmaitainer to delete CLDataPoster and free dataVec
 }

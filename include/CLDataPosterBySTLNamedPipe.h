@@ -14,7 +14,9 @@ private:
 	virtual CLStatus PostData(CLIOVector dataVec);
 
 private:
-	CLNamedPipe m_NamedPipe;
+	CLNamedPipe *m_pNamedPipe;
+
+	int m_iDataStartIndex;
 
 };
 
