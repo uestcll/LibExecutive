@@ -8,8 +8,9 @@
 #include "CLNamedPipe.h"
 #include "CLStatus.h"
 #include "CLIOVector.h"
+#include "CLCriticalSection.h"
 
-CLNamedPipe::CLNamedPipe(const char* pStrPipeName, int flag)
+CLNamedPipe::CLNamedPipe(const char*  , int flag)
 {
 	try
 	{
@@ -103,6 +104,7 @@ CLStatus CLNamedPipe::Initialize(const char* pStrPipeName, int flag)
 
 CLStatus CLNamedPipe::Read(char *pBuf, int length)
 {
+	CLCriticalSection cs(m_pMutexForNamedPipe);
 	int  readLen = 0;
 
 	readLen = read(m_Fd, pBuf, length);
@@ -118,6 +120,7 @@ CLStatus CLNamedPipe::Read(char *pBuf, int length)
 
 CLStatus CLNamedPipe::Write(char *pBuf, int length)
 {
+	CLCriticalSection cs(m_pMutexForNamedPipe);
 	int writeLen = 0;
 
 	writeLen = write(m_Fd, pBuf, length);
@@ -138,6 +141,7 @@ long CLNamedPipe::GetAtomWriteSize()
 
 CLStatus CLNamedPipe::ReadVecs(CLIOVector& dataVec)
 {
+	CLCriticalSection cs(m_pMutexForNamedPipe);
 	int readLen = 0;
 
 	struct iovec *pDataVecs = dataVec.GetIOVecStructs();
@@ -154,11 +158,14 @@ CLStatus CLNamedPipe::ReadVecs(CLIOVector& dataVec)
 		return CLStatus(-1, 0);
 	}
 
+	delete [] pDataVecs;
 	return CLStatus(readLen, 0);
 }
 
 CLStatus CLNamedPipe::WriteVecs(CLIOVector& dataVec)
 {
+	CLCriticalSection cs(m_pMutexForNamedPipe);
+	
 	int writeLen = 0;
 	struct iovec *pDataVecs = dataVec.GetIOVecStructs();
 	if(pDataVecs == NULL)
@@ -174,5 +181,6 @@ CLStatus CLNamedPipe::WriteVecs(CLIOVector& dataVec)
 		return CLStatus(-1, 0);
 	}
 
+	delete [] pDataVecs;
 	return CLStatus(writeLen, 0);
 }

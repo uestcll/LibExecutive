@@ -4,10 +4,14 @@
 #include "CLDataPoster.h"
 #include "CLNamedPipe.h"
 
+#define PIPE_QUEUE_BETWEEN_PROCESS 30
+#define PIPE_QUEUE_IN_PROCESS 31
+
 class CLDataPosterByNamedPipe : public CLDataPoster
 {
 public:
-	CLDataPosterByNamedPipe(const char* strPipeName);
+	CLDataPosterByNamedPipe(const char* strPipeName, int pipeType);
+	CLDataPosterByNamedPipe(CLNamedPipe *pipe);
 	virtual ~CLDataPosterByNamedPipe();
 
 private:

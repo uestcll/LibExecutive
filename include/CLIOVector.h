@@ -40,6 +40,9 @@ public:
 
 	const char& operator[](const int &index);
 
+	CLIOVector(const CLIOVector&);
+	CLIOVector& operator= (const CLIOVector&);
+
 private:
 	int m_iDataLength;
 	std::deque<struct iovec> m_ioVecQueue;

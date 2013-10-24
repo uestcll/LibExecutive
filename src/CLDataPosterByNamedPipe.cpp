@@ -3,14 +3,19 @@
 
 using namespace std;
 
-CLDataPosterByNamedPipe::CLDataPosterByNamedPipe(const char* strPipeName) : m_iDataStartIndex(0)
-{
-	m_pNamedPipe = new CLNamedPipe(strPipeName, PIPE_FOR_WRITE);
-}
 
-CLDataPosterByNamedPipe::CLDataPosterByNamedPipe(const char* strPipeName, const char* strMutexName) : m_iDataStartIndex(0)
+CLDataPosterByNamedPipe::CLDataPosterByNamedPipe(const char* strPipeName, int pipeType) : m_iDataStartIndex(0)
 {
-	m_pNamedPipe = new CLNamedPipe(strPipeName, strMutexName, PIPE_FOR_WRITE);
+	if(strPipeName == 0)
+		throw "In CLDataPosterByNamedPipe::CLDataPosterByNamedPipe(), strPipeName == 0";
+	if(pipeType == PIPE_QUEUE_BETWEEN_PROCESS)
+	{
+		m_pNamedPipe = new CLNamedPipe(strPipeName, strPipeName, PIPE_FOR_WRITE);
+	}
+	else if(pipeType == PIPE_QUEUE_IN_PROCESS)
+	{
+		m_pNamedPipe = new CLNamedPipe(strPipeName, PIPE_FOR_WRITE);
+	}
 }
 
 CLDataPosterByNamedPipe::CLDataPosterByNamedPipe(CLNamedPipe *pipe) : m_pNamedPipe(pipe), m_iDataStartIndex(0)
@@ -20,17 +25,37 @@ CLDataPosterByNamedPipe::CLDataPosterByNamedPipe(CLNamedPipe *pipe) : m_pNamedPi
 
 CLDataPosterByNamedPipe::~CLDataPosterByNamedPipe()
 {
-
+	if(m_pNamedPipe != 0)
+	{
+		delete m_pNamedPipe;
+		m_pNamedPipe = 0;
+	}
 }
 
 CLStatus CLDataPosterByNamedPipe::PostData(CLIOVector dataVec) 
 {
+	CLIOVector tmpVec;
+
 	if(0 == m_iDataStartIndex)
 	{
-		
+		tmpVec = dataVec;
 	}
-	int ctxLen = dataVec.Length();
+	else
+	{
+		dataVec.GetIOVecs(m_iDataStartIndex, dataVec.Length(), tmpVec);
+	}
 
+	CLStatus s = m_pNamedPipe->WriteVecs(tmpVec);
+
+	if(tmpVec.Length() == s.m_clReturnCode)
+	{
+		return CLStatus(s.m_clReturnCode, POST_DATA_COMPLETE); //data post complete and notify the maintainer to delete this poster
+	}
+	else
+	{
+		m_iDataStartIndex += s.m_clReturnCode;
+		return CLStatus(m_iDataStartIndex, POST_DATA_PARTION);			
+	}
 
 	return CLStatus(0, 0);
 }

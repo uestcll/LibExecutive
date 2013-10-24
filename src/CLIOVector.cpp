@@ -6,7 +6,7 @@ using namespace std;
 
 CLIOVector::CLIOVector()
 {
-	m_iDataLength;
+	m_iDataLength = 0;
 }
 
 CLIOVector::~CLIOVector()
@@ -24,6 +24,34 @@ CLIOVector::~CLIOVector()
 			m_ioVecQueue.pop_back();
 		}
 	}*/		
+}
+
+CLIOVector::CLIOVector(const CLIOVector& rhs)
+{
+	this->m_iDataLength = rhs.Length();
+
+	struct iovec* pVec = rhs.GetIOVecStructs();
+	for(int i = 0; i < rhs.IOVecNum(); i++)
+	{
+		(this->m_ioVecQueue).push_back(pVec[i]);
+	}
+
+	delete [] pVec;
+}
+
+CLIOVector& CLIOVector::operator=(const CLIOVector& rhs)
+{
+	this->m_iDataLength = rhs.Length();
+
+	struct iovec* pVec = rhs.GetIOVecStructs();
+	for(int i = 0; i < rhs.IOVecNum(); i++)
+	{
+		(this->m_ioVecQueue).push_back(pVec[i]);
+	}
+
+	delete [] pVec;
+
+	return *this;
 }
 
 CLStatus CLIOVector::PushBack(char* pBuffer, int bufLen)
@@ -121,6 +149,11 @@ int CLIOVector::GetBufPtr(int index, char** pBuffer)
 
 CLStatus CLIOVector::GetIOVecs(int index, int len, CLIOVector& IOVector)
 {
+	if((0 == index) && (m_iDataLength == len))
+	{
+		IOVector = *this;
+		return CLStatus(0, 0);
+	}	
 	int position = 0;
 	deque<struct iovec>::iterator it = m_ioVecQueue.begin();
 	for(; it <= m_ioVecQueue.end(); it++)
