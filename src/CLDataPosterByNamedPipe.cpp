@@ -1,5 +1,6 @@
 #include "CLDataPosterByNamedPipe.h"
 #include "CLIOVector.h"
+#include "CLLogger.h"
 
 using namespace std;
 
@@ -32,7 +33,7 @@ CLDataPosterByNamedPipe::~CLDataPosterByNamedPipe()
 	}
 }
 
-CLStatus CLDataPosterByNamedPipe::PostData(CLIOVector dataVec) 
+CLStatus CLDataPosterByNamedPipe::PostData(CLIOVector& dataVec) 
 {
 	CLIOVector tmpVec;
 
@@ -46,6 +47,11 @@ CLStatus CLDataPosterByNamedPipe::PostData(CLIOVector dataVec)
 	}
 
 	CLStatus s = m_pNamedPipe->WriteVecs(tmpVec);
+	if(!s.IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLDataPosterByNamedPipe::PostData(), m_pNamedPipe->WriteVecs() error", 0);
+		return CLStatus(-1, POST_DATA_ERROR);
+	}
 
 	if(tmpVec.Length() == s.m_clReturnCode)
 	{

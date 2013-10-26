@@ -12,7 +12,7 @@ CLDataPosterBySTLQueue::~CLDataPosterBySTLQueue()
 
 }
 
-CLStatus CLDataPosterBySTLQueue::PostData(CLIOVector dataVec)
+CLStatus CLDataPosterBySTLQueue::PostData(CLIOVector& dataVec)
 {
 	CLMessage *pMsg = new CLMessage();
 	
