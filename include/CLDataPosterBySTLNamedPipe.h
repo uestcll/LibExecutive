@@ -15,7 +15,7 @@ public:
 	virtual ~CLDataPosterByNamedPipe();
 
 private:
-	virtual CLStatus PostData(CLIOVector dataVec);
+	virtual CLStatus PostData(CLIOVector& dataVec);
 
 private:
 	CLNamedPipe *m_pNamedPipe;

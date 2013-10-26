@@ -12,7 +12,7 @@ public:
 	CLDataPosterBySTLQueue(CLSTLQueue queue);
 	virtual ~CLDataPosterBySTLQueue();
 
-	virtual CLStatus PostData(CLIOVector dataVec);
+	virtual CLStatus PostData(CLIOVector& dataVec);
 	 
 private:
 	CLSTLQueue m_Queue;
