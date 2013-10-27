@@ -3,10 +3,15 @@
 #include "CLThread.h"
 #include "CLExecutiveFunctionForMsgLoop.h"
 #include "CLMsgLoopManagerForSTLqueue.h"
-#include "CLLogger.h"
 #include "CLThreadInitialFinishedNotifier.h"
+#include "CLMsgLoopManagerForPrivateNamedPipe.h"
+#include "CLMsgLoopManagerForShareNamedPipe.h"
+#include "CLProtocolDecapsulatorByDefaultMsgFormat.h"
+#include "CLMultiMsgSerializer.h"
+#include "CLMultiMsgDeserializer.h"
 #include "CLEvent.h"
-#include "CLMsgLoopManagerForPipeQueue.h"
+#include "CLLogger.h"
+#include "ErrorCode.h"
 
 CLThreadForMsgLoop::CLThreadForMsgLoop(CLMessageObserver *pMsgObserver, const char *pstrThreadName, bool bWaitForDeath, int ExecutiveType)
 {
@@ -18,24 +23,32 @@ CLThreadForMsgLoop::CLThreadForMsgLoop(CLMessageObserver *pMsgObserver, const ch
 
 	m_bWaitForDeath = bWaitForDeath;
 
-	m_pPipeQueue = NULL;
+	if(ExecutiveType == EXECUTIVE_BETWEEN_PROCESS_USE_PIPE_QUEUE)
+	{
+		m_pSerializer = new CLMultiMsgSerializer();
+		m_pDeserializer = new CLMultiMsgDeserializer();
+		m_pThread = new CLThread(new CLExecutiveFunctionForMsgLoop(new CLMsgLoopManagerForShareNamedPipe(pMsgObserver, pstrThreadName, 0, new CLProtocolDecapsulatorByDefaultMsgFormat(), m_pSerializer, m_pDeserializer)), bWaitForDeath);
 
-	if(ExecutiveType == EXECUTIVE_IN_PROCESS_USE_STL_QUEUE)
-	{
-		m_pThread = new CLThread(new CLExecutiveFunctionForMsgLoop(new CLMsgLoopManagerForSTLqueue(pMsgObserver, pstrThreadName)), bWaitForDeath);
-	}
-	else if(ExecutiveType == EXECUTIVE_IN_PROCESS_USE_PIPE_QUEUE)
-	{
-		m_pPipeQueue = new CLMsgLoopManagerForPipeQueue(pMsgObserver, pstrThreadName, PIPE_QUEUE_IN_PROCESS);
-		m_pThread = new CLThread(new CLExecutiveFunctionForMsgLoop(m_pPipeQueue), bWaitForDeath);
-	}
-	else if(ExecutiveType == EXECUTIVE_BETWEEN_PROCESS_USE_PIPE_QUEUE)
-	{
-		m_pPipeQueue = new CLMsgLoopManagerForPipeQueue(pMsgObserver, pstrThreadName, PIPE_QUEUE_BETWEEN_PROCESS);
-		m_pThread = new CLThread(new CLExecutiveFunctionForMsgLoop(m_pPipeQueue), bWaitForDeath);
+		return;
 	}
 	else
-		throw "In CLThreadForMsgLoop::CLThreadForMsgLoop(), ExecutiveType Error";
+	{
+		m_pDeserializer = 0;
+		m_pSerializer = 0;
+
+		if(ExecutiveType == EXECUTIVE_IN_PROCESS_USE_STL_QUEUE)
+		{
+			m_pThread = new CLThread(new CLExecutiveFunctionForMsgLoop(new CLMsgLoopManagerForSTLqueue(pMsgObserver, pstrThreadName)), bWaitForDeath);
+			return;
+		}
+		else if(ExecutiveType == EXECUTIVE_IN_PROCESS_USE_PIPE_QUEUE)
+		{
+			m_pThread = new CLThread(new CLExecutiveFunctionForMsgLoop(new CLMsgLoopManagerForPrivateNamedPipe(pMsgObserver, pstrThreadName)), bWaitForDeath);
+			return;
+		}
+	}
+	
+	throw "In CLThreadForMsgLoop::CLThreadForMsgLoop(), ExecutiveType Error";
 }
 
 CLThreadForMsgLoop::~CLThreadForMsgLoop()
@@ -79,10 +92,22 @@ CLStatus CLThreadForMsgLoop::Run(void *pContext)
 		return CLStatus(-1, 0);
 }
 
+CLStatus CLThreadForMsgLoop::RegisterSerializer(unsigned long lMsgID, CLMessageSerializer *pSerializer)
+{
+	if(m_pSerializer)
+	{
+		return m_pSerializer->RegisterSerializer(lMsgID, pSerializer);
+	}
+
+	return CLStatus(-1, NORMAL_ERROR);
+}
+
 CLStatus CLThreadForMsgLoop::RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer)
 {
-	if(m_pPipeQueue != NULL)
-		return m_pPipeQueue->RegisterDeserializer(lMsgID, pDeserializer);
+	if(m_pDeserializer)
+	{
+		return m_pDeserializer->RegisterDeserializer(lMsgID, pDeserializer);
+	}
 
-	return CLStatus(-1, 0);
+	return CLStatus(-1, NORMAL_ERROR);
 }

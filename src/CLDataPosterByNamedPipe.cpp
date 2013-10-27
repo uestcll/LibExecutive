@@ -1,5 +1,6 @@
 #include "CLDataPosterByNamedPipe.h"
 #include "CLNamedPipe.h"
+#include "CLIOVectors.h"
 #include "CLLogger.h"
 #include "ErrorCode.h"
 

@@ -4,7 +4,9 @@
 #include <string>
 #include "CLMessageLoopManager.h"
 
-class CLMsgReceiverFromPrivateNamedPipe;
+class CLMessageReceiver;
+class CLEvent;
+class CLBufferManager;
 
 class CLMsgLoopManagerForPrivateNamedPipe : public CLMessageLoopManager
 {
@@ -16,15 +18,16 @@ protected:
 	virtual CLStatus Initialize();
 	virtual CLStatus Uninitialize();
 
-	virtual CLMessage* WaitForMessage();
+	virtual CLStatus WaitForMessage();
 
 private:
 	CLMsgLoopManagerForPrivateNamedPipe(const CLMsgLoopManagerForPrivateNamedPipe&);
 	CLMsgLoopManagerForPrivateNamedPipe& operator=(const CLMsgLoopManagerForPrivateNamedPipe&);
 
 private:
-	CLMsgReceiverFromPrivateNamedPipe *m_pMsgQueue;
 	std::string m_strThreadName;
+	CLMessageReceiver *m_pMsgReceiver;
+	CLEvent *m_pEvent;
 };
 
 #endif

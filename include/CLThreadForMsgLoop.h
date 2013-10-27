@@ -6,8 +6,10 @@
 
 class CLMessageObserver;
 class CLThread;
-class CLMsgLoopManagerForPipeQueue;
+class CLMessageSerializer;
 class CLMessageDeserializer;
+class CLMultiMsgSerializer;
+class CLMultiMsgDeserializer;
 
 class CLThreadForMsgLoop
 {
@@ -15,8 +17,9 @@ public:
 	CLThreadForMsgLoop(CLMessageObserver *pMsgObserver, const char *pstrThreadName, bool bWaitForDeath = false, int ExecutiveType = EXECUTIVE_IN_PROCESS_USE_STL_QUEUE);
 	virtual ~CLThreadForMsgLoop();
 
-	CLStatus RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer);
 	CLStatus Run(void *pContext);
+	CLStatus RegisterSerializer(unsigned long lMsgID, CLMessageSerializer *pSerializer);
+	CLStatus RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer);
 
 private:
 	CLThreadForMsgLoop(const CLThreadForMsgLoop&);
@@ -25,8 +28,8 @@ private:
 private:
 	CLThread *m_pThread;
 	bool m_bWaitForDeath;
-
-	CLMsgLoopManagerForPipeQueue *m_pPipeQueue;
+	CLMultiMsgSerializer *m_pSerializer;
+	CLMultiMsgDeserializer *m_pDeserializer;
 };
 
 #endif

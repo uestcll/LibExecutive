@@ -5,8 +5,10 @@
 
 class CLMessageObserver;
 class CLExecutiveFunctionProvider;
-class CLMsgLoopManagerForPipeQueue;
+class CLMessageSerializer;
 class CLMessageDeserializer;
+class CLMultiMsgSerializer;
+class CLMultiMsgDeserializer;
 
 #define EXECUTIVE_IN_PROCESS_USE_STL_QUEUE 0
 #define EXECUTIVE_IN_PROCESS_USE_PIPE_QUEUE 1
@@ -19,6 +21,8 @@ public:
 	virtual ~CLNonThreadForMsgLoop();
 
 	CLStatus Run(void *pContext);
+	
+	CLStatus RegisterSerializer(unsigned long lMsgID, CLMessageSerializer *pSerializer);
 	CLStatus RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer);
 
 private:
@@ -27,7 +31,8 @@ private:
 
 private:
 	CLExecutiveFunctionProvider *m_pFunctionProvider;
-	CLMsgLoopManagerForPipeQueue *m_pPipeMsgQueue;
+	CLMultiMsgSerializer *m_pSerializer;
+	CLMultiMsgDeserializer *m_pDeserializer;
 };
 
 #endif

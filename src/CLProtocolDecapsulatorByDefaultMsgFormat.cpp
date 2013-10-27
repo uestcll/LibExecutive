@@ -1,9 +1,12 @@
+#include <vector>
 #include "CLProtocolDecapsulatorByDefaultMsgFormat.h"
 #include "CLIOVectors.h"
 #include "CLIteratorForIOVectors.h"
 #include "CLBufferManager.h"
 #include "ErrorCode.h"
 #include "CLLogger.h"
+
+using namespace std;
 
 CLProtocolDecapsulatorByDefaultMsgFormat::CLProtocolDecapsulatorByDefaultMsgFormat() : CLProtocolDecapsulator(0)
 {
