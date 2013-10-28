@@ -44,7 +44,7 @@ public:
 	//CLIOVector GetDataIOVecs();
 
 private:
-	CLStatus CLBuffer::CheckForRestBuffer();
+	CLStatus CheckForRestBuffer();
 
 public:
 	const int& m_ciDataStartIndex;

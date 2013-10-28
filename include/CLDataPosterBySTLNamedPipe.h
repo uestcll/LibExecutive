@@ -14,12 +14,12 @@ public:
 	CLDataPosterByNamedPipe(CLNamedPipe *pipe);
 	virtual ~CLDataPosterByNamedPipe();
 
-private:
+public:
 	virtual CLStatus PostData(CLIOVector& dataVec);
 
 private:
+	CLIOVector *m_pDataVecter;
 	CLNamedPipe *m_pNamedPipe;
-
 	int m_iDataStartIndex;
 
 };

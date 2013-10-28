@@ -10,7 +10,7 @@
 #include "CLIOVector.h"
 #include "CLCriticalSection.h"
 
-CLNamedPipe::CLNamedPipe(const char*  , int flag)
+CLNamedPipe::CLNamedPipe(const char* pStrPipeName, int flag)
 {
 	try
 	{

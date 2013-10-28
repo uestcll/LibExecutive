@@ -33,10 +33,10 @@ public:
 	CLStatus WriteData(char* pBuffer, const int& index, const int& len);
 	CLStatus ReadData(char* pBuffer, const int& index, const int& len);
 
-	struct iovec* GetIOVecStructs();
+	struct iovec* GetIOVecStructs() const;
 
-	int IOVecNum();//iovec item num
-	int Length();//all buffer Length
+	const int IOVecNum() const;//iovec item num
+	const int Length() const;//all buffer Length
 
 	const char& operator[](const int &index);
 

@@ -217,12 +217,12 @@ CLStatus CLIOVector::GetIOVecs(int index, int len, CLIOVector& IOVector)
 	return CLStatus(0, 0);
 }
 
-int CLIOVector::Length()
+const int CLIOVector::Length() const
 {
 	return m_iDataLength;
 }
 
-int CLIOVector::IOVecNum()
+const int CLIOVector::IOVecNum() const
 {
 	return m_ioVecQueue.size();
 }
@@ -372,7 +372,7 @@ CLStatus CLIOVector::PushBackIOVecs(CLIOVector& IOVector)
 	return CLStatus(0, 0);
 }
 
-struct iovec* CLIOVector::GetIOVecStructs()
+struct iovec* CLIOVector::GetIOVecStructs() const
 {
 	int num = m_ioVecQueue.size();
 	if(num == 0)
@@ -381,12 +381,13 @@ struct iovec* CLIOVector::GetIOVecStructs()
 	}
 	struct iovec* pSIOVecs = new struct iovec [num];
 
-	deque<struct iovec>::iterator it = m_ioVecQueue.begin();
+	deque<struct iovec>::const_iterator it = m_ioVecQueue.begin();
 
 	for(int i = 0; i < num; i++)
 	{	
 		pSIOVecs[i].iov_base = it->iov_base;
-		pSIOVecs[i].iov_len = it->iov_len;		
+		pSIOVecs[i].iov_len = it->iov_len;
+		++it;		
 	}
 
 	return pSIOVecs;

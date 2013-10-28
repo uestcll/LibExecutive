@@ -17,11 +17,13 @@ CLDataPosterByNamedPipe::CLDataPosterByNamedPipe(const char* strPipeName, int pi
 	{
 		m_pNamedPipe = new CLNamedPipe(strPipeName, PIPE_FOR_WRITE);
 	}
+
+	m_pDataVecter = new CLIOVector();
 }
 
 CLDataPosterByNamedPipe::CLDataPosterByNamedPipe(CLNamedPipe *pipe) : m_pNamedPipe(pipe), m_iDataStartIndex(0)
 {
-
+	m_pDataVecter = new CLIOVector();
 }
 
 CLDataPosterByNamedPipe::~CLDataPosterByNamedPipe()
@@ -35,15 +37,17 @@ CLDataPosterByNamedPipe::~CLDataPosterByNamedPipe()
 
 CLStatus CLDataPosterByNamedPipe::PostData(CLIOVector& dataVec) 
 {
+	m_pDataVecter->PushBackIOVecs(dataVec);
+
 	CLIOVector tmpVec;
 
 	if(0 == m_iDataStartIndex)
 	{
-		tmpVec = dataVec;
+		tmpVec = *m_pDataVecter;
 	}
 	else
 	{
-		dataVec.GetIOVecs(m_iDataStartIndex, dataVec.Length(), tmpVec);
+		m_pDataVecter->GetIOVecs(m_iDataStartIndex, dataVec.Length(), tmpVec);
 	}
 
 	CLStatus s = m_pNamedPipe->WriteVecs(tmpVec);
@@ -55,7 +59,9 @@ CLStatus CLDataPosterByNamedPipe::PostData(CLIOVector& dataVec)
 
 	if(tmpVec.Length() == s.m_clReturnCode)
 	{
-		return CLStatus(s.m_clReturnCode, POST_DATA_COMPLETE); //data post complete and notify the maintainer to delete this poster
+		m_pDataVecter->FreeAll();
+		m_iDataStartIndex = 0;
+		return CLStatus(s.m_clReturnCode, POST_DATA_COMPLETE); //data post complete and notify the maintainer to unregister write event in epoll
 	}
 	else
 	{

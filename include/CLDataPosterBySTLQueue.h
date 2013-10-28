@@ -3,17 +3,23 @@
 
 #include "CLDataPoster.h"
 #include "CLIOVector.h"
+#include "CLSTLQueue.h"
 
-class CLSTLQueue;
 
 class CLDataPosterBySTLQueue : public CLDataPoster
 {
 public:
-	CLDataPosterBySTLQueue(CLSTLQueue queue);
+	CLDataPosterBySTLQueue(CLSTLQueue *pQueue);
 	virtual ~CLDataPosterBySTLQueue();
 
 	virtual CLStatus PostData(CLIOVector& dataVec);
 	 
 private:
-	CLSTLQueue m_Queue;
+	CLSTLQueue *m_pQueue;
+
+private:
+	CLDataPosterBySTLQueue(const CLDataPosterBySTLQueue&);
+	CLDataPosterBySTLQueue& operator=(const CLDataPosterBySTLQueue&);
 };
+
+#endif
