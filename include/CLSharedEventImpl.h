@@ -2,7 +2,9 @@
 #define CLSharedEventImpl_H
 
 #include "CLSharedObjectsImpl.h"
-template<typename T,typename SL> class CLSharedObjectAllocator;
+
+template<typename T, typename SL> class CLSharedObjectAllocator;
+
 struct SLEventInfo
 {
 	long Flag;
@@ -22,7 +24,6 @@ public:
 	virtual CLStatus InitializeSharedObject(SLSharedObjectHead *pObject);
 	virtual CLStatus DestroySharedObject(SLSharedObjectHead *pObject);
 
-//	friend  class CLSharedEventAllocator;
 	friend class CLSharedObjectAllocator<CLSharedEventImpl,SLEventInfo>;
 
 private:

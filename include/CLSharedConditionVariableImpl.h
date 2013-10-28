@@ -4,7 +4,7 @@
 #include <pthread.h>
 #include "CLSharedObjectsImpl.h"
 
-template<typename T,typename SL> class CLSharedObjectAllocator;
+template<typename T, typename SL> class CLSharedObjectAllocator;
 
 struct SLSharedConditionVariableItem
 {
@@ -18,12 +18,12 @@ public:
 	virtual CLStatus InitializeSharedObject(SLSharedObjectHead *pObject);
 	virtual CLStatus DestroySharedObject(SLSharedObjectHead *pObject);
 
-//	friend  class CLSharedConditionVariableAllocator;
-	friend  class CLSharedObjectAllocator<CLSharedConditionVariableImpl,pthread_cond_t>;
+	friend  class CLSharedObjectAllocator<CLSharedConditionVariableImpl, pthread_cond_t>;
 
 private:	
 	CLSharedConditionVariableImpl();
 	virtual ~CLSharedConditionVariableImpl();
+
 	CLSharedConditionVariableImpl(const CLSharedConditionVariableImpl&);
 	CLSharedConditionVariableImpl& operator=(const CLSharedConditionVariableImpl&);
 };

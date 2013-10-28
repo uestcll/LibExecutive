@@ -37,7 +37,7 @@ CLEvent::CLEvent(bool bSemaphore)
 
 CLEvent::CLEvent(const char *pstrEventName) : m_Mutex(pstrEventName, MUTEX_USE_SHARED_PTHREAD), m_Cond(pstrEventName)
 {
-	m_pEventInfo = CLSharedObjectAllocator<CLSharedEventImpl,SLEventInfo>::Get(pstrEventName);
+	m_pEventInfo = CLSharedObjectAllocator<CLSharedEventImpl, SLEventInfo>::Get(pstrEventName);
 	if(m_pEventInfo == 0)
 	{
 		CLLogger::WriteLogMsg("In CLEvent::CLEvent1(), CLSharedEventAllocator::Get error", 0);
@@ -50,7 +50,7 @@ CLEvent::CLEvent(const char *pstrEventName) : m_Mutex(pstrEventName, MUTEX_USE_S
 
 CLEvent::CLEvent(const char *pstrEventName, bool bSemaphore) : m_Mutex(pstrEventName, MUTEX_USE_SHARED_PTHREAD), m_Cond(pstrEventName)
 {
-	m_pEventInfo = CLSharedObjectAllocator<CLSharedEventImpl,SLEventInfo>::Get(pstrEventName);
+	m_pEventInfo = CLSharedObjectAllocator<CLSharedEventImpl, SLEventInfo>::Get(pstrEventName);
 	if(m_pEventInfo == 0)
 	{
 		CLLogger::WriteLogMsg("In CLEvent::CLEvent(), CLSharedEventAllocator::Get error", 0);
@@ -73,7 +73,7 @@ CLEvent::~CLEvent()
 		delete m_pEventInfo;
 	else
 	{
-		CLStatus s = CLSharedObjectAllocator<CLSharedEventImpl,SLEventInfo>::Release(m_strEventName.c_str());
+		CLStatus s = CLSharedObjectAllocator<CLSharedEventImpl, SLEventInfo>::Release(m_strEventName.c_str());
 		if(!s.IsSuccess())
 			CLLogger::WriteLogMsg("In CLEvent::~CLEvent(), CLSharedEventAllocator::Release error", 0);
 	}

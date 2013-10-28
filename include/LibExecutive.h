@@ -26,9 +26,6 @@
 #include "CLSharedMemory.h"
 #include "CLSharedObjectsImpl.h"
 #include "CLSharedObjectAllocator.h"
-//#include "CLSharedMutexAllocator.h"
-//#include "CLSharedConditionVariableAllocator.h"
-//#include "CLSharedEventAllocator.h"
 #include "CLProcess.h"
 #include "CLProcessFunctionForExec.h"
 #include "CLMessageQueueByNamedPipe.h"
@@ -43,6 +40,5 @@
 #include "CLSharedEventImpl.h"
 #include "CLSharedMsgQueueByNamedPipe.h"
 #include "CLPrivateMsgQueueByNamedPipe.h"
-
 
 #endif
