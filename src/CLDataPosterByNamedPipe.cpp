@@ -59,7 +59,8 @@ CLStatus CLDataPosterByNamedPipe::PostData(CLIOVector& dataVec)
 
 	if(tmpVec.Length() == s.m_clReturnCode)
 	{
-		m_pDataVecter->FreeAll();
+		m_pDataVecter->FreeAndPopAll();
+		
 		m_iDataStartIndex = 0;
 		return CLStatus(s.m_clReturnCode, POST_DATA_COMPLETE); //data post complete and notify the maintainer to unregister write event in epoll
 	}

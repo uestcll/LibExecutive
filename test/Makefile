@@ -1,5 +1,5 @@
-main : ATester.o CLConditionVariableTester.o CLCriticalSectionTester.o CLEventTester.o CLExecutiveCommunicationByNamedPipeTester.o CLExecutiveFunctionForMsgLoopTester.o CLExecutiveNameServerTester.o CLLoggerTester.o CLMessageLoopManagerTester.o CLMessageQueueByNamedPipeTester.o CLMessageQueueBySTLqueueTester.o CLMsgLoopManagerForPipeQueueTester.o CLMsgLoopManagerForSTLQueueTester.o CLMutexTester.o CLNonThreadForMsgLoopTester.o CLProcessTester.o CLSharedConditionVariableAllocatorTester.o CLSharedEventAllocatorTester.o CLSharedMemoryTester.o CLSharedMutexAllocatorTester.o CLStatusTester.o CLThreadForMsgLoopTester.o CLThreadInitialFinishedNotifierTester.o CLThreadTester.o test.o ZTester.o CLConditionVariable.o CLCriticalSection.o CLEvent.o CLExecutive.o CLExecutiveCommunication.o CLExecutiveCommunicationByNamedPipe.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessageQueueByNamedPipe.o CLMessageQueueBySTLqueue.o CLMessageSerializer.o CLMsgLoopManagerForPipeQueue.o CLMsgLoopManagerForSTLqueue.o CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o CLNonThreadForMsgLoop.o CLPrivateExecutiveCommunicationByNamedPipe.o CLPrivateMsgQueueByNamedPipe.o CLProcess.o CLProcessFunctionForExec.o CLSharedConditionVariableAllocator.o CLSharedConditionVariableImpl.o CLSharedEventAllocator.o CLSharedEventImpl.o CLSharedExecutiveCommunicationByNamedPipe.o CLSharedMemory.o CLSharedMsgQueueByNamedPipe.o CLSharedMutexAllocator.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLStatus.o CLThread.o CLThreadCommunicationBySTLqueue.o CLThreadForMsgLoop.o CLThreadInitialFinishedNotifier.o 
-	g++ -I../lib/gtest-1.4.0/include -o main ATester.o CLConditionVariableTester.o CLCriticalSectionTester.o CLEventTester.o CLExecutiveCommunicationByNamedPipeTester.o CLExecutiveFunctionForMsgLoopTester.o CLExecutiveNameServerTester.o CLLoggerTester.o CLMessageLoopManagerTester.o CLMessageQueueByNamedPipeTester.o CLMessageQueueBySTLqueueTester.o CLMsgLoopManagerForPipeQueueTester.o CLMsgLoopManagerForSTLQueueTester.o CLMutexTester.o CLNonThreadForMsgLoopTester.o CLProcessTester.o CLSharedConditionVariableAllocatorTester.o CLSharedEventAllocatorTester.o CLSharedMemoryTester.o CLSharedMutexAllocatorTester.o CLStatusTester.o CLThreadForMsgLoopTester.o CLThreadInitialFinishedNotifierTester.o CLThreadTester.o test.o ZTester.o CLConditionVariable.o CLCriticalSection.o CLEvent.o CLExecutive.o CLExecutiveCommunication.o CLExecutiveCommunicationByNamedPipe.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessageQueueByNamedPipe.o CLMessageQueueBySTLqueue.o CLMessageSerializer.o CLMsgLoopManagerForPipeQueue.o CLMsgLoopManagerForSTLqueue.o CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o CLNonThreadForMsgLoop.o CLPrivateExecutiveCommunicationByNamedPipe.o CLPrivateMsgQueueByNamedPipe.o CLProcess.o CLProcessFunctionForExec.o CLSharedConditionVariableAllocator.o CLSharedConditionVariableImpl.o CLSharedEventAllocator.o CLSharedEventImpl.o CLSharedExecutiveCommunicationByNamedPipe.o CLSharedMemory.o CLSharedMsgQueueByNamedPipe.o CLSharedMutexAllocator.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLStatus.o CLThread.o CLThreadCommunicationBySTLqueue.o CLThreadForMsgLoop.o CLThreadInitialFinishedNotifier.o ../lib/gtest-1.4.0/libgtest.a -g -lpthread
+main : ATester.o CLConditionVariableTester.o CLCriticalSectionTester.o CLEventTester.o CLExecutiveCommunicationByNamedPipeTester.o CLExecutiveFunctionForMsgLoopTester.o CLExecutiveNameServerTester.o CLLoggerTester.o CLMessageLoopManagerTester.o CLMessageQueueByNamedPipeTester.o CLMessageQueueBySTLqueueTester.o CLMsgLoopManagerForPipeQueueTester.o CLMsgLoopManagerForSTLQueueTester.o CLMutexTester.o CLNonThreadForMsgLoopTester.o CLProcessTester.o CLSharedMemoryTester.o CLSharedObjectAllocatorTester.o CLStatusTester.o CLThreadForMsgLoopTester.o CLThreadInitialFinishedNotifierTester.o CLThreadTester.o test.o ZTester.o CLConditionVariable.o CLCriticalSection.o CLEvent.o CLExecutive.o CLExecutiveCommunication.o CLExecutiveCommunicationByNamedPipe.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessageQueueByNamedPipe.o CLMessageQueueBySTLqueue.o CLMessageSerializer.o CLMsgLoopManagerForPipeQueue.o CLMsgLoopManagerForSTLqueue.o CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o CLNonThreadForMsgLoop.o CLPrivateExecutiveCommunicationByNamedPipe.o CLPrivateMsgQueueByNamedPipe.o CLProcess.o CLProcessFunctionForExec.o CLSharedConditionVariableImpl.o CLSharedEventImpl.o CLSharedExecutiveCommunicationByNamedPipe.o CLSharedMemory.o CLSharedMsgQueueByNamedPipe.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLStatus.o CLThread.o CLThreadCommunicationBySTLqueue.o CLThreadForMsgLoop.o CLThreadInitialFinishedNotifier.o 
+	g++ -I../lib/gtest-1.4.0/include -o main ATester.o CLConditionVariableTester.o CLCriticalSectionTester.o CLEventTester.o CLExecutiveCommunicationByNamedPipeTester.o CLExecutiveFunctionForMsgLoopTester.o CLExecutiveNameServerTester.o CLLoggerTester.o CLMessageLoopManagerTester.o CLMessageQueueByNamedPipeTester.o CLMessageQueueBySTLqueueTester.o CLMsgLoopManagerForPipeQueueTester.o CLMsgLoopManagerForSTLQueueTester.o CLMutexTester.o CLNonThreadForMsgLoopTester.o CLProcessTester.o CLSharedMemoryTester.o CLSharedObjectAllocatorTester.o CLStatusTester.o CLThreadForMsgLoopTester.o CLThreadInitialFinishedNotifierTester.o CLThreadTester.o test.o ZTester.o CLConditionVariable.o CLCriticalSection.o CLEvent.o CLExecutive.o CLExecutiveCommunication.o CLExecutiveCommunicationByNamedPipe.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessageQueueByNamedPipe.o CLMessageQueueBySTLqueue.o CLMessageSerializer.o CLMsgLoopManagerForPipeQueue.o CLMsgLoopManagerForSTLqueue.o CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o CLNonThreadForMsgLoop.o CLPrivateExecutiveCommunicationByNamedPipe.o CLPrivateMsgQueueByNamedPipe.o CLProcess.o CLProcessFunctionForExec.o CLSharedConditionVariableImpl.o CLSharedEventImpl.o CLSharedExecutiveCommunicationByNamedPipe.o CLSharedMemory.o CLSharedMsgQueueByNamedPipe.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLStatus.o CLThread.o CLThreadCommunicationBySTLqueue.o CLThreadForMsgLoop.o CLThreadInitialFinishedNotifier.o ../lib/gtest-1.4.0/libgtest.a -g -lpthread
 	rm *.o
 
 ATester.o : ATester.cpp
@@ -50,17 +50,11 @@ CLNonThreadForMsgLoopTester.o : CLNonThreadForMsgLoopTester.cpp
 CLProcessTester.o : CLProcessTester.cpp
 	g++ -I../lib/gtest-1.4.0/include -o CLProcessTester.o -c CLProcessTester.cpp -I../include -g
 
-CLSharedConditionVariableAllocatorTester.o : CLSharedConditionVariableAllocatorTester.cpp
-	g++ -I../lib/gtest-1.4.0/include -o CLSharedConditionVariableAllocatorTester.o -c CLSharedConditionVariableAllocatorTester.cpp -I../include -g
-
-CLSharedEventAllocatorTester.o : CLSharedEventAllocatorTester.cpp
-	g++ -I../lib/gtest-1.4.0/include -o CLSharedEventAllocatorTester.o -c CLSharedEventAllocatorTester.cpp -I../include -g
-
 CLSharedMemoryTester.o : CLSharedMemoryTester.cpp
 	g++ -I../lib/gtest-1.4.0/include -o CLSharedMemoryTester.o -c CLSharedMemoryTester.cpp -I../include -g
 
-CLSharedMutexAllocatorTester.o : CLSharedMutexAllocatorTester.cpp
-	g++ -I../lib/gtest-1.4.0/include -o CLSharedMutexAllocatorTester.o -c CLSharedMutexAllocatorTester.cpp -I../include -g
+CLSharedObjectAllocatorTester.o : CLSharedObjectAllocatorTester.cpp
+	g++ -I../lib/gtest-1.4.0/include -o CLSharedObjectAllocatorTester.o -c CLSharedObjectAllocatorTester.cpp -I../include -g
 
 CLStatusTester.o : CLStatusTester.cpp
 	g++ -I../lib/gtest-1.4.0/include -o CLStatusTester.o -c CLStatusTester.cpp -I../include -g
@@ -176,14 +170,8 @@ CLProcess.o : ../src/CLProcess.cpp
 CLProcessFunctionForExec.o : ../src/CLProcessFunctionForExec.cpp
 	g++ -o CLProcessFunctionForExec.o -c ../src/CLProcessFunctionForExec.cpp -I../include -g
 
-CLSharedConditionVariableAllocator.o : ../src/CLSharedConditionVariableAllocator.cpp
-	g++ -o CLSharedConditionVariableAllocator.o -c ../src/CLSharedConditionVariableAllocator.cpp -I../include -g
-
 CLSharedConditionVariableImpl.o : ../src/CLSharedConditionVariableImpl.cpp
 	g++ -o CLSharedConditionVariableImpl.o -c ../src/CLSharedConditionVariableImpl.cpp -I../include -g
-
-CLSharedEventAllocator.o : ../src/CLSharedEventAllocator.cpp
-	g++ -o CLSharedEventAllocator.o -c ../src/CLSharedEventAllocator.cpp -I../include -g
 
 CLSharedEventImpl.o : ../src/CLSharedEventImpl.cpp
 	g++ -o CLSharedEventImpl.o -c ../src/CLSharedEventImpl.cpp -I../include -g
@@ -196,9 +184,6 @@ CLSharedMemory.o : ../src/CLSharedMemory.cpp
 
 CLSharedMsgQueueByNamedPipe.o : ../src/CLSharedMsgQueueByNamedPipe.cpp
 	g++ -o CLSharedMsgQueueByNamedPipe.o -c ../src/CLSharedMsgQueueByNamedPipe.cpp -I../include -g
-
-CLSharedMutexAllocator.o : ../src/CLSharedMutexAllocator.cpp
-	g++ -o CLSharedMutexAllocator.o -c ../src/CLSharedMutexAllocator.cpp -I../include -g
 
 CLSharedMutexImpl.o : ../src/CLSharedMutexImpl.cpp
 	g++ -o CLSharedMutexImpl.o -c ../src/CLSharedMutexImpl.cpp -I../include -g

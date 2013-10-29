@@ -16,12 +16,13 @@ class CLIOVector;
 class CLNamedPipe
 {
 public:
-	CLNamedPipe(const char* pStrPipeName, int flag);
-	CLNamedPipe(const char* pStrPipeName, const char* pstrMutexName, int flag);
+	CLNamedPipe(const char* pStrPipeName, bool isShared, int flag);
+	// CLNamedPipe(const char* pStrPipeName, const char* pstrMutexName, int flag);
 	virtual ~CLNamedPipe();
 
 	long GetAtomWriteSize();
 
+	const int GetPipeFd() const;
 	CLStatus Read(char *pBuf, int length);
 	CLStatus Write(char *pBuf, int length);
 

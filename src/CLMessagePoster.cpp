@@ -5,7 +5,7 @@
 #include "CLMessageSerializer.h"
 #include "CLProtocolEncapsulator.h"
 #include "CLIOVector.h"
-
+#include "CLProtocolDataPoster.h"
 CLMessagePoster::CLMessagePoster(CLDataPosterChannelMaintainer *pDataPosterChannel, CLMessageSerializer *pMsgSerializer, CLProtocolEncapsulator *pProtoEncapsulator)
 {
 	if(pDataPoster == 0 || pMsgSerializer == 0)
@@ -21,9 +21,10 @@ CLMessagePoster::~CLMessagePoster()
 
 }
 
-CLStatus CLMessagePoster::Initialize()
+CLStatus CLMessagePoster::Initialize(void *pContext)
 {
-	CLStatus s = m_pDataPosterChannel->Init(); //chang lianjie
+	m_pProtoDataPoster = new CLProtocolDataPoster;
+	CLStatus s = m_pDataPosterChannel->Initialize(m_pProtoDataPoster, pContext); //chang lianjie
 //deal with the socket connect and regist into epoll or sth else!!!
 	if(!s.IsSuccess());
 	{
@@ -34,9 +35,9 @@ CLStatus CLMessagePoster::Initialize()
 	return CLStatus(0, 0);
 }
 
-CLStatus CLMessagePoster::Uninitialize()
+CLStatus CLMessagePoster::UnInitialize(void *pContext)
 {
-	CLStatus s = m_pDataPosterChannel->Uninit();
+	CLStatus s = m_pDataPosterChannel->Uninitialize(pContext);
 
 	if(!s.IsSuccess())
 	{
@@ -65,7 +66,15 @@ CLStatus CLMessagePoster::PostMessage(CLMessage* pMsg)
 		return s2;
 	}
 
-	CLStatus s3 = m_pDataPosterChannel->PostData(dataVec);
+	CLDataPoster *tmp = m_pDataPosterChannel->GetDataPoster();
+	if(tmp == NULL)
+	{
+		CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), m_pDataPosterChannel->GetDataPoster() is 0", 0);
+		return CLStatus(-1, 0);
+	}
+	m_pProtoDataPoster->SetDataPoster(tmp);
+
+	m_pProtoDataPoster->PostProtoData(dataVec);
 	if(!s3.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), m_pDataPosterChannel->PostData() error", 0);

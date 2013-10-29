@@ -234,7 +234,7 @@ const char& CLIOVector::operator[](const int& index)
 	return buf[0];
 }
 
-CLStatus CLIOVector::FreeAll()
+CLStatus CLIOVector::FreeAndPopAll()
 {
 	if(m_ioVecQueue.empty())
 	{

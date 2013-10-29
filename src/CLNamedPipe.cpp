@@ -10,7 +10,7 @@
 #include "CLIOVector.h"
 #include "CLCriticalSection.h"
 
-CLNamedPipe::CLNamedPipe(const char* pStrPipeName, int flag)
+CLNamedPipe::CLNamedPipe(const char* pStrPipeName, bool isShared, int flag)
 {
 	try
 	{
@@ -19,24 +19,10 @@ CLNamedPipe::CLNamedPipe(const char* pStrPipeName, int flag)
 		{
 			throw s;
 		}
-		m_pMutexForNamedPipe = new CLMutex();
-	}
-	catch(CLStatus& s)
-	{
-		CLLogger::WriteLogMsg("In CLNamedPipe::CLNamedPipe(), Initialize() error", 0);
-	}
-}	
-
-CLNamedPipe::CLNamedPipe(const char* pStrPipeName, const char* pstrMutexName, int flag)
-{
-	try
-	{
-		CLStatus s = Initialize(pStrPipeName, flag);
-		if(!s.IsSuccess())
-		{
-			throw s;
-		}
-		m_pMutexForNamedPipe = new CLMutex(pstrMutexName, MUTEX_USE_SHARED_PTHREAD);
+		if(isShared)
+			m_pMutexForNamedPipe = new CLMutex(pStrPipeName, MUTEX_USE_SHARED_PTHREAD);
+		else
+			m_pMutexForNamedPipe = new CLMutex();
 	}
 	catch(CLStatus& s)
 	{
@@ -51,6 +37,11 @@ CLNamedPipe::~CLNamedPipe()
 		delete m_pMutexForNamedPipe;
 		m_pMutexForNamedPipe = 0;
 	}	
+}
+
+const int CLNamedPipe::GetPipeFd() const
+{
+	return m_Fd;
 }
 
 CLStatus CLNamedPipe::Initialize(const char* pStrPipeName, int flag)

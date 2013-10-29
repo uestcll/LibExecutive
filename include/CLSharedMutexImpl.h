@@ -4,6 +4,8 @@
 #include <pthread.h>
 #include "CLSharedObjectsImpl.h"
 
+template<typename T, typename SL> class CLSharedObjectAllocator;
+
 struct SLSharedMutexItem
 {
 	SLSharedObjectHead head;
@@ -16,7 +18,7 @@ public:
 	virtual CLStatus InitializeSharedObject(SLSharedObjectHead *pObject);
 	virtual CLStatus DestroySharedObject(SLSharedObjectHead *pObject);
 
-	friend  class CLSharedMutexAllocator;
+	friend class CLSharedObjectAllocator<CLSharedMutexImpl, pthread_mutex_t>;
 
 private:
 	CLSharedMutexImpl();

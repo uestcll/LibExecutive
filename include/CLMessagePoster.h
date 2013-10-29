@@ -15,14 +15,16 @@ public:
 	CLMessagePoster(CLDataPosterChannelMaintainer *pDataPosterChannel, CLMessageSerializer *pMsgSerializer, CLProtocolEncapsulator *pProtoEncapsulator);
 	virtual ~CLMessagePoster();
 
-	CLStatus Initialize();
+	CLStatus Initialize(void *pContext);
 	CLStatus PostMessage(CLMessage *pMsg);
-	CLStatus Uninitialize();
+	CLStatus PostLeftMessage();
+	CLStatus UnInitialize(void *pContext);
 
 private:
 	CLDataPosterChannelMaintainer *m_pDataPosterChannel;
 	CLMessageSerializer *m_pMsgSerializer;
 	CLProtocolEncapsulator *m_pProtoEncapsulator;
+	CLProtocolDataPoster *m_pProtoDataPoster;
 };
 
 

@@ -3,7 +3,7 @@
 #include "CLMessage.h"
 
 CLDataPosterBySTLQueue::CLDataPosterBySTLQueue(CLSTLQueue *pQueue)
-{
+{ 
 	m_pQueue = pQueue;
 }
 
@@ -38,7 +38,7 @@ CLStatus CLDataPosterBySTLQueue::PostData(CLIOVector& dataVec)
 		return CLStatus(-1, POST_DATA_ERROR);
 	}
 
-	dataVec.FreeAll();
+	dataVec.FreeAndPopAll();
 
 	return CLStatus(sizeof(pMsg), POST_DATA_COMPLETE);//send msg success, and notify the channelmaitainer to delete CLDataPoster and free dataVec
 }
