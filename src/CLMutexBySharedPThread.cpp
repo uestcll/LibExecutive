@@ -1,7 +1,8 @@
 #include <string.h>
+#include <pthread.h>
 #include "CLMutexBySharedPThread.h"
-#include "CLSharedMutexAllocator.h"
 #include "CLLogger.h"
+#include "CLSharedObjectAllocator.h"
 
 CLMutexBySharedPThread::CLMutexBySharedPThread(const char *pstrMutexName)
 {
@@ -10,7 +11,7 @@ CLMutexBySharedPThread::CLMutexBySharedPThread(const char *pstrMutexName)
 
 	m_strMutexName = pstrMutexName;
 
-	m_pMutex = CLSharedMutexAllocator::Get(pstrMutexName);
+	m_pMutex = CLSharedObjectAllocator<CLSharedMutexImpl, pthread_mutex_t>::Get(pstrMutexName);
 	if(m_pMutex == 0)
 	{
 		CLLogger::WriteLogMsg("In CLMutexBySharedPThread::CLMutexBySharedPThread(), Get error", 0);
@@ -20,7 +21,7 @@ CLMutexBySharedPThread::CLMutexBySharedPThread(const char *pstrMutexName)
 
 CLMutexBySharedPThread::~CLMutexBySharedPThread()
 {
-	if(!CLSharedMutexAllocator::Release(m_strMutexName.c_str()).IsSuccess())
+	if(!CLSharedObjectAllocator<CLSharedMutexImpl, pthread_mutex_t>::Release(m_strMutexName.c_str()).IsSuccess())
 		CLLogger::WriteLogMsg("In CLMutexBySharedPThread::~CLMutexBySharedPThread(), Release error", 0);
 }
 
