@@ -32,6 +32,19 @@ CLStatus CLMessagePoster::Initialize(void *pContext)
 		return s;
 	}
 
+	CLDataPoster *tmp = m_pDataPosterChannel->GetDataPoster();
+	if(tmp == NULL)
+	{
+		CLLogger::WriteLogMsg("In CLMessagePoster::Initialize(), m_pDataPosterChannel->GetDataPoster() is 0", 0);
+		return CLStatus(-1, 0);
+	}
+	CLStatus s1 = m_pProtoDataPoster->SetDataPoster(tmp);
+	if(!s1.IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLMessagePoster::Initialize(), m_pProtoDataPoster->SetDataPoster error", 0);
+		return s1;
+	}
+
 	return CLStatus(0, 0);
 }
 
@@ -50,15 +63,15 @@ CLStatus CLMessagePoster::UnInitialize(void *pContext)
 
 CLStatus CLMessagePoster::PostMessage(CLMessage* pMsg)
 {
-	CLIOVector dataVec;
-	CLStatus s = m_pMsgSerializer->Serialize(pMsg, dataVec);
+	CLIOVector *pDataVec;
+	CLStatus s = m_pMsgSerializer->Serialize(pMsg, pDataVec);
 	if(!s.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), m_pMsgSerializer->Serialize() error", 0);
 		return s;
 	}
 
-	CLStatus s2 = m_pProtoEncapsulator->Encapsulate(dataVec);
+	CLStatus s2 = m_pProtoEncapsulator->Encapsulate(pDataVec);
 
 	if(!s2.IsSuccess())
 	{
@@ -66,15 +79,8 @@ CLStatus CLMessagePoster::PostMessage(CLMessage* pMsg)
 		return s2;
 	}
 
-	CLDataPoster *tmp = m_pDataPosterChannel->GetDataPoster();
-	if(tmp == NULL)
-	{
-		CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), m_pDataPosterChannel->GetDataPoster() is 0", 0);
-		return CLStatus(-1, 0);
-	}
-	m_pProtoDataPoster->SetDataPoster(tmp);
-
-	m_pProtoDataPoster->PostProtoData(dataVec);
+	// CLStatus s3 = m_pDataPosterChannel->PostData();
+	CLStatus s3 = m_pProtoDataPoster->PostProtoData(pDataVec);
 	if(!s3.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), m_pDataPosterChannel->PostData() error", 0);
@@ -82,4 +88,9 @@ CLStatus CLMessagePoster::PostMessage(CLMessage* pMsg)
 	}
 
 	return CLStatus(0, 0);
+}
+
+CLStatus CLMessagePoster::PostLeftMessage()
+{
+	
 }
