@@ -5,7 +5,6 @@
 
 class CLSTLQueue;
 class CLEvent;
-class CLDataPoster;
 
 class CLDataPosterChannelBySTLQueueMaintainer : public CLDataPosterChannelMaintainer
 {
@@ -16,12 +15,10 @@ public:
 public:
 	virtual CLStatus Initialize(void *pContext);
 	virtual CLStatus UnInitialize(void *pContext);
-	virtual CLStatus PostData(CLIOVector &dataVec);
+	virtual CLDataPoster* GetDataPoster();
 
 private:
 	CLSTLQueue *m_pQueue;
-	CLEvent *m_pEvent;
-	CLDataPoster *m_pDataPoster;
 };
 
 

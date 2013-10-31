@@ -12,22 +12,22 @@ CLDataPosterBySTLQueue::~CLDataPosterBySTLQueue()
 
 }
 
-CLStatus CLDataPosterBySTLQueue::PostData(CLIOVector& dataVec)
+CLStatus CLDataPosterBySTLQueue::PostData(CLIOVector* pDataVec) //do not deal with the free of data vec
 {
 	CLMessage *pMsg;
 	
 	int msgLen = sizeof(CLMessage*);
 
-	if(dataVec.Length() < msgLen)
+	if(pDataVec->Length() != msgLen)
 	{
-		CLLogger::WriteLogMsg("In CLDataPosterBySTLQueue::PostData(), dataVec length is < msgLen", 0);
-		return CLStatus(-1, POST_DATA_BUF_ERROR);
+		CLLogger::WriteLogMsg("In CLDataPosterBySTLQueue::PostData(), pDataVec length is < msgLen", 0);
+		return CLStatus(-1, 0);
 	}
 
-	CLStatus s = dataVec.ReadData((char*)&pMsg, 0, msgLen);
+	CLStatus s = pDataVec->ReadData((char*)&pMsg, 0, msgLen);
 	if(!s.IsSuccess())
 	{
-		CLLogger::WriteLogMsg("In CLDataPosterBySTLQueue::PostData(), dataVec.ReadData() error", 0);
+		CLLogger::WriteLogMsg("In CLDataPosterBySTLQueue::PostData(), pDataVec->ReadData() error", 0);
 		return CLStatus(-1, 0);
 	}
 
@@ -35,10 +35,10 @@ CLStatus CLDataPosterBySTLQueue::PostData(CLIOVector& dataVec)
 	if(!s1.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLDataPosterBySTLQueue::PostData(), m_pQueue->PushMessage error", 0);
-		return CLStatus(-1, POST_DATA_ERROR);
+		return CLStatus(-1, 0);
 	}
 
-	dataVec.FreeAndPopAll();
+	// pDataVec->FreeAndPopAll();
 
-	return CLStatus(sizeof(pMsg), POST_DATA_COMPLETE);//send msg success, and notify the channelmaitainer to delete CLDataPoster and free dataVec
+	return CLStatus(msgLen, 0);//send msg success, and notify the channelmaitainer to delete CLDataPoster and free dataVec
 }

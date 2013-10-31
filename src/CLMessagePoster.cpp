@@ -6,7 +6,9 @@
 #include "CLProtocolEncapsulator.h"
 #include "CLIOVector.h"
 #include "CLProtocolDataPoster.h"
-CLMessagePoster::CLMessagePoster(CLDataPosterChannelMaintainer *pDataPosterChannel, CLMessageSerializer *pMsgSerializer, CLProtocolEncapsulator *pProtoEncapsulator)
+#include "CLEvent.h"
+
+CLMessagePoster::CLMessagePoster(CLDataPosterChannelMaintainer *pDataPosterChannel, CLMessageSerializer *pMsgSerializer, CLProtocolEncapsulator *pProtoEncapsulator, CLEvent *pEvent)
 {
 	if(pDataPoster == 0 || pMsgSerializer == 0)
 		throw "In CLMessagePoster::CLMessagePoster(), parameters is error";
@@ -14,17 +16,42 @@ CLMessagePoster::CLMessagePoster(CLDataPosterChannelMaintainer *pDataPosterChann
 	m_pDataPosterChannel = pDataPosterChannel;
 	m_pMsgSerializer = pMsgSerializer;
 	m_pProtoEncapsulator= pProtoEncapsulator;
+	m_pEvent = pEvent;
+	m_pProtoDataPoster = new CLProtocolDataPoster;
 }
 
 CLMessagePoster::~CLMessagePoster()
 {
-
+	if(m_pEvent)
+	{
+		delete m_pEvent;
+		m_pEvent = 0;
+	}
+	if(m_pDataPosterChannel)
+	{
+		delete m_pDataPosterChannel;
+		m_pDataPosterChannel = 0;
+	}
+	if(m_pMsgSerializer)
+	{
+		delete m_pMsgSerializer;
+		m_pMsgSerializer = 0;
+	}
+	if(m_pProtoEncapsulator)
+	{
+		delete m_pProtoEncapsulator;
+		m_pProtoEncapsulator = 0;
+	}
+	if(m_pProtoDataPoster)
+	{
+		delete m_pProtoDataPoster;
+		m_pProtoDataPoster = 0;
+	}
 }
 
 CLStatus CLMessagePoster::Initialize(void *pContext)
 {
-	m_pProtoDataPoster = new CLProtocolDataPoster;
-	CLStatus s = m_pDataPosterChannel->Initialize(m_pProtoDataPoster, pContext); //chang lianjie
+	CLStatus s = m_pDataPosterChannel->Initialize(pContext); //chang lianjie
 //deal with the socket connect and regist into epoll or sth else!!!
 	if(!s.IsSuccess());
 	{
@@ -32,18 +59,19 @@ CLStatus CLMessagePoster::Initialize(void *pContext)
 		return s;
 	}
 
-	CLDataPoster *tmp = m_pDataPosterChannel->GetDataPoster();
-	if(tmp == NULL)
+	CLDataPoster *tmpDataPoster = m_pDataPosterChannel->GetDataPoster();
+	if(tmpDataPoster == NULL)
 	{
 		CLLogger::WriteLogMsg("In CLMessagePoster::Initialize(), m_pDataPosterChannel->GetDataPoster() is 0", 0);
 		return CLStatus(-1, 0);
 	}
-	CLStatus s1 = m_pProtoDataPoster->SetDataPoster(tmp);
+	CLStatus s1 = m_pProtoDataPoster->SetParameters(tmpDataPoster, m_pEvent);
 	if(!s1.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLMessagePoster::Initialize(), m_pProtoDataPoster->SetDataPoster error", 0);
 		return s1;
 	}
+	tmpDataPoster->SetProtocolDataPoster(m_pProtoDataPoster);
 
 	return CLStatus(0, 0);
 }
@@ -81,16 +109,18 @@ CLStatus CLMessagePoster::PostMessage(CLMessage* pMsg)
 
 	// CLStatus s3 = m_pDataPosterChannel->PostData();
 	CLStatus s3 = m_pProtoDataPoster->PostProtoData(pDataVec);
-	if(!s3.IsSuccess())
+	if(!s3.IsSuccess() && (s3.m_clErrorCode == POST_DATA_ERROR))
 	{
 		CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), m_pDataPosterChannel->PostData() error", 0);
-		return s3;
 	}
-
-	return CLStatus(0, 0);
+	return s3;
 }
 
 CLStatus CLMessagePoster::PostLeftMessage()
 {
-	
+	CLStatus s = m_pProtoDataPoster->PostLeftProtoData();
+	if(!s.IsSuccess() && (s.m_clErrorCode == POST_DATA_ERROR)
+		CLLogger::WriteLogMsg("In CLMessagePoster::PostLeftMessage(), m_pProtoDataPoster->PostLeftProtoData() error", 0);
+
+	return s;
 }

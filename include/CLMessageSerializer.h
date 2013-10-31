@@ -2,6 +2,7 @@
 #define CLMessageSerializer_H
 
 class CLMessage;
+class CLIOVector;
 
 class CLMessageSerializer
 {
@@ -9,7 +10,7 @@ public:
 	CLMessageSerializer();
 	virtual ~CLMessageSerializer();
 
-	virtual char *Serialize(CLMessage *pMsg, unsigned int *pFullLength, unsigned int HeadLength) = 0;
+	virtual CLStatus Serialize(CLMessage *pMsg, CLIOVector *pDataVec) = 0;
 
 private:
 	CLMessageSerializer(const CLMessageSerializer&);

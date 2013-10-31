@@ -135,21 +135,21 @@ CLStatus CLNamedPipe::ReadVecs(CLIOVector& dataVec)
 	CLCriticalSection cs(m_pMutexForNamedPipe);
 	int readLen = 0;
 
-	struct iovec *pDataVecs = dataVec.GetIOVecStructs();
-	if(pDataVecs == NULL)
+	struct iovec *pDataVecStructs = dataVec.GetIOVecStructs();
+	if(pDataVecStructs == NULL)
 	{
 		CLLogger::WriteLogMsg("In CLNamedPipe::ReadVecs(), dataVec.GetIOVecStructs() error", 0);
 		return CLStatus(-1, /*EMPTY_SPACE*/0);
 	}
 
-	readLen = readv(m_Fd, pDataVecs, dataVec.IOVecNum());
+	readLen = readv(m_Fd, pDataVecStructs, dataVec.IOVecNum());
 	if(-1 == readLen)
 	{
 		CLLogger::WriteLogMsg("In CLNamedPipe::ReadVecs(), readv() error", 0);
 		return CLStatus(-1, 0);
 	}
 
-	delete [] pDataVecs;
+	delete [] pDataVecStructs;
 	return CLStatus(readLen, 0);
 }
 
@@ -158,20 +158,20 @@ CLStatus CLNamedPipe::WriteVecs(CLIOVector& dataVec)
 	CLCriticalSection cs(m_pMutexForNamedPipe);
 	
 	int writeLen = 0;
-	struct iovec *pDataVecs = dataVec.GetIOVecStructs();
-	if(pDataVecs == NULL)
+	struct iovec *pDataVecStructs = dataVec.GetIOVecStructs();
+	if(pDataVecStructs == NULL)
 	{
 		CLLogger::WriteLogMsg("In CLNamedPipe::WriteVecs(), dataVec.GetIOVecStructs() error", 0);
-		return CLStatus(-1, /*EMPTY_SPACE*/0);
+		return CLStatus(-1, 0);
 	}
 
-	writeLen = writev(m_Fd, pDataVecs, dataVec.IOVecNum());
+	writeLen = writev(m_Fd, pDataVecStructs, dataVec.IOVecNum());
 	if(-1 == writeLen)
 	{
 		CLLogger::WriteLogMsg("In CLNamedPipe::WriteVecs(), writev() error", 0);
 		return CLStatus(-1, 0);
 	}
 
-	delete [] pDataVecs;
+	delete [] pDataVecStructs;
 	return CLStatus(writeLen, 0);
 }

@@ -4,26 +4,35 @@
 
 using namespace std;
 
-CLProtocolDataPoster::CLProtocolDataPoster() : m_topMsgBufIndex(0), m_pDataPoster(0), m_bDataLeftFlag(false)
+CLProtocolDataPoster::CLProtocolDataPoster() : m_topMsgBufIndex(0), m_pDataPoster(0), m_bDataLeftFlag(false), m_pEvent(0)
 {
 
 }
 
-CLProtocolDataPoster::~CLProtocolDataPoster()
+CLProtocolDataPsoter::~CLProtocolDataPoster()
 {
-
+	if(m_pDataPoster)
+	{	
+		delete m_pDataPoster;
+		m_pDataPoster = 0;
+	}
+	while(1)
+	{
+		if(m_MsgBufVecList.empty())
+		{
+			break;
+		}
+		CLIOVector *tmpVec = m_MsgBufVecList.front();
+		m_MsgBufVecList.pop_front();
+		tmpVec->FreeAndPopAll();
+		delete tmpVec;
+	}
 }
 
-CLStatus CLProtocolDataPoster::SetDataPoster(CLDataPoster *pDataPoster)
-{
-	m_pDataPoster = pDataPoster;
-
-	return CLStatus(0, 0);
-}
-
-CLStatus CLProtocolDataPoster::SetEventNotify(CLEvent *pEvent)
+CLStatus CLProtocolDataPoster::SetParameters(CLDataPoster *pDataPoster, CLEvent *pEvent)
 {
 	m_pEvent = pEvent;
+	m_pDataPoster = pDataPoster;
 
 	return CLStatus(0, 0);
 }
@@ -32,7 +41,13 @@ CLStatus CLProtocolDataPoster::PostProtoData(CLIOVector *pDataVec)//this dataVec
 {
 	if(!m_bDataLeftFlag)
 	{
-		return PostData(pDataVec);
+		CLStatus s = PostData(pDataVec);
+		if(s.IsSuccess())
+		{
+			pDataVec->FreeAndPopAll();
+			delete pDataVec;
+		}
+		return s;
 	}
 	else
 	{
@@ -40,8 +55,6 @@ CLStatus CLProtocolDataPoster::PostProtoData(CLIOVector *pDataVec)//this dataVec
 		
 		return PostLeftProtoData();
 	}
-
-	return CLStatus(0, 0);
 }
 
 CLStatus CLProtocolDataPoster::PostData(CLIOVector *pDataVec)
@@ -54,29 +67,28 @@ CLStatus CLProtocolDataPoster::PostData(CLIOVector *pDataVec)
 	}
 	if(s1.m_clReturnCode == pDataVec->Length())
 	{
+		m_topMsgBufIndex = 0;
 		if(m_pEvent != NULL)
 		{
 			CLStatus s2 = m_pEvent->Set();
 			if(!s2.IsSuccess())
 				return CLStatus(-1, POST_DATA_ERROR);
 		}
-		pDataVec->FreeAndPopAll();
-		delete pDataVec;
+		// pDataVec->FreeAndPopAll();
+		// delete pDataVec;
 
 		return CLStatus(0, POST_DATA_COMPLETE);
 	}
 	else if(s1.m_clReturnCode < pDataVec->Length())
 	{
-		m_topMsgBufIndex = s1.m_clReturnCode;
+		m_topMsgBufIndex += s1.m_clReturnCode;
 	
-		m_MsgBufVecList.push_front(pDataVec);
+		//m_MsgBufVecList.push_front(pDataVec);
 
 		m_bDataLeftFlag = true;
 		
 		return CLStatus(-1, POST_DATA_PARTION);
 	}
-
-	return CLStatus(0, 0);
 }
 
 CLStatus CLProtocolDataPoster::PostLeftProtoData()
@@ -91,11 +103,18 @@ CLStatus CLProtocolDataPoster::PostLeftProtoData()
 		CLStatus s = PostData(&partDataVec);
 		if(s.IsSuccess())
 		{
+			pTopDataVec->FreeAndPopAll();
+			delete pTopDataVec;
 			if(m_MsgBufVecList.empty())
 			{
 				m_bDataLeftFlag = false;
 				return s;
 			}
+		}
+		else if(s.m_clErrorCode == POST_DATA_PARTION)
+		{
+			m_MsgBufVecList.push_front(pTopDataVec);
+			return s;
 		}
 		else
 		{

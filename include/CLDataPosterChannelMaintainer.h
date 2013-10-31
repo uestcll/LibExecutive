@@ -4,6 +4,8 @@
 #include "CLStatus.h"
 #include "CLIOVector.h"
 
+class CLDataPoster;
+
 class CLDataPosterChannelMaintainer
 {
 public:
@@ -11,9 +13,8 @@ public:
 	virtual ~CLDataPosterChannelMaintainer();
 
 public:
-	virtual CLStatus Initialize(CLProtocolDataPoster *pProtoDataPoster, void *pContext) = 0;
+	virtual CLStatus Initialize(void *pContext) = 0;
 	virtual CLStatus UnInitialize(void *pContext) = 0;
-	virtual CLStatus PostData(CLIOVector &dataVec) = 0;
 	virtual CLDataPoster* GetDataPoster() = 0;
 
 private:

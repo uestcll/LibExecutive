@@ -7,7 +7,8 @@ class CLDataPosterChannelMaintainer;
 class CLMessageSerializer;
 class CLProtocolEncapsulator;
 class CLMessage;
-
+class CLEvent;
+class CLProtocolDataPoster;
 
 class CLMessagePoster
 {
@@ -25,6 +26,7 @@ private:
 	CLMessageSerializer *m_pMsgSerializer;
 	CLProtocolEncapsulator *m_pProtoEncapsulator;
 	CLProtocolDataPoster *m_pProtoDataPoster;
+	CLEvent	*m_pEvent;
 };
 
 
