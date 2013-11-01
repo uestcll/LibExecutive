@@ -94,6 +94,14 @@ CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLMessage
 	SLMessagePosterPtrCount *p = new SLMessagePosterPtrCount;
 	p->pMsgPoster = pMsgPoster;
 	p->nCount = 1;
+
+	CLStatus s1 = pMsgPoster->Initialize(0);
+
+	if(!s1.IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLExecutiveNameServer::Register(), pMsgPoster->Initialize() error", 0);
+		return s1;
+	}
 	
 	m_NameTable[strExecutiveName] = p;
 	
@@ -161,7 +169,17 @@ CLStatus CLExecutiveNameServer::ReleaseCommunicationPtr(const char* strExecutive
 	}
 
 	if(pTmp != 0)
+	{
+		CLStatus s1 = pTmp->UnInitialize(0);
 		delete pTmp;
+
+		if(!s1.IsSuccess())
+		{
+			CLLogger::WriteLogMsg("In CLExecutiveNameServer::Register(), pTmp->Initialize() error", 0);
+			return s1;
+		}
+		
+	}
 		
 	return CLStatus(0, 0);
 }

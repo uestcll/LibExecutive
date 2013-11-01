@@ -63,7 +63,7 @@ CLStatus CLIOVector::PushBack(char* pBuffer, int bufLen)
 	}
 	struct iovec item;
 	item.iov_base = pBuffer;
-	item.iov_len = bufLen;
+	item.iov_len = (size_t)bufLen;
 
 	m_ioVecQueue.push_back(item);
 
@@ -80,7 +80,7 @@ CLStatus CLIOVector::PushFront(char* pBuffer, int bufLen)
 		return CLStatus(-1, 0);
 	}
 	struct iovec item;
-	item.iov_base = pBuffer;
+	item.iov_base = (void *)pBuffer;
 	item.iov_len = bufLen;
 
 	m_ioVecQueue.push_front(item);
@@ -254,7 +254,7 @@ CLStatus CLIOVector::FreeAndPopAll()
 	// for(; it != m_ioVecQueue.end(); it++)
 	// {
 	// 	delete [] (char *)(it->iov_base);
-	// 	it->iov_base = NULL;
+	// 	it->iov_base = (void *)NULL;
 	// }
 
 	return CLStatus(0, 0);
@@ -385,7 +385,7 @@ struct iovec* CLIOVector::GetIOVecStructs() const
 
 	for(int i = 0; i < num; i++)
 	{	
-		pSIOVecs[i].iov_base = it->iov_base;
+		pSIOVecs[i].iov_base = (void *)it->iov_base;
 		pSIOVecs[i].iov_len = it->iov_len;
 		++it;		
 	}

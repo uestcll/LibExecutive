@@ -13,7 +13,16 @@ CLPointerMsgSerializer::~CLPointerMsgSerializer()
 
 CLStatus CLPointerMsgSerializer::Serialize(CLMessage *pMsg, CLIOVector *pDataVec)
 {
-	char *buf = (char*)&pMsg;
+	if((pMsg == 0) || (pDataVec == 0))
+    {
+        CLLogger::WriteLogMsg("In CLPointerMsgSerializer::Serialize(), parameters error", 0);
+        return CLStatus(-1, 0);
+    }
 
-	return (pDataVec->PushBack(buf, sizeof(pMsg)));
+    char *p = new char[sizeof(CLMessage *)];
+    *((unsigned long *)p) = (unsigned long)pMsg; //where to delete msg
+
+    pDataVec->PushBack(p, sizeof(CLMessage *));
+    
+    return CLStatus(0, 0);
 }

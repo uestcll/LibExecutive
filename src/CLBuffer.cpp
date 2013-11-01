@@ -8,11 +8,11 @@ CLBuffer::CLBuffer(int itemSize) : m_iItemSize(itemSize), m_ciDataStartIndex(m_i
 
 	m_iSumBufferLen = m_iDataStartIndex = m_iUsedBufferLen = 0;
 
-	// CLStatus s = NewBuffer(itemSize);
-	// if(!s.IsSuccess())
-	// {
-	// 		throw "In CLBuffer::CLBuffer(int itemSize) new buffer error!";
-	// }
+	CLStatus s = NewBuffer(itemSize);
+	if(!s.IsSuccess())
+	{
+			throw "In CLBuffer::CLBuffer(int itemSize) new buffer error!";
+	}
 	//use the iovector , to push back into clbuffer,so do not need to new buffer at first
 	//or user to call the func NewBuffer themselves
 }

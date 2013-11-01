@@ -25,7 +25,7 @@ public:
 	CLMessageReceiver(CLDataReceiver *pDataReceiver, CLProtoParser *pProtoParser, CLMessageDeserializer *pMsgDeserializer);
 	virtual ~CLMessageReceiver();
 
-	CLStatus GetMessage(std::queue<CLMessage*> MessageQueue);
+	CLStatus GetMessage(std::queue<CLMessage*> &MessageQueue);
 private:
 	CLMessageReceiver(const CLMessageReceiver&);
 	CLMessageReceiver& operator=(const CLMessageReceiver&);

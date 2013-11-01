@@ -54,7 +54,7 @@ CLStatus CLMessagePoster::Initialize(void *pContext)
 {
 	CLStatus s = m_pDataPosterChannel->Initialize(pContext); //chang lianjie
 //deal with the socket connect and regist into epoll or sth else!!!
-	if(!s.IsSuccess());
+	if(!s.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLMessagePoster::Initialize(), m_pDataPosterChannel->init() error", 0);
 		return s;
@@ -92,7 +92,7 @@ CLStatus CLMessagePoster::UnInitialize(void *pContext)
 
 CLStatus CLMessagePoster::PostMessage(CLMessage* pMsg)
 {
-	CLIOVector *pDataVec;
+	CLIOVector *pDataVec = new CLIOVector();
 	CLStatus s = m_pMsgSerializer->Serialize(pMsg, pDataVec);
 	if(!s.IsSuccess())
 	{

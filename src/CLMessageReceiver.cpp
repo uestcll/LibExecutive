@@ -83,7 +83,7 @@ CLMessageReceiver::~CLMessageReceiver()
 	// }
 }
 
-CLStatus CLMessageReceiver::GetMessage(queue<CLMessage*> MessageQueue)
+CLStatus CLMessageReceiver::GetMessage(queue<CLMessage*> &MessageQueue)
 {
 	//CLIOVector revDataBufVec;
 	// CLStatus s1 = m_pDataReceiver->GetData(revDataBufVec);
