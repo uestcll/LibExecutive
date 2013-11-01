@@ -2,7 +2,7 @@
 #include "CLExecutiveNameServer.h"
 #include "CLCriticalSection.h"
 #include "CLLogger.h"
-#include "CLExecutiveCommunication.h"
+#include "CLMessagePoster.h"
 #include "CLMessage.h"
 #include "CLMutex.h"
 
@@ -36,18 +36,18 @@ CLStatus CLExecutiveNameServer::PostExecutiveMessage(const char* pstrExecutiveNa
 		return CLStatus(-1, 0);
 	}
 
-	CLExecutiveCommunication* pComm = pNameServer->GetCommunicationPtr(pstrExecutiveName);
-	if(pComm == 0)
+	CLMessagePoster* pMessagePoster = pNameServer->GetCommunicationPtr(pstrExecutiveName);
+	if(pMessagePoster == 0)
 	{
 		CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pNameServer->GetCommunicationPtr error", 0);
 		delete pMessage;
 		return CLStatus(-1, 0);
 	}	
 
-	CLStatus s = pComm->PostExecutiveMessage(pMessage);
+	CLStatus s = pMessagePoster->PostMessage(pMessage);
 	if(!s.IsSuccess())
 	{
-		CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pComm->PostExecutiveMessage error", 0);
+		CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pMessagePoster->PostExecutiveMessage error", 0);
 
 		CLStatus s1 = pNameServer->ReleaseCommunicationPtr(pstrExecutiveName);
 		if(!s1.IsSuccess())
@@ -63,14 +63,14 @@ CLStatus CLExecutiveNameServer::PostExecutiveMessage(const char* pstrExecutiveNa
 	return CLStatus(0, 0);
 }
 
-CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLExecutiveCommunication *pExecutiveCommunication)
+CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLMessagePoster *pMsgPoster)
 {
-	if(pExecutiveCommunication == 0)
+	if(pMsgPoster == 0)
 		return CLStatus(-1, 0);
 
 	if((strExecutiveName == 0) || (strlen(strExecutiveName) == 0))
 	{
-		delete pExecutiveCommunication;
+		delete pMsgPoster;
 		return CLStatus(-1, 0);
 	}
 
@@ -83,16 +83,16 @@ CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLExecuti
 		return CLStatus(-1, 0);
 	}
 	
-	std::map<std::string, SLExecutiveCommunicationPtrCount*>::iterator it = m_NameTable.find(strExecutiveName);	
+	std::map<std::string, SLMessagePosterPtrCount*>::iterator it = m_NameTable.find(strExecutiveName);	
 	if(it != m_NameTable.end())
 	{
-		delete pExecutiveCommunication;
+		delete pMsgPoster;
 		CLLogger::WriteLogMsg("In CLExecutiveNameServer::Register(), m_NameTable.find error", 0);
 		return CLStatus(-1, 0);
 	}
 	
-	SLExecutiveCommunicationPtrCount *p = new SLExecutiveCommunicationPtrCount;
-	p->pExecutiveCommunication = pExecutiveCommunication;
+	SLMessagePosterPtrCount *p = new SLMessagePosterPtrCount;
+	p->pMsgPoster = pMsgPoster;
 	p->nCount = 1;
 	
 	m_NameTable[strExecutiveName] = p;
@@ -100,7 +100,7 @@ CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLExecuti
 	return CLStatus(0, 0);
 }
 
-CLExecutiveCommunication* CLExecutiveNameServer::GetCommunicationPtr(const char* strExecutiveName)
+CLMessagePoster* CLExecutiveNameServer::GetCommunicationPtr(const char* strExecutiveName)
 {
 	if((strExecutiveName == 0) || (strlen(strExecutiveName) == 0))
 		return 0;
@@ -114,7 +114,7 @@ CLExecutiveCommunication* CLExecutiveNameServer::GetCommunicationPtr(const char*
 		return 0;
 	}
 
-	std::map<std::string, SLExecutiveCommunicationPtrCount*>::iterator it = m_NameTable.find(strExecutiveName);
+	std::map<std::string, SLMessagePosterPtrCount*>::iterator it = m_NameTable.find(strExecutiveName);
 	if(it == m_NameTable.end())
 	{
 		CLLogger::WriteLogMsg("In CLExecutiveNameServer::GetCommunicationPtr(), m_NameTable.find error", 0);
@@ -123,7 +123,7 @@ CLExecutiveCommunication* CLExecutiveNameServer::GetCommunicationPtr(const char*
 
 	it->second->nCount++;
 
-	return it->second->pExecutiveCommunication;
+	return it->second->pMsgPoster;
 }
 
 CLStatus CLExecutiveNameServer::ReleaseCommunicationPtr(const char* strExecutiveName)
@@ -131,7 +131,7 @@ CLStatus CLExecutiveNameServer::ReleaseCommunicationPtr(const char* strExecutive
 	if((strExecutiveName == 0) || (strlen(strExecutiveName) == 0))
 		return CLStatus(-1, 0);
 
-	CLExecutiveCommunication *pTmp = 0;
+	CLMessagePoster *pTmp = 0;
 	
 	{
 		CLMutex mutex(&m_Mutex);	
@@ -143,7 +143,7 @@ CLStatus CLExecutiveNameServer::ReleaseCommunicationPtr(const char* strExecutive
 			return CLStatus(-1, 0);
 		}
 
-		std::map<std::string, SLExecutiveCommunicationPtrCount*>::iterator it = m_NameTable.find(strExecutiveName);
+		std::map<std::string, SLMessagePosterPtrCount*>::iterator it = m_NameTable.find(strExecutiveName);
 		if(it == m_NameTable.end())
 		{
 			CLLogger::WriteLogMsg("In CLExecutiveNameServer::ReleaseCommunicationPtr(), m_NameTable.find error", 0);
@@ -154,7 +154,7 @@ CLStatus CLExecutiveNameServer::ReleaseCommunicationPtr(const char* strExecutive
 
 		if(it->second->nCount == 0)
 		{
-			pTmp = it->second->pExecutiveCommunication;
+			pTmp = it->second->pMsgPoster;
 			delete it->second;
 			m_NameTable.erase(it);
 		}

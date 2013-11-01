@@ -56,22 +56,37 @@ CLStatus CLMessageLoopManager::EnterMessageLoop(void *pContext)
 	}
 
 	para->pNotifier->NotifyInitialFinished(true);
+
+	bool bQuitLoop = false;
 	
 	while(true)
 	{
-		CLMessage *pMsg = WaitForMessage();
-		if(pMsg == 0)
+		CLStatus s3 = WaitForMessage();
+		if(!s3.IsSuccess())
 		{
-			CLLogger::WriteLogMsg("In CLMessageLoopManager::EnterMessageLoop(), pMsg == 0", 0);
+			CLLogger::WriteLogMsg("In CLMessageLoopManager::EnterMessageLoop(), WaitForMessage() error", 0);
 			continue;
 		}
-		
-		CLStatus s3 = DispatchMessage(pMsg);
+		while(!m_MessageQueue.empty())
+		{
+			CLMessage* pMsg = m_MessageQueue.front();
+			m_MessageQueue.pop();
 
-		delete pMsg;
+			if(pMsg != 0)
+			{
+				CLStatus s4 = DispatchMessage(pMsg);
 
-		if(s3.m_clReturnCode == QUIT_MESSAGE_LOOP)
-			break;
+				delete pMsg;
+
+				if(s4.m_clReturnCode == QUIT_MESSAGE_LOOP)
+				{
+					bQuitLoop = true;
+					break;
+				}
+			}
+		}
+		if(bQuitLoop)
+			break;	
 	}
 
 	CLStatus s4 = Uninitialize();

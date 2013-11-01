@@ -7,10 +7,11 @@
 #include "CLIOVector.h"
 #include "CLProtocolDataPoster.h"
 #include "CLEvent.h"
+#include "CLDataPoster.h"
 
 CLMessagePoster::CLMessagePoster(CLDataPosterChannelMaintainer *pDataPosterChannel, CLMessageSerializer *pMsgSerializer, CLProtocolEncapsulator *pProtoEncapsulator, CLEvent *pEvent)
 {
-	if(pDataPoster == 0 || pMsgSerializer == 0)
+	if(pDataPosterChannel == 0 || pMsgSerializer == 0)
 		throw "In CLMessagePoster::CLMessagePoster(), parameters is error";
 
 	m_pDataPosterChannel = pDataPosterChannel;
@@ -78,7 +79,7 @@ CLStatus CLMessagePoster::Initialize(void *pContext)
 
 CLStatus CLMessagePoster::UnInitialize(void *pContext)
 {
-	CLStatus s = m_pDataPosterChannel->Uninitialize(pContext);
+	CLStatus s = m_pDataPosterChannel->UnInitialize(pContext);
 
 	if(!s.IsSuccess())
 	{
@@ -99,14 +100,16 @@ CLStatus CLMessagePoster::PostMessage(CLMessage* pMsg)
 		return s;
 	}
 
-	CLStatus s2 = m_pProtoEncapsulator->Encapsulate(pDataVec);
-
-	if(!s2.IsSuccess())
+	if(m_pProtoEncapsulator)
 	{
-		CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), m_pProtoEncapsulator->Encapsulate() error", 0);
-		return s2;
-	}
+		CLStatus s2 = m_pProtoEncapsulator->Encapsulate(pDataVec);
 
+		if(!s2.IsSuccess())
+		{
+			CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), m_pProtoEncapsulator->Encapsulate() error", 0);
+			return s2;
+		}
+	}
 	// CLStatus s3 = m_pDataPosterChannel->PostData();
 	CLStatus s3 = m_pProtoDataPoster->PostProtoData(pDataVec);
 	if(!s3.IsSuccess() && (s3.m_clErrorCode == POST_DATA_ERROR))
@@ -119,7 +122,7 @@ CLStatus CLMessagePoster::PostMessage(CLMessage* pMsg)
 CLStatus CLMessagePoster::PostLeftMessage()
 {
 	CLStatus s = m_pProtoDataPoster->PostLeftProtoData();
-	if(!s.IsSuccess() && (s.m_clErrorCode == POST_DATA_ERROR)
+	if(!s.IsSuccess() && (s.m_clErrorCode == POST_DATA_ERROR))
 		CLLogger::WriteLogMsg("In CLMessagePoster::PostLeftMessage(), m_pProtoDataPoster->PostLeftProtoData() error", 0);
 
 	return s;

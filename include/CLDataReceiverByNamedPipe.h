@@ -9,7 +9,7 @@ class CLBuffer;
 class CLDataReceiverByNamedPipe : public CLDataReceiver
 {
 public:
-	CLDataReceiverByNamedPipe(const char *pStrPipeName);
+	CLDataReceiverByNamedPipe(const char *pStrPipeName, bool isSharedPipe = false);
 	virtual ~CLDataReceiverByNamedPipe();
 
 	virtual CLStatus GetData(CLBuffer *pBuffer);

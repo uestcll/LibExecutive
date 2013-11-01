@@ -1,6 +1,8 @@
 #include "CLProtocolDataPoster.h"
 #include "CLLogger.h"
 #include "CLEvent.h"
+#include "CLDataPoster.h"
+#include "CLIOVector.h"
 
 using namespace std;
 
@@ -9,7 +11,7 @@ CLProtocolDataPoster::CLProtocolDataPoster() : m_topMsgBufIndex(0), m_pDataPoste
 
 }
 
-CLProtocolDataPsoter::~CLProtocolDataPoster()
+CLProtocolDataPoster::~CLProtocolDataPoster()
 {
 	if(m_pDataPoster)
 	{	

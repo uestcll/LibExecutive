@@ -1,7 +1,5 @@
 #include "CLDataPosterChannelByNamedPipeMaintainer.h"
 #include "CLLogger.h"
-#include "CLEpollWapper.h"
-#include "CLNamedPipe.h"
 #include "CLProtocolDataPoster.h"
 #include "CLDataPosterByNamedPipe.h"
 /*

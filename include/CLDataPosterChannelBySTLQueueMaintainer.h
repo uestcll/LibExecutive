@@ -9,7 +9,7 @@ class CLEvent;
 class CLDataPosterChannelBySTLQueueMaintainer : public CLDataPosterChannelMaintainer
 {
 public:
-	CLDataPosterChannelBySTLQueueMaintainer(CLSTLQueue *pQueue, CLEvent *pEvent);
+	CLDataPosterChannelBySTLQueueMaintainer(CLSTLQueue *pQueue);
 	virtual ~CLDataPosterChannelBySTLQueueMaintainer();
 
 public:

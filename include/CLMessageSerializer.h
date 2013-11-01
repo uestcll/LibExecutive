@@ -1,6 +1,8 @@
 #ifndef CLMessageSerializer_H
 #define CLMessageSerializer_H
 
+#include "CLStatus.h"
+
 class CLMessage;
 class CLIOVector;
 

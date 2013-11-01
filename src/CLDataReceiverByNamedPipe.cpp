@@ -4,7 +4,7 @@
 #include "CLLogger.h"
 #include "CLIOVector.h"
 
-CLDataReceiverByNamedPipe::CLDataReceiverByNamedPipe(const char *pStrPipeName) : m_NamedPipe(pStrPipeName, PIPE_FOR_READ)
+CLDataReceiverByNamedPipe::CLDataReceiverByNamedPipe(const char *pStrPipeName, bool isSharedPipe) : m_NamedPipe(pStrPipeName, isSharedPipe, PIPE_FOR_READ)
 {
 	m_lMaxSizeForPipe = m_NamedPipe.GetAtomWriteSize();
 }

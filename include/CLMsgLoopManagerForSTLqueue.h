@@ -4,8 +4,10 @@
 #include <string>
 #include "CLMessageLoopManager.h"
 #include "CLEvent.h"
+#include "CLMessageReceiver.h"
 
-class CLMessageReceiverBySTLqueue;
+class CLSTLQueue;
+class CLEvent;
 
 class CLMsgLoopManagerForSTLqueue : public CLMessageLoopManager
 {
@@ -20,7 +22,7 @@ protected:
 	virtual CLStatus Initialize();
 	virtual CLStatus Uninitialize();
 	
-	virtual CLMessage* WaitForMessage();
+	virtual CLStatus WaitForMessage();
 
 private:
 	CLMsgLoopManagerForSTLqueue(const CLMsgLoopManagerForSTLqueue&);
@@ -29,7 +31,8 @@ private:
 private:
 	CLMessageReceiver *m_pMsgReceiver;
 	std::string m_strThreadName;
-	CLEvent     m_Event;
+	CLEvent     *m_pEvent;
+	CLSTLQueue *m_pStlQueue;
 };
 
 #endif

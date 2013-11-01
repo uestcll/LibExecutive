@@ -1,7 +1,7 @@
 #ifndef CLMESSAGEPOSTER_H
 #define CLMESSAGEPOSTER_H
 
-#incldue "CLStatus.h"
+#include "CLStatus.h"
 
 class CLDataPosterChannelMaintainer;
 class CLMessageSerializer;
@@ -13,7 +13,7 @@ class CLProtocolDataPoster;
 class CLMessagePoster
 {
 public:
-	CLMessagePoster(CLDataPosterChannelMaintainer *pDataPosterChannel, CLMessageSerializer *pMsgSerializer, CLProtocolEncapsulator *pProtoEncapsulator);
+	CLMessagePoster(CLDataPosterChannelMaintainer *pDataPosterChannel, CLMessageSerializer *pMsgSerializer, CLProtocolEncapsulator *pProtoEncapsulator, CLEvent *pEvent);
 	virtual ~CLMessagePoster();
 
 	CLStatus Initialize(void *pContext);

@@ -21,7 +21,7 @@ CLBuffer::~CLBuffer()
 {
 	if(m_pIOBufferVec != NULL)
 	{
-		m_pIOBufferVec->FreeAll();
+		m_pIOBufferVec->FreeAndPopAll();
 		delete m_pIOBufferVec;
 		m_pIOBufferVec = NULL;
 	}

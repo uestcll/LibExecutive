@@ -2,11 +2,10 @@
 #define CLDATAPOSTERCHANNELBYNAMEDPIPEMAINTAINER_H
 
 #include "CLDataPosterChannelMaintainer.h"
-
+#include "CLNamedPipe.h"
 // #define PIPE_QUEUE_BETWEEN_PROCESS 0
 // #define PIPE_QUEUE_IN_PROCESS 1
 
-class CLNamdePipe;
 
 class CLDataPosterChannelByNamedPipeMaintainer : public CLDataPosterChannelMaintainer
 {
