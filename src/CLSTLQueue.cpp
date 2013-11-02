@@ -3,6 +3,7 @@
 #include "CLCriticalSection.h"
 #include "CLMessage.h"
 #include "CLLogger.h"
+#include <iostream>
 
 CLSTLQueue::CLSTLQueue()
 {
@@ -11,14 +12,16 @@ CLSTLQueue::CLSTLQueue()
 
 CLSTLQueue::~CLSTLQueue()
 {
+    std::cout<<"In ~CLSTLQueue()"<<endl;
     while(1)
     {
         CLMessage* p = PopMessage();
-        if(p == NULL)
+        if(p == 0)
             break;
         
         delete p;
     }
+    std::cout<<"In ~CLSTLQueue()!"<<endl;
 }
 
 CLMessage* CLSTLQueue::PopMessage()

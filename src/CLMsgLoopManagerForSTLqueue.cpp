@@ -25,6 +25,7 @@ CLMsgLoopManagerForSTLqueue::CLMsgLoopManagerForSTLqueue(CLMessageObserver *pMsg
 
 CLMsgLoopManagerForSTLqueue::~CLMsgLoopManagerForSTLqueue()
 {
+    delete m_pMsgReceiver;
 }
 
 CLStatus CLMsgLoopManagerForSTLqueue::Initialize()

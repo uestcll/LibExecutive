@@ -11,11 +11,11 @@ CLDataReceiverBySTLQueue::CLDataReceiverBySTLQueue(CLSTLQueue* pDataSTLQueue)
 
 CLDataReceiverBySTLQueue::~CLDataReceiverBySTLQueue()
 {
-    if (m_pDataSTLQueue != NULL)
-    {
-        delete m_pDataSTLQueue;
-        m_pDataSTLQueue = NULL;
-    }
+//    if(m_pDataSTLQueue)
+  //  {
+    //    delete m_pDataSTLQueue;
+      //  m_pDataSTLQueue = NULL;
+   // }/
 }
 
 CLStatus CLDataReceiverBySTLQueue::GetData(CLBuffer *pBuffer)

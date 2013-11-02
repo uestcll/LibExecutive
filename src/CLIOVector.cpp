@@ -294,6 +294,7 @@ CLStatus CLIOVector::ReadData(char* pBuffer, const int& index, const int& len)
 	}
 	else
 	{
+        memcpy(pBuffer, pBuf, continuiousLen);
 		int nread = continuiousLen;
 		int nstart = index + continuiousLen;
 	
@@ -319,7 +320,8 @@ CLStatus CLIOVector::ReadData(char* pBuffer, const int& index, const int& len)
 CLStatus CLIOVector::WriteData(char* pBuffer, const int& index, const int& len)
 {
 	char* pBuf;
-	int bufLen = GetBufPtr(index, &pBuf);
+    int newIndex = index;
+	int bufLen = GetBufPtr(newIndex, &pBuf);
 
 	if(len <= bufLen)
 	{
@@ -335,7 +337,8 @@ CLStatus CLIOVector::WriteData(char* pBuffer, const int& index, const int& len)
 			{
 				memcpy(pBuf, pBuffer + nwrite, bufLen);	
 				nwrite += bufLen;
-				bufLen = GetBufPtr(index, &pBuf);//buflen change to a new space len, pBuf alse
+                newIndex += bufLen;
+				bufLen = GetBufPtr(newIndex, &pBuf);//buflen change to a new space len, pBuf alse
 			}
 			else
 			{

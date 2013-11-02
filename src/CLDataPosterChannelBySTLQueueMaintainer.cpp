@@ -16,10 +16,10 @@ CLDataPosterChannelBySTLQueueMaintainer::CLDataPosterChannelBySTLQueueMaintainer
 
 CLDataPosterChannelBySTLQueueMaintainer::~CLDataPosterChannelBySTLQueueMaintainer()
 {
-	if(m_pQueue != 0)
+	if(m_pQueue)
 	{
 		delete m_pQueue;
-		m_pQueue = 0;
+		m_pQueue = NULL;
 	}
 }
 

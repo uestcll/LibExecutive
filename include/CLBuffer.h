@@ -2,7 +2,7 @@
 #define CLBUFFER_H
 
 #include "CLStatus.h"
-#define DEAFULT_BUFFER_LENGTH 4096
+#define DEAFULT_BUFFER_LENGTH 7
 #define MINIMUN_BUFFER_LENGTH 512
 
 class CLIOVector;
