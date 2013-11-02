@@ -10,6 +10,7 @@
 #include "CLMessagePoster.h"
 #include "CLDataPosterChannelBySTLQueueMaintainer.h"
 #include "CLPointerMsgSerializer.h"
+#include "CLProtoParserForPointerMsg.h"
 
 CLMsgLoopManagerForSTLqueue::CLMsgLoopManagerForSTLqueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName) : CLMessageLoopManager(pMsgObserver)
 {
@@ -19,7 +20,7 @@ CLMsgLoopManagerForSTLqueue::CLMsgLoopManagerForSTLqueue(CLMessageObserver *pMsg
 	m_strThreadName = pstrThreadName;
 	m_pStlQueue = new CLSTLQueue();
 	m_pEvent = new CLEvent(true);
-	m_pMsgReceiver = new CLMessageReceiver(new CLDataReceiverBySTLQueue(m_pStlQueue), NULL, new CLPointerMsgDeserializer());
+	m_pMsgReceiver = new CLMessageReceiver(new CLDataReceiverBySTLQueue(m_pStlQueue), new CLProtoParserForPointerMsg(), new CLPointerMsgDeserializer());
 }
 
 CLMsgLoopManagerForSTLqueue::~CLMsgLoopManagerForSTLqueue()

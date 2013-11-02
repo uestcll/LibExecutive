@@ -30,26 +30,34 @@ CLIOVector::CLIOVector(const CLIOVector& rhs)
 {
 	this->m_iDataLength = rhs.Length();
 
-	struct iovec* pVec = rhs.GetIOVecStructs();
-	for(int i = 0; i < rhs.IOVecNum(); i++)
+	if(rhs.IOVecNum() > 0)
 	{
-		(this->m_ioVecQueue).push_back(pVec[i]);
-	}
+		struct iovec* pVec = rhs.GetIOVecStructs();
 
-	delete [] pVec;
+		for(int i = 0; i < rhs.IOVecNum(); i++)
+		{
+			(this->m_ioVecQueue).push_back(pVec[i]);
+		}
+
+		delete [] pVec;
+	}
 }
 
 CLIOVector& CLIOVector::operator=(const CLIOVector& rhs)
 {
 	this->m_iDataLength = rhs.Length();
 
-	struct iovec* pVec = rhs.GetIOVecStructs();
-	for(int i = 0; i < rhs.IOVecNum(); i++)
+	if(rhs.IOVecNum() > 0)
 	{
-		(this->m_ioVecQueue).push_back(pVec[i]);
-	}
+		struct iovec* pVec = rhs.GetIOVecStructs();
 
-	delete [] pVec;
+		for(int i = 0; i < rhs.IOVecNum(); i++)
+		{
+			(this->m_ioVecQueue).push_back(pVec[i]);
+		}
+
+		delete [] pVec;
+	}
 
 	return *this;
 }
@@ -267,6 +275,7 @@ CLStatus CLIOVector::PopAll()
 	{
 		m_ioVecQueue.pop_back();
 	}
+	m_iDataLength = 0;
 
 	return CLStatus(0, 0);
 }
@@ -371,6 +380,29 @@ CLStatus CLIOVector::PushBackIOVecs(CLIOVector& IOVector)
 	}
 	return CLStatus(0, 0);
 }
+
+// CLStatus CLIOVector::GetIOVecStructs(struct iovec** ppSIOVecs) const
+// {
+// 	int num = m_ioVecQueue.size();
+// 	if(num == 0)
+// 	{
+// 		*ppSIOVecs = NULL;
+// 		return CLStatus(0, 0);
+// 	}
+// 	struct iovec *pSIOVecs = *ppSIOVecs;
+// 	pSIOVecs = new struct iovec [num];
+
+// 	deque<struct iovec>::const_iterator it = m_ioVecQueue.begin();
+
+// 	for(int i = 0; i < num; i++)
+// 	{	
+// 		pSIOVecs[i].iov_base = (void *)it->iov_base;
+// 		pSIOVecs[i].iov_len = it->iov_len;
+// 		++it;		
+// 	}
+
+// 	return CLStatus(0, 0); 
+// }
 
 struct iovec* CLIOVector::GetIOVecStructs() const
 {

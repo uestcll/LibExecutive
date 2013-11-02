@@ -12,7 +12,7 @@ public:
 	CLMultiMsgDeserializer();
 	virtual ~CLMultiMsgDeserializer();
 
-	virtual CLStatus Deserialize(CLIOVector dataVec, CLMessage **pMsg);
+	virtual CLStatus Deserialize(CLIOVector &dataVec, CLMessage **pMsg);
 
 	CLStatus RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer);
 	CLStatus UnRegisterDeserializer(unsigned long lMsgID);

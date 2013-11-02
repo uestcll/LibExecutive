@@ -18,9 +18,9 @@ public:
 	virtual ~CLProtoParser();
 
 public:
-	CLStatus Decapsulate(CLBuffer* pBuffer, vector<CLIOVector *> vSerializedMsgs);
+	CLStatus Decapsulate(CLBuffer* pBuffer, vector<CLIOVector *> &vSerializedMsgs);
 
-	virtual CLStatus DecapsulateMsg(CLIOVector& dataVec, vector<CLIOVector *> vSerializedMsgs) = 0;
+	virtual CLStatus DecapsulateMsg(CLIOVector& dataVec, vector<CLIOVector *> &vSerializedMsgs) = 0;
 
 };
 

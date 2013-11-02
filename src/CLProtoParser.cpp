@@ -14,7 +14,7 @@ CLProtoParser::~CLProtoParser()
 
 }
 
-CLStatus CLProtoParser::Decapsulate(CLBuffer* pBuffer, vector<CLIOVector *> vSerializedMsgs)
+CLStatus CLProtoParser::Decapsulate(CLBuffer* pBuffer, vector<CLIOVector *> &vSerializedMsgs)
 {	
 	int decapsulateStartIndex = pBuffer->DataStartIndex();
 	CLIOVector dataVec;

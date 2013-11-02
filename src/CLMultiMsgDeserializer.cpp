@@ -12,7 +12,7 @@ CLMultiMsgDeserializer::~CLMultiMsgDeserializer()
 
 }
 
-CLStatus CLMultiMsgDeserializer::Deserialize(CLIOVector dataVec, CLMessage **pMsg)
+CLStatus CLMultiMsgDeserializer::Deserialize(CLIOVector &dataVec, CLMessage **pMsg)
 {
 	const unsigned int msgIDLen = sizeof(unsigned long);
 

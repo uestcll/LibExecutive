@@ -1,7 +1,7 @@
 libexecutive.a : CLConditionVariable.o CLCriticalSection.o CLEvent.o CLExecutive.o CLExecutiveCommunication.o CLExecutiveCommunicationByNamedPipe.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessageSerializer.o   CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o CLPrivateExecutiveCommunicationByNamedPipe.o CLProcess.o CLProcessFunctionForExec.o CLSharedConditionVariableImpl.o CLSharedEventImpl.o CLSharedMemory.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLStatus.o CLThread.o CLThreadInitialFinishedNotifier.o  CLBuffer.o CLDataReceiver.o CLDataReceiverBySTLQueue.o CLMessageReceiver.o CLIOVector.o CLSTLQueue.o CLProtoParser.o CLPointerMsgDeserializer.o CLDataReceiverByNamedPipe.o \
-CLNamedPipe.o CLProtoParserForSharedPipe.o CLMultiMsgDeserializer.o CLDataPoster.o CLDataPosterBySTLQueue.o CLDataPosterByNamedPipe.o CLDataPosterChannelMaintainer.o CLDataPosterChannelByNamedPipeMaintainer.o CLDataPosterChannelBySTLQueueMaintainer.o CLProtocolDataPoster.o CLProtocolEncapsulator.o CLMessagePoster.o CLPointerMsgSerializer.o CLMsgLoopManagerForSTLqueue.o 
+CLNamedPipe.o CLProtoParserForSharedPipe.o CLMultiMsgDeserializer.o CLDataPoster.o CLDataPosterBySTLQueue.o CLDataPosterByNamedPipe.o CLDataPosterChannelMaintainer.o CLDataPosterChannelByNamedPipeMaintainer.o CLDataPosterChannelBySTLQueueMaintainer.o CLProtocolDataPoster.o CLProtocolEncapsulator.o CLMessagePoster.o CLPointerMsgSerializer.o CLMsgLoopManagerForSTLqueue.o CLProtoParserForPointerMsg.o 
 	ar -rc libexecutive.a CLConditionVariable.o CLCriticalSection.o CLEvent.o CLExecutive.o CLExecutiveCommunication.o CLExecutiveCommunicationByNamedPipe.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessageSerializer.o  CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o  CLPrivateExecutiveCommunicationByNamedPipe.o  CLProcess.o CLProcessFunctionForExec.o CLSharedConditionVariableImpl.o CLSharedEventImpl.o CLSharedMemory.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLStatus.o CLThread.o CLThreadInitialFinishedNotifier.o CLBuffer.o CLDataReceiver.o CLDataReceiverBySTLQueue.o CLMessageReceiver.o CLIOVector.o CLSTLQueue.o CLProtoParser.o CLPointerMsgDeserializer.o CLDataReceiverByNamedPipe.o \
-CLNamedPipe.o CLProtoParserForSharedPipe.o CLMultiMsgDeserializer.o CLDataPoster.o CLDataPosterBySTLQueue.o CLDataPosterByNamedPipe.o CLDataPosterChannelMaintainer.o CLDataPosterChannelByNamedPipeMaintainer.o CLDataPosterChannelBySTLQueueMaintainer.o CLProtocolDataPoster.o CLProtocolEncapsulator.o CLMessagePoster.o CLPointerMsgSerializer.o CLMsgLoopManagerForSTLqueue.o 
+CLNamedPipe.o CLProtoParserForSharedPipe.o CLMultiMsgDeserializer.o CLDataPoster.o CLDataPosterBySTLQueue.o CLDataPosterByNamedPipe.o CLDataPosterChannelMaintainer.o CLDataPosterChannelByNamedPipeMaintainer.o CLDataPosterChannelBySTLQueueMaintainer.o CLProtocolDataPoster.o CLProtocolEncapsulator.o CLMessagePoster.o CLPointerMsgSerializer.o CLMsgLoopManagerForSTLqueue.o CLProtoParserForPointerMsg.o 
 	rm *.o
 
 
@@ -70,6 +70,10 @@ CLMessagePoster.o : ./src/CLMessagePoster.cpp
 
 CLPointerMsgSerializer.o : ./src/CLPointerMsgSerializer.cpp
 	g++ -o CLPointerMsgSerializer.o -c ./src/CLPointerMsgSerializer.cpp -I ./include -g
+
+CLProtoParserForPointerMsg.o : ./src/CLProtoParserForPointerMsg.cpp
+	g++ -o CLProtoParserForPointerMsg.o -c ./src/CLProtoParserForPointerMsg.cpp -I ./include -g
+
 
 
 CLConditionVariable.o : ./src/CLConditionVariable.cpp
