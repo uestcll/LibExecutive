@@ -10,6 +10,7 @@
 #include "CLIOVectors.h"
 #include "CLCriticalSection.h"
 #include "CLMutex.h"
+#include "DefinitionForConst.h"
 
 using namespace std;
 

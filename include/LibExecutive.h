@@ -1,6 +1,7 @@
 #ifndef LIBEXECUTIVE_H
 #define LIBEXECUTIVE_H
 
+#include "DefinitionForConst.h"
 #include "CLStatus.h"
 #include "CLLogger.h"
 #include "CLMutex.h"
@@ -10,8 +11,6 @@
 #include "CLThread.h"
 #include "CLExecutiveFunctionForMsgLoop.h"
 #include "CLMsgLoopManagerForSTLqueue.h"
-#include "CLMessageQueueBySTLqueue.h"
-#include "CLThreadCommunicationBySTLqueue.h"
 #include "CLThreadInitialFinishedNotifier.h"
 #include "CLMessage.h"
 #include "CLMessageObserver.h"
@@ -28,17 +27,12 @@
 #include "CLSharedObjectAllocator.h"
 #include "CLProcess.h"
 #include "CLProcessFunctionForExec.h"
-#include "CLMessageQueueByNamedPipe.h"
 #include "CLMessageDeserializer.h"
-#include "CLMsgLoopManagerForPipeQueue.h"
 #include "CLMessageSerializer.h"
-#include "CLExecutiveCommunicationByNamedPipe.h"
-#include "CLPrivateExecutiveCommunicationByNamedPipe.h"
-#include "CLSharedExecutiveCommunicationByNamedPipe.h"
 #include "CLSharedMutexImpl.h"
 #include "CLSharedConditionVariableImpl.h"
 #include "CLSharedEventImpl.h"
-#include "CLSharedMsgQueueByNamedPipe.h"
-#include "CLPrivateMsgQueueByNamedPipe.h"
+#include "CLIOVectors.h"
+#include "CLIteratorForIOVectors.h"
 
 #endif

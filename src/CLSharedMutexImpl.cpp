@@ -1,7 +1,6 @@
 #include "CLSharedMutexImpl.h"
 #include "CLLogger.h"
-
-#define SHARED_SPACE_FOR_SHARED_MUTEX_ALLOCATOR "shared_space_for_shared_mutex_allocator"
+#include "DefinitionForConst.h"
 
 CLSharedMutexImpl::CLSharedMutexImpl()
 {

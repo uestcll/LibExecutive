@@ -1,6 +1,5 @@
 #include "CLSharedEventImpl.h"
-
-#define SHARED_SPACE_FOR_SHARED_EVENT_ALLOCATOR "shared_space_for_shared_event_allocator"
+#include "DefinitionForConst.h"
 
 CLSharedEventImpl::CLSharedEventImpl()
 {

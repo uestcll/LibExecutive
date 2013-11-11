@@ -4,6 +4,7 @@
 #include "CLMutexByRecordLocking.h"
 #include "CLMutexByRecordLockingAndPThread.h"
 #include "CLMutexBySharedPThread.h"
+#include "DefinitionForConst.h"
 
 CLMutex::CLMutex()
 {
@@ -12,6 +13,7 @@ CLMutex::CLMutex()
 	if(!(m_pMutex->Initialize()).IsSuccess())
 	{
 		delete m_pMutex;
+		CLLogger::WriteLogMsg("In CLMutex::CLMutex(), Initialize error", 0);
 		throw "In CLMutex::CLMutex(), Initialize error";
 	}
 }
@@ -23,6 +25,7 @@ CLMutex::CLMutex(pthread_mutex_t *pMutex)
 	if(!(m_pMutex->Initialize()).IsSuccess())
 	{
 		delete m_pMutex;
+		CLLogger::WriteLogMsg("In CLMutex::CLMutex() 2, Initialize error", 0);
 		throw "In CLMutex::CLMutex(), Initialize error";
 	}
 }
@@ -47,6 +50,7 @@ CLMutex::CLMutex(const char *pstrFileName, int nType)
 	if(!(m_pMutex->Initialize()).IsSuccess())
 	{
 		delete m_pMutex;
+		CLLogger::WriteLogMsg("In CLMutex::CLMutex() 3, Initialize error", 0);
 		throw "In CLMutex::CLMutex(), Initialize error";
 	}
 }
@@ -58,24 +62,37 @@ CLMutex::CLMutex(const char *pstrFileName, pthread_mutex_t *pMutex)
 	if(!(m_pMutex->Initialize()).IsSuccess())
 	{
 		delete m_pMutex;
+		CLLogger::WriteLogMsg("In CLMutex::CLMutex() 4, Initialize error", 0);
 		throw "In CLMutex::CLMutex(), Initialize error";
 	}
 }
 
 CLMutex::~CLMutex()
 {
-	m_pMutex->Uninitialize();
+	if(!(m_pMutex->Uninitialize().IsSuccess()))
+		CLLogger::WriteLogMsg("In CLMutex::~CLMutex(), Uninitialize error", 0);
+
 	delete m_pMutex;
 }
 
 CLStatus CLMutex::Lock()
 {
-	return m_pMutex->Lock();
+	CLStatus s = m_pMutex->Lock();
+
+	if(!s.IsSuccess())
+		CLLogger::WriteLogMsg("In CLMutex::Lock(), Lock error", 0);
+
+	return s;
 }
 
 CLStatus CLMutex::Unlock()
 {
-	return m_pMutex->Unlock();
+	CLStatus s = m_pMutex->Unlock();
+
+	if(!s.IsSuccess())
+		CLLogger::WriteLogMsg("In CLMutex::Unlock(), Unock error", 0);
+
+	return s;
 }
 
 CLMutexInterface *CLMutex::GetMutexInterface()

@@ -4,6 +4,7 @@
 #include "CLSharedEventImpl.h"
 #include "CLSharedObjectAllocator.h"
 #include "CLSharedEventImpl.h"
+#include "DefinitionForConst.h"
 
 CLEvent::CLEvent()
 {

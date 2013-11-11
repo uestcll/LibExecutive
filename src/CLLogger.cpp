@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "CLLogger.h"
+#include "DefinitionForConst.h"
 
-#define LOG_FILE_NAME "logger"
 #define MAX_SIZE 265
 
 CLLogger* CLLogger::m_pLog = 0;

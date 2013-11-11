@@ -1,7 +1,6 @@
 #include "CLSharedConditionVariableImpl.h"
 #include "CLLogger.h"
-
-#define SHARED_SPACE_FOR_SHARED_CONDITION_VARIABLE_ALLOCATOR "shared_space_for_shared_condition_variable_allocator"
+#include "DefinitionForConst.h"
 
 CLSharedConditionVariableImpl::CLSharedConditionVariableImpl()
 {

@@ -8,12 +8,9 @@
 #include "CLSharedMemory.h"
 #include "CLLogger.h"
 #include "CLCriticalSection.h"
+#include "DefinitionForConst.h"
 
 using namespace std;
-
-#define ID_FOR_KEY 32
-
-#define FILE_PATH_FOR_SHARED_MEMORY "/tmp/"
 
 CLSharedMemory::CLSharedMemory(const char *pstrFileName, size_t nSize) : m_Mutex(pstrFileName, MUTEX_USE_RECORD_LOCK)
 {

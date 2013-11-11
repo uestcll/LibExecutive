@@ -2,18 +2,10 @@
 #define CLSharedObjectsImpl_H
 
 #include <string>
+#include "DefinitionForConst.h"
 #include "CLStatus.h"
 
 using namespace std;
-
-#define LENGTH_OF_SHARED_OBJECT_NAME 256
-
-#define UNINITIALIZED_SHARED_OBJECT 0
-#define INITIALIZED_SHARED_OBJECT 1
-#define ALLOCATED_SHARED_OBJECT 2
-
-#define NUMBER_OF_SHARED_OBJECT 1024
-#define MAGIC_NUMBER_FOR_SHARED_OBJECT 0x12345678
 
 class CLSharedMemory;
 

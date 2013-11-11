@@ -4,11 +4,10 @@
 #include <errno.h>
 #include <string>
 #include "CLMutexByRecordLocking.h"
+#include "DefinitionForConst.h"
 #include "CLLogger.h"
 
 using namespace std;
-
-#define FILE_PATH_FOR_RECORD_LOCKING "/tmp/"
 
 CLMutexByRecordLocking::CLMutexByRecordLocking(const char *pstrFileName)
 {

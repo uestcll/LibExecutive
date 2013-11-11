@@ -10,10 +10,7 @@
 #include "CLSharedEventImpl.h"
 #include "CLLogger.h"
 #include "CLStatus.h"
-
-#define MUTEX_FOR_SHARED_CONDITION_VARIABLE_ALLOCATOR "mutex_for_shared_condition_variable_allocator"
-#define MUTEX_FOR_SHARED_MUTEX_ALLOCATOR "mutex_for_shared_mutex_allocator"
-#define MUTEX_FOR_SHARED_EVENT_ALLOCATOR "mutex_for_shared_event_allocator"
+#include "DefinitionForConst.h"
 
 template<typename TSharedObjectPool, typename TSharedObject>
 class CLSharedObjectAllocator
@@ -94,7 +91,10 @@ CLSharedObjectAllocator<TSharedObjectPool, TSharedObject>::CLSharedObjectAllocat
 	delete mutex;
 
 	if(isReturn)
+	{
+		CLLogger::WriteLogMsg("In CLSharedEventAllocator::CLSharedEventAllocator(), m_pImpl->Initialize error", 0);
 		throw "In CLSharedEventAllocator::CLSharedEventAllocator(), m_pImpl->Initialize error";
+	}
 }
 
 template<typename TSharedObjectPool, typename TSharedObject>
