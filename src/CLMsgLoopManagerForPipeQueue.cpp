@@ -11,6 +11,7 @@
 #include "CLMessagePoster.h"
 #include "CLDataPosterChannelByNamedPipeMaintainer.h"
 #include "CLPointerMsgSerializer.h"
+#include "CLMessage.h"
 
 CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName, int PipeQueueType, CLMultiMsgDeserializer *pMultiMsgDeserializer) : CLMessageLoopManager(pMsgObserver)
 {
@@ -76,6 +77,25 @@ CLStatus CLMsgLoopManagerForPipeQueue::Uninitialize()
 {
 	if(m_pMultiMsgDeserializer)
 		return CLStatus(0, 0);
+
+/*清理private pipe里面剩余的msg pointer，进行del*/
+	CLStatus s = m_pMsgReceiver->GetMessage(m_MessageQueue);
+	if(!s.IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLMsgLoopManagerForPipeQueue::Uninitialize(), m_pMsgReceiver->GetMessage() error", 0);
+		return s;
+	}
+
+	while(!m_MessageQueue.empty())
+	{
+		CLMessage* pMsg = m_MessageQueue.front();
+		m_MessageQueue.pop();
+
+		if(pMsg)
+			delete pMsg;
+	}
+
+/*end*/
 
 	CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
 	if(pNameServer == 0)

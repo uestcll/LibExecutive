@@ -110,6 +110,9 @@ CLStatus CLMessageReceiver::GetMessage(queue<CLMessage*> &MessageQueue)
 	// 	return s;
 	// }
 
+	if(m_pDataBuffer->DataStartIndex() == m_pDataBuffer->UsedBufferLen())
+		return CLStatus(0, 0);
+	
 	if(m_pProtoParser != NULL)
 	{
 		vector<CLIOVector *> vSerializedMsgs;

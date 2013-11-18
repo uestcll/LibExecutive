@@ -32,6 +32,8 @@ CLNamedPipe::CLNamedPipe(const char* pStrPipeName, bool isShared, int flag)
 
 CLNamedPipe::~CLNamedPipe()
 {
+	close(m_Fd);
+	
 	if(m_pMutexForNamedPipe != 0)
 	{
 		delete m_pMutexForNamedPipe;

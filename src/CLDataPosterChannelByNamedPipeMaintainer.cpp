@@ -2,6 +2,7 @@
 #include "CLLogger.h"
 #include "CLProtocolDataPoster.h"
 #include "CLDataPosterByNamedPipe.h"
+#include "CLMessage.h"
 /*
 deal with the namedpipe free
 */
@@ -25,6 +26,19 @@ CLDataPosterChannelByNamedPipeMaintainer::CLDataPosterChannelByNamedPipeMaintain
 
 CLDataPosterChannelByNamedPipeMaintainer::~CLDataPosterChannelByNamedPipeMaintainer()
 {
+	// while(1)
+	// {
+	// 	CLMessage *pMsg;
+	// 	pMsg = NULL;
+
+	// 	CLStatus s = m_pNamedPipe->Read((char*)&pMsg, sizeof(CLMessage *));
+	// 	if(s.m_clReturnCode <= 0)
+	// 	{
+	// 		break;
+	// 	}
+	// 	delete pMsg;
+	// }
+
 	if(m_pNamedPipe)
 		delete m_pNamedPipe;
 }

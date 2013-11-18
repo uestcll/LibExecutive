@@ -16,11 +16,7 @@ CLDataPosterChannelBySTLQueueMaintainer::CLDataPosterChannelBySTLQueueMaintainer
 
 CLDataPosterChannelBySTLQueueMaintainer::~CLDataPosterChannelBySTLQueueMaintainer()
 {
-	if(m_pQueue)
-	{
-		delete m_pQueue;
-		m_pQueue = NULL;
-	}
+	
 }
 
 CLStatus CLDataPosterChannelBySTLQueueMaintainer::Initialize(void *pContext)
