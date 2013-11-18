@@ -30,12 +30,12 @@ CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(CLMessageObserver *pM
 		{
 			m_pMultiMsgDeserializer = new CLMultiMsgDeserializer();
 		}
-		m_pMsgReceiver = new CLMessageReceiver(new CLDataReceiverByNamedPipe(m_strThreadName, true), new CLProtoParserForSharedPipe(), m_pMultiMsgDeserializer);
+		m_pMsgReceiver = new CLMessageReceiver(new CLDataReceiverByNamedPipe(m_strThreadName.c_str(), true), new CLProtoParserForSharedPipe(), m_pMultiMsgDeserializer);
 	}
 	else if(PipeQueueType == PIPE_QUEUE_IN_PROCESS)
 	{
 		m_pMultiMsgDeserializer = NULL;
-		m_pMsgReceiver = new CLMessageReceiver(new CLDataReceiverByNamedPipe(m_strThreadName, false), new CLProtoParserForPointerMsg(), new CLPointerMsgDeserializer());
+		m_pMsgReceiver = new CLMessageReceiver(new CLDataReceiverByNamedPipe(m_strThreadName.c_str()), new CLProtoParserForPointerMsg(), new CLPointerMsgDeserializer());
 	}
 	else
 		throw "In CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(), PipeQueueType error";
@@ -100,9 +100,14 @@ CLStatus CLMsgLoopManagerForPipeQueue::WaitForMessage()
 
 CLStatus CLMsgLoopManagerForPipeQueue::RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer)
 {
-	CLSharedMsgQueueByNamedPipe *pQueue = dynamic_cast<CLSharedMsgQueueByNamedPipe *>(m_pMsgQueue);
-	if(pQueue != 0)
-		return pQueue->RegisterDeserializer(lMsgID, pDeserializer);
-	else
+	if(!m_pMultiMsgDeserializer)
 		return CLStatus(-1, 0);
+	
+	CLStatus s = m_pMultiMsgDeserializer->RegisterDeserializer(lMsgID, pDeserializer);
+	if(!s.IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLMsgLoopManagerForPipeQueue::RegisterDeserializer(), m_pMultiMsgDeserializer->RegisterDeserializer() error", 0);
+		return s;
+	}
+	return CLStatus(0, 0);
 }

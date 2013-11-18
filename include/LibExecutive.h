@@ -10,6 +10,7 @@
 #include "CLThread.h"
 #include "CLExecutiveFunctionForMsgLoop.h"
 #include "CLMsgLoopManagerForSTLqueue.h"
+#include "CLMsgLoopManagerForPipeQueue.h"
 #include "CLThreadCommunicationBySTLqueue.h"
 #include "CLThreadInitialFinishedNotifier.h"
 #include "CLMessage.h"

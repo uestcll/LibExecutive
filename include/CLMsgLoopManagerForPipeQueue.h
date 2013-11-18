@@ -3,6 +3,7 @@
 
 #include <string>
 #include "CLMessageLoopManager.h"
+#include "CLMsgLoopManagerForPipeQueue.h"
 #include "CLEvent.h"
 #include "CLMessageReceiver.h"
 
