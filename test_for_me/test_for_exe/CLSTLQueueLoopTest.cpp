@@ -41,7 +41,7 @@ public:
 
 	CLStatus On_3(CLMessage *pm)
 	{
-		std::cout<<"the msg ID is (2)"<<(pm->m_clMsgID)<<endl;
+		std::cout<<"the msg ID is (3)"<<(pm->m_clMsgID)<<endl;
 		g3 = true;
 		return CLStatus(QUIT_MESSAGE_LOOP, 0);
 	}

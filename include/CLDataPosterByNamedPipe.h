@@ -7,7 +7,7 @@
 class CLDataPosterByNamedPipe : public CLDataPoster
 {
 public:
-	// CLDataPosterByNamedPipe(const char* strPipeName, int pipeType);
+	CLDataPosterByNamedPipe(const char* strPipeName, int pipeType);
 	CLDataPosterByNamedPipe(CLNamedPipe *pipe);
 	virtual ~CLDataPosterByNamedPipe();
 

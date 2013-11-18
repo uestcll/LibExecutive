@@ -1,48 +1,70 @@
 #include <string.h>
 #include "CLMsgLoopManagerForPipeQueue.h"
-#include "CLMessageQueueByNamedPipe.h"
 #include "CLLogger.h"
-#include "CLSharedMsgQueueByNamedPipe.h"
-#include "CLPrivateMsgQueueByNamedPipe.h"
 #include "CLExecutiveNameServer.h"
-#include "CLPrivateExecutiveCommunicationByNamedPipe.h"
+#include "CLMultiMsgDeserializer.h"
+#include "CLMessageReceiver.h"
+#include "CLDataReceiverByNamedPipe.h"
+#include "CLProtoParserForPointerMsg.h"
+#include "CLProtoParserForSharedPipe.h"
+#include "CLPointerMsgDeserializer.h"
+#include "CLMessagePoster.h"
+#include "CLDataPosterChannelByNamedPipeMaintainer.h"
+#include "CLPointerMsgSerializer.h"
 
-CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName, int PipeQueueType) : CLMessageLoopManager(pMsgObserver)
+CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName, int PipeQueueType, CLMultiMsgDeserializer *pMultiMsgDeserializer) : CLMessageLoopManager(pMsgObserver)
 {
 	if((pstrThreadName == 0) || (strlen(pstrThreadName) == 0))
 		throw "In CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(), pstrThreadName error";
 
 	m_strThreadName = pstrThreadName;
-
+	m_pEvent = new CLEvent(true);
+	
 	if(PipeQueueType == PIPE_QUEUE_BETWEEN_PROCESS)
-		m_pMsgQueue = new CLSharedMsgQueueByNamedPipe(pstrThreadName);
+	{
+		if(pMultiMsgDeserializer)
+		{
+			m_pMultiMsgDeserializer = pMultiMsgDeserializer;
+		}
+		else
+		{
+			m_pMultiMsgDeserializer = new CLMultiMsgDeserializer();
+		}
+		m_pMsgReceiver = new CLMessageReceiver(new CLDataReceiverByNamedPipe(m_strThreadName, true), new CLProtoParserForSharedPipe(), m_pMultiMsgDeserializer);
+	}
 	else if(PipeQueueType == PIPE_QUEUE_IN_PROCESS)
-		m_pMsgQueue = new CLPrivateMsgQueuebyNamedPipe(pstrThreadName);
+	{
+		m_pMultiMsgDeserializer = NULL;
+		m_pMsgReceiver = new CLMessageReceiver(new CLDataReceiverByNamedPipe(m_strThreadName, false), new CLProtoParserForPointerMsg(), new CLPointerMsgDeserializer());
+	}
 	else
 		throw "In CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(), PipeQueueType error";
 }
 
 CLMsgLoopManagerForPipeQueue::~CLMsgLoopManagerForPipeQueue()
 {
-	delete m_pMsgQueue;
+	delete m_pMsgReceiver;
 }
 
 CLStatus CLMsgLoopManagerForPipeQueue::Initialize()
 {
-	CLPrivateMsgQueuebyNamedPipe *pQueue = dynamic_cast<CLPrivateMsgQueuebyNamedPipe *>(m_pMsgQueue);
-	if(pQueue == 0)
+	if(m_pMultiMsgDeserializer)
 		return CLStatus(0, 0);
 
 	CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
 	if(pNameServer == 0)
 	{
+		delete m_pMsgReceiver;
+		m_pMsgReceiver = 0;
 		CLLogger::WriteLogMsg("In CLMsgLoopManagerForPipeQueue::Initialize(), CLExecutiveNameServer::GetInstance error", 0);
 		return CLStatus(-1, 0);
 	}
 
-	CLStatus s = pNameServer->Register(m_strThreadName.c_str(), new CLPrivateExecutiveCommunicationByNamedPipe(m_strThreadName.c_str()));
+	CLStatus s = pNameServer->Register(m_strThreadName.c_str(), new CLMessagePoster(new CLDataPosterChannelByNamedPipeMaintainer(m_strThreadName.c_str()), new CLPointerMsgSerializer(), NULL, m_pEvent));
 	if(!s.IsSuccess())
 	{
+		delete m_pMsgReceiver;
+		m_pMsgReceiver = 0;
 		CLLogger::WriteLogMsg("In CLMsgLoopManagerForPipeQueue::Initialize(), pNameServer->Register error", 0);
 		return CLStatus(-1, 0);
 	}
@@ -52,8 +74,7 @@ CLStatus CLMsgLoopManagerForPipeQueue::Initialize()
 
 CLStatus CLMsgLoopManagerForPipeQueue::Uninitialize()
 {
-	CLPrivateMsgQueuebyNamedPipe *pQueue = dynamic_cast<CLPrivateMsgQueuebyNamedPipe *>(m_pMsgQueue);
-	if(pQueue == 0)
+	if(m_pMultiMsgDeserializer)
 		return CLStatus(0, 0);
 
 	CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
@@ -66,9 +87,15 @@ CLStatus CLMsgLoopManagerForPipeQueue::Uninitialize()
 	return pNameServer->ReleaseCommunicationPtr(m_strThreadName.c_str());
 }
 
-CLMessage* CLMsgLoopManagerForPipeQueue::WaitForMessage()
+CLStatus CLMsgLoopManagerForPipeQueue::WaitForMessage()
 {
-	return m_pMsgQueue->GetMessage();
+	CLStatus s = m_pEvent->Wait();
+	if(!s.IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLMsgLoopManagerForPipeQueue::WaitForMessage(), m_pEvent->Wait error", 0);
+		return s;
+	}
+	return m_pMsgReceiver->GetMessage(m_MessageQueue);
 }
 
 CLStatus CLMsgLoopManagerForPipeQueue::RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer)

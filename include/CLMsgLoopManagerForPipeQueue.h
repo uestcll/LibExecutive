@@ -3,11 +3,14 @@
 
 #include <string>
 #include "CLMessageLoopManager.h"
+#include "CLEvent.h"
+#include "CLMessageReceiver.h"
 
 using namespace std;
 
-class CLMessageQueueByNamedPipe;
 class CLMessageDeserializer;
+class CLMultiMsgDeserializer;
+class CLNamedPipe;
 
 #define PIPE_QUEUE_BETWEEN_PROCESS 0
 #define PIPE_QUEUE_IN_PROCESS 1
@@ -15,7 +18,7 @@ class CLMessageDeserializer;
 class CLMsgLoopManagerForPipeQueue : public CLMessageLoopManager
 {
 public:
-	CLMsgLoopManagerForPipeQueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName, int PipeQueueType);
+	CLMsgLoopManagerForPipeQueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName, int PipeQueueType, CLMultiMsgDeserializer *pMultiMsgDeserializer = NULL);
 	virtual ~CLMsgLoopManagerForPipeQueue();
 
 	CLStatus RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer);
@@ -24,15 +27,18 @@ protected:
 	virtual CLStatus Initialize();
 	virtual CLStatus Uninitialize();
 
-	virtual CLMessage* WaitForMessage();
+	virtual CLStatus WaitForMessage();
 
 private:
 	CLMsgLoopManagerForPipeQueue(const CLMsgLoopManagerForPipeQueue&);
 	CLMsgLoopManagerForPipeQueue& operator=(const CLMsgLoopManagerForPipeQueue&);
 
 private:
-	CLMessageQueueByNamedPipe *m_pMsgQueue;
+	CLMessageReceiver *m_pMsgReceiver;
 	string m_strThreadName;
+	CLEvent *m_pEvent;
+	// CLNamedPipe *m_pNamedPipe;
+	CLMultiMsgDeserializer *m_pMultiMsgDeserializer;	
 };
 
 #endif

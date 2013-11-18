@@ -75,7 +75,8 @@ CLStatus CLBuffer::WriteData(char* pBuffer, const int& len)
 	int diff = len - restBufLen;
 	if(diff > 0)
 	{
-		CLStatus s = NewBuffer(diff);
+		int tmpSize = (diff > m_iItemSize) ? diff : m_iItemSize;
+		CLStatus s = NewBuffer(tmpSize);
 		if(!s.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLBuffer::WriteData(), NewBuffer(0) error", 0);

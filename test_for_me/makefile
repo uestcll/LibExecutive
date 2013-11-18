@@ -1,11 +1,20 @@
-main : CLSTLQueueLoopTest.o CLConditionVariable.o CLCriticalSection.o CLEvent.o CLExecutive.o CLExecutiveCommunication.o CLExecutiveCommunicationByNamedPipe.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessageSerializer.o   CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o CLPrivateExecutiveCommunicationByNamedPipe.o CLProcess.o CLProcessFunctionForExec.o CLSharedConditionVariableImpl.o CLSharedEventImpl.o CLSharedMemory.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLStatus.o CLThread.o CLThreadInitialFinishedNotifier.o  CLBuffer.o CLDataReceiver.o CLDataReceiverBySTLQueue.o CLMessageReceiver.o CLIOVector.o CLSTLQueue.o CLProtoParser.o CLPointerMsgDeserializer.o CLDataReceiverByNamedPipe.o \
+main : ZTester.o CLMsgLoopManagerForSTLQueueTester.o  test.o  ATester.o CLConditionVariable.o CLCriticalSection.o CLEvent.o CLExecutive.o CLExecutiveCommunication.o CLExecutiveCommunicationByNamedPipe.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessageSerializer.o   CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o CLPrivateExecutiveCommunicationByNamedPipe.o CLProcess.o CLProcessFunctionForExec.o CLSharedConditionVariableImpl.o CLSharedEventImpl.o CLSharedMemory.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLStatus.o CLThread.o CLThreadInitialFinishedNotifier.o  CLBuffer.o CLDataReceiver.o CLDataReceiverBySTLQueue.o CLMessageReceiver.o CLIOVector.o CLSTLQueue.o CLProtoParser.o CLPointerMsgDeserializer.o CLDataReceiverByNamedPipe.o \
 CLNamedPipe.o CLProtoParserForSharedPipe.o CLMultiMsgDeserializer.o CLDataPoster.o CLDataPosterBySTLQueue.o CLDataPosterByNamedPipe.o CLDataPosterChannelMaintainer.o CLDataPosterChannelByNamedPipeMaintainer.o CLDataPosterChannelBySTLQueueMaintainer.o CLProtocolDataPoster.o CLProtocolEncapsulator.o CLMessagePoster.o CLPointerMsgSerializer.o CLMsgLoopManagerForSTLqueue.o CLProtoParserForPointerMsg.o
-	g++ -o main CLSTLQueueLoopTest.o  CLConditionVariable.o CLCriticalSection.o CLEvent.o CLExecutive.o CLExecutiveCommunication.o CLExecutiveCommunicationByNamedPipe.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessageSerializer.o   CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o CLPrivateExecutiveCommunicationByNamedPipe.o CLProcess.o CLProcessFunctionForExec.o CLSharedConditionVariableImpl.o CLSharedEventImpl.o CLSharedMemory.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLStatus.o CLThread.o CLThreadInitialFinishedNotifier.o  CLBuffer.o CLDataReceiver.o CLDataReceiverBySTLQueue.o CLMessageReceiver.o CLIOVector.o CLSTLQueue.o CLProtoParser.o CLPointerMsgDeserializer.o CLDataReceiverByNamedPipe.o \
-CLNamedPipe.o CLProtoParserForSharedPipe.o CLMultiMsgDeserializer.o CLDataPoster.o CLDataPosterBySTLQueue.o CLDataPosterByNamedPipe.o CLDataPosterChannelMaintainer.o CLDataPosterChannelByNamedPipeMaintainer.o CLDataPosterChannelBySTLQueueMaintainer.o CLProtocolDataPoster.o CLProtocolEncapsulator.o CLMessagePoster.o CLPointerMsgSerializer.o CLMsgLoopManagerForSTLqueue.o CLProtoParserForPointerMsg.o -g -lpthread
+	g++ -I../../gtest-1.6.0/include -o main ZTester.o CLMsgLoopManagerForSTLQueueTester.o test.o ATester.o CLConditionVariable.o CLCriticalSection.o CLEvent.o CLExecutive.o CLExecutiveCommunication.o CLExecutiveCommunicationByNamedPipe.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessageSerializer.o   CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o CLPrivateExecutiveCommunicationByNamedPipe.o CLProcess.o CLProcessFunctionForExec.o CLSharedConditionVariableImpl.o CLSharedEventImpl.o CLSharedMemory.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLStatus.o CLThread.o CLThreadInitialFinishedNotifier.o  CLBuffer.o CLDataReceiver.o CLDataReceiverBySTLQueue.o CLMessageReceiver.o CLIOVector.o CLSTLQueue.o CLProtoParser.o CLPointerMsgDeserializer.o CLDataReceiverByNamedPipe.o \
+CLNamedPipe.o CLProtoParserForSharedPipe.o CLMultiMsgDeserializer.o CLDataPoster.o CLDataPosterBySTLQueue.o CLDataPosterByNamedPipe.o CLDataPosterChannelMaintainer.o CLDataPosterChannelByNamedPipeMaintainer.o CLDataPosterChannelBySTLQueueMaintainer.o CLProtocolDataPoster.o CLProtocolEncapsulator.o CLMessagePoster.o CLPointerMsgSerializer.o CLMsgLoopManagerForSTLqueue.o CLProtoParserForPointerMsg.o ../../gtest-1.6.0/libgtest.a -g -lpthread
+	rm *.o
 
+ATester.o : ATester.cpp
+	g++ -I../../gtest-1.6.0/include -o ATester.o -c ATester.cpp -I../include -g
 
-CLSTLQueueLoopTest.o : CLSTLQueueLoopTest.cpp
-	g++ -o CLSTLQueueLoopTest.o -c CLSTLQueueLoopTest.cpp -I../include -g
+CLMsgLoopManagerForSTLQueueTester.o : CLMsgLoopManagerForSTLQueueTester.cpp
+	g++ -I../../gtest-1.6.0/include -o CLMsgLoopManagerForSTLQueueTester.o -c CLMsgLoopManagerForSTLQueueTester.cpp -I../include -g
+
+test.o : test.cpp
+	g++ -I../../gtest-1.6.0/include -o test.o -c test.cpp -I../include -g
+
+ZTester.o : ZTester.cpp
+	g++ -I../../gtest-1.6.0/include -o ZTester.o -c ZTester.cpp -I../include -g
 
 CLBuffer.o : ../src/CLBuffer.cpp
 	g++ -o CLBuffer.o -c ../src/CLBuffer.cpp -I../include -g
@@ -72,11 +81,9 @@ CLMessagePoster.o : ../src/CLMessagePoster.cpp
 
 CLPointerMsgSerializer.o : ../src/CLPointerMsgSerializer.cpp
 	g++ -o CLPointerMsgSerializer.o -c ../src/CLPointerMsgSerializer.cpp -I../include -g
-
+	
 CLProtoParserForPointerMsg.o : ../src/CLProtoParserForPointerMsg.cpp
 	g++ -o CLProtoParserForPointerMsg.o -c ../src/CLProtoParserForPointerMsg.cpp -I ../include -g
-
-
 
 
 CLConditionVariable.o : ../src/CLConditionVariable.cpp

@@ -12,7 +12,7 @@ CLSTLQueue::CLSTLQueue()
 
 CLSTLQueue::~CLSTLQueue()
 {
-    std::cout<<"In ~CLSTLQueue()"<<endl;
+    // std::cout<<"In ~CLSTLQueue()"<<endl;
     while(1)
     {
         CLMessage* p = PopMessage();
@@ -21,7 +21,7 @@ CLSTLQueue::~CLSTLQueue()
         
         delete p;
     }
-    std::cout<<"In ~CLSTLQueue()!"<<endl;
+    //std::cout<<"In ~CLSTLQueue()!"<<endl;
 }
 
 CLMessage* CLSTLQueue::PopMessage()

@@ -16,7 +16,7 @@ class CLIOVector;
 class CLNamedPipe
 {
 public:
-	CLNamedPipe(const char* pStrPipeName, bool isShared, int flag);
+	CLNamedPipe(const char* pStrPipeName, bool isShared, int flag);//flag is for read or write
 	// CLNamedPipe(const char* pStrPipeName, const char* pstrMutexName, int flag);
 	virtual ~CLNamedPipe();
 

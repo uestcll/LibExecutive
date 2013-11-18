@@ -5,19 +5,19 @@
 using namespace std;
 
 
-// CLDataPosterByNamedPipe::CLDataPosterByNamedPipe(const char* strPipeName, int pipeType))
-// {
-// 	if(strPipeName == 0)
-// 		throw "In CLDataPosterByNamedPipe::CLDataPosterByNamedPipe(), strPipeName == 0";
-// 	if(pipeType == PIPE_QUEUE_BETWEEN_PROCESS)
-// 	{
-// 		m_pNamedPipe = new CLNamedPipe(strPipeName, strPipeName, PIPE_FOR_WRITE);
-// 	}
-// 	else if(pipeType == PIPE_QUEUE_IN_PROCESS)
-// 	{
-// 		m_pNamedPipe = new CLNamedPipe(strPipeName, PIPE_FOR_WRITE);
-// 	}
-// }
+CLDataPosterByNamedPipe::CLDataPosterByNamedPipe(const char* strPipeName, int pipeType))
+{
+	if(strPipeName == 0)
+		throw "In CLDataPosterByNamedPipe::CLDataPosterByNamedPipe(), strPipeName == 0";
+	if(pipeType == PIPE_QUEUE_BETWEEN_PROCESS)
+	{
+		m_pNamedPipe = new CLNamedPipe(strPipeName, strPipeName, PIPE_FOR_WRITE);
+	}
+	else if(pipeType == PIPE_QUEUE_IN_PROCESS)
+	{
+		m_pNamedPipe = new CLNamedPipe(strPipeName, PIPE_FOR_WRITE);
+	}
+}
 
 CLDataPosterByNamedPipe::CLDataPosterByNamedPipe(CLNamedPipe *pipe) : m_pNamedPipe(pipe)
 {
