@@ -196,9 +196,9 @@ public:
 		CLMessage *p1 = new CLMsg2ForCLMsgLoopManagerForPipeQueue;
 		// EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p1).IsSuccess());
 		CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p1);
-		CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, new CLQuitMessage());
 
-		return CLStatus(0, 0);
+	   // CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, new CLQuitMessage());
+		return CLStatus(QUIT_MESSAGE_LOOP, 0);
 	}
 
 	CLStatus On_Quit(CLMessage *pm)
