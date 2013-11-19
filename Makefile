@@ -1,7 +1,7 @@
 libexecutive.a : CLConditionVariable.o CLCriticalSection.o CLEvent.o CLExecutive.o CLExecutiveCommunication.o CLExecutiveCommunicationByNamedPipe.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessageSerializer.o   CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o CLPrivateExecutiveCommunicationByNamedPipe.o CLProcess.o CLProcessFunctionForExec.o CLSharedConditionVariableImpl.o CLSharedEventImpl.o CLSharedMemory.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLStatus.o CLThread.o CLThreadInitialFinishedNotifier.o  CLBuffer.o CLDataReceiver.o CLDataReceiverBySTLQueue.o CLMessageReceiver.o CLIOVector.o CLSTLQueue.o CLProtoParser.o CLPointerMsgDeserializer.o CLDataReceiverByNamedPipe.o \
-CLNamedPipe.o CLProtoParserForSharedPipe.o CLMultiMsgDeserializer.o CLDataPoster.o CLDataPosterBySTLQueue.o CLDataPosterByNamedPipe.o CLDataPosterChannelMaintainer.o CLDataPosterChannelByNamedPipeMaintainer.o CLDataPosterChannelBySTLQueueMaintainer.o CLProtocolDataPoster.o CLProtocolEncapsulator.o CLMessagePoster.o CLPointerMsgSerializer.o CLMsgLoopManagerForSTLqueue.o CLProtoParserForPointerMsg.o CLMsgLoopManagerForPipeQueue.o
+CLNamedPipe.o CLProtoParserForDefaultMsgFormat.o CLProtoEncapForDefaultMsgFormat.o CLMultiMsgDeserializer.o CLMultiMsgSerializer.o CLDataPoster.o CLDataPosterBySTLQueue.o CLDataPosterByNamedPipe.o CLDataPosterChannelMaintainer.o CLDataPosterChannelByNamedPipeMaintainer.o CLDataPosterChannelBySTLQueueMaintainer.o CLProtocolDataPoster.o CLProtocolEncapsulator.o CLMessagePoster.o CLPointerMsgSerializer.o CLMsgLoopManagerForSTLqueue.o CLProtoParserForPointerMsg.o CLMsgLoopManagerForPipeQueue.o
 	ar -rc libexecutive.a CLConditionVariable.o CLCriticalSection.o CLEvent.o CLExecutive.o CLExecutiveCommunication.o CLExecutiveCommunicationByNamedPipe.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessageSerializer.o  CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o  CLPrivateExecutiveCommunicationByNamedPipe.o  CLProcess.o CLProcessFunctionForExec.o CLSharedConditionVariableImpl.o CLSharedEventImpl.o CLSharedMemory.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLStatus.o CLThread.o CLThreadInitialFinishedNotifier.o CLBuffer.o CLDataReceiver.o CLDataReceiverBySTLQueue.o CLMessageReceiver.o CLIOVector.o CLSTLQueue.o CLProtoParser.o CLPointerMsgDeserializer.o CLDataReceiverByNamedPipe.o \
-CLNamedPipe.o CLProtoParserForSharedPipe.o CLMultiMsgDeserializer.o CLDataPoster.o CLDataPosterBySTLQueue.o CLDataPosterByNamedPipe.o CLDataPosterChannelMaintainer.o CLDataPosterChannelByNamedPipeMaintainer.o CLDataPosterChannelBySTLQueueMaintainer.o CLProtocolDataPoster.o CLProtocolEncapsulator.o CLMessagePoster.o CLPointerMsgSerializer.o CLMsgLoopManagerForSTLqueue.o CLProtoParserForPointerMsg.o CLMsgLoopManagerForPipeQueue.o
+CLNamedPipe.o CLProtoParserForDefaultMsgFormat.o CLProtoEncapForDefaultMsgFormat.o CLMultiMsgDeserializer.o CLMultiMsgSerializer.o CLDataPoster.o CLDataPosterBySTLQueue.o CLDataPosterByNamedPipe.o CLDataPosterChannelMaintainer.o CLDataPosterChannelByNamedPipeMaintainer.o CLDataPosterChannelBySTLQueueMaintainer.o CLProtocolDataPoster.o CLProtocolEncapsulator.o CLMessagePoster.o CLPointerMsgSerializer.o CLMsgLoopManagerForSTLqueue.o CLProtoParserForPointerMsg.o CLMsgLoopManagerForPipeQueue.o
 	rm *.o
 
 
@@ -35,11 +35,17 @@ CLDataReceiverByNamedPipe.o : ./src/CLDataReceiverByNamedPipe.cpp
 CLNamedPipe.o : ./src/CLNamedPipe.cpp
 	g++ -o CLNamedPipe.o -c ./src/CLNamedPipe.cpp -I ./include -g
 
-CLProtoParserForSharedPipe.o : ./src/CLProtoParserForSharedPipe.cpp
-	g++ -o CLProtoParserForSharedPipe.o -c ./src/CLProtoParserForSharedPipe.cpp -I ./include -g
+CLProtoParserForDefaultMsgFormat.o : ./src/CLProtoParserForDefaultMsgFormat.cpp
+	g++ -o CLProtoParserForDefaultMsgFormat.o -c ./src/CLProtoParserForDefaultMsgFormat.cpp -I ./include -g
+
+CLProtoEncapForDefaultMsgFormat.o : ./src/CLProtoEncapForDefaultMsgFormat.cpp
+	g++ -o CLProtoEncapForDefaultMsgFormat.o -c ./src/CLProtoEncapForDefaultMsgFormat.cpp -I ./include -g
 
 CLMultiMsgDeserializer.o : ./src/CLMultiMsgDeserializer.cpp
 	g++ -o CLMultiMsgDeserializer.o -c ./src/CLMultiMsgDeserializer.cpp -I ./include -g
+
+CLMultiMsgSerializer.o : ./src/CLMultiMsgSerializer.cpp
+	g++ -o CLMultiMsgSerializer.o -c ./src/CLMultiMsgSerializer.cpp -I ./include -g
 
 CLDataPoster.o : ./src/CLDataPoster.cpp
 	g++ -o CLDataPoster.o -c ./src/CLDataPoster.cpp -I ./include -g

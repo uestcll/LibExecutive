@@ -8,6 +8,7 @@
 #include "CLProtocolDataPoster.h"
 #include "CLEvent.h"
 #include "CLDataPoster.h"
+#include "CLMultiMsgSerializer.h"
 
 CLMessagePoster::CLMessagePoster(CLDataPosterChannelMaintainer *pDataPosterChannel, CLMessageSerializer *pMsgSerializer, CLProtocolEncapsulator *pProtoEncapsulator, CLEvent *pEvent)
 {
@@ -126,4 +127,13 @@ CLStatus CLMessagePoster::PostLeftMessage()
 		CLLogger::WriteLogMsg("In CLMessagePoster::PostLeftMessage(), m_pProtoDataPoster->PostLeftProtoData() error", 0);
 
 	return s;
+}
+
+CLStatus CLMessagePoster::RegisterSerializer(unsigned long lMsgID, CLMessageSerializer *pSerializer)
+{
+	CLMultiMsgSerializer *pMultiSerializer = dynamic_cast<CLMultiMsgSerializer *>(m_pMsgSerializer);
+	if(pMultiSerializer == 0)
+		return CLStatus(0, 0);
+
+	return (pMultiSerializer->RegisterSerializer(lMsgID, pSerializer));
 }

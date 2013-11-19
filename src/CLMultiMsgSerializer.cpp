@@ -1,6 +1,7 @@
 #include "CLMultiMsgSerializer.h"
 #include "CLIOVector.h"
 #include "CLLogger.h"
+#include "CLMessage.h"
 
 using namespace std;
 

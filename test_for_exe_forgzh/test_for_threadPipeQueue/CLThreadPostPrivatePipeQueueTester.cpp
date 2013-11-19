@@ -1,4 +1,4 @@
-#include <gtest/gtest.h>
+#include <iostream>
 #include "LibExecutive.h"
 
 static const char *test_pipe_name = "test_for_CLMessageQueueByNamedPipe_PrivateQueueForSelfPostMsg";
@@ -11,6 +11,15 @@ static int g_for_msg1_dese = 0;
 static int g_for_msg2_dese = 0;
 static int g_for_msg1_se = 0;
 static int g_for_msg2_se = 0;
+
+class CLQuitMessage : public CLMessage
+{
+public:
+	CLQuitMessage() : CLMessage(100)
+	{}
+	virtual ~CLQuitMessage()
+	{}
+};
 
 class CLMsg1ForCLMsgLoopManagerForPipeQueue : public CLMessage
 {
@@ -88,7 +97,6 @@ public:
 	virtual char *Serialize(CLMessage *pMsg, unsigned int *pFullLength, unsigned int HeadLength)
 	{
 		CLMsg1ForCLMsgLoopManagerForPipeQueue *p = dynamic_cast<CLMsg1ForCLMsgLoopManagerForPipeQueue *>(pMsg);
-		EXPECT_TRUE(p != 0);
 
 		*pFullLength = HeadLength + 8 + 4 + 4;
 		char *pBuf = new char[*pFullLength];
@@ -117,7 +125,7 @@ public:
 	virtual char *Serialize(CLMessage *pMsg, unsigned int *pFullLength, unsigned int HeadLength)
 	{
 		CLMsg2ForCLMsgLoopManagerForPipeQueue *p = dynamic_cast<CLMsg2ForCLMsgLoopManagerForPipeQueue *>(pMsg);
-		EXPECT_TRUE(p != 0);
+
 
 		*pFullLength = HeadLength + 8 + 8 + 4;
 		char *pBuf = new char[*pFullLength];
@@ -147,12 +155,15 @@ public:
 	{
 		pMessageLoop->Register(1, (CallBackForMessageLoop)(&CLPrivateQueueForSelfPostMsg_CLMsgLoopManagerForPipeQueue::On_1));
 		pMessageLoop->Register(2, (CallBackForMessageLoop)(&CLPrivateQueueForSelfPostMsg_CLMsgLoopManagerForPipeQueue::On_2));
+		pMessageLoop->Register(100, (CallBackForMessageLoop)(&CLPrivateQueueForSelfPostMsg_CLMsgLoopManagerForPipeQueue::On_Quit));
 
 		CLMessage *p = new CLMsg1ForCLMsgLoopManagerForPipeQueue;
-		EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p).IsSuccess());
+		// EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p).IsSuccess());
+		CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p);
 
 		p = new CLMsg2ForCLMsgLoopManagerForPipeQueue;
-		EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p).IsSuccess());
+		// EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p).IsSuccess());
+		CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p);
 
 		return CLStatus(0, 0);
 	}
@@ -160,7 +171,11 @@ public:
 	CLStatus On_1(CLMessage *pm)
 	{
 		CLMsg1ForCLMsgLoopManagerForPipeQueue *p = dynamic_cast<CLMsg1ForCLMsgLoopManagerForPipeQueue*>(pm);
-		EXPECT_TRUE(p != 0);
+		if(p == 0)
+		{
+			std::cout<<"In CLPrivateQueueForSelfPostMsg_CLMsgLoopManagerForPipeQueue,  On_1(), the p == 0"<<std::endl;
+			return CLStatus(-1, 0);
+		}
 
 		g_for_on1++;
 
@@ -170,35 +185,28 @@ public:
 	CLStatus On_2(CLMessage *pm)
 	{
 		CLMsg2ForCLMsgLoopManagerForPipeQueue *p = dynamic_cast<CLMsg2ForCLMsgLoopManagerForPipeQueue*>(pm);
-		EXPECT_TRUE(p != 0);
+		if(p == 0)
+		{
+			std::cout<<"In CLPrivateQueueForSelfPostMsg_CLMsgLoopManagerForPipeQueue,  On_2(), the p == 0"<<std::endl;
+			return CLStatus(-1, 0);
+		}
 
 		g_for_on2++;
 
 		CLMessage *p1 = new CLMsg2ForCLMsgLoopManagerForPipeQueue;
-		EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p1).IsSuccess());
+		// EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p1).IsSuccess());
+		CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p1);
 
+	   // CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, new CLQuitMessage());
+		return CLStatus(QUIT_MESSAGE_LOOP, 0);
+	}
+
+	CLStatus On_Quit(CLMessage *pm)
+	{
+		std::cout<<"Quit!"<<std::endl;
 		return CLStatus(QUIT_MESSAGE_LOOP, 0);
 	}
 };
-
-TEST(CLMsgLoopManagerForPipeQueue, PrivateQueueForSelfPostMsg)
-{
-	CLMessageLoopManager *pM = new CLMsgLoopManagerForPipeQueue(new CLPrivateQueueForSelfPostMsg_CLMsgLoopManagerForPipeQueue, test_pipe_name, PIPE_QUEUE_IN_PROCESS);
-
-	SLExecutiveInitialParameter s;
-	s.pContext = 0;
-	CLThreadInitialFinishedNotifier notifier(0);
-	s.pNotifier = &notifier;
-
-	EXPECT_TRUE((pM->EnterMessageLoop(&s)).IsSuccess());
-
-	delete pM;
-
-	EXPECT_EQ(g_for_on1, 1);
-	EXPECT_EQ(g_for_on2, 1);
-	EXPECT_EQ(g_for_msg1, 1);
-	EXPECT_EQ(g_for_msg2, 2);
-}
 
 class CLThreadForTestingCLMsgLoopManagerForPipeQueue_PrivateQueueForPostMsg : public CLExecutiveFunctionProvider
 {
@@ -206,10 +214,12 @@ public:
 	virtual CLStatus RunExecutiveFunction(void* pContext)
 	{
 		CLMessage *p = new CLMsg1ForCLMsgLoopManagerForPipeQueue;
-		EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p).IsSuccess());
+		// EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p).IsSuccess());
+		CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p);
 
 		p = new CLMsg2ForCLMsgLoopManagerForPipeQueue;
-		EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p).IsSuccess());
+		// EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p).IsSuccess());
+		CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p);
 
 		return CLStatus(0, 0);
 	}
@@ -224,7 +234,8 @@ public:
 		pMessageLoop->Register(2, (CallBackForMessageLoop)(&CLPrivateQueueForPostMsg_CLMsgLoopManagerForPipeQueue::On_2));
 
 		CLThread *p = new CLThread(new CLThreadForTestingCLMsgLoopManagerForPipeQueue_PrivateQueueForPostMsg, false);
-		EXPECT_TRUE(p->Run().IsSuccess());
+		// EXPECT_TRUE(p->Run().IsSuccess());
+		p->Run();
 
 		return CLStatus(0, 0);
 	}
@@ -232,9 +243,14 @@ public:
 	CLStatus On_1(CLMessage *pm)
 	{
 		CLMsg1ForCLMsgLoopManagerForPipeQueue *p = dynamic_cast<CLMsg1ForCLMsgLoopManagerForPipeQueue*>(pm);
-		EXPECT_TRUE(p != 0);
+		// EXPECT_TRUE(p != 0);
+		if(p != 0)
+		{
+			std::cout<<"In On_1"<<std::endl;
 
-		g_for_on1++;
+			g_for_on1++;
+		}
+		
 
 		return CLStatus(0, 0);
 	}
@@ -242,16 +258,26 @@ public:
 	CLStatus On_2(CLMessage *pm)
 	{
 		CLMsg2ForCLMsgLoopManagerForPipeQueue *p = dynamic_cast<CLMsg2ForCLMsgLoopManagerForPipeQueue*>(pm);
-		EXPECT_TRUE(p != 0);
+		// EXPECT_TRUE(p != 0);
+		if(p != 0)
+		{
+			std::cout<<"In On_2"<<std::endl;
 
-		g_for_on2++;
-
+			g_for_on2++;
+		}
+		
 		return CLStatus(QUIT_MESSAGE_LOOP, 0);
 	}
 };
 
-TEST(CLMsgLoopManagerForPipeQueue, PrivateQueueForfPostMsg)
+int main()
 {
+    if(!CLLibExecutiveInitializer::Initialize().IsSuccess())
+   	{
+        cout<<"Initialize error"<<endl;
+        return 0;
+   	}
+
 	g_for_on1 = 0;
 	g_for_on2 = 0;
 	g_for_msg1 = 0;
@@ -264,14 +290,25 @@ TEST(CLMsgLoopManagerForPipeQueue, PrivateQueueForfPostMsg)
 	CLThreadInitialFinishedNotifier notifier(0);
 	s.pNotifier = &notifier;
 
-	EXPECT_TRUE((pM->EnterMessageLoop(&s)).IsSuccess());
+	// EXPECT_TRUE((pM->EnterMessageLoop(&s)).IsSuccess());
+	pM->EnterMessageLoop(&s);
 
 	delete pM;
 
-	EXPECT_EQ(g_for_on1, 1);
-	EXPECT_EQ(g_for_on2, 1);
-	EXPECT_EQ(g_for_msg1, 1);
-	EXPECT_EQ(g_for_msg2, 1);
+	std::cout<<"the g_for_on1 (1) is"<<g_for_on1<<std::endl;
+	std::cout<<"the g_for_on2 (1) is"<<g_for_on2<<std::endl;
+	std::cout<<"the g_for_msg1 (1) is"<<g_for_msg1<<std::endl;
+	std::cout<<"the g_for_msg2 (1) is"<<g_for_msg2<<std::endl;
+
+	if(!CLLibExecutiveInitializer::Destroy().IsSuccess())
+   	{
+            cout<<"Destroy error"<<endl;
+            return -1;
+   	}
+	// EXPECT_EQ(g_for_on1, 1);
+	// EXPECT_EQ(g_for_on2, 1);
+	// EXPECT_EQ(g_for_msg1, 1);
+	// EXPECT_EQ(g_for_msg2, 2);
+
+	return 0;
 }
-
-

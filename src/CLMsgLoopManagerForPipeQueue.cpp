@@ -6,7 +6,7 @@
 #include "CLMessageReceiver.h"
 #include "CLDataReceiverByNamedPipe.h"
 #include "CLProtoParserForPointerMsg.h"
-#include "CLProtoParserForSharedPipe.h"
+#include "CLProtoParserForDefaultMsgFormat.h"
 #include "CLPointerMsgDeserializer.h"
 #include "CLMessagePoster.h"
 #include "CLDataPosterChannelByNamedPipeMaintainer.h"
@@ -31,7 +31,7 @@ CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(CLMessageObserver *pM
 		{
 			m_pMultiMsgDeserializer = new CLMultiMsgDeserializer();
 		}
-		m_pMsgReceiver = new CLMessageReceiver(new CLDataReceiverByNamedPipe(m_strThreadName.c_str(), true), new CLProtoParserForSharedPipe(), m_pMultiMsgDeserializer);
+		m_pMsgReceiver = new CLMessageReceiver(new CLDataReceiverByNamedPipe(m_strThreadName.c_str(), true), new CLProtoParserForDefaultMsgFormat(), m_pMultiMsgDeserializer);
 	}
 	else if(PipeQueueType == PIPE_QUEUE_IN_PROCESS)
 	{
@@ -79,7 +79,7 @@ CLStatus CLMsgLoopManagerForPipeQueue::Uninitialize()
 		return CLStatus(0, 0);
 
 /*清理private pipe里面剩余的msg pointer，进行del*/
-	CLStatus s = m_pMsgReceiver->GetMessage(m_MessageQueue);
+/*	CLStatus s = m_pMsgReceiver->GetMessage(m_MessageQueue);
 	if(!s.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLMsgLoopManagerForPipeQueue::Uninitialize(), m_pMsgReceiver->GetMessage() error", 0);
@@ -94,7 +94,7 @@ CLStatus CLMsgLoopManagerForPipeQueue::Uninitialize()
 		if(pMsg)
 			delete pMsg;
 	}
-
+*/
 /*end*/
 
 	CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();

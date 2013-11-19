@@ -6,7 +6,7 @@
 /*
 deal with the namedpipe free
 */
-CLDataPosterChannelByNamedPipeMaintainer::CLDataPosterChannelByNamedPipeMaintainer(const char* pStrPipeName, bool isSharedPipe)
+CLDataPosterChannelByNamedPipeMaintainer::CLDataPosterChannelByNamedPipeMaintainer(const char* pStrPipeName, bool isSharedPipe) : m_bIsSharedPipe(isSharedPipe)
 {
 	if(!pStrPipeName)
 		throw "In CLDataPosterChannelByNamedPipeMaintainer::CLDataPosterChannelByNamedPipeMaintainer(), para error";
@@ -26,19 +26,6 @@ CLDataPosterChannelByNamedPipeMaintainer::CLDataPosterChannelByNamedPipeMaintain
 
 CLDataPosterChannelByNamedPipeMaintainer::~CLDataPosterChannelByNamedPipeMaintainer()
 {
-	// while(1)
-	// {
-	// 	CLMessage *pMsg;
-	// 	pMsg = NULL;
-
-	// 	CLStatus s = m_pNamedPipe->Read((char*)&pMsg, sizeof(CLMessage *));
-	// 	if(s.m_clReturnCode <= 0)
-	// 	{
-	// 		break;
-	// 	}
-	// 	delete pMsg;
-	// }
-
 	if(m_pNamedPipe)
 		delete m_pNamedPipe;
 }
@@ -55,7 +42,29 @@ CLStatus CLDataPosterChannelByNamedPipeMaintainer::Initialize(void *pContext)
 
 CLStatus CLDataPosterChannelByNamedPipeMaintainer::UnInitialize(void *pContext)
 {
-	return CLStatus(0, 0);
+	if(m_bIsSharedPipe)
+		return CLStatus(0, 0);
+
+	if(!(m_pNamedPipe->OpenRead()).IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLDataPosterChannelByNamedPipeMaintainer::UnInitialize(), (m_pNamedPipe->OpenRead()) error", 0);
+		return CLStatus(-1, 0);
+	}
+
+	while(1)
+	{
+		CLMessage *pMsg;
+		pMsg = NULL;
+
+		CLStatus s = m_pNamedPipe->Read((char*)&pMsg, sizeof(CLMessage *));
+		if(s.m_clReturnCode <= 0)
+		{
+			break;
+		}
+		delete pMsg;
+	}
+
+	return CLStatus(0, 0);	
 }
 
 CLDataPoster* CLDataPosterChannelByNamedPipeMaintainer::GetDataPoster()

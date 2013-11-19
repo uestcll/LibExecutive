@@ -46,7 +46,7 @@
 #include "CLPointerMsgDeserializer.h"
 #include "CLDataReceiverByNamedPipe.h"
 #include "CLNamedPipe.h"
-#include "CLProtoParserForSharedPipe.h"
+#include "CLProtoParserForDefaultMsgFormat.h"
 #include "CLMultiMsgDeserializer.h"
 #include "CLDataPoster.h"
 #include "CLDataPosterBySTLQueue.h"

@@ -20,6 +20,7 @@ public:
 	CLStatus PostMessage(CLMessage *pMsg);
 	CLStatus PostLeftMessage();
 	CLStatus UnInitialize(void *pContext);
+	CLStatus RegisterSerializer(unsigned long lMsgID, CLMessageSerializer *pSerializer);
 
 private:
 	CLDataPosterChannelMaintainer *m_pDataPosterChannel;

@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/uio.h>
+#include <iostream>
 #include "CLLogger.h"
 #include "CLNamedPipe.h"
 #include "CLStatus.h"
@@ -102,10 +103,17 @@ CLStatus CLNamedPipe::Read(char *pBuf, int length)
 
 	readLen = read(m_Fd, pBuf, length);
 
-	if(readLen == -1)
+	if(-1 == readLen)
 	{
-		CLLogger::WriteLogMsg("In CLNamedPipe::Read(), read error", errno);
-		return CLStatus(-1, errno);
+		if(EAGAIN == errno)
+		{
+			readLen = 0;
+		}
+		else
+		{
+			// std::cout<<"in pipe readv ,errno is"<<strerror(errno)<<std::endl;
+			CLLogger::WriteLogMsg("In CLNamedPipe::ReadVecs(), readv() error", errno);
+		}	
 	}
 
 	return CLStatus(readLen, 0);
@@ -145,13 +153,22 @@ CLStatus CLNamedPipe::ReadVecs(CLIOVector& dataVec)
 	}
 
 	readLen = readv(m_Fd, pDataVecStructs, dataVec.IOVecNum());
+
 	if(-1 == readLen)
 	{
-		CLLogger::WriteLogMsg("In CLNamedPipe::ReadVecs(), readv() error", 0);
-		return CLStatus(-1, 0);
+		if(EAGAIN == errno)
+		{
+			readLen = 0;
+		}
+		else
+		{
+			// std::cout<<"in pipe readv ,errno is"<<strerror(errno)<<std::endl;
+			CLLogger::WriteLogMsg("In CLNamedPipe::ReadVecs(), readv() error", errno);
+		}	
 	}
-
+	
 	delete [] pDataVecStructs;
+
 	return CLStatus(readLen, 0);
 }
 
@@ -176,4 +193,58 @@ CLStatus CLNamedPipe::WriteVecs(CLIOVector& dataVec)
 
 	delete [] pDataVecStructs;
 	return CLStatus(writeLen, 0);
+}
+
+CLStatus CLNamedPipe::OpenRead()
+{
+	if(0 > close(m_Fd))
+	{
+		CLLogger::WriteLogMsg("In CLNamedPipe::OpenRead(), close(m_Fd) error", errno);
+		return CLStatus(-1, 0);
+	}
+
+	m_Fd = open(m_strPipeName.c_str(), O_RDONLY | O_NONBLOCK);
+	if(m_Fd == -1)
+	{
+		CLLogger::WriteLogMsg("In CLNamedPipe::OpenRead(), for read open error", errno);
+		return CLStatus(-1, 0);
+	}
+
+	return CLStatus(0, 0);
+}
+
+CLStatus CLNamedPipe::OpenWrite()
+{
+	if(0 > close(m_Fd))
+	{
+		CLLogger::WriteLogMsg("In CLNamedPipe::OpenWrite(), close(m_Fd) error", errno);
+		return CLStatus(-1, 0);
+	}
+
+	m_Fd = open(m_strPipeName.c_str(), O_RDONLY | O_NONBLOCK);
+	if(m_Fd == -1)
+	{
+		CLLogger::WriteLogMsg("In CLNamedPipe::OpenWrite(), for read open error", errno);
+		return CLStatus(-1, 0);
+	}
+
+	return CLStatus(0, 0);
+}
+
+CLStatus CLNamedPipe::OpenReadAndWrite()
+{
+	if(0 > close(m_Fd))
+	{
+		CLLogger::WriteLogMsg("In CLNamedPipe::OpenReadAndWrite(), close(m_Fd) error", errno);
+		return CLStatus(-1, 0);
+	}
+
+	m_Fd = open(m_strPipeName.c_str(), O_RDWR| O_NONBLOCK);
+	if(m_Fd == -1)
+	{
+		CLLogger::WriteLogMsg("In CLNamedPipe::OpenReadAndWrite(), for read open error", errno);
+		return CLStatus(-1, 0);
+	}
+
+	return CLStatus(0, 0);
 }

@@ -29,6 +29,9 @@ public:
 	CLStatus ReadVecs(CLIOVector& dataVec);
 	CLStatus WriteVecs(CLIOVector& dataVec);
 
+	CLStatus OpenRead();
+	CLStatus OpenWrite();
+	CLStatus OpenReadAndWrite();
 private:
 	CLStatus Initialize(const char* pStrPipeName, int flag);
 

@@ -21,6 +21,7 @@ public:
 
 private:
 	CLNamedPipe *m_pNamedPipe;
+	bool m_bIsSharedPipe;
 	// CLDataPoster *m_pDataPoster;
 	// CLProtocolDataPoster *m_pProtoDataPoster;
 	// CLEpollWapper *m_pEpollHandler;
