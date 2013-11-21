@@ -60,5 +60,6 @@
 #include "CLProtoEncapForDefaultMsgFormat.h"
 #include "CLMessagePoster.h"
 #include "CLPointerMsgSerializer.h"
+#include "CLDataPostResultNotifier.h"
 
 #endif

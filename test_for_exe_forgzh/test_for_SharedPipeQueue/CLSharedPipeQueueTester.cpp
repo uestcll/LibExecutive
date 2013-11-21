@@ -170,8 +170,8 @@ public:
 		sender.RegisterSerializer(1, new CLMsg1ForCLMsgLoopManagerForPipeQueue_Serializer);
 		sender.RegisterSerializer(2, new CLMsg2ForCLMsgLoopManagerForPipeQueue_Serializer);
 
-		sender.PostMessage(new CLMsg1ForCLMsgLoopManagerForPipeQueue);
-		sender.PostMessage(new CLMsg2ForCLMsgLoopManagerForPipeQueue);
+		sender.PostMessage(new CLMsg1ForCLMsgLoopManagerForPipeQueue, new CLDataPostResultNotifier(true));
+		sender.PostMessage(new CLMsg2ForCLMsgLoopManagerForPipeQueue,new CLDataPostResultNotifier(true));
 
 		sender.UnInitialize(0);
 		return CLStatus(0, 0);

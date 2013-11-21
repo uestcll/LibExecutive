@@ -16,6 +16,12 @@ CLStatus::CLStatus(const CLStatus& status) : m_clReturnCode(m_lReturnCode), m_cl
 	m_lErrorCode = status.m_lErrorCode;
 }
 
+CLStatus& CLStatus::operator= (const CLStatus& status)
+{
+	m_lReturnCode = status.m_lReturnCode;
+	m_lErrorCode = status.m_lErrorCode;
+}
+
 bool CLStatus::IsSuccess()
 {
 	if(m_clReturnCode >= 0)

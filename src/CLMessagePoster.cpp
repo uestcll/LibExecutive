@@ -9,6 +9,7 @@
 #include "CLEvent.h"
 #include "CLDataPoster.h"
 #include "CLMultiMsgSerializer.h"
+#include "CLDataPostResultNotifier.h"
 
 CLMessagePoster::CLMessagePoster(CLDataPosterChannelMaintainer *pDataPosterChannel, CLMessageSerializer *pMsgSerializer, CLProtocolEncapsulator *pProtoEncapsulator, CLEvent *pEvent)
 {
@@ -91,7 +92,7 @@ CLStatus CLMessagePoster::UnInitialize(void *pContext)
 	return CLStatus(0, 0);
 }
 
-CLStatus CLMessagePoster::PostMessage(CLMessage* pMsg)
+CLStatus CLMessagePoster::PostMessage(CLMessage* pMsg, CLDataPostResultNotifier *pResNotifier)
 {
 	CLIOVector *pDataVec = new CLIOVector();
 	CLStatus s = m_pMsgSerializer->Serialize(pMsg, pDataVec);
@@ -112,8 +113,13 @@ CLStatus CLMessagePoster::PostMessage(CLMessage* pMsg)
 		}
 	}
 	// CLStatus s3 = m_pDataPosterChannel->PostData();
+	pResNotifier->SetMessage(pMsg);
 	
-	CLStatus s3 = m_pProtoDataPoster->PostProtoData(pDataVec);
+	SLDataAndNotifier *pDataAndNotifier = new SLDataAndNotifier;
+	pDataAndNotifier->m_pData = pDataVec;
+	pDataAndNotifier->m_pResNotifier = pResNotifier;
+	
+	CLStatus s3 = m_pProtoDataPoster->PostProtoData(pDataAndNotifier);
 	if(s3.IsSuccess())
 	{
 		return CLStatus(0, POST_MSG_SUCCESS);

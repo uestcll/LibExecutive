@@ -3,6 +3,7 @@
 #include "CLEvent.h"
 #include "CLDataPoster.h"
 #include "CLIOVector.h"
+#include "CLDataPostResultNotifier.h"
 
 using namespace std;
 
@@ -24,12 +25,21 @@ CLProtocolDataPoster::~CLProtocolDataPoster()
 		{
 			break;
 		}
-		CLIOVector *tmpVec = m_MsgBufVecList.front();
+		SLDataAndNotifier *pDataAndNotifier = m_MsgBufVecList.front();
 		m_MsgBufVecList.pop_front();
-		tmpVec->FreeAndPopAll();
-		delete tmpVec;
+
+		(pDataAndNotifier->m_pData)->FreeAndPopAll();
+		delete (pDataAndNotifier->m_pData);
+
+		delete (pDataAndNotifier->m_pResNotifier);
+		delete pDataAndNotifier;
 	}
 }
+
+// CLStatus CLProtocolDataPoster::FreeDataAndNotifyStruct(SLDataAndNotifier *pDataAndNotifier)
+// {
+
+// }
 
 CLStatus CLProtocolDataPoster::SetParameters(CLDataPoster *pDataPoster, CLEvent *pEvent)
 {
@@ -39,21 +49,43 @@ CLStatus CLProtocolDataPoster::SetParameters(CLDataPoster *pDataPoster, CLEvent 
 	return CLStatus(0, 0);
 }
 
-CLStatus CLProtocolDataPoster::PostProtoData(CLIOVector *pDataVec)//this dataVec must be one Msg`s buffer
+CLStatus CLProtocolDataPoster::PostProtoData(SLDataAndNotifier *pDataAndNotifier)//this dataVec must be one Msg`s buffer
 {
 	if(!m_bDataLeftFlag)
 	{
-		CLStatus s = PostData(pDataVec);
-		if(s.IsSuccess())
+		CLStatus s = PostData(pDataAndNotifier->m_pData);
+		
+		if(s.m_clErrorCode == POST_DATA_PARTION)
 		{
-			pDataVec->FreeAndPopAll();
-			delete pDataVec;
+			m_MsgBufVecList.push_back(pDataAndNotifier);
 		}
+		else
+		{
+			CLStatus s1(0, 0);
+			if(s.IsSuccess())
+			{
+				s1 = (pDataAndNotifier->m_pResNotifier)->NotifyResult(POST_MSG_SUCCESS);			
+			}
+			else 
+				s1 = (pDataAndNotifier->m_pResNotifier)->NotifyResult(POST_MSG_ERROR);	
+
+			if(!s1.IsSuccess())
+			{
+				CLLogger::WriteLogMsg("In CLProtocolDataPoster::PostProtoData(), pDataAndNotifier->NotifyResult() error", 0);
+			}
+
+			(pDataAndNotifier->m_pData)->FreeAndPopAll();
+			delete (pDataAndNotifier->m_pData);
+
+			delete (pDataAndNotifier->m_pResNotifier);
+			delete pDataAndNotifier;
+		}
+
 		return s;
 	}
 	else
 	{
-		m_MsgBufVecList.push_back(pDataVec);
+		m_MsgBufVecList.push_back(pDataAndNotifier);
 		
 		return PostLeftProtoData();
 	}
@@ -85,8 +117,6 @@ CLStatus CLProtocolDataPoster::PostData(CLIOVector *pDataVec)
 	{
 		m_topMsgBufIndex += s1.m_clReturnCode;
 	
-		//m_MsgBufVecList.push_front(pDataVec);
-
 		m_bDataLeftFlag = true;
 		
 		return CLStatus(-1, POST_DATA_PARTION);
@@ -97,30 +127,45 @@ CLStatus CLProtocolDataPoster::PostLeftProtoData()
 {
 	while(1)
 	{
-		CLIOVector partDataVec;
-		CLIOVector *pTopDataVec = m_MsgBufVecList.front(); 
+		CLIOVector partDataVec;	
+
+		SLDataAndNotifier *pTopDataAndNotifier = m_MsgBufVecList.front(); 	
 		m_MsgBufVecList.pop_front();
+
+		CLIOVector *pTopDataVec = (pTopDataAndNotifier->m_pData);
 		pTopDataVec->GetIOVecs(m_topMsgBufIndex, pTopDataVec->Length(), partDataVec);
 
 		CLStatus s = PostData(&partDataVec);
-		if(s.IsSuccess())
+		if(s.m_clErrorCode == POST_DATA_PARTION)
 		{
+			m_MsgBufVecList.push_front(pTopDataAndNotifier);
+			return s;
+		}
+		else
+		{
+			CLStatus s1(0, 0);
+			if(s.IsSuccess())
+			{
+				s1 = (pTopDataAndNotifier->m_pResNotifier)->NotifyResult(POST_MSG_SUCCESS);			
+			}
+			else 
+				s1 = (pTopDataAndNotifier->m_pResNotifier)->NotifyResult(POST_MSG_ERROR);	
+
+			if(!s1.IsSuccess())
+			{
+				CLLogger::WriteLogMsg("In CLProtocolDataPoster::PostProtoData(), pTopDataAndNotifier->NotifyResult() error", 0);
+			}
+
 			pTopDataVec->FreeAndPopAll();
 			delete pTopDataVec;
+			delete (pTopDataAndNotifier->m_pResNotifier);
+			delete pTopDataAndNotifier;
+
 			if(m_MsgBufVecList.empty())
 			{
 				m_bDataLeftFlag = false;
 				return s;
 			}
-		}
-		else if(s.m_clErrorCode == POST_DATA_PARTION)
-		{
-			m_MsgBufVecList.push_front(pTopDataVec);
-			return s;
-		}
-		else
-		{
-			return s;
 		}
 	}
 }

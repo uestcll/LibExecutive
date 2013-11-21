@@ -159,11 +159,11 @@ public:
 
 		CLMessage *p = new CLMsg1ForCLMsgLoopManagerForPipeQueue;
 		// EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p).IsSuccess());
-		CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p);
+		CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p, new CLDataPostResultNotifier);
 
 		p = new CLMsg2ForCLMsgLoopManagerForPipeQueue;
 		// EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p).IsSuccess());
-		CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p);
+		CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p, new CLDataPostResultNotifier);
 
 		return CLStatus(0, 0);
 	}

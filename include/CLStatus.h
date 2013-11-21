@@ -6,6 +6,7 @@ class CLStatus
 public:
 	CLStatus(long lReturnCode, long lErrorCode);
 	CLStatus(const CLStatus& status);
+	CLStatus& operator= (const CLStatus& status);
 	virtual ~CLStatus();
 
 public:

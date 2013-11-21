@@ -8,6 +8,7 @@
 
 class CLMessagePoster;
 class CLMessage;
+class CLDataPostResultNotifier;
 
 struct SLMessagePosterPtrCount
 {
@@ -19,7 +20,7 @@ class CLExecutiveNameServer
 {
 public:
 	static CLExecutiveNameServer* GetInstance();
-	static CLStatus PostExecutiveMessage(const char* pstrExecutiveName, CLMessage *pMessage);
+	static CLStatus PostExecutiveMessage(const char* pstrExecutiveName, CLMessage *pMessage, CLDataPostResultNotifier *pResNotifier);
 	
 	friend class CLLibExecutiveInitializer;
 

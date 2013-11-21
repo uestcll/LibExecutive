@@ -5,6 +5,7 @@
 #include "CLMessagePoster.h"
 #include "CLMessage.h"
 #include "CLMutex.h"
+#include "CLDataPostResultNotifier.h"
 
 CLExecutiveNameServer* CLExecutiveNameServer::m_pNameServer = 0;
 pthread_mutex_t CLExecutiveNameServer::m_Mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -17,7 +18,7 @@ CLExecutiveNameServer::~CLExecutiveNameServer()
 {
 }
 
-CLStatus CLExecutiveNameServer::PostExecutiveMessage(const char* pstrExecutiveName, CLMessage *pMessage)
+CLStatus CLExecutiveNameServer::PostExecutiveMessage(const char* pstrExecutiveName, CLMessage *pMessage, CLDataPostResultNotifier *pResNotifier)
 {
 	if(pMessage == 0)
 		return CLStatus(-1, 0);
@@ -44,7 +45,7 @@ CLStatus CLExecutiveNameServer::PostExecutiveMessage(const char* pstrExecutiveNa
 		return CLStatus(-1, 0);
 	}	
 
-	CLStatus s = pMessagePoster->PostMessage(pMessage);
+	CLStatus s = pMessagePoster->PostMessage(pMessage, pResNotifier);
 	if(!s.IsSuccess() && (s.m_clErrorCode == POST_MSG_ERROR)) 
 	{
 		CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pMessagePoster->PostExecutiveMessage error", 0);

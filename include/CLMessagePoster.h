@@ -3,16 +3,15 @@
 
 #include "CLStatus.h"
 
-#define POST_MSG_ERROR 31
-#define POST_MSG_PARTION 32
-#define POST_MSG_SUCCESS 33
-
 class CLDataPosterChannelMaintainer;
 class CLMessageSerializer;
 class CLProtocolEncapsulator;
 class CLMessage;
 class CLEvent;
 class CLProtocolDataPoster;
+class CLDataPostResultNotifier;
+class CLIOVector;
+
 
 class CLMessagePoster
 {
@@ -21,7 +20,7 @@ public:
 	virtual ~CLMessagePoster();
 
 	CLStatus Initialize(void *pContext);
-	CLStatus PostMessage(CLMessage *pMsg);
+	CLStatus PostMessage(CLMessage *pMsg, CLDataPostResultNotifier *pResNotifier);
 	CLStatus PostLeftMessage();
 	CLStatus UnInitialize(void *pContext);
 	CLStatus RegisterSerializer(unsigned long lMsgID, CLMessageSerializer *pSerializer);
