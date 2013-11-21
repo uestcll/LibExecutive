@@ -48,6 +48,7 @@
 #include "CLNamedPipe.h"
 #include "CLProtoParserForDefaultMsgFormat.h"
 #include "CLMultiMsgDeserializer.h"
+#include "CLMultiMsgSerializer.h"
 #include "CLDataPoster.h"
 #include "CLDataPosterBySTLQueue.h"
 #include "CLDataPosterByNamedPipe.h"
@@ -56,6 +57,7 @@
 #include "CLDataPosterChannelBySTLQueueMaintainer.h"
 #include "CLProtocolDataPoster.h"
 #include "CLProtocolEncapsulator.h"
+#include "CLProtoEncapForDefaultMsgFormat.h"
 #include "CLMessagePoster.h"
 #include "CLPointerMsgSerializer.h"
 

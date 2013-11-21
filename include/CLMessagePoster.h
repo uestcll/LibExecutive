@@ -3,6 +3,10 @@
 
 #include "CLStatus.h"
 
+#define POST_MSG_ERROR 31
+#define POST_MSG_PARTION 32
+#define POST_MSG_SUCCESS 33
+
 class CLDataPosterChannelMaintainer;
 class CLMessageSerializer;
 class CLProtocolEncapsulator;

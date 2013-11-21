@@ -13,16 +13,18 @@
 #include "CLPointerMsgSerializer.h"
 #include "CLMessage.h"
 
-CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName, int PipeQueueType, CLMultiMsgDeserializer *pMultiMsgDeserializer) : CLMessageLoopManager(pMsgObserver)
+CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName, int PipeQueueType, CLMultiMsgDeserializer *pMultiMsgDeserializer) : CLMessageLoopManager(pMsgObserver), m_bIsShared(false)
 {
 	if((pstrThreadName == 0) || (strlen(pstrThreadName) == 0))
 		throw "In CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(), pstrThreadName error";
 
 	m_strThreadName = pstrThreadName;
-	m_pEvent = new CLEvent(true);
 	
+	 
 	if(PipeQueueType == PIPE_QUEUE_BETWEEN_PROCESS)
 	{
+		m_bIsShared = true;
+		m_pEvent = new CLEvent(m_strThreadName.c_str(), true);
 		if(pMultiMsgDeserializer)
 		{
 			m_pMultiMsgDeserializer = pMultiMsgDeserializer;
@@ -35,6 +37,7 @@ CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(CLMessageObserver *pM
 	}
 	else if(PipeQueueType == PIPE_QUEUE_IN_PROCESS)
 	{
+		m_pEvent = new CLEvent(true);
 		m_pMultiMsgDeserializer = NULL;
 		m_pMsgReceiver = new CLMessageReceiver(new CLDataReceiverByNamedPipe(m_strThreadName.c_str()), new CLProtoParserForPointerMsg(), new CLPointerMsgDeserializer());
 	}
@@ -45,6 +48,8 @@ CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(CLMessageObserver *pM
 CLMsgLoopManagerForPipeQueue::~CLMsgLoopManagerForPipeQueue()
 {
 	delete m_pMsgReceiver;
+	if(m_bIsShared)
+		delete m_pEvent;
 }
 
 CLStatus CLMsgLoopManagerForPipeQueue::Initialize()

@@ -9,7 +9,10 @@ CLMultiMsgDeserializer::CLMultiMsgDeserializer()
 
 CLMultiMsgDeserializer::~CLMultiMsgDeserializer()
 {
+	map<unsigned long, CLMessageDeserializer*>::iterator it = m_DeserializerTable.begin();
 
+	for(; it != m_DeserializerTable.end(); ++it)
+		delete it->second;
 }
 
 CLStatus CLMultiMsgDeserializer::Deserialize(CLIOVector &dataVec, CLMessage **pMsg)

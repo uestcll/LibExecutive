@@ -18,34 +18,31 @@ CLStatus CLProtoParserForDefaultMsgFormat::DecapsulateMsg(CLIOVector& dataVec, v
 	int headLen = sizeof(int);
 	int wholeLen = dataVec.Length();
 
-	CLIOVector restDataVec;
-
-	dataVec.GetIOVecs(startIndex, wholeLen - startIndex, restDataVec);
-
 	while(1)
 	{
-		if(restDataVec.Length() < headLen)
+		if(startIndex + headLen >= wholeLen)
 			break;
-		else
+		dataVec.ReadData((char*)&ctxLen, startIndex, headLen);
+		
+		if(0 == ctxLen)
 		{
-			restDataVec.ReadData((char*)&ctxLen, startIndex, headLen);
-			if(ctxLen == 0)
-				continue;
-			if(restDataVec.Length() < (headLen + ctxLen))
-				break;
-			else
-			{
-				CLIOVector *pOneSerializedMsg = new CLIOVector();
-				startIndex += headLen;
-				restDataVec.GetIOVecs(startIndex, ctxLen, *pOneSerializedMsg);
-
-				vSerializedMsgs.push_back(pOneSerializedMsg);				
-				startIndex += ctxLen;
-				restDataVec.PopAll();
-				dataVec.GetIOVecs(startIndex, wholeLen - startIndex, restDataVec);
-			}
+			startIndex += headLen;
+			continue;
 		}
+		if(startIndex + headLen + ctxLen > wholeLen)
+		{
+			break;
+		}
+
+		CLIOVector *pOneSerializedMsg = new CLIOVector();
+		startIndex += headLen;
+		dataVec.GetIOVecs(startIndex, ctxLen, *pOneSerializedMsg);
+
+		vSerializedMsgs.push_back(pOneSerializedMsg);				
+		startIndex += ctxLen;
+	
 	}
+	
 	return CLStatus(startIndex, 0);
 }
 

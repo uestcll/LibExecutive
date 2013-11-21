@@ -2,6 +2,7 @@
 #define CLMULTIMSGSERIALIZER_H
 
 #include "CLMessageSerializer.h"
+#include "CLStatus.h"
 #include <map>
 
 class CLMultiMsgSerializer : public CLMessageSerializer

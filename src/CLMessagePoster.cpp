@@ -112,12 +112,21 @@ CLStatus CLMessagePoster::PostMessage(CLMessage* pMsg)
 		}
 	}
 	// CLStatus s3 = m_pDataPosterChannel->PostData();
+	
 	CLStatus s3 = m_pProtoDataPoster->PostProtoData(pDataVec);
-	if(!s3.IsSuccess() && (s3.m_clErrorCode == POST_DATA_ERROR))
+	if(s3.IsSuccess())
+	{
+		return CLStatus(0, POST_MSG_SUCCESS);
+	}
+	else if(s3.m_clErrorCode == POST_DATA_ERROR)
 	{
 		CLLogger::WriteLogMsg("In CLMessagePoster::PostMessage(), m_pDataPosterChannel->PostData() error", 0);
+		return CLStatus(-1, POST_MSG_ERROR);
 	}
-	return s3;
+	else
+	{
+		return CLStatus(-1, POST_MSG_PARTION);
+	}
 }
 
 CLStatus CLMessagePoster::PostLeftMessage()

@@ -12,7 +12,11 @@ CLMultiMsgSerializer::CLMultiMsgSerializer()
 
 CLMultiMsgSerializer::~CLMultiMsgSerializer()
 {
-
+	map<unsigned long, CLMessageSerializer*>::iterator it = m_SerializerTable.begin();
+	for(; it != m_SerializerTable.end(); ++it)
+	{
+		delete it->second;
+	}
 }
 
 CLStatus CLMultiMsgSerializer::Serialize(CLMessage *pMsg, CLIOVector *pDataVec)
@@ -64,6 +68,9 @@ CLStatus CLMultiMsgSerializer::UnRegisterSerializer(unsigned long lMsgID)
 		CLLogger::WriteLogMsg("In CLMultiMsgSerializer::RegisterSerializer(), it == m_SerializerTable.end(), cannot find the Serializer", 0);
 		return CLStatus(-1, 0);
 	}
+
+	delete it->second;
+	m_SerializerTable.erase(it);
 
 	return CLStatus(0, 0);
 }

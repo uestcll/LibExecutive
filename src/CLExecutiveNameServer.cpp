@@ -45,7 +45,7 @@ CLStatus CLExecutiveNameServer::PostExecutiveMessage(const char* pstrExecutiveNa
 	}	
 
 	CLStatus s = pMessagePoster->PostMessage(pMessage);
-	if(!s.IsSuccess())
+	if(!s.IsSuccess() && (s.m_clErrorCode == POST_MSG_ERROR)) 
 	{
 		CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pMessagePoster->PostExecutiveMessage error", 0);
 

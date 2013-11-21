@@ -38,6 +38,7 @@ private:
 	CLMessageReceiver *m_pMsgReceiver;
 	string m_strThreadName;
 	CLEvent *m_pEvent;
+	bool m_bIsShared;
 	// CLNamedPipe *m_pNamedPipe;
 	CLMultiMsgDeserializer *m_pMultiMsgDeserializer;	
 };
