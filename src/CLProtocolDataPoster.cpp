@@ -125,6 +125,12 @@ CLStatus CLProtocolDataPoster::PostData(CLIOVector *pDataVec)
 
 CLStatus CLProtocolDataPoster::PostLeftProtoData()
 {
+	if(m_MsgBufVecList.empty())
+	{
+		m_bDataLeftFlag = false;
+		return CLStatus(0, 0);
+	}
+
 	while(1)
 	{
 		CLIOVector partDataVec;	

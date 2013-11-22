@@ -172,7 +172,8 @@ public:
 
 		sender.PostMessage(new CLMsg1ForCLMsgLoopManagerForPipeQueue, new CLDataPostResultNotifier(true));
 		sender.PostMessage(new CLMsg2ForCLMsgLoopManagerForPipeQueue,new CLDataPostResultNotifier(true));
-
+		sender.PostLeftMessage();
+		
 		sender.UnInitialize(0);
 		return CLStatus(0, 0);
 	}
