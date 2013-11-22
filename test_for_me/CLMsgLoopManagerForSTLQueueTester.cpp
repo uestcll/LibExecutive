@@ -16,9 +16,9 @@ public:
 
 		CLMessagePoster *pq = (CLExecutiveNameServer::GetInstance())->GetCommunicationPtr("CLMsgLoopManagerForMsgQueueTester");
 
-		EXPECT_TRUE((pq->PostMessage(new CLMessage(1))).IsSuccess());
-		EXPECT_TRUE((pq->PostMessage(new CLMessage(2))).IsSuccess());
-		EXPECT_TRUE((pq->PostMessage(new CLMessage(3))).IsSuccess());
+		EXPECT_TRUE((pq->PostMessage(new CLMessage(1), new CLDataPostResultNotifier)).IsSuccess());
+		EXPECT_TRUE((pq->PostMessage(new CLMessage(2), new CLDataPostResultNotifier)).IsSuccess());
+		EXPECT_TRUE((pq->PostMessage(new CLMessage(3), new CLDataPostResultNotifier)).IsSuccess());
 
 		EXPECT_TRUE(((CLExecutiveNameServer::GetInstance())->ReleaseCommunicationPtr("CLMsgLoopManagerForMsgQueueTester")).IsSuccess());
 
