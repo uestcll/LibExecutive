@@ -96,6 +96,7 @@ CLStatus CLProtocolDataPoster::PostData(CLIOVector *pDataVec)
 	CLStatus s1 = m_pDataPoster->PostData(pDataVec);
 	if(!s1.IsSuccess())
 	{
+		m_topMsgBufIndex = 0;
 		CLLogger::WriteLogMsg("In CLProtocolDataPoster::PostProtoData(), m_pDataPoster->PostData() error", 0);
 		return s1;
 	}
