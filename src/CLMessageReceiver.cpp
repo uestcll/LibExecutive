@@ -13,6 +13,13 @@
 // iovector 提供返回连续空间的长度值 CLBuffer根据分配了空间的buf，和指定的对应长度，返回该buf的值。
 using namespace std;
 
+CLMessageReceiver::CLMessageReceiver()
+{
+	m_pProtoParser = NULL;
+	m_pDataReceiver = NULL;
+	m_pMsgDeserializer = NULL;
+}
+
 CLMessageReceiver::CLMessageReceiver(CLDataReceiver *pDataReceiver, CLProtoParser *pProtoParser, CLMessageDeserializer *pMsgDeserializer)
 {
 	try
@@ -167,6 +174,11 @@ CLStatus CLMessageReceiver::GetMessage(queue<CLMessage*> &MessageQueue)
 	// }
 	
 	return CLStatus(0, 0);
+}
+
+const int& CLMessageReceiver::GetFd()
+{
+	return m_pDataReceiver->GetFd();
 }
 
 // CLMessage* CLMessageReceiver::PopMessage()

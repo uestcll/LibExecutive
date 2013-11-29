@@ -67,3 +67,8 @@ CLStatus CLDataReceiverByNamedPipe::GetData(CLBuffer *pBuffer)
 	*/
 	return CLStatus(readLen, 0);
 }
+
+const int CLDataReceiverByNamedPipe::GetFd()
+{
+	return m_NamedPipe.GetPipeFd();
+}

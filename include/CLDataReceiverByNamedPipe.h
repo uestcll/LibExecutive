@@ -13,6 +13,7 @@ public:
 	virtual ~CLDataReceiverByNamedPipe();
 
 	virtual CLStatus GetData(CLBuffer *pBuffer);
+	virtual const int GetFd();
 
 private:
 	CLDataReceiverByNamedPipe(const CLDataReceiverByNamedPipe&);

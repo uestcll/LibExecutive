@@ -22,10 +22,13 @@ class CLMessageDeserializer;
 class CLMessageReceiver
 {
 public:
+	CLMessageReceiver();
 	CLMessageReceiver(CLDataReceiver *pDataReceiver, CLProtoParser *pProtoParser, CLMessageDeserializer *pMsgDeserializer);
 	virtual ~CLMessageReceiver();
 
-	CLStatus GetMessage(std::queue<CLMessage*> &MessageQueue);
+	virtual CLStatus GetMessage(std::queue<CLMessage*> &MessageQueue);
+	virtual const int& GetFd();
+
 private:
 	CLMessageReceiver(const CLMessageReceiver&);
 	CLMessageReceiver& operator=(const CLMessageReceiver&);
