@@ -18,10 +18,6 @@ public:
 	bool IsEnd();
 
 private:
-	CLIteratorForIOVectors(const CLIteratorForIOVectors&);
-	CLIteratorForIOVectors& operator=(const CLIteratorForIOVectors&);
-
-private:
 	char* m_pData;
 	std::list<SLIOVectorItem>::iterator m_Iter;
 	std::list<SLIOVectorItem> *m_pIOVectors;

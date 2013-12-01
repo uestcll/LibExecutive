@@ -198,7 +198,183 @@ TEST(CLIOVectors, PopBackAndFront_Features_Test)
 	EXPECT_TRUE(CheckIOVectorData(buf, 10, iovs));
 }
 
+bool CheckCLIOVectorIterator(char *pData, CLIteratorForIOVectors& iter)
+{
+	long *p = (long *)(&iter);
+	p++;
+	if((char *)(*p) == pData)
+		return true;
+	else
+		return false;
+}
+
 TEST(CLIOVectors, GetIterator_Features_Test)
 {
-	//................
+	CLIOVectors iov;
+
+	CLIteratorForIOVectors iter1;
+	iov.GetIterator(0, iter1);
+	EXPECT_TRUE(iter1.IsEnd());
+	EXPECT_TRUE(CheckCLIOVectorIterator(0, iter1));
+
+	CLIteratorForIOVectors iter2;
+	iov.GetIterator(100, iter2);
+	EXPECT_TRUE(iter2.IsEnd());
+	EXPECT_TRUE(CheckCLIOVectorIterator(0, iter2));
+
+	char *p1 = new char[1];
+	*p1 = 2;
+	EXPECT_TRUE(iov.PushBack(p1, 1, true).IsSuccess());
+	CLIteratorForIOVectors iter3;
+	iov.GetIterator(0, iter3);
+	EXPECT_FALSE(iter3.IsEnd());
+	EXPECT_TRUE(CheckCLIOVectorIterator(p1, iter3));
+
+	CLIteratorForIOVectors iter4;
+	iov.GetIterator(100, iter4);
+	EXPECT_TRUE(iter4.IsEnd());
+	EXPECT_TRUE(CheckCLIOVectorIterator(0, iter4));
+
+	char *p2 = new char[10];
+	int i;
+	for(i = 0; i < 10; i++)
+		p2[i] = i;
+	EXPECT_TRUE(iov.PushBack(p2, 10, true).IsSuccess());
+
+	CLIteratorForIOVectors iter5;
+	iov.GetIterator(0, iter5);
+	EXPECT_FALSE(iter5.IsEnd());
+	EXPECT_TRUE(CheckCLIOVectorIterator(p1, iter5));
+
+	CLIteratorForIOVectors iter6;
+	iov.GetIterator(6, iter6);
+	EXPECT_FALSE(iter6.IsEnd());
+	EXPECT_TRUE(CheckCLIOVectorIterator(p2+5, iter6));
+
+	CLIteratorForIOVectors iter7;
+	iov.GetIterator(100, iter7);
+	EXPECT_TRUE(iter7.IsEnd());
+	EXPECT_TRUE(CheckCLIOVectorIterator(0, iter7));
+
+	char *p3 = new char[5];
+	for(i = 0; i < 5; i++)
+		p3[i] = i * 5;
+	EXPECT_TRUE(iov.PushBack(p3, 5, true).IsSuccess());
+
+	char *p4 = new char[1];
+	*p4 = 0;
+	EXPECT_TRUE(iov.PushBack(p4, 1, true).IsSuccess());
+
+	char *p5 = new char[6];
+	for(i = 0; i < 6; i++)
+		p5[i] = i;
+	EXPECT_TRUE(iov.PushBack(p5, 6, true).IsSuccess());
+
+	CLIteratorForIOVectors iter8;
+	iov.GetIterator(16, iter8);
+	EXPECT_FALSE(iter8.IsEnd());
+	EXPECT_TRUE(CheckCLIOVectorIterator(p4, iter8));
+
+	CLIteratorForIOVectors iter9;
+	iov.GetIterator(22, iter9);
+	EXPECT_FALSE(iter9.IsEnd());
+	EXPECT_TRUE(CheckCLIOVectorIterator(p5+5, iter9));
+
+	CLIteratorForIOVectors iter10;
+	iov.GetIterator(23, iter10);
+	EXPECT_TRUE(iter10.IsEnd());
+	EXPECT_TRUE(CheckCLIOVectorIterator(0, iter10));
 }
+
+TEST(CLIOVectors, Iterator_Features_Test)
+{
+	CLIOVectors iov;
+
+	CLIteratorForIOVectors iter1;
+	iov.GetIterator(0, iter1);
+	CLStatus s1 = iter1.Add(3);
+	EXPECT_FALSE(s1.IsSuccess());
+	EXPECT_EQ(s1.m_clErrorCode, NORMAL_ERROR);
+
+	CLIteratorForIOVectors iter2;
+	iov.GetIterator(0, iter2);
+	CLStatus s2 = iter1.Sub(1);
+	EXPECT_FALSE(s2.IsSuccess());
+	EXPECT_EQ(s2.m_clErrorCode, NORMAL_ERROR);
+
+	char *p1 = new char[1];
+	*p1 = 2;
+	EXPECT_TRUE(iov.PushBack(p1, 1, true).IsSuccess());
+
+	char *p2 = new char[10];
+	int i;
+	for(i = 0; i < 10; i++)
+		p2[i] = i;
+	EXPECT_TRUE(iov.PushBack(p2, 10, true).IsSuccess());
+
+	char *p3 = new char[5];
+	for(i = 0; i < 5; i++)
+		p3[i] = i * 5;
+	EXPECT_TRUE(iov.PushBack(p3, 5, true).IsSuccess());
+
+	char *p4 = new char[1];
+	*p4 = 0;
+	EXPECT_TRUE(iov.PushBack(p4, 1, true).IsSuccess());
+
+	char *p5 = new char[6];
+	for(i = 0; i < 6; i++)
+		p5[i] = i;
+	EXPECT_TRUE(iov.PushBack(p5, 6, true).IsSuccess());
+
+	CLIteratorForIOVectors iter3;
+	iov.GetIterator(0, iter3);
+	EXPECT_TRUE(iter3.Add(0).IsSuccess());
+	
+	EXPECT_TRUE(iter3.Add(1).IsSuccess());
+	EXPECT_TRUE(CheckCLIOVectorIterator(p2, iter3));
+
+	EXPECT_TRUE(iter3.Add(4).IsSuccess());
+	EXPECT_TRUE(CheckCLIOVectorIterator(p2+4, iter3));
+
+	EXPECT_TRUE(iter3.Add(11).IsSuccess());
+	EXPECT_TRUE(CheckCLIOVectorIterator(p4, iter3));
+
+	CLIteratorForIOVectors iter6(iter3);
+
+	EXPECT_TRUE(iter3.Add(6).IsSuccess());
+	EXPECT_TRUE(CheckCLIOVectorIterator(p5+5, iter3));
+
+	CLStatus s3 = iter3.Add(1);
+	EXPECT_FALSE(s3.IsSuccess());
+	EXPECT_EQ(s3.m_clErrorCode, IOVECTOR_ITERATOR_END);
+	EXPECT_TRUE(iter3.IsEnd());
+	EXPECT_TRUE(CheckCLIOVectorIterator(0, iter3));
+
+	CLIteratorForIOVectors iter4;
+	iov.GetIterator(0, iter4);
+	EXPECT_TRUE(iter4.Add(20).IsSuccess());
+	EXPECT_TRUE(CheckCLIOVectorIterator(p5+3, iter4));
+
+	EXPECT_TRUE(iter4.Sub(0).IsSuccess());
+
+	EXPECT_TRUE(iter4.Sub(3).IsSuccess());
+	EXPECT_TRUE(CheckCLIOVectorIterator(p5, iter4));
+
+	EXPECT_TRUE(iter4.Sub(9).IsSuccess());
+	EXPECT_TRUE(CheckCLIOVectorIterator(p2+7, iter4));
+
+	CLIteratorForIOVectors iter5;
+	iter5 = iter4;
+
+	EXPECT_TRUE(iter4.Sub(4).IsSuccess());
+	EXPECT_TRUE(CheckCLIOVectorIterator(p2+3, iter4));
+
+	CLStatus s4 = iter4.Sub(5);
+	EXPECT_FALSE(s4.IsSuccess());
+	EXPECT_EQ(s4.m_clErrorCode, IOVECTOR_ITERATOR_END);
+	EXPECT_TRUE(iter4.IsEnd());
+	EXPECT_TRUE(CheckCLIOVectorIterator(0, iter4));
+
+	EXPECT_TRUE(CheckCLIOVectorIterator(p2+7, iter5));
+	EXPECT_TRUE(CheckCLIOVectorIterator(p4, iter6));
+}	

@@ -2,6 +2,7 @@
 #define LIBEXECUTIVE_H
 
 #include "DefinitionForConst.h"
+#include "ErrorCode.h"
 #include "CLStatus.h"
 #include "CLLogger.h"
 #include "CLMutex.h"

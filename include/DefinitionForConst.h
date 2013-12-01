@@ -29,7 +29,7 @@ const int NUMBER_OF_SHARED_OBJECT = 1024;
 const int MAGIC_NUMBER_FOR_SHARED_OBJECT = 0x12345678;
 
 const int IOVECTOR_DELETE = 0;
-const int IOVECTOR_STEADY = 1;
+const int IOVECTOR_STAIN = 1;
 const int IOVECTOR_NON_DELETE = 2;
 
 #endif
