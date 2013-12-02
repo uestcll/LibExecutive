@@ -5,6 +5,8 @@
 #include "CLEpoll.h"
 #include "CLLogger.h"
 
+#define DEFAULT_EPOLLWAIT_TIME 5
+
 CLEpoll::CLEpoll()
 {
 	m_pEpollEvents = NULL;
@@ -55,9 +57,33 @@ CLStatus CLEpoll::DoEvent(CLEpollEvent *pEvent, int fd, int epollOpt, int epollE
 
 CLStatus CLEpoll::Run()
 {
+	int nfds;
+
 	while(1)
 	{
-		
+		if( (nfds = epoll_wait(m_iEpollFd, m_pEpollEvents, m_iMaxEventSize, DEFAULT_EPOLLWAIT_TIME)) < 0)
+		{
+			if(EINTR == errno)
+				continue;
+			else
+				CLLogger::WriteLogMsg("In CLEpoll::Run(), epoll_wait error", errno);
+		}
+
+		for(int i = 0; i < nfds; ++i)
+		{
+			if ( m_pEpollEvents[i].events & EPOLLERR || m_pEpollEvents[i].events & EPOLLHUP )
+            {
+               continue;
+            }
+            if ( m_pEpollEvents[i].events & EPOLLOUT )
+            {
+               continue;
+            }
+            if ( m_pEpollEvents[i].events & EPOLLIN )
+            {
+                continue;
+            }
+		}
 	}
 
 
