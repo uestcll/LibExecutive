@@ -285,10 +285,12 @@ void CLIOVectors::Clear()
 	for(; it != m_IOVectors.end(); ++it)
 	{
 		if(it->bDelete)
-			delete (char *)it->IOVector.iov_base;
+			delete [] (char *)it->IOVector.iov_base;
 	}
 
 	m_IOVectors.clear();
+
+	m_nDataLength = 0;
 }
 
 CLStatus CLIOVectors::GetIndex(CLIteratorForIOVectors& Iter, unsigned int& Index)

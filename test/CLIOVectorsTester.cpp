@@ -377,4 +377,163 @@ TEST(CLIOVectors, Iterator_Features_Test)
 
 	EXPECT_TRUE(CheckCLIOVectorIterator(p2+7, iter5));
 	EXPECT_TRUE(CheckCLIOVectorIterator(p4, iter6));
-}	
+}
+
+TEST(CLIOVectors, Clear_Features_Test)
+{
+	int i;
+	CLIOVectors iovs;
+
+	char *p1 = new char[10];
+	for(i = 0; i < 10; i++)
+		p1[i] = i;
+
+	char *p2 = new char[20];
+	for(i = 0; i < 20; i++)
+		p2[i] = i * 2;
+
+	char *p3 = new char[30];
+	for(i = 0; i < 30; i++)
+		p3[i] = i * 3;
+
+	EXPECT_TRUE(iovs.PushBack(p1, 10, true).IsSuccess());
+	EXPECT_TRUE(iovs.PushBack(p2, 20, true).IsSuccess());
+	EXPECT_TRUE(iovs.PushFront(p3, 30, true).IsSuccess());
+
+	iovs.Clear();
+
+	EXPECT_TRUE(CheckIOVectorStatus(0, 0, iovs));
+}
+
+TEST(CLIOVectors, GetIndex_Features_Test)
+{
+	CLIOVectors iov1, iov2;
+	CLIteratorForIOVectors iter1, iter2;
+	unsigned int index;
+	
+	iov1.GetIterator(0, iter1);
+	CLStatus s1 = iov1.GetIndex(iter1, index);
+	EXPECT_FALSE(s1.IsSuccess());
+	EXPECT_EQ(s1.m_clErrorCode, NORMAL_ERROR);
+
+	char *p1 = new char[1];
+	*p1 = 2;
+
+	char *p2 = new char[10];
+	int i;
+	for(i = 0; i < 10; i++)
+		p2[i] = i;
+
+	char *p3 = new char[5];
+	for(i = 0; i < 5; i++)
+		p3[i] = i * 5;
+
+	char *p4 = new char[1];
+	*p4 = 0;
+
+	char *p5 = new char[6];
+	for(i = 0; i < 6; i++)
+		p5[i] = i;
+
+	EXPECT_TRUE(iov2.PushBack(p1, 1).IsSuccess());
+	iov2.GetIterator(0, iter2);
+
+	EXPECT_TRUE(iov1.PushBack(p1, 1, true).IsSuccess());
+	EXPECT_TRUE(iov1.PushBack(p2, 10, true).IsSuccess());
+	EXPECT_TRUE(iov1.PushBack(p3, 5, true).IsSuccess());
+	EXPECT_TRUE(iov1.PushBack(p4, 1, true).IsSuccess());
+	EXPECT_TRUE(iov1.PushBack(p5, 6, true).IsSuccess());
+
+	CLStatus s2 = iov1.GetIndex(iter2, index);
+	EXPECT_FALSE(s2.IsSuccess());
+	EXPECT_EQ(s2.m_clErrorCode, NORMAL_ERROR);
+
+	iov1.GetIterator(0, iter1);
+	EXPECT_TRUE(iov1.GetIndex(iter1, index).IsSuccess());
+	EXPECT_EQ(index, 0);
+
+	EXPECT_TRUE(iter1.Add(4).IsSuccess());
+	EXPECT_TRUE(iov1.GetIndex(iter1, index).IsSuccess());
+	EXPECT_EQ(index, 4);
+
+	EXPECT_TRUE(iter1.Add(12).IsSuccess());
+	EXPECT_TRUE(iov1.GetIndex(iter1, index).IsSuccess());
+	EXPECT_EQ(index, 16);
+
+	EXPECT_TRUE(iter1.Add(1).IsSuccess());
+	EXPECT_TRUE(iov1.GetIndex(iter1, index).IsSuccess());
+	EXPECT_EQ(index, 17);
+
+	EXPECT_TRUE(iter1.Add(5).IsSuccess());
+	EXPECT_TRUE(iov1.GetIndex(iter1, index).IsSuccess());
+	EXPECT_EQ(index, 22);
+}
+
+TEST(CLIOVectors, WriteBlockIterator_Features_Test)
+{
+	CLIOVectors iov;
+	CLIteratorForIOVectors iter;
+	
+	CLStatus s1 = iov.WriteBlock(iter, 0, 0);
+	EXPECT_FALSE(s1.IsSuccess());
+	EXPECT_EQ(s1.m_clErrorCode, NORMAL_ERROR);
+
+	CLStatus s2 = iov.WriteBlock(iter, (char *)2, 0);
+	EXPECT_FALSE(s2.IsSuccess());
+	EXPECT_EQ(s2.m_clErrorCode, NORMAL_ERROR);
+
+	CLStatus s3 = iov.WriteBlock(iter, (char *)2, 2);
+	EXPECT_FALSE(s3.IsSuccess());
+	EXPECT_EQ(s3.m_clErrorCode, NORMAL_ERROR);
+
+	char *p1 = new char[1];
+	char *p2 = new char[10];
+	char *p3 = new char[5];
+	char *p4 = new char[1];
+	char *p5 = new char[6];
+
+	EXPECT_TRUE(iov.PushBack(p1, 1, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p2, 10, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p3, 5, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p4, 1, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p5, 6, true).IsSuccess());
+
+	iov.GetIterator(0, iter);
+	char x = 2;
+	CLStatus s4 = iov.WriteBlock(iter, &x, 1);
+	EXPECT_EQ(s4.m_clReturnCode, 1);
+	unsigned int index;
+	EXPECT_TRUE(iov.GetIndex(iter, index).IsSuccess());
+	EXPECT_EQ(index, 1);
+
+	char buf[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+	CLStatus s5 = iov.WriteBlock(iter, buf, 3);
+	EXPECT_EQ(s5.m_clReturnCode, 3);
+	EXPECT_TRUE(iov.GetIndex(iter, index).IsSuccess());
+	EXPECT_EQ(index, 4);
+
+	CLStatus s6 = iov.WriteBlock(iter, buf+3, 4);
+	EXPECT_EQ(s6.m_clReturnCode, 4);
+	EXPECT_TRUE(iov.GetIndex(iter, index).IsSuccess());
+	EXPECT_EQ(index, 8);
+
+	CLStatus s7 = iov.WriteBlock(iter, buf+7, 3);
+	EXPECT_EQ(s7.m_clReturnCode, 3);
+	EXPECT_TRUE(iov.GetIndex(iter, index).IsSuccess());
+	EXPECT_EQ(index, 11);
+
+	char buf1[10] = {0, 5, 10, 15, 20};
+	CLStatus s8 = iov.WriteBlock(iter, buf1, 5);
+	EXPECT_EQ(s8.m_clReturnCode, 5);
+	EXPECT_TRUE(iov.GetIndex(iter, index).IsSuccess());
+	EXPECT_EQ(index, 16);
+
+	char buf2[16] = {3, 4, 5, 6, 7, 8, 9, 0, 5, 10, 15, 20, 0, 0, 1, 2};
+	iov.GetIterator(4, iter);
+	CLStatus s9 = iov.WriteBlock(iter, buf2, 16);
+	EXPECT_EQ(s9.m_clReturnCode, 16);
+	EXPECT_TRUE(iov.GetIndex(iter, index).IsSuccess());
+	EXPECT_EQ(index, 20);
+
+	//.............
+}
