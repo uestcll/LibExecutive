@@ -1,30 +1,20 @@
 #include "CLMessageReceiverByTimerFd.h"
-#include "CLTimerApplyMsg.h"
 #include "CLLogger.h"
 #include "CLTimerOutMsg.h"
-#include <sys/timerfd.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <time.h>
+#include "CLTimerFd.h"
 
-CLMessageReceiverByTimerFd::CLMessageReceiverByTimerFd(CLTimerApplyMsg *pMsg)
+CLMessageReceiverByTimerFd::CLMessageReceiverByTimerFd(CLTimerFd *pTimer)
 {
-	try
+	try//12.2 优化：觉得这里可以封装一层CLTimerFd的类//已完成
 	{
-		m_bRepeat = false;
-		m_strRemoteName = pMsg->m_strRemoteName;
-		m_iEchoID = pMsg->m_iEchoID;
+		if(!pTimer)
+			throw "In CLMessageReceiverByTimerFd::CLMessageReceiverByTimerFd(), pTimer is NULL";
 
-		m_sTimerValue = pMsg->m_sTimerValue;
-		if(m_sTimerValue.it_interval.tv_sec || m_sTimerValue.it_interval.tv_nsec)
-			m_bRepeat = true;
+		m_pTimer = pTimer;
 
-		m_Fd = timerfd_create(CLOCK_REALTIME, TFD_NONBLOCK);
-
-		int ret = timerfd_settime(m_Fd, TFD_TIMER_ABSTIME, &m_sTimerValue, NULL);
-		if(-1 == ret)
-			throw "In CLMessageReceiverByTimerFd::CLMessageReceiverByTimerFd(), timerfd_settime error";
+		CLStatus s = m_pTimer->StartClock();
+		if(!s.IsSuccess())
+			throw "In CLMessageReceiverByTimerFd::CLMessageReceiverByTimerFd(), m_pTimer->StartClock() error";
 	}
 	catch(...)
 	{
@@ -36,13 +26,14 @@ CLMessageReceiverByTimerFd::~CLMessageReceiverByTimerFd
 {
 
 }
-
+ 
 CLStatus CLMessageReceiverByTimerFd::GetMessage(std::queue<CLMessage*> &MessageQueue)]
 {
 	CLMessage *pMsg = new CLTimerOutMsg();
 
-	pMsg->m_strRemoteName = m_strRemoteName;
-	pMsg->m_iEchoID = m_iEchoID;
+	pMsg->m_strRemoteName = m_pTimer->GetRemoteName();
+	pMsg->m_iEchoID = m_pTimer->GetTimerID();
+	pMsg->m_bRepeat = m_pTimer->IsRepeatTimer();
 
 	MessageQueue.push_back(pMsg);
 
@@ -51,7 +42,7 @@ CLStatus CLMessageReceiverByTimerFd::GetMessage(std::queue<CLMessage*> &MessageQ
 
 const int& CLMessageReceiverByTimerFd::GetFd()
 {
-	return m_Fd;
+	return m_pTimer->GetTimerFd();
 }
 
 

@@ -7,6 +7,8 @@
 class CLEpoll;
 class CLEpollEvent;
 
+#define EPOLL_MAX_FD_SIZE 1000
+
 class CLMsgLoopManagerForEpoll : public CLMessageLoopManager
 {
 public:
@@ -20,14 +22,13 @@ public:
 
 	CLStatus RecycleMsgReceiver();
 	CLStatus RecycleMsgPoster();
-	CLStatus NotifyReadable();
+	CLStatus NotifyReadable(int fd);
 
 protected:
-	virtual CLStatus Initialize() = 0;
-	virtual CLStatus Uninitialize() = 0;
+	virtual CLStatus Initialize();
+	virtual CLStatus Uninitialize();
 	
 	virtual CLStatus WaitForMessage();
-	virtual CLStatus DispatchMessage(CLMessage *pMessage);
 
 private:
 	CLMsgLoopManagerForEpoll(const CLMsgLoopManagerForEpoll&);
@@ -35,7 +36,8 @@ private:
 
 protected:
 	CLEpoll *m_pEpoll;
-	map<fd, CLMessageReceiver*> m_MsgReceiverMap;
+	CLMessageReceiver* m_pMsgReceiver;
+	map<fd, CLEpollEvent*> m_MsgReceiverMap;//!!!!
 };
 
 #endif
