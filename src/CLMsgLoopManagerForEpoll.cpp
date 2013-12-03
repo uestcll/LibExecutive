@@ -3,6 +3,7 @@
 #include "CLLogger.h"
 #include "CLEpoll.h"
 #include "CLMessageObserver.h"
+#include "CLEpollEvent.h"
 
 CLMsgLoopManagerForEpoll::CLMsgLoopManagerForEpoll(CLMessageObserver *pMessageObserver, CLEpoll *pEpoll) : CLMessageLoopManager(pMessageObserver)
 {
@@ -27,12 +28,12 @@ CLStatus CLMsgLoopManagerForEpoll::Register(unsigned long lMsgID, CallBackForMes
 
 CLStatus CLMsgLoopManagerForEpoll::Initialize()
 {
-	CLStatus s = m_pEpoll->Initialize(EPOLL_MAX_FD_SIZE, this);
-	if(!s.IsSuccess())
-	{
-		CLLogger::WriteLogMsg("In CLMessageLoopManager::EnterMessageLoop(), m_pEpoll->Initialize() error", 0);
-		return CLStatus(-1, 0);
-	}
+	// CLStatus s = m_pEpoll->Initialize(EPOLL_MAX_FD_SIZE);
+	// if(!s.IsSuccess())
+	// {
+	// 	CLLogger::WriteLogMsg("In CLMessageLoopManager::EnterMessageLoop(), m_pEpoll->Initialize() error", 0);
+	// 	return CLStatus(-1, 0);
+	// }
 }
 
 CLStatus CLMsgLoopManagerForEpoll::EnterMessageLoop(void *pContext)
@@ -79,6 +80,47 @@ CLStatus CLMsgLoopManagerForEpoll::Uninitialize()
 	return CLStatus(0, 0);
 }
 
+CLStatus CLMsgLoopManagerForEpoll::RegisterMsgReceiver(CLMessageReceiver *pReceiver)
+{
+	int fd = pReceiver->GetFd();
+
+	if(0 > fd)
+	{
+		CLLogger::WriteLogMsg("In CLMsgLoopManagerForEpoll::RegisterMsgReceiver(), fd < 0", 0);
+		return CLStatus(-1, 0);
+	}
+
+	map<fd, CLMessageReceiver*>::iterator it = m_MsgReceiverMap.find(fd);
+	if(it != m_MsgReceiverMap.end())
+	{
+		CLLogger::WriteLogMsg("In CLMsgLoopManagerForEpoll::RegisterMsgReceiver(), it != m_MsgReceiverMap.end()", 0);
+		return CLStatus(-1, 0);
+	}
+	m_MsgReceiverMap[fd] = pReceiver;
+
+	map<fd, CLEpollEvent*>::iterator it = m_EpollEventMap.find(fd);
+	if(it != m_EpollEventMap.end())
+	{
+		CLLogger::WriteLogMsg("In CLMsgLoopManagerForEpoll::RegisterMsgReceiver(), it != m_EpollEventMap.end()", 0);
+		return CLStatus(-1, 0);
+	}
+
+	CLEpollEvent *pEvent = new CLEpollEvent(m_pEpoll);
+	pEvent->SetHandler(this);
+	pEvent->SetFd(fd);
+
+	CLStatus s = pEvent->RegisterREvent();
+	if(!s.IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLMsgLoopManagerForEpoll::RegisterMsgReceiver(), pEvent->RegisterREvent() error", 0);
+		return CLStatus(-1, 0);
+	}	
+	m_EpollEventMap[fd] = pEvent;
+
+	return CLStatus(0, 0);
+}
+
+
 CLStatus CLMsgLoopManagerForEpoll::WaitForMessage()
 {
 	if(m_pMsgReceiver)
@@ -105,6 +147,7 @@ CLStatus CLMsgLoopManagerForEpoll::NotifyReadable(int fd)
 	CLStatus s = WaitForMessage();
 	if(!s.IsSuccess())
 	{
+		//此处 要不要回收这个 msgReceiver？？
 		CLLogger::WriteLogMsg("In CLMsgLoopManagerForEpoll::NotifyReadable(), WaitForMessage() error", 0);
 		return CLStatus(-1, 0);
 	}

@@ -7,7 +7,7 @@
 class CLEpoll;
 class CLEpollEvent;
 
-#define EPOLL_MAX_FD_SIZE 1000
+#define EPOLL_MAX_FD_SIZE 1024
 
 class CLMsgLoopManagerForEpoll : public CLMessageLoopManager
 {
@@ -19,6 +19,7 @@ public:
 
 public:	
 	virtual CLStatus Register(unsigned long lMsgID, CallBackForMessageLoop pMsgProcessFunction);
+	virtual CLStatus RegisterMsgReceiver(CLMessageReceiver *pReceiver);
 
 	CLStatus RecycleMsgReceiver();
 	CLStatus RecycleMsgPoster();
@@ -37,7 +38,8 @@ private:
 protected:
 	CLEpoll *m_pEpoll;
 	CLMessageReceiver* m_pMsgReceiver;
-	map<fd, CLEpollEvent*> m_MsgReceiverMap;//!!!!
+	map<fd, CLMessageReceiver*> m_MsgReceiverMap;//!!!!
+	map<fd, CLEpollEvent*> m_EpollEventMap;
 };
 
 #endif

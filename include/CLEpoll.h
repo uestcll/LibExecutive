@@ -4,7 +4,6 @@
 #include <sys/epoll.h>
 #include "CLStatus.h"
 
-class CLMsgLoopManagerForEpoll;
 
 class CLEpoll
 {
@@ -14,7 +13,8 @@ public:
 
 public:
 	CLStatus Run();
-	CLStatus Initialize(int maxFdSize, CLMsgLoopManagerForEpoll *pMsgLoopManager = NULL);
+	CLStatus Initialize(int maxFdSize);
+	CLStatus DoEvent(CLEpollEvent *pEvent, int fd, int epollOpt, int epollEvents);
 
 
 private:
@@ -22,7 +22,7 @@ private:
 	int 				m_iEpollFd;
 	int 				m_iMaxEventSize;
 
-	CLMsgLoopManagerForEpoll *m_pMsgLoopManager;
+	// CLMsgLoopManagerForEpoll *m_pMsgLoopManager;
 };
 
 #endif

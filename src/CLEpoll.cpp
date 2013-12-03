@@ -4,6 +4,8 @@
 
 #include "CLEpoll.h"
 #include "CLLogger.h"
+#include "CLDelayedDataPoster.h"
+#include "CLMsgLoopManagerForEpoll.h"
 
 #define DEFAULT_EPOLLWAIT_TIME 5
 
@@ -16,7 +18,7 @@ CLEpoll::CLEpoll()
 
 CLEpoll::~CLEpoll()
 {
-
+	close(m_iEpollFd);
 }
 
 CLStatus CLEpoll::Initialize(int maxFdSize)
@@ -42,7 +44,7 @@ CLStatus CLEpoll::DoEvent(CLEpollEvent *pEvent, int fd, int epollOpt, int epollE
 {
 	struct epoll_event ev;
 	memset(&ev, 0, sizeof(struct epoll_event));
-	ev.data.ptr = pEvent->GetHandlePtr();
+	ev.data.ptr = pEvent->GetHandler();
 	ev.events = epollEvents;
 
 	if(0 > epoll_ctl(m_iEpollFd, epollOpt, fd, &ev))
@@ -77,10 +79,35 @@ CLStatus CLEpoll::Run()
             }
             if ( m_pEpollEvents[i].events & EPOLLOUT )
             {
-               continue;
+            	CLDelayedDataPoster *pDataPoster = (CLDelayedDataPoster *)m_pEpollEvents[i].data.ptr;
+            	if(pDataPoster == NULL)
+            	{
+            		CLLogger::WriteLogMsg("In CLEpoll::Run(), pDataPoster == NULL", 0);
+            		continue;
+               	}
+               	CLStatus s = pDataPoster->SendData();
+               	if(!s.IsSuccess())
+               	{
+               		CLLogger::WriteLogMsg("In CLEpoll::Run(), pDataPoster->SendData() error", 0);
+               	}
+
+               	continue;
             }
             if ( m_pEpollEvents[i].events & EPOLLIN )
             {
+            	CLMsgLoopManagerForEpoll *pMsgLoopManager = (CLMsgLoopManagerForEpoll *)m_pEpollEvents[i].data.ptr;
+            	if(pMsgLoopManager)
+            	{
+            		CLStatus s = pMsgLoopManager->NotifyReadable(m_pEpollEvents[i].data.fd);
+            		if(!s.IsSuccess())
+            		{
+            			CLLogger::WriteLogMsg("In CLEpoll::Run(), pMsgLoopManager->NotifyReadable() error", 0);
+            		}
+            	}
+            	else
+            	{
+            		CLLogger::WriteLogMsg("In CLEpoll::Run(), pMsgLoopManager is NULL", 0);
+            	}
                 continue;
             }
 		}
