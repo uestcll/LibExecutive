@@ -9,7 +9,7 @@ using namespace std;
 class CLTimerFd
 {
 public:
-	CLTimerFd(struct itimerspec sTimerValue, string pstrRemoteName, int ID);
+	CLTimerFd(struct itimerspec& sTimerValue, string pstrRemoteName, const int& ID);
 	virtual ~CLTimerFd();
 
 public:

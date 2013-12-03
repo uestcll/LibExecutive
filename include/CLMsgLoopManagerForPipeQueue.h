@@ -19,7 +19,7 @@ class CLNamedPipe;
 class CLMsgLoopManagerForPipeQueue : public CLMessageLoopManager
 {
 public:
-	CLMsgLoopManagerForPipeQueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName, int PipeQueueType, CLMultiMsgDeserializer *pMultiMsgDeserializer = NULL);
+	CLMsgLoopManagerForPipeQueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName, int PipeQueueType, CLMessageDeserializer *pMsgDeserializer = NULL);
 	virtual ~CLMsgLoopManagerForPipeQueue();
 
 	CLStatus RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer);
@@ -40,7 +40,7 @@ private:
 	CLEvent *m_pEvent;
 	bool m_bIsShared;
 	// CLNamedPipe *m_pNamedPipe;
-	CLMultiMsgDeserializer *m_pMultiMsgDeserializer;	
+	CLMessageDeserializer *m_pMultiMsgDeserializer;	
 };
 
 #endif

@@ -4,16 +4,41 @@
 #include "CLEpoll.h"
 #include "CLMessageObserver.h"
 #include "CLEpollEvent.h"
+#include "CLMultiMsgDeserializer.h"
+#include "CLMessageDeserializer.h"
+#include "CLMsgLoopManagerForPipeQueue.h"
+#include "CLMessageReceiverByTimerFd.h"
+#include "CLTimerFd.h"
+#include "CLPointerMsgDeserializer.h"
+#include "CLProtoParserForPointerMsg.h"
+#include "CLProtoParserForDefaultMsgFormat.h"
 
-CLMsgLoopManagerForEpoll::CLMsgLoopManagerForEpoll(CLMessageObserver *pMessageObserver, CLEpoll *pEpoll) : CLMessageLoopManager(pMessageObserver)
+
+CLMsgLoopManagerForEpoll::CLMsgLoopManagerForEpoll(CLMessageObserver *pMessageObserver, CLEpoll *pEpoll, CLMessageDeserializer *pMsgDeserializer) : CLMessageLoopManager(pMessageObserver)
 {
 	m_pEpoll = pEpoll;
 	m_pMsgReceiver = NULL;
-}
+	m_pMultiMsgDeserializer = pMsgDeserializer;
+	if(!m_pMultiMsgDeserializer)
+		m_pMultiMsgDeserializer = new CLMultiMsgDeserializer();
+	m_pPointerMsgDeserializer = NULL;
+}	
 
 CLMsgLoopManagerForEpoll::~CLMsgLoopManagerForEpoll()
 {
+	map<fd, CLMessageReceiver*>::iterator it = m_MsgReceiverMap.begin();
 
+	for(; it != m_MsgReceiverMap.end(); ++it)
+		delete it->second;
+
+	map<fd, CLEpollEvent*>::iterator it = m_EpollEventMap.begin();
+	for(; it != m_EpollEventMap.end(); ++it)
+		delete it->second;
+
+	if(m_pPointerMsgDeserializer)
+		delete m_pPointerMsgDeserializer;
+	if(m_pMultiMsgDeserializer)
+		delete m_pMultiMsgDeserializer;
 }
 
 CLStatus CLMsgLoopManagerForEpoll::Register(unsigned long lMsgID, CallBackForMessageLoop pMsgProcessFunction)
@@ -120,6 +145,16 @@ CLStatus CLMsgLoopManagerForEpoll::RegisterMsgReceiver(CLMessageReceiver *pRecei
 	return CLStatus(0, 0);
 }
 
+CLStatus CLMsgLoopManagerForEpoll::RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer)
+{
+	CLStatus s = m_pMultiMsgDeserializer->RegisterDeserializer(lMsgID, pDeserializer);
+	if(!s.IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLMsgLoopManagerForEpoll::RegisterDeserializer(), m_pMultiMsgDeserializer->RegisterDeserializer() error", 0);
+		return s;
+	}
+	return CLStatus(0, 0);
+}
 
 CLStatus CLMsgLoopManagerForEpoll::WaitForMessage()
 {
@@ -172,4 +207,29 @@ CLStatus CLMsgLoopManagerForEpoll::NotifyReadable(int fd)
 	}
 
 	return CLStatus(0, 0);
+}
+
+CLStatus CLMsgLoopManagerForEpoll::RegisterPipeReceiver(string strPipeName, int pipeType)
+{
+	if(pipeType == PIPE_QUEUE_BETWEEN_PROCESS)
+	{
+		return RegisterMsgReceiver(new CLMessageReceiver(new CLDataReceiverByNamedPipe(strPipeName.c_str(), true), new CLProtoParserForDefaultMsgFormat(), m_pMultiMsgDeserializer));
+	
+	}
+	else if(pipeType == PIPE_QUEUE_IN_PROCESS)
+	{
+		m_pPointerMsgDeserializer = new CLPointerMsgDeserializer();
+		return RegisterMsgReceiver(new CLMessageReceiver(new CLDataReceiverByNamedPipe(strPipeName.c_str()), new CLProtoParserForPointerMsg(), m_pPointerMsgDeserializer));
+	}
+	else
+	{
+		CLLogger::WriteLogMsg("In CLMsgLoopManagerForEpoll::RegisterPipeReceiver(), pipeType error", 0);
+	}
+	return CLStatus(-1, 0);
+}
+
+CLStatus CLMsgLoopManagerForEpoll::RegisterTimerReceiver(struct itimerspec& sTimerValue, string pstrRemoteName, const int& ID)
+{
+	return RegisterMsgReceiver(new CLMessageReceiverByTimerFd(new CLTimerFd(sTimerValue, pstrRemoteName, ID)));
+
 }

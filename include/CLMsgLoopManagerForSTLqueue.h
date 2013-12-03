@@ -8,6 +8,7 @@
 
 class CLSTLQueue;
 class CLEvent;
+class CLPointerMsgDeserializer;
 
 class CLMsgLoopManagerForSTLqueue : public CLMessageLoopManager
 {
@@ -33,6 +34,7 @@ private:
 	std::string m_strThreadName;
 	CLEvent     *m_pEvent;
 	CLSTLQueue *m_pStlQueue;
+	CLPointerMsgDeserializer m_pMsgDeserializer;
 };
 
 #endif

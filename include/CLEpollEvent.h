@@ -18,7 +18,8 @@ public:
 
 	CLStatus RegisterREvent();
 	CLStatus RegisterWEvent();
-	CLStatus RegisterRWEvent();
+	CLStatus RegisterRWEvents();
+	CLStatus UnRegisterRWEvents();
 
 	CLStatus OpenREvent();
 	CLStatus OpenWEvent();
@@ -29,10 +30,11 @@ private:
 	CLEpoll *m_pEpoll;
 	void *m_pHandle;
 	int m_Fd;
+	unsigned int m_Event;
 
 	bool m_bReadFlag;
 	bool m_bWriteFlag;
-	
+
 private:
 	CLEpollEvent(const CLEpollEvent&);
 	CLEpollEvent& operator=(const CLEpollEvent&);

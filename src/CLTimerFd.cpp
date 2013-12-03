@@ -7,7 +7,7 @@
 #include "CLTimerFd.h"
 #include "CLLogger.h"
 
-CLTimerFd::CLTimerFd(struct itimerspec sTimerValue, string pstrRemoteName, int ID)
+CLTimerFd::CLTimerFd(struct itimerspec& sTimerValue, string pstrRemoteName, const int& ID)
 {
 	m_strRemoteName = pstrRemoteName;
 	m_ID = ID;

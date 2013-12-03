@@ -20,11 +20,13 @@ CLMsgLoopManagerForSTLqueue::CLMsgLoopManagerForSTLqueue(CLMessageObserver *pMsg
 	m_strThreadName = pstrThreadName;
 	m_pStlQueue = new CLSTLQueue();
 	m_pEvent = new CLEvent(true);
-	m_pMsgReceiver = new CLMessageReceiver(new CLDataReceiverBySTLQueue(m_pStlQueue), new CLProtoParserForPointerMsg(), new CLPointerMsgDeserializer());
+	m_pMsgDeserializer = new CLPointerMsgDeserializer();
+	m_pMsgReceiver = new CLMessageReceiver(new CLDataReceiverBySTLQueue(m_pStlQueue), new CLProtoParserForPointerMsg(), m_pMsgDeserializer);
 }
 
 CLMsgLoopManagerForSTLqueue::~CLMsgLoopManagerForSTLqueue()
 {
+	delete m_pMsgDeserializer;
     delete m_pMsgReceiver;
 }
 

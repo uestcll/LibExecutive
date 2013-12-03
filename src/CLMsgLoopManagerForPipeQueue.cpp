@@ -13,7 +13,7 @@
 #include "CLPointerMsgSerializer.h"
 #include "CLMessage.h"
 
-CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName, int PipeQueueType, CLMultiMsgDeserializer *pMultiMsgDeserializer) : CLMessageLoopManager(pMsgObserver), m_bIsShared(false)
+CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName, int PipeQueueType,  CLMessageDeserializer *pMsgDeserializer) : CLMessageLoopManager(pMsgObserver), m_bIsShared(false)
 {
 	if((pstrThreadName == 0) || (strlen(pstrThreadName) == 0))
 		throw "In CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(), pstrThreadName error";
@@ -25,21 +25,21 @@ CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(CLMessageObserver *pM
 	{
 		m_bIsShared = true;
 		m_pEvent = new CLEvent(m_strThreadName.c_str(), true);
-		if(pMultiMsgDeserializer)
+		if(pMsgDeserializer)
 		{
-			m_pMultiMsgDeserializer = pMultiMsgDeserializer;
+			m_pMsgDeserializer = pMultiMsgDeserializer;
 		}
 		else
 		{
-			m_pMultiMsgDeserializer = new CLMultiMsgDeserializer();
+			m_pMsgDeserializer = new CLMultiMsgDeserializer();
 		}
-		m_pMsgReceiver = new CLMessageReceiver(new CLDataReceiverByNamedPipe(m_strThreadName.c_str(), true), new CLProtoParserForDefaultMsgFormat(), m_pMultiMsgDeserializer);
+		m_pMsgReceiver = new CLMessageReceiver(new CLDataReceiverByNamedPipe(m_strThreadName.c_str(), true), new CLProtoParserForDefaultMsgFormat(), m_pMsgDeserializer);
 	}
 	else if(PipeQueueType == PIPE_QUEUE_IN_PROCESS)
 	{
 		m_pEvent = new CLEvent(true);
-		m_pMultiMsgDeserializer = NULL;
-		m_pMsgReceiver = new CLMessageReceiver(new CLDataReceiverByNamedPipe(m_strThreadName.c_str()), new CLProtoParserForPointerMsg(), new CLPointerMsgDeserializer());
+		m_pMsgDeserializer = new CLPointerMsgDeserializer();
+		m_pMsgReceiver = new CLMessageReceiver(new CLDataReceiverByNamedPipe(m_strThreadName.c_str()), new CLProtoParserForPointerMsg(), m_pMsgDeserializer);
 	}
 	else
 		throw "In CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(), PipeQueueType error";
@@ -48,6 +48,8 @@ CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(CLMessageObserver *pM
 CLMsgLoopManagerForPipeQueue::~CLMsgLoopManagerForPipeQueue()
 {
 	delete m_pMsgReceiver;
+	delete m_pMsgDeserializer;
+	
 	if(m_bIsShared)
 		delete m_pEvent;
 }

@@ -51,11 +51,11 @@ CLMessageReceiver::CLMessageReceiver(CLDataReceiver *pDataReceiver, CLProtoParse
 			delete m_pDataReceiver;
 			m_pDataReceiver = NULL;
 		}
-		if(m_pMsgDeserializer != NULL)
-		{
-			delete m_pMsgDeserializer;
-			m_pMsgDeserializer = NULL;
-		}
+		// if(m_pMsgDeserializer != NULL)
+		// {
+		// 	delete m_pMsgDeserializer;
+		// 	m_pMsgDeserializer = NULL;
+		// }
 
 		throw s;
 	}
@@ -74,11 +74,11 @@ CLMessageReceiver::~CLMessageReceiver()
 		delete m_pDataReceiver;
 		m_pDataReceiver = NULL;
 	}
-	if(m_pMsgDeserializer != NULL)
-	{
-		delete m_pMsgDeserializer;
-		m_pMsgDeserializer = NULL;
-	}
+	// if(m_pMsgDeserializer != NULL)
+	// {
+	// 	delete m_pMsgDeserializer;
+	// 	m_pMsgDeserializer = NULL;
+	// }
 
 	// while(true)
 	// {
@@ -89,6 +89,11 @@ CLMessageReceiver::~CLMessageReceiver()
 	// 	delete pMsg;
 	// }
 }
+
+// CLStatus CLMessageReceiver::SetMsgDeserializer()
+// {
+// 	m_pMsgDeserializer
+// }
 
 CLStatus CLMessageReceiver::GetMessage(queue<CLMessage*> &MessageQueue)
 {
