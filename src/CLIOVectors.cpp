@@ -441,8 +441,6 @@ CLStatus CLIOVectors::TransferBlockByIndex(bool bWriteIntoIOVectors, unsigned in
 
 	CLIteratorForIOVectors iter;
 	GetIterator(Index, iter);
-	if(iter.IsEnd())
-		return CLStatus(-1, NORMAL_ERROR);
 
 	return TransferBlock(bWriteIntoIOVectors, iter.m_pData, iter.m_Iter, pBuf, Length);
 }
