@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
+#include <stdint.h>
 
 #include "CLTimerFd.h"
 #include "CLLogger.h"
@@ -35,6 +36,23 @@ CLStatus CLTimerFd::StartClock()
 		CLLogger::WriteLogMsg("In CLMessageReceiverByTimerFd::CLMessageReceiverByTimerFd(), timerfd_settime error", 0);
 		return CLStatus(-1, 0);
 	}
+
+	return CLStatus(0, 0);
+}
+
+CLStatus CLTimerFd::Read()
+{
+	uint64_t eps;
+
+	ssize_t a = read(m_Fd, &eps, sizeof(uint64_t));
+	if(a != sizeof(uint64_t))
+	{
+		CLLogger::WriteLogMsg("In  CLTimerFd::Read(), read context is not int sizeof unit64_t", 0);
+		return CLStatus(-1, 0);
+	}
+#ifdef debug_for_timer
+    printf("timer out!!!!!!!!!!, the value is %ld\n", eps);
+#endif 
 
 	return CLStatus(0, 0);
 }

@@ -13,8 +13,6 @@ class CLProtoParser;
 
 using namespace std;
 
-#define EPOLL_MAX_FD_SIZE 1024
-
 class CLMsgLoopManagerForEpoll : public CLMessageLoopManager
 {
 public:
@@ -27,6 +25,7 @@ public:
 	CLStatus RegisterTimerReceiver(struct itimerspec& sTimerValue, string pstrRemoteName, const int& ID);
 	// CLStatus RegisterSocketReceiver(CLSocket );
 
+	CLStatus UnRegisterMsgReceiver(int fd);
 	CLStatus RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer);
 	// CLStatus RecycleMsgReceiver();
 	// CLStatus RecycleMsgPoster();

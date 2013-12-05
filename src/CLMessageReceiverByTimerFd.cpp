@@ -29,11 +29,16 @@ CLMessageReceiverByTimerFd::~CLMessageReceiverByTimerFd
  
 CLStatus CLMessageReceiverByTimerFd::GetMessage(std::queue<CLMessage*> &MessageQueue)]
 {
+	CLStatus s = m_pTimer->Read();
+	if(!s.IsSuccess())
+		return CLStatus(-1, 0);
+
 	CLMessage *pMsg = new CLTimerOutMsg();
 
 	pMsg->m_strRemoteName = m_pTimer->GetRemoteName();
 	pMsg->m_iEchoID = m_pTimer->GetTimerID();
 	pMsg->m_bRepeat = m_pTimer->IsRepeatTimer();
+	pMsg->m_iTimeFd = m_pTimer->GetTimerFd();
 
 	MessageQueue.push_back(pMsg);
 

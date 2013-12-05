@@ -4,6 +4,7 @@
 #include <sys/epoll.h>
 #include "CLStatus.h"
 
+#define EPOLL_MAX_FD_SIZE 1024
 
 class CLEpoll
 {

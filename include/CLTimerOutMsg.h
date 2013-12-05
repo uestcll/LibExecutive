@@ -1,10 +1,9 @@
 #ifndef CLTIMEROUTMSG_H
 #define CLTIMEROUTMSG_H
 
-#define TIMER_OUT_MSG_ID 41
-
 #include "CLMessage.h"
 #include <string>
+#include "MessageID.h"
 
 class CLTimerOutMsg : public CLMessage
 {
@@ -13,9 +12,12 @@ public:
 	{
 
 	}
+
 public:
 	std::string m_strRemoteName;
 	int m_iEchoID; 
+	bool m_bRepeat;
+	int m_iTimeFd;
 };
 
 #endif

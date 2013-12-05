@@ -4,7 +4,7 @@
 
 #include "CLEpoll.h"
 #include "CLLogger.h"
-#include "CLDelayedDataPoster.h"
+// #include "CLDelayedDataPoster.h"
 #include "CLMsgLoopManagerForEpoll.h"
 
 #define DEFAULT_EPOLLWAIT_TIME 5
@@ -80,16 +80,16 @@ CLStatus CLEpoll::Run()
             if ( m_pEpollEvents[i].events & EPOLLOUT )
             {
             	CLDelayedDataPoster *pDataPoster = (CLDelayedDataPoster *)m_pEpollEvents[i].data.ptr;
-            	if(pDataPoster == NULL)
-            	{
-            		CLLogger::WriteLogMsg("In CLEpoll::Run(), pDataPoster == NULL", 0);
-            		continue;
-               	}
-               	CLStatus s = pDataPoster->SendData();
-               	if(!s.IsSuccess())
-               	{
-               		CLLogger::WriteLogMsg("In CLEpoll::Run(), pDataPoster->SendData() error", 0);
-               	}
+            	// if(pDataPoster == NULL)
+            	// {
+            	// 	CLLogger::WriteLogMsg("In CLEpoll::Run(), pDataPoster == NULL", 0);
+            	// 	continue;
+             //   	}
+             //   	CLStatus s = pDataPoster->SendData();
+             //   	if(!s.IsSuccess())
+             //   	{
+             //   		CLLogger::WriteLogMsg("In CLEpoll::Run(), pDataPoster->SendData() error", 0);
+             //   	}
 
                	continue;
             }

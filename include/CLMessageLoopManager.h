@@ -4,14 +4,13 @@
 #include <map>
 #include <queue>
 #include "CLStatus.h"
+#include "MessageID.h"
 
 class CLMessageObserver;
 class CLMessage;
 class CLExecutiveInitialFinishedNotifier;
 
 typedef CLStatus (CLMessageObserver::*CallBackForMessageLoop)(CLMessage *);
-
-#define QUIT_MESSAGE_LOOP 1
 
 struct SLExecutiveInitialParameter
 {

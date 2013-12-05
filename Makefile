@@ -1,8 +1,37 @@
 libexecutive.a : CLConditionVariable.o CLCriticalSection.o CLEvent.o CLExecutive.o CLExecutiveCommunication.o CLExecutiveCommunicationByNamedPipe.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessageSerializer.o   CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o CLPrivateExecutiveCommunicationByNamedPipe.o CLProcess.o CLProcessFunctionForExec.o CLSharedConditionVariableImpl.o CLSharedEventImpl.o CLSharedMemory.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLStatus.o CLThread.o CLThreadInitialFinishedNotifier.o  CLBuffer.o CLDataReceiver.o CLDataReceiverBySTLQueue.o CLMessageReceiver.o CLIOVector.o CLSTLQueue.o CLProtoParser.o CLPointerMsgDeserializer.o CLDataReceiverByNamedPipe.o \
-CLNamedPipe.o CLProtoParserForDefaultMsgFormat.o CLProtoEncapForDefaultMsgFormat.o CLMultiMsgDeserializer.o CLMultiMsgSerializer.o CLDataPoster.o CLDataPosterBySTLQueue.o CLDataPosterByNamedPipe.o CLDataPosterChannelMaintainer.o CLDataPosterChannelByNamedPipeMaintainer.o CLDataPosterChannelBySTLQueueMaintainer.o CLProtocolDataPoster.o CLProtocolEncapsulator.o CLMessagePoster.o CLPointerMsgSerializer.o CLMsgLoopManagerForSTLqueue.o CLProtoParserForPointerMsg.o CLMsgLoopManagerForPipeQueue.o CLDataPostResultNotifier.o
+CLNamedPipe.o CLProtoParserForDefaultMsgFormat.o CLProtoEncapForDefaultMsgFormat.o CLMultiMsgDeserializer.o CLMultiMsgSerializer.o CLDataPoster.o CLDataPosterBySTLQueue.o CLDataPosterByNamedPipe.o CLDataPosterChannelMaintainer.o CLDataPosterChannelByNamedPipeMaintainer.o CLDataPosterChannelBySTLQueueMaintainer.o CLProtocolDataPoster.o CLProtocolEncapsulator.o CLMessagePoster.o CLPointerMsgSerializer.o CLMsgLoopManagerForSTLqueue.o CLProtoParserForPointerMsg.o CLMsgLoopManagerForPipeQueue.o CLDataPostResultNotifier.o CLEpoll.o CLEpollEvent.o CLMsgLoopManagerForEpoll.o CLTimerFd.o CLTimerApplyMsgDeserializer.o CLTimerApplyMsgSerializer.o CLTimerOutNotifyMsgDeserializer.o CLTimerOutNotifyMsgSerializer.o CLMessageReceiverByTimerFd.o
 	ar -rc libexecutive.a CLConditionVariable.o CLCriticalSection.o CLEvent.o CLExecutive.o CLExecutiveCommunication.o CLExecutiveCommunicationByNamedPipe.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessageSerializer.o  CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o  CLPrivateExecutiveCommunicationByNamedPipe.o  CLProcess.o CLProcessFunctionForExec.o CLSharedConditionVariableImpl.o CLSharedEventImpl.o CLSharedMemory.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLStatus.o CLThread.o CLThreadInitialFinishedNotifier.o CLBuffer.o CLDataReceiver.o CLDataReceiverBySTLQueue.o CLMessageReceiver.o CLIOVector.o CLSTLQueue.o CLProtoParser.o CLPointerMsgDeserializer.o CLDataReceiverByNamedPipe.o \
-CLNamedPipe.o CLProtoParserForDefaultMsgFormat.o CLProtoEncapForDefaultMsgFormat.o CLMultiMsgDeserializer.o CLMultiMsgSerializer.o CLDataPoster.o CLDataPosterBySTLQueue.o CLDataPosterByNamedPipe.o CLDataPosterChannelMaintainer.o CLDataPosterChannelByNamedPipeMaintainer.o CLDataPosterChannelBySTLQueueMaintainer.o CLProtocolDataPoster.o CLProtocolEncapsulator.o CLMessagePoster.o CLPointerMsgSerializer.o CLMsgLoopManagerForSTLqueue.o CLProtoParserForPointerMsg.o CLMsgLoopManagerForPipeQueue.o CLDataPostResultNotifier.o
+CLNamedPipe.o CLProtoParserForDefaultMsgFormat.o CLProtoEncapForDefaultMsgFormat.o CLMultiMsgDeserializer.o CLMultiMsgSerializer.o CLDataPoster.o CLDataPosterBySTLQueue.o CLDataPosterByNamedPipe.o CLDataPosterChannelMaintainer.o CLDataPosterChannelByNamedPipeMaintainer.o CLDataPosterChannelBySTLQueueMaintainer.o CLProtocolDataPoster.o CLProtocolEncapsulator.o CLMessagePoster.o CLPointerMsgSerializer.o CLMsgLoopManagerForSTLqueue.o CLProtoParserForPointerMsg.o CLMsgLoopManagerForPipeQueue.o CLDataPostResultNotifier.o CLEpoll.o CLEpollEvent.o CLMsgLoopManagerForEpoll.o CLTimerFd.o CLTimerApplyMsgDeserializer.o CLTimerApplyMsgSerializer.o CLTimerOutNotifyMsgDeserializer.o CLTimerOutNotifyMsgSerializer.o CLMessageReceiverByTimerFd.o
 	rm *.o
+
+##for timer
+CLEpoll.o : ./src/CLEpoll.cpp
+	g++ -o CLEpoll.o -c ./src/CLEpoll.cpp -I./include -g
+
+CLEpollEvent.o : ./src/CLEpollEvent.cpp
+	g++ -o CLEpollEvent.o -c ./src/CLEpollEvent.cpp -I./include -g
+
+CLMsgLoopManagerForEpoll.o : ./src/CLMsgLoopManagerForEpoll.cpp
+	g++ -o CLMsgLoopManagerForEpoll.o -c ./src/CLMsgLoopManagerForEpoll.cpp -I./include -g
+
+CLTimerFd.o : ./src/CLTimerFd.cpp
+	g++ -o CLTimerFd.o -c ./src/CLTimerFd.cpp -I./include -g
+
+CLTimerApplyMsgDeserializer.o : ./src/CLTimerApplyMsgDeserializer.cpp
+	g++ -o CLTimerApplyMsgDeserializer.o -c ./src/CLTimerApplyMsgDeserializer.cpp -I./include -g
+
+CLTimerApplyMsgSerializer.o : ./src/CLTimerApplyMsgSerializer.cpp
+	g++ -o CLTimerApplyMsgSerializer.o -c ./src/CLTimerApplyMsgSerializer.cpp -I./include -g
+
+CLTimerOutNotifyMsgDeserializer.o : ./src/CLTimerOutNotifyMsgDeserializer.cpp
+	g++ -o CLTimerOutNotifyMsgDeserializer.o -c ./src/CLTimerOutNotifyMsgDeserializer.cpp -I./include -g
+
+CLTimerOutNotifyMsgSerializer.o : ./src/CLTimerOutNotifyMsgSerializer.cpp
+	g++ -o CLTimerOutNotifyMsgSerializer.o -c ./src/CLTimerOutNotifyMsgSerializer.cpp -I./include -g
+
+CLMessageReceiverByTimerFd.o : ./src/CLMessageReceiverByTimerFd.cpp
+	g++ -o CLMessageReceiverByTimerFd.o -c ./src/CLMessageReceiverByTimerFd.cpp -I./include -g
+
 
 
 CLDataPostResultNotifier.o : ./src/CLDataPostResultNotifier.cpp

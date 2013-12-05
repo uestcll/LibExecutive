@@ -14,6 +14,7 @@ public:
 
 public:
 	CLStatus startClock();
+	CLStatus Read();
 
 	const bool& IsRepeatTimer();
 	const string& GetRemoteName();

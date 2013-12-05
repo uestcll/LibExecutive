@@ -11,7 +11,7 @@
 #include "CLTimerFd.h"
 #include "CLPointerMsgDeserializer.h"
 #include "CLProtoParserForPointerMsg.h"
-#include "CLProtoParserForDefaultMsgFormat.h"
+#include "CLProtoParserForDefaultMsgFormat"
 
 
 CLMsgLoopManagerForEpoll::CLMsgLoopManagerForEpoll(CLMessageObserver *pMessageObserver, CLEpoll *pEpoll, CLMessageDeserializer *pMsgDeserializer) : CLMessageLoopManager(pMessageObserver)
@@ -21,7 +21,7 @@ CLMsgLoopManagerForEpoll::CLMsgLoopManagerForEpoll(CLMessageObserver *pMessageOb
 	m_pMultiMsgDeserializer = pMsgDeserializer;
 	if(!m_pMultiMsgDeserializer)
 		m_pMultiMsgDeserializer = new CLMultiMsgDeserializer();
-	m_pPointerMsgDeserializer = NULL;
+	m_pPointerMsgDeserializer = new CLPointerMsgDeserializer();
 }	
 
 CLMsgLoopManagerForEpoll::~CLMsgLoopManagerForEpoll()
@@ -145,6 +145,35 @@ CLStatus CLMsgLoopManagerForEpoll::RegisterMsgReceiver(CLMessageReceiver *pRecei
 	return CLStatus(0, 0);
 }
 
+CLStatus CLMsgLoopManagerForEpoll::UnRegisterMsgReceiver(int fd)
+{
+	map<fd, CLEpollEvent*>::iterator it = m_EpollEventMap.find(fd);
+	if(it == m_EpollEventMap.end())
+	{
+		CLLogger::WriteLogMsg("In CLMsgLoopManagerForEpoll::UnRegisterMsgReceiver(), it == m_EpollEventMap.end()", 0);
+		return CLStatus(-1, 0);
+	}
+	CLStatus s = it->second->UnRegisterRWEvents();
+	if(!s.IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLMsgLoopManagerForEpoll::UnRegisterMsgReceiver(), UnRegisterRWEvents() error", 0);
+		return CLStatus(-1 ,0);
+	}
+	delete it->second;
+	m_EpollEventMap.erase(it);
+
+	map<fd, CLMessageReceiver*>::iterator it = m_MsgReceiverMap.find(fd);
+	if(it == m_MsgReceiverMap.end())
+	{
+		CLLogger::WriteLogMsg("In CLMsgLoopManagerForEpoll::UnRegisterMsgReceiver(), it == m_MsgReceiverMap.end()", 0);
+		return CLStatus(-1, 0);
+	}
+	delete it->second;
+	m_MsgReceiverMap.erase(it);
+
+	return CLStatus(0, 0);
+}
+
 CLStatus CLMsgLoopManagerForEpoll::RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer)
 {
 	CLStatus s = m_pMultiMsgDeserializer->RegisterDeserializer(lMsgID, pDeserializer);
@@ -218,7 +247,7 @@ CLStatus CLMsgLoopManagerForEpoll::RegisterPipeReceiver(string strPipeName, int 
 	}
 	else if(pipeType == PIPE_QUEUE_IN_PROCESS)
 	{
-		m_pPointerMsgDeserializer = new CLPointerMsgDeserializer();
+		
 		return RegisterMsgReceiver(new CLMessageReceiver(new CLDataReceiverByNamedPipe(strPipeName.c_str()), new CLProtoParserForPointerMsg(), m_pPointerMsgDeserializer));
 	}
 	else
