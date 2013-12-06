@@ -13,7 +13,7 @@ public:
 	virtual ~CLTimerFd();
 
 public:
-	CLStatus startClock();
+	CLStatus StartClock();
 	CLStatus Read();
 
 	const bool& IsRepeatTimer();
@@ -33,3 +33,5 @@ private:
 	CLTimerFd& operator=(const CLTimerFd&);
 
 };
+
+#endif

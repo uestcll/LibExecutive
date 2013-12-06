@@ -17,15 +17,15 @@ CLStatus CLTimerApplyMsgDeserializer::Deserialize(CLIOVector &dataVec, CLMessage
 {
 	CLTimerApplyMsg *pTimerApplyMsg = new CLTimerApplyMsg();
 
-	struc itimerspec *pTimeValue = &(pTimerApplyMsg->m_sTimeValue);
+	struct itimerspec *pTimeValue = &(pTimerApplyMsg->m_sTimeValue);
 	int *pID = &(pTimerApplyMsg->m_iEchoID);
 
-	int nameLen = dataVec.Length() - sizeof(long) - sizeof(struct itimerspec) - sizeof(int)
+	int nameLen = dataVec.Length() - sizeof(long) - sizeof(struct itimerspec) - sizeof(int);
 	char *pName = new char [nameLen];
 
-	dataVec->ReadData((char*)(pTimeValue), sizeof(long), sizeof(struct itimerspec));
-	dataVec->ReadData((char*)(pID), sizeof(long) + sizeof(struct itimerspec), sizeof(int));
-	dataVec->ReadData(pName, sizeof(long) + sizeof(struct itimerspec) + sizeof(int), nameLen);
+	dataVec.ReadData((char*)(pTimeValue), sizeof(long), sizeof(struct itimerspec));
+	dataVec.ReadData((char*)(pID), sizeof(long) + sizeof(struct itimerspec), sizeof(int));
+	dataVec.ReadData(pName, sizeof(long) + sizeof(struct itimerspec) + sizeof(int), nameLen);
 
 	pTimerApplyMsg->m_strRemoteName = pName;
 

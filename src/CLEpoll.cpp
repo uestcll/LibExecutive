@@ -1,11 +1,12 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
-
+#include <string.h>
 #include "CLEpoll.h"
 #include "CLLogger.h"
 // #include "CLDelayedDataPoster.h"
 #include "CLMsgLoopManagerForEpoll.h"
+#include "CLEpollEvent.h"
 
 #define DEFAULT_EPOLLWAIT_TIME 5
 
@@ -79,7 +80,7 @@ CLStatus CLEpoll::Run()
             }
             if ( m_pEpollEvents[i].events & EPOLLOUT )
             {
-            	CLDelayedDataPoster *pDataPoster = (CLDelayedDataPoster *)m_pEpollEvents[i].data.ptr;
+            	//CLDelayedDataPoster *pDataPoster = (CLDelayedDataPoster *)m_pEpollEvents[i].data.ptr;
             	// if(pDataPoster == NULL)
             	// {
             	// 	CLLogger::WriteLogMsg("In CLEpoll::Run(), pDataPoster == NULL", 0);

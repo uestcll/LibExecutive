@@ -5,13 +5,14 @@
 #include <string>
 
 #include "CLStatus.h"
+#include "CLMessageReceiver.h"
 
 class CLMessage;
 class CLTimerFd;
 
 struct itimerspec;
 
-class CLMessageReceiverByTimerFd
+class CLMessageReceiverByTimerFd : public CLMessageReceiver
 {
 public:
 	CLMessageReceiverByTimerFd(CLTimerFd *pTimer);

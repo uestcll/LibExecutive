@@ -2,7 +2,9 @@
 #include "CLStatus.h"
 #include "CLLogger.h"
 #include "CLEpoll.h"
+#include "CLMessage.h"
 #include "CLMessageObserver.h"
+#include "CLMessageLoopManager.h"
 #include "CLEpollEvent.h"
 #include "CLMultiMsgDeserializer.h"
 #include "CLMessageDeserializer.h"
@@ -11,10 +13,11 @@
 #include "CLTimerFd.h"
 #include "CLPointerMsgDeserializer.h"
 #include "CLProtoParserForPointerMsg.h"
-#include "CLProtoParserForDefaultMsgFormat"
+#include "CLProtoParserForDefaultMsgFormat.h"
+#include "CLExecutiveInitialFinishedNotifier.h"
+#include "CLDataReceiverByNamedPipe.h"
 
-
-CLMsgLoopManagerForEpoll::CLMsgLoopManagerForEpoll(CLMessageObserver *pMessageObserver, CLEpoll *pEpoll, CLMessageDeserializer *pMsgDeserializer) : CLMessageLoopManager(pMessageObserver)
+CLMsgLoopManagerForEpoll::CLMsgLoopManagerForEpoll(CLMessageObserver *pMessageObserver, CLEpoll *pEpoll, CLMultiMsgDeserializer *pMsgDeserializer) : CLMessageLoopManager(pMessageObserver)
 {
 	m_pEpoll = pEpoll;
 	m_pMsgReceiver = NULL;
@@ -26,14 +29,14 @@ CLMsgLoopManagerForEpoll::CLMsgLoopManagerForEpoll(CLMessageObserver *pMessageOb
 
 CLMsgLoopManagerForEpoll::~CLMsgLoopManagerForEpoll()
 {
-	map<fd, CLMessageReceiver*>::iterator it = m_MsgReceiverMap.begin();
+	map<int, CLMessageReceiver*>::iterator it = m_MsgReceiverMap.begin();
 
 	for(; it != m_MsgReceiverMap.end(); ++it)
 		delete it->second;
 
-	map<fd, CLEpollEvent*>::iterator it = m_EpollEventMap.begin();
-	for(; it != m_EpollEventMap.end(); ++it)
-		delete it->second;
+	map<int, CLEpollEvent*>::iterator iter = m_EpollEventMap.begin();
+	for(; iter != m_EpollEventMap.end(); ++iter)
+		delete iter->second;
 
 	if(m_pPointerMsgDeserializer)
 		delete m_pPointerMsgDeserializer;
@@ -115,7 +118,7 @@ CLStatus CLMsgLoopManagerForEpoll::RegisterMsgReceiver(CLMessageReceiver *pRecei
 		return CLStatus(-1, 0);
 	}
 
-	map<fd, CLMessageReceiver*>::iterator it = m_MsgReceiverMap.find(fd);
+	map<int, CLMessageReceiver*>::iterator it = m_MsgReceiverMap.find(fd);
 	if(it != m_MsgReceiverMap.end())
 	{
 		CLLogger::WriteLogMsg("In CLMsgLoopManagerForEpoll::RegisterMsgReceiver(), it != m_MsgReceiverMap.end()", 0);
@@ -123,8 +126,8 @@ CLStatus CLMsgLoopManagerForEpoll::RegisterMsgReceiver(CLMessageReceiver *pRecei
 	}
 	m_MsgReceiverMap[fd] = pReceiver;
 
-	map<fd, CLEpollEvent*>::iterator it = m_EpollEventMap.find(fd);
-	if(it != m_EpollEventMap.end())
+	map<int, CLEpollEvent*>::iterator iter = m_EpollEventMap.find(fd);
+	if(iter != m_EpollEventMap.end())
 	{
 		CLLogger::WriteLogMsg("In CLMsgLoopManagerForEpoll::RegisterMsgReceiver(), it != m_EpollEventMap.end()", 0);
 		return CLStatus(-1, 0);
@@ -147,7 +150,7 @@ CLStatus CLMsgLoopManagerForEpoll::RegisterMsgReceiver(CLMessageReceiver *pRecei
 
 CLStatus CLMsgLoopManagerForEpoll::UnRegisterMsgReceiver(int fd)
 {
-	map<fd, CLEpollEvent*>::iterator it = m_EpollEventMap.find(fd);
+	map<int, CLEpollEvent*>::iterator it = m_EpollEventMap.find(fd);
 	if(it == m_EpollEventMap.end())
 	{
 		CLLogger::WriteLogMsg("In CLMsgLoopManagerForEpoll::UnRegisterMsgReceiver(), it == m_EpollEventMap.end()", 0);
@@ -162,14 +165,14 @@ CLStatus CLMsgLoopManagerForEpoll::UnRegisterMsgReceiver(int fd)
 	delete it->second;
 	m_EpollEventMap.erase(it);
 
-	map<fd, CLMessageReceiver*>::iterator it = m_MsgReceiverMap.find(fd);
-	if(it == m_MsgReceiverMap.end())
+	map<int, CLMessageReceiver*>::iterator iter = m_MsgReceiverMap.find(fd);
+	if(iter == m_MsgReceiverMap.end())
 	{
 		CLLogger::WriteLogMsg("In CLMsgLoopManagerForEpoll::UnRegisterMsgReceiver(), it == m_MsgReceiverMap.end()", 0);
 		return CLStatus(-1, 0);
 	}
-	delete it->second;
-	m_MsgReceiverMap.erase(it);
+	delete iter->second;
+	m_MsgReceiverMap.erase(iter);
 
 	return CLStatus(0, 0);
 }
@@ -198,7 +201,7 @@ CLStatus CLMsgLoopManagerForEpoll::WaitForMessage()
 
 CLStatus CLMsgLoopManagerForEpoll::NotifyReadable(int fd)
 {
-	map<fd, CLMessageReceiver*>::iterator it =  m_MsgReceiverMap.find(fd);
+	map<int, CLMessageReceiver*>::iterator it =  m_MsgReceiverMap.find(fd);
 
 	if(it == m_MsgReceiverMap.end())
 	{

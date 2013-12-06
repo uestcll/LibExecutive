@@ -1,5 +1,5 @@
 #include <sys/epoll.h>
-#include <fnctl.h>
+#include <fcntl.h>
 #include <stdio.h>
 
 #include "CLEpollEvent.h"
@@ -21,7 +21,7 @@ CLEpollEvent::CLEpollEvent(CLEpoll *pEpoll)
 {
 	m_pEpoll = pEpoll;
 	m_Fd = -1;
-	m_pHandler = NULL;
+	m_pHandle = NULL;
 	m_bReadFlag = m_bWriteFlag = false;
 }
 
@@ -38,21 +38,21 @@ CLStatus CLEpollEvent::SetFd(int fd)
 
 CLStatus CLEpollEvent::SetHandler(void* pHandler)
 {
-	m_pHandler = pHandler;
+	m_pHandle = pHandler;
 
 	return CLStatus(0, 0);
 }
 
 void* CLEpollEvent::GetHandler()
 {
-	return m_pHandler;
+	return m_pHandle;
 }
 
-CLStatus CLEpollEvent::RegisterREvents()
+CLStatus CLEpollEvent::RegisterREvent()
 {
-	if(-1 == m_Fd || (NULL == m_pHandler))
+	if(-1 == m_Fd || (NULL == m_pHandle))
 	{
-		CLLogger::WriteLogMsg("In CLEpollEvent::RegisterREvent(), m_Fd = -1 | m_pHandler = NULL", 0);
+		CLLogger::WriteLogMsg("In CLEpollEvent::RegisterREvent(), m_Fd = -1 | m_pHandle = NULL", 0);
 		return CLStatus(-1, 0);
 	}
 
@@ -73,9 +73,9 @@ CLStatus CLEpollEvent::RegisterREvents()
 
 CLStatus CLEpollEvent::RegisterWEvent()
 {
-	if(-1 == m_Fd || (NULL == m_pHandler))
+	if(-1 == m_Fd || (NULL == m_pHandle))
 	{
-		CLLogger::WriteLogMsg("In CLEpollEvent::RegisterWEvent(), m_Fd = -1 | m_pHandler = NULL", 0);
+		CLLogger::WriteLogMsg("In CLEpollEvent::RegisterWEvent(), m_Fd = -1 | m_pHandle = NULL", 0);
 		return CLStatus(-1, 0);
 	}
 	if(m_bWriteFlag)
@@ -94,11 +94,11 @@ CLStatus CLEpollEvent::RegisterWEvent()
 	return CLStatus(0, 0);
 }
 
-CLStatus CLEpollEvent::RegisterRWEvent()
+CLStatus CLEpollEvent::RegisterRWEvents()
 {
-	if(-1 == m_Fd || (NULL == m_pHandler))
+	if(-1 == m_Fd || (NULL == m_pHandle))
 	{
-		CLLogger::WriteLogMsg("In CLEpollEvent::RegisterRWEvent(), m_Fd = -1 | m_pHandler = NULL", 0);
+		CLLogger::WriteLogMsg("In CLEpollEvent::RegisterRWEvent(), m_Fd = -1 | m_pHandle = NULL", 0);
 		return CLStatus(-1, 0);
 	}
 	if(m_bWriteFlag && m_bReadFlag)
@@ -121,9 +121,9 @@ CLStatus CLEpollEvent::RegisterRWEvent()
 
 CLStatus CLEpollEvent::UnRegisterRWEvents()
 {
-	if(-1 == m_Fd || (NULL == m_pHandler))
+	if(-1 == m_Fd || (NULL == m_pHandle))
 	{
-		CLLogger::WriteLogMsg("In CLEpollEvent::UnRegisterRWEvents(), m_Fd = -1 | m_pHandler = NULL", 0);
+		CLLogger::WriteLogMsg("In CLEpollEvent::UnRegisterRWEvents(), m_Fd = -1 | m_pHandle = NULL", 0);
 		return CLStatus(-1, 0);
 	}
 

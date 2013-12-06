@@ -1,3 +1,5 @@
+#include <string.h>
+#include <stdio.h>
 #include "CLTimerApplyMsgSerializer.h"
 #include "CLIOVector.h"
 #include "CLTimerApplyMsg.h"
@@ -20,10 +22,10 @@ CLStatus CLTimerApplyMsgSerializer::Serialize(CLMessage *pMsg, CLIOVector *pData
 
 	int length = sizeof(struct itimerspec) + sizeof(int) + (p->m_strRemoteName.length());
 	char *pBuf = new char[length];
-	memcpy(pBuf, &(p->m_sTimeValue), sizoef(struct itimerspec));
+	memcpy(pBuf, &(p->m_sTimeValue), sizeof(struct itimerspec));
 	
 	int *pi = (int *)(pBuf + sizeof(struct itimerspec));
-	*pi = p->m_iEchoID:
+	*pi = p->m_iEchoID;
 
 	memcpy(pBuf + sizeof(struct itimerspec) + sizeof(int), (p->m_strRemoteName).c_str(), (p->m_strRemoteName.length()));
 

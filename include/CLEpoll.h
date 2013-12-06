@@ -6,6 +6,8 @@
 
 #define EPOLL_MAX_FD_SIZE 1024
 
+class CLEpollEvent;
+
 class CLEpoll
 {
 public:

@@ -40,7 +40,7 @@ private:
 	CLEvent *m_pEvent;
 	bool m_bIsShared;
 	// CLNamedPipe *m_pNamedPipe;
-	CLMessageDeserializer *m_pMultiMsgDeserializer;	
+	CLMessageDeserializer *m_pMsgDeserializer;	
 };
 
 #endif

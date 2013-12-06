@@ -10,13 +10,14 @@ class CLEpollEvent;
 class CLMessageDeserializer;
 class CLMultiMsgDeserializer;
 class CLProtoParser;
+class CLPointerMsgDeserializer;
 
 using namespace std;
 
 class CLMsgLoopManagerForEpoll : public CLMessageLoopManager
 {
 public:
-	CLMsgLoopManagerForEpoll(CLMessageObserver *pMessageObserver, CLEpoll *pEpoll, CLMessageDeserializer *pMsgDeserializer = NULL);
+	CLMsgLoopManagerForEpoll(CLMessageObserver *pMessageObserver, CLEpoll *pEpoll, CLMultiMsgDeserializer *pMsgDeserializer = NULL);
 	virtual ~CLMsgLoopManagerForEpoll();
 
 	virtual CLStatus EnterMessageLoop(void *pContext);
@@ -51,8 +52,8 @@ protected:
 	CLMessageReceiver* m_pMsgReceiver;
 	CLMultiMsgDeserializer *m_pMultiMsgDeserializer;
 	CLPointerMsgDeserializer *m_pPointerMsgDeserializer;
-	map<fd, CLMessageReceiver*> m_MsgReceiverMap;//!!!!
-	map<fd, CLEpollEvent*> m_EpollEventMap;
+	map<int, CLMessageReceiver*> m_MsgReceiverMap;//!!!!
+	map<int, CLEpollEvent*> m_EpollEventMap;
 };
 
 #endif

@@ -27,7 +27,7 @@ CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(CLMessageObserver *pM
 		m_pEvent = new CLEvent(m_strThreadName.c_str(), true);
 		if(pMsgDeserializer)
 		{
-			m_pMsgDeserializer = pMultiMsgDeserializer;
+			m_pMsgDeserializer = pMsgDeserializer;
 		}
 		else
 		{
@@ -56,7 +56,8 @@ CLMsgLoopManagerForPipeQueue::~CLMsgLoopManagerForPipeQueue()
 
 CLStatus CLMsgLoopManagerForPipeQueue::Initialize()
 {
-	if(m_pMultiMsgDeserializer)
+	CLPointerMsgDeserializer *pDeserializer = dynamic_cast<CLPointerMsgDeserializer*>(m_pMsgDeserializer);
+	if(pDeserializer == 0)
 		return CLStatus(0, 0);
 
 	CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
@@ -82,7 +83,8 @@ CLStatus CLMsgLoopManagerForPipeQueue::Initialize()
 
 CLStatus CLMsgLoopManagerForPipeQueue::Uninitialize()
 {
-	if(m_pMultiMsgDeserializer)
+	CLPointerMsgDeserializer *pDeserializer = dynamic_cast<CLPointerMsgDeserializer*>(m_pMsgDeserializer);
+	if(pDeserializer == 0)
 		return CLStatus(0, 0);
 
 /*清理private pipe里面剩余的msg pointer，进行del*/
@@ -127,13 +129,14 @@ CLStatus CLMsgLoopManagerForPipeQueue::WaitForMessage()
 
 CLStatus CLMsgLoopManagerForPipeQueue::RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer)
 {
-	if(!m_pMultiMsgDeserializer)
-		return CLStatus(-1, 0);
+	CLMultiMsgDeserializer *pMultiDeserializer = dynamic_cast<CLMultiMsgDeserializer *>(m_pMsgDeserializer);
+	if(pMultiDeserializer == 0)
+		return CLStatus(0, 0);
 	
-	CLStatus s = m_pMultiMsgDeserializer->RegisterDeserializer(lMsgID, pDeserializer);
+	CLStatus s = pMultiDeserializer->RegisterDeserializer(lMsgID, pDeserializer);
 	if(!s.IsSuccess())
 	{
-		CLLogger::WriteLogMsg("In CLMsgLoopManagerForPipeQueue::RegisterDeserializer(), m_pMultiMsgDeserializer->RegisterDeserializer() error", 0);
+		CLLogger::WriteLogMsg("In CLMsgLoopManagerForPipeQueue::RegisterDeserializer(), m_pMsgDeserializer->RegisterDeserializer() error", 0);
 		return s;
 	}
 	return CLStatus(0, 0);
