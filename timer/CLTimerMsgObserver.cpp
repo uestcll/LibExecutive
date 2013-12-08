@@ -1,4 +1,5 @@
 #include "LibExecutive.h"
+#include "CLTimerMsgObserver.h"
 #include <iostream>
 
 using namespace std;
@@ -20,12 +21,12 @@ CLStatus CLTimerMsgObserver::Initialize(CLMessageLoopManager *pMessageLoop, void
 	pMessageLoop->Register(TIMER_APPLY_MSG_ID, (CallBackForMessageLoop)(&CLTimerMsgObserver::On_TimerApply));
 	pMessageLoop->Register(TIMER_OUT_MSG_ID, (CallBackForMessageLoop)(&CLTimerMsgObserver::On_TimerOut));
 
-	m_pMsgLoopManager = pMessageLoop;
+	m_pMsgLoopManager = dynamic_cast<CLMsgLoopManagerForEpoll *>(pMessageLoop);
 
 	CLMessagePoster sender(new CLDataPosterChannelByNamedPipeMaintainer(TIMER_PIPE_NAME, true), new CLMultiMsgSerializer(), new CLProtoEncapForDefaultMsgFormat(), new CLEvent(TIMER_PIPE_NAME, true));
 	
 	sender.Initialize(0);
-	send.RegisterSerializer(TIMER_APPLY_MSG_ID, new CLTimerApplyMsgSerializer());
+	sender.RegisterSerializer(TIMER_APPLY_MSG_ID, new CLTimerApplyMsgSerializer());
 
 	CLTimerApplyMsg *pM = new CLTimerApplyMsg();
 	memset(&(pM->m_sTimeValue), 0, sizeof(struct itimerspec));
@@ -33,11 +34,11 @@ CLStatus CLTimerMsgObserver::Initialize(CLMessageLoopManager *pMessageLoop, void
 	pM->m_iEchoID = 3;
 	pM->m_strRemoteName = "Hello";
 
-	send.PostMessage(pM, new CLDataPostResultNotifier(true));
+	sender.PostMessage(pM, new CLDataPostResultNotifier(true));
 
 	sender.UnInitialize(0);
 
-	cout<<"Now is in CLTimerMsgObserver::Initialize(), the time is "<<time(NULL)<<endl;
+	cout<<"Now is in CLTimerMsgObserver::Initialize(), the time is "<<time(NULL)<<"the alarm time is "<<pM->m_sTimeValue.it_value.tv_sec<<endl;
 	return CLStatus(0, 0);
 }
 
@@ -68,11 +69,11 @@ CLStatus CLTimerMsgObserver::On_TimerOut(CLMessage *pM)
 	// send.PostMessage(new CLTimerOutNotifyMsg(pMsg->m_iEchoID), new CLDataPostResultNotifier(true));
 	// sender.UnInitialize(0);
 	cout<<"Now is in CLTimerMsgObserver::On_TimerOut, the time is "<<time(NULL)<<endl;
-	
 
-	if(!(pMsg->bRepeat))
+
+	if(!(pMsg->m_bRepeat))
 	{
-		CLStatus s = m_pMsgLoopManager->UnRegisterMsgReceiver(pMsg->m_TimerFd);
+		CLStatus s = m_pMsgLoopManager->UnRegisterMsgReceiver(pMsg->m_iTimerFd);
 		if(!s.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLTimerMsgObserver::On_TimerOut(), m_pMsgLoopManager->UnRegisterMsgReceiver() error", 0);

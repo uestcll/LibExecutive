@@ -17,7 +17,7 @@ public:
 public:
 	CLStatus Run();
 	CLStatus Initialize(int maxFdSize);
-	CLStatus DoEvent(CLEpollEvent *pEvent, int fd, int epollOpt, int epollEvents);
+	CLStatus DoEvent(CLEpollEvent *pEvent, int fd, int epollOpt, unsigned int epollEvents);
 
 
 private:

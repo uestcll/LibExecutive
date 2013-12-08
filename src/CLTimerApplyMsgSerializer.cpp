@@ -20,14 +20,18 @@ CLStatus CLTimerApplyMsgSerializer::Serialize(CLMessage *pMsg, CLIOVector *pData
 	if(NULL == p)
 		return CLStatus(-1, 0);
 
-	int length = sizeof(struct itimerspec) + sizeof(int) + (p->m_strRemoteName.length());
+	int length = sizeof(unsigned long) + sizeof(struct itimerspec) + sizeof(int) + (p->m_strRemoteName.length());
 	char *pBuf = new char[length];
-	memcpy(pBuf, &(p->m_sTimeValue), sizeof(struct itimerspec));
+
+	unsigned long *pID = (unsigned long *)(pBuf);
+	*pID = p->m_clMsgID;
+
+	memcpy(pBuf + sizeof(unsigned long), &(p->m_sTimeValue), sizeof(struct itimerspec));
 	
-	int *pi = (int *)(pBuf + sizeof(struct itimerspec));
+	int *pi = (int *)(pBuf + sizeof(unsigned long) + sizeof(struct itimerspec));
 	*pi = p->m_iEchoID;
 
-	memcpy(pBuf + sizeof(struct itimerspec) + sizeof(int), (p->m_strRemoteName).c_str(), (p->m_strRemoteName.length()));
+	memcpy(pBuf + sizeof(unsigned long) + sizeof(struct itimerspec) + sizeof(int), (p->m_strRemoteName).c_str(), (p->m_strRemoteName.length()));
 
 	return (pDataVec->PushBack(pBuf, length));
 }

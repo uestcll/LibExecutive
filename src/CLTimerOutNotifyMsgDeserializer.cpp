@@ -19,7 +19,7 @@ CLStatus CLTimerOutNotifyMsgDeserializer::Deserialize(CLIOVector &dataVec, CLMes
 	CLTimerOutNotifyMsg *pTimerOutMsg = new CLTimerOutNotifyMsg();
 
 	int *pID = &(pTimerOutMsg->m_iEchoID);
-	dataVec->ReadData((char*)pID, sizeof(long), sizeof(int));
+	dataVec.ReadData((char*)pID, sizeof(long), sizeof(int));
 
 	*pMsg = pTimerOutMsg;
 

@@ -41,12 +41,13 @@ CLStatus CLEpoll::Initialize(int maxFdSize)
 	return CLStatus(0, 0);
 }
 
-CLStatus CLEpoll::DoEvent(CLEpollEvent *pEvent, int fd, int epollOpt, int epollEvents)
+CLStatus CLEpoll::DoEvent(CLEpollEvent *pEvent, int fd, int epollOpt, unsigned int epollEvents)
 {
 	struct epoll_event ev;
 	memset(&ev, 0, sizeof(struct epoll_event));
-	ev.data.ptr = pEvent->GetHandler();
+	ev.data.ptr = pEvent;
 	ev.events = epollEvents;
+	//ev.data.fd = fd;
 
 	if(0 > epoll_ctl(m_iEpollFd, epollOpt, fd, &ev))
 	{
@@ -61,6 +62,7 @@ CLStatus CLEpoll::DoEvent(CLEpollEvent *pEvent, int fd, int epollOpt, int epollE
 CLStatus CLEpoll::Run()
 {
 	int nfds;
+	CLEpollEvent *pEvent = NULL;
 
 	while(1)
 	{
@@ -74,10 +76,13 @@ CLStatus CLEpoll::Run()
 
 		for(int i = 0; i < nfds; ++i)
 		{
-			if ( m_pEpollEvents[i].events & EPOLLERR || m_pEpollEvents[i].events & EPOLLHUP )
-            {
-               continue;
-            }
+			pEvent = (CLEpollEvent *)m_pEpollEvents[i].data.ptr;
+			if(pEvent == NULL)
+				continue;
+			// if ( m_pEpollEvents[i].events & EPOLLERR || m_pEpollEvents[i].events & EPOLLHUP )
+   //          {
+   //             continue;
+   //          }
             if ( m_pEpollEvents[i].events & EPOLLOUT )
             {
             	//CLDelayedDataPoster *pDataPoster = (CLDelayedDataPoster *)m_pEpollEvents[i].data.ptr;
@@ -96,10 +101,11 @@ CLStatus CLEpoll::Run()
             }
             if ( m_pEpollEvents[i].events & EPOLLIN )
             {
-            	CLMsgLoopManagerForEpoll *pMsgLoopManager = (CLMsgLoopManagerForEpoll *)m_pEpollEvents[i].data.ptr;
+            	CLMsgLoopManagerForEpoll *pMsgLoopManager = (CLMsgLoopManagerForEpoll *)(pEvent->GetHandler());
             	if(pMsgLoopManager)
             	{
-            		CLStatus s = pMsgLoopManager->NotifyReadable(m_pEpollEvents[i].data.fd);
+            		int fd = pEvent->GetFd();
+            		CLStatus s = pMsgLoopManager->NotifyReadable(fd);
             		if(!s.IsSuccess())
             		{
             			CLLogger::WriteLogMsg("In CLEpoll::Run(), pMsgLoopManager->NotifyReadable() error", 0);

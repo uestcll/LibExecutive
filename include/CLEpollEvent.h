@@ -14,6 +14,7 @@ public:
 	CLStatus SetHandler(void* pHandle);
 	CLStatus SetFd(int fd);
 
+	const int GetFd();
 	void* GetHandler();
 
 	CLStatus RegisterREvent();

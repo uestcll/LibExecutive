@@ -19,10 +19,13 @@ CLStatus CLTimerOutNotifyMsgSerializer::Serialize(CLMessage *pMsg, CLIOVector *p
 	if(!pM)
 		return CLStatus(-1, 0);
 	
-	int len = sizeof(int);
+	int len = sizeof(unsigned long) + sizeof(int);
 	char *pBuffer = new char[len];
-	int *pID = (int*)pBuffer;
-	*pID = pM->m_iEchoID;
+
+	unsigned long *pID = (unsigned long *)(pBuffer);
+	*pID = pM->m_clMsgID;
+	int *pEchoID = (int*)(pBuffer + sizeof(unsigned long));
+	*pEchoID = pM->m_iEchoID;
 
 	return (pDataVec->PushBack(pBuffer, len));
 }

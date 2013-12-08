@@ -47,7 +47,7 @@ private:
 	CLMsgLoopManagerForEpoll(const CLMsgLoopManagerForEpoll&);
 	CLMsgLoopManagerForEpoll& operator=(const CLMsgLoopManagerForEpoll&);
 
-protected:
+private:
 	CLEpoll *m_pEpoll;
 	CLMessageReceiver* m_pMsgReceiver;
 	CLMultiMsgDeserializer *m_pMultiMsgDeserializer;

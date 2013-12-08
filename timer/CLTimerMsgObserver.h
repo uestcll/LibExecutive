@@ -4,6 +4,8 @@
 #include "CLStatus.h"
 #include "CLMessageObserver.h"
 
+#define TIMER_PIPE_NAME "timer_server_pipe"
+
 class CLMessageLoopManager;
 class CLMessage;
 
@@ -19,7 +21,7 @@ public:
 	CLStatus On_TimerOut(CLMessage *pM);
 
 private:
-	CLMessageLoopManager *pMsgLoopManager;
+	CLMsgLoopManagerForEpoll *m_pMsgLoopManager;
 
 private:
 	CLTimerMsgObserver(const CLTimerMsgObserver&);

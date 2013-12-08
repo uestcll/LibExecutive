@@ -17,7 +17,7 @@ public:
 	std::string m_strRemoteName;
 	int m_iEchoID; 
 	bool m_bRepeat;
-	int m_iTimeFd;
+	int m_iTimerFd;
 };
 
 #endif

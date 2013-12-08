@@ -14,15 +14,15 @@ int main()
         return 0;
    	}
    	CLEpoll *pEpoll = new CLEpoll;
-   	CLStatus s = m_pEpoll->Initialize(EPOLL_MAX_FD_SIZE);
-   	if(!s.IsSuccess())
+   	CLStatus s1 = pEpoll->Initialize(EPOLL_MAX_FD_SIZE);
+   	if(!s1.IsSuccess())
    		cout<<"epoll Initialize error"<<endl;
 
 	CLMsgLoopManagerForEpoll *pM = new CLMsgLoopManagerForEpoll(new CLTimerMsgObserver(), pEpoll);
 	pM->RegisterDeserializer(TIMER_APPLY_MSG_ID, new CLTimerApplyMsgDeserializer());
 
-	CLStatus s1 = pM->RegisterPipeReceiver(TIMER_PIPE_NAME, PIPE_QUEUE_BETWEEN_PROCESS);
-	if(!s1.IsSuccess())
+	CLStatus s2 = pM->RegisterPipeReceiver(TIMER_PIPE_NAME, PIPE_QUEUE_BETWEEN_PROCESS);
+	if(!s2.IsSuccess())
 		cout<<"RegisterPipeReceiver error"<<endl;
 
 	SLExecutiveInitialParameter s;

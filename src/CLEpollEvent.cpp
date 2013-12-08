@@ -213,3 +213,7 @@ CLStatus CLEpollEvent::CloseWEvent()
 	return CLStatus(0, 0);
 }
 
+const int CLEpollEvent::GetFd()
+{
+	return m_Fd;
+}
