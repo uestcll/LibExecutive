@@ -720,8 +720,6 @@ TEST(CLIOVectors, WriteBlockIndex_Features_Test)
 	EXPECT_EQ(s4.m_clReturnCode, 1);
 	EXPECT_TRUE(CheckIOVectorData(total, 23, iov));
 
-
-	//.....................
 	char buf[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 	CLStatus s5 = iov.WriteBlock(1, buf, 3);
 	EXPECT_EQ(s5.m_clReturnCode, 3);
