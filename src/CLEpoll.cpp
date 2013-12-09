@@ -79,10 +79,8 @@ CLStatus CLEpoll::Run()
 			pEvent = (CLEpollEvent *)m_pEpollEvents[i].data.ptr;
 			if(pEvent == NULL)
 				continue;
-			// if ( m_pEpollEvents[i].events & EPOLLERR || m_pEpollEvents[i].events & EPOLLHUP )
-   //          {
-   //             continue;
-   //          }
+
+			
             if ( m_pEpollEvents[i].events & EPOLLOUT )
             {
             	//CLDelayedDataPoster *pDataPoster = (CLDelayedDataPoster *)m_pEpollEvents[i].data.ptr;
@@ -116,6 +114,11 @@ CLStatus CLEpoll::Run()
             		CLLogger::WriteLogMsg("In CLEpoll::Run(), pMsgLoopManager is NULL", 0);
             	}
                 continue;
+            }
+            
+            if ( m_pEpollEvents[i].events & EPOLLERR || m_pEpollEvents[i].events & EPOLLHUP )
+            {
+               continue;
             }
 		}
 	}

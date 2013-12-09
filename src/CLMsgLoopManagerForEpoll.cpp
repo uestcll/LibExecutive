@@ -127,7 +127,7 @@ CLStatus CLMsgLoopManagerForEpoll::RegisterMsgReceiver(CLMessageReceiver *pRecei
 	}
 	m_MsgReceiverMap[fd] = pReceiver;
 	///debug
-	cout<<"in RegisterMsgReceiver() map size is "<<m_MsgReceiverMap.size()<<endl;
+	// cout<<"in RegisterMsgReceiver() map size is "<<m_MsgReceiverMap.size()<<endl;
 	///debug
 	map<int, CLEpollEvent*>::iterator iter = m_EpollEventMap.find(fd);
 	if(iter != m_EpollEventMap.end())
@@ -205,7 +205,7 @@ CLStatus CLMsgLoopManagerForEpoll::WaitForMessage()
 CLStatus CLMsgLoopManagerForEpoll::NotifyReadable(int fd)
 {
 	///debug
-	std::cout<<"the mag size is "<<m_MsgReceiverMap.size()<<endl;
+	// std::cout<<"the map size is "<<m_MsgReceiverMap.size()<<endl;
 	///debug end
 	map<int, CLMessageReceiver*>::iterator it = m_MsgReceiverMap.find(fd);
 	if(it == m_MsgReceiverMap.end())
