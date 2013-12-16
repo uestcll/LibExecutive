@@ -5,6 +5,7 @@
 #include <sys/uio.h>
 #include <vector>
 #include "CLStatus.h"
+#include "DefinitionForConst.h"
 
 class CLIteratorForIOVectors;
 
@@ -36,7 +37,7 @@ public:
 	CLStatus ReadBlock(unsigned int Index, char *pBuf, unsigned int Length);
 
 	CLStatus PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned int Index, unsigned int Length);
-	CLStatus PushBackRangeToAIOVector(CLIOVectors& IOVectors, CLIteratorForIOVectors& Iter, unsigned int Length);
+	CLStatus PushBackRangeToAIOVector(CLIOVectors& IOVectors, CLIteratorForIOVectors& Iter, unsigned int Length, int DeleteAction = IOVECTOR_NON_DELETE);
 
 	CLStatus FindIOVectors(CLIOVectors& IOVectors, bool bDelete);
 

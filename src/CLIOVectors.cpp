@@ -81,14 +81,25 @@ CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned 
 	return PushBackRangeToAIOVector(IOVectors, iter, Length);
 }
 
-CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, CLIteratorForIOVectors& Iter, unsigned int Length)
+CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, CLIteratorForIOVectors& Iter, unsigned int Length, int DeleteAction)
 {
 	if(Iter.IsEnd() || (Length == 0))
 		return CLStatus(-1, NORMAL_ERROR);
 
+	bool bDelete;
+	if(DeleteAction == IOVECTOR_NON_DELETE)
+		bDelete = false;
+	else if(DeleteAction == IOVECTOR_DELETE)
+		bDelete = true;
+	else if(DeleteAction != IOVECTOR_STAIN)
+		return CLStatus(-1, NORMAL_ERROR);
+
 	if(IsRangeInAIOVector(Iter.m_pData, Length, Iter.m_Iter))
 	{
-		if(IOVectors.PushBack(Iter.m_pData, Length, false).IsSuccess())
+		if(DeleteAction == IOVECTOR_STAIN)
+			bDelete = Iter.m_Iter->bDelete;
+
+		if(IOVectors.PushBack(Iter.m_pData, Length, bDelete).IsSuccess())
 		{
 			if((Iter.m_pData - (char *)Iter.m_Iter->IOVector.iov_base + Length) == Iter.m_Iter->IOVector.iov_len)
 			{
@@ -114,7 +125,11 @@ CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, CLIterato
 
 	unsigned long offset = (unsigned long)Iter.m_pData - (unsigned long)(Iter.m_Iter->IOVector.iov_base);
 	unsigned long leftroom = Iter.m_Iter->IOVector.iov_len - offset;
-	if(!(IOVectors.PushBack(Iter.m_pData, leftroom, false).IsSuccess()))
+	
+	if(DeleteAction == IOVECTOR_STAIN)
+		bDelete = Iter.m_Iter->bDelete;
+
+	if(!(IOVectors.PushBack(Iter.m_pData, leftroom, bDelete).IsSuccess()))
 	{
 		CLLogger::WriteLogMsg("In CLIOVectors::PushBackRangeToAIOVector(), IOVectors.PushBack 2 error", 0);
 		return CLStatus(-1, NORMAL_ERROR);
@@ -134,7 +149,10 @@ CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, CLIterato
 		int room = Iter.m_Iter->IOVector.iov_len;
 		if(Length <= room)
 		{
-			if(!(IOVectors.PushBack((char *)Iter.m_Iter->IOVector.iov_base, Length, false).IsSuccess()))
+			if(DeleteAction == IOVECTOR_STAIN)
+				bDelete = Iter.m_Iter->bDelete;
+
+			if(!(IOVectors.PushBack((char *)Iter.m_Iter->IOVector.iov_base, Length, bDelete).IsSuccess()))
 			{
 				CLLogger::WriteLogMsg("In CLIOVectors::PushBackRangeToAIOVector(), IOVectors.PushBack 3 error", 0);
 				return CLStatus(-1, NORMAL_ERROR);
@@ -156,7 +174,10 @@ CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, CLIterato
 			}
 		}
 
-		if(!(IOVectors.PushBack((char *)Iter.m_Iter->IOVector.iov_base, room, false).IsSuccess()))
+		if(DeleteAction == IOVECTOR_STAIN)
+			bDelete = Iter.m_Iter->bDelete;
+
+		if(!(IOVectors.PushBack((char *)Iter.m_Iter->IOVector.iov_base, room, bDelete).IsSuccess()))
 		{
 			CLLogger::WriteLogMsg("In CLIOVectors::PushBackRangeToAIOVector(), IOVectors.PushBack 4 error", 0);
 			return CLStatus(-1, NORMAL_ERROR);

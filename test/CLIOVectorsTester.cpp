@@ -723,37 +723,201 @@ TEST(CLIOVectors, WriteBlockIndex_Features_Test)
 	char buf[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 	CLStatus s5 = iov.WriteBlock(1, buf, 3);
 	EXPECT_EQ(s5.m_clReturnCode, 3);
+	total[1] = 0;
+	total[2] = 1;
+	total[3] = 2;
+	EXPECT_TRUE(CheckIOVectorData(total, 23, iov));
 
 	CLStatus s6 = iov.WriteBlock(4, buf+3, 4);
 	EXPECT_EQ(s6.m_clReturnCode, 4);
+	total[4] = 3;
+	total[5] = 4;
+	total[6] = 5;
+	total[7] = 6;
+	EXPECT_TRUE(CheckIOVectorData(total, 23, iov));
 
 	CLStatus s7 = iov.WriteBlock(8, buf+7, 3);
 	EXPECT_EQ(s7.m_clReturnCode, 3);
+	total[8] = 7;
+	total[9] = 8;
+	total[10] = 9;
+	EXPECT_TRUE(CheckIOVectorData(total, 23, iov));
 
 	char buf1[10] = {0, 5, 10, 15, 20};
 	CLStatus s8 = iov.WriteBlock(11, buf1, 5);
 	EXPECT_EQ(s8.m_clReturnCode, 5);
+	total[11] = 0;
+	total[12] = 5;
+	total[13] = 10;
+	total[14] = 15;
+	total[15] = 20;
+	EXPECT_TRUE(CheckIOVectorData(total, 23, iov));
 
 	char buf2[16] = {3, 4, 5, 6, 7, 8, 9, 0, 5, 10, 15, 20, 0, 0, 1, 2};
 	CLStatus s9 = iov.WriteBlock(4, buf2, 16);
 	EXPECT_EQ(s9.m_clReturnCode, 16);
+	total[16] = 0;
+	total[17] = 0;
+	total[18] = 1;
+	total[19] = 2;
+	EXPECT_TRUE(CheckIOVectorData(total, 23, iov));
 
 	char buf3[3] = {3, 4, 5};
 	CLStatus s10 = iov.WriteBlock(20, buf3, 3);
 	EXPECT_EQ(s10.m_clReturnCode, 3);
+	total[20] = 3;
+	total[21] = 4;
+	total[22] = 5;
+	EXPECT_TRUE(CheckIOVectorData(total, 23, iov));
 
 	char buf4[11] = {10, 15, 20, 0, 0, 1, 2, 3, 4, 5, 6};
 	CLStatus s11 = iov.WriteBlock(13, buf4, 11);
 	EXPECT_EQ(s11.m_clReturnCode, 10);
+	EXPECT_TRUE(CheckIOVectorData(total, 23, iov));
 
 	char buf5[10] = {10, 15, 20, 0, 0, 1, 2, 3, 4, 5};
 	CLStatus s12 = iov.WriteBlock(13, buf5, 10);
 	EXPECT_EQ(s12.m_clReturnCode, 10);
+	EXPECT_TRUE(CheckIOVectorData(total, 23, iov));
 
 	char buf6[13] = {3, 4, 5, 6, 7, 8, 9, 0, 5, 10, 15, 20, 0};
 	CLStatus s13 = iov.WriteBlock(4, buf6, 13);
 	EXPECT_EQ(s13.m_clReturnCode, 13);
+	EXPECT_TRUE(CheckIOVectorData(total, 23, iov));
 
 	char buf7[23] = {2, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 5, 10, 15, 20, 0, 0, 1, 2, 3, 4, 5};
 	EXPECT_TRUE(CheckIOVectorData(buf7, 23, iov));
+	EXPECT_TRUE(CheckIOVectorData(total, 23, iov));
+}
+
+TEST(CLIOVectors, ReadBlockIndex_Features_Test)
+{
+	CLIOVectors iov;
+	
+	CLStatus s1 = iov.ReadBlock(0, 0, 2);
+	EXPECT_FALSE(s1.IsSuccess());
+	EXPECT_EQ(s1.m_clErrorCode, NORMAL_ERROR);
+
+	CLStatus s2 = iov.ReadBlock(0, (char *)2, 0);
+	EXPECT_FALSE(s2.IsSuccess());
+	EXPECT_EQ(s2.m_clErrorCode, NORMAL_ERROR);
+
+	CLStatus s3 = iov.ReadBlock(0, (char *)2, 2);
+	EXPECT_FALSE(s3.IsSuccess());
+	EXPECT_EQ(s3.m_clErrorCode, NORMAL_ERROR);
+
+	char *p1 = new char[1];
+	*p1 = 2;
+
+	char *p2 = new char[10];
+	int i;
+	for(i = 0; i < 10; i++)
+		p2[i] = i;
+
+	char *p3 = new char[5];
+	for(i = 0; i < 5; i++)
+		p3[i] = i * 5;
+
+	char *p4 = new char[1];
+	*p4 = 0;
+
+	char *p5 = new char[6];
+	for(i = 0; i < 6; i++)
+		p5[i] = i;
+
+	EXPECT_TRUE(iov.PushBack(p1, 1, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p2, 10, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p3, 5, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p4, 1, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p5, 6, true).IsSuccess());
+
+	char x;
+	CLStatus s4 = iov.ReadBlock(0, &x, 1);
+	EXPECT_EQ(s4.m_clReturnCode, 1);
+	EXPECT_EQ(x, 2);
+
+	char buf[23] = {2, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 5, 10, 15, 20, 0, 0, 1, 2, 3, 4, 5};
+
+	char buffer[30];
+	CLStatus s5 = iov.ReadBlock(1, buffer, 3);
+	EXPECT_EQ(s5.m_clReturnCode, 3);
+	EXPECT_EQ(memcmp(buffer, buf + 1, 3), 0);
+
+	CLStatus s6 = iov.ReadBlock(4, buffer, 4);
+	EXPECT_EQ(s6.m_clReturnCode, 4);
+	EXPECT_EQ(memcmp(buffer, buf + 4, 4), 0);
+
+	CLStatus s7 = iov.ReadBlock(8, buffer, 3);
+	EXPECT_EQ(s7.m_clReturnCode, 3);
+	EXPECT_EQ(memcmp(buffer, buf + 8, 3), 0);
+
+	CLStatus s8 = iov.ReadBlock(11, buffer, 5);
+	EXPECT_EQ(s8.m_clReturnCode, 5);
+	EXPECT_EQ(memcmp(buffer, buf + 11, 5), 0);
+
+	CLStatus s9 = iov.ReadBlock(4, buffer, 16);
+	EXPECT_EQ(s9.m_clReturnCode, 16);
+	EXPECT_EQ(memcmp(buffer, buf + 4, 16), 0);
+
+	CLStatus s10 = iov.ReadBlock(20, buffer, 3);
+	EXPECT_EQ(s10.m_clReturnCode, 3);
+	EXPECT_EQ(memcmp(buffer, buf + 20, 3), 0);
+
+	CLStatus s11 = iov.ReadBlock(13, buffer, 11);
+	EXPECT_EQ(s11.m_clReturnCode, 10);
+	EXPECT_EQ(memcmp(buffer, buf + 13, 10), 0);
+
+	CLStatus s12 = iov.ReadBlock(13, buffer, 10);
+	EXPECT_EQ(s12.m_clReturnCode, 10);
+	EXPECT_EQ(memcmp(buffer, buf + 13, 10), 0);
+
+	CLStatus s13 = iov.ReadBlock(4, buffer, 13);
+	EXPECT_EQ(s13.m_clReturnCode, 13);
+	EXPECT_EQ(memcmp(buffer, buf + 4, 13), 0);
+}
+
+TEST(CLIOVectors, PushBackRangeToAIOVectorIter_Features_Test)
+{
+	CLIOVectors iov;
+	CLIOVectors tio;
+	CLIteratorForIOVectors iter;
+	
+	iov.GetIterator(0, iter);
+	CLStatus s1 = iov.PushBackRangeToAIOVector(tio, iter, 23);
+	EXPECT_FALSE(s1.IsSuccess());
+	EXPECT_EQ(s1.m_clErrorCode, NORMAL_ERROR);
+
+	char *p1 = new char[1];
+	*p1 = 2;
+
+	char *p2 = new char[10];
+	int i;
+	for(i = 0; i < 10; i++)
+		p2[i] = i;
+
+	char *p3 = new char[5];
+	for(i = 0; i < 5; i++)
+		p3[i] = i * 5;
+
+	char *p4 = new char[1];
+	*p4 = 0;
+
+	char *p5 = new char[6];
+	for(i = 0; i < 6; i++)
+		p5[i] = i;
+
+	EXPECT_TRUE(iov.PushBack(p1, 1, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p2, 10, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p3, 5, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p4, 1, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p5, 6, true).IsSuccess());
+
+	iov.GetIterator(1, iter);
+	CLStatus s2 = iov.PushBackRangeToAIOVector(tio, iter, 0);
+	EXPECT_FALSE(s2.IsSuccess());
+	EXPECT_EQ(s2.m_clErrorCode, NORMAL_ERROR);
+
+	CLStatus s3 = iov.PushBackRangeToAIOVector(tio, iter, 4, 5);
+	EXPECT_FALSE(s3.IsSuccess());
+	EXPECT_EQ(s3.m_clErrorCode, NORMAL_ERROR);
 }
