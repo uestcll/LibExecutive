@@ -920,4 +920,210 @@ TEST(CLIOVectors, PushBackRangeToAIOVectorIter_Features_Test)
 	CLStatus s3 = iov.PushBackRangeToAIOVector(tio, iter, 4, 5);
 	EXPECT_FALSE(s3.IsSuccess());
 	EXPECT_EQ(s3.m_clErrorCode, NORMAL_ERROR);
+
+	unsigned int index;
+	char buf[23] = {2, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 5, 10, 15, 20, 0, 0, 1, 2, 3, 4, 5};
+
+	iov.GetIterator(0, iter);
+	CLStatus s4 = iov.PushBackRangeToAIOVector(tio, iter, 1);
+	EXPECT_TRUE(s4.IsSuccess());
+	EXPECT_EQ(s4.m_clReturnCode, 1);
+	EXPECT_TRUE(iov.GetIndex(iter, index).IsSuccess());
+	EXPECT_EQ(index, 1);
+	EXPECT_TRUE(CheckIOVectorData(buf, 1, tio));
+
+	CLStatus s5 = iov.PushBackRangeToAIOVector(tio, iter, 10);
+	EXPECT_TRUE(s5.IsSuccess());
+	EXPECT_EQ(s5.m_clReturnCode, 10);
+	EXPECT_TRUE(iov.GetIndex(iter, index).IsSuccess());
+	EXPECT_EQ(index, 11);
+	EXPECT_TRUE(CheckIOVectorData(buf, 11, tio));
+
+	iter.Add(1);
+	CLStatus s6 = iov.PushBackRangeToAIOVector(tio, iter, 3);
+	EXPECT_TRUE(s6.IsSuccess());
+	EXPECT_EQ(s6.m_clReturnCode, 3);
+	EXPECT_TRUE(iov.GetIndex(iter, index).IsSuccess());
+	EXPECT_EQ(index, 15);
+	char buf1[22] = {2, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 5, 10, 15, 20, 0, 0, 1, 2, 3, 4, 5};
+	EXPECT_TRUE(CheckIOVectorData(buf1, 14, tio));
+
+	iov.GetIterator(19, iter);
+	CLStatus s7 = iov.PushBackRangeToAIOVector(tio, iter, 4);
+	EXPECT_TRUE(s7.IsSuccess());
+	EXPECT_EQ(s7.m_clReturnCode, 4);
+	EXPECT_TRUE(iter.IsEnd());
+	char buf2[18] = {2, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 5, 10, 15, 2, 3, 4, 5};
+	EXPECT_TRUE(CheckIOVectorData(buf2, 18, tio));
+
+	tio.Clear();
+
+	iov.GetIterator(13, iter);
+	CLStatus s8 = iov.PushBackRangeToAIOVector(tio, iter, 11);
+	EXPECT_TRUE(s8.IsSuccess());
+	EXPECT_EQ(s8.m_clReturnCode, 10);
+	EXPECT_TRUE(iter.IsEnd());
+	char buf3[10] = {10, 15, 20, 0, 0, 1, 2, 3, 4, 5};
+	EXPECT_TRUE(CheckIOVectorData(buf3, 10, tio));
+
+	tio.Clear();
+
+	iov.GetIterator(13, iter);
+	CLStatus s9 = iov.PushBackRangeToAIOVector(tio, iter, 8);
+	EXPECT_TRUE(s9.IsSuccess());
+	EXPECT_EQ(s9.m_clReturnCode, 8);
+	EXPECT_TRUE(iov.GetIndex(iter, index).IsSuccess());
+	EXPECT_EQ(index, 21);
+	char buf4[8] = {10, 15, 20, 0, 0, 1, 2, 3};
+	EXPECT_TRUE(CheckIOVectorData(buf4, 8, tio));
+}
+
+TEST(CLIOVectors, PushBackRangeToAIOVectorIterStain_Features_Test)
+{
+	CLIOVectors iov;
+	CLIOVectors tio;
+	CLIteratorForIOVectors iter;
+
+	char *p1 = new char[1];
+	*p1 = 2;
+
+	char *p2 = new char[10];
+	int i;
+	for(i = 0; i < 10; i++)
+		p2[i] = i;
+
+	char *p3 = new char[5];
+	for(i = 0; i < 5; i++)
+		p3[i] = i * 5;
+
+	char *p4 = new char[1];
+	*p4 = 0;
+
+	char *p5 = new char[6];
+	for(i = 0; i < 6; i++)
+		p5[i] = i;
+
+	EXPECT_TRUE(iov.PushBack(p1, 1, false).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p2, 10, false).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p3, 5, false).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p4, 1, false).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p5, 6, false).IsSuccess());
+
+	unsigned int index;
+	char buf[23] = {2, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 5, 10, 15, 20, 0, 0, 1, 2, 3, 4, 5};
+
+	iov.GetIterator(0, iter);
+	CLStatus s4 = iov.PushBackRangeToAIOVector(tio, iter, 1, IOVECTOR_STAIN);
+	EXPECT_TRUE(s4.IsSuccess());
+	EXPECT_EQ(s4.m_clReturnCode, 1);
+	EXPECT_TRUE(iov.GetIndex(iter, index).IsSuccess());
+	EXPECT_EQ(index, 1);
+	EXPECT_TRUE(CheckIOVectorData(buf, 1, tio));
+
+	CLStatus s5 = iov.PushBackRangeToAIOVector(tio, iter, 10, IOVECTOR_STAIN);
+	EXPECT_TRUE(s5.IsSuccess());
+	EXPECT_EQ(s5.m_clReturnCode, 10);
+	EXPECT_TRUE(iov.GetIndex(iter, index).IsSuccess());
+	EXPECT_EQ(index, 11);
+	EXPECT_TRUE(CheckIOVectorData(buf, 11, tio));
+
+	iter.Add(1);
+	CLStatus s6 = iov.PushBackRangeToAIOVector(tio, iter, 3, IOVECTOR_STAIN);
+	EXPECT_TRUE(s6.IsSuccess());
+	EXPECT_EQ(s6.m_clReturnCode, 3);
+	EXPECT_TRUE(iov.GetIndex(iter, index).IsSuccess());
+	EXPECT_EQ(index, 15);
+	char buf1[22] = {2, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 5, 10, 15, 20, 0, 0, 1, 2, 3, 4, 5};
+	EXPECT_TRUE(CheckIOVectorData(buf1, 14, tio));
+
+	iov.GetIterator(19, iter);
+	CLStatus s7 = iov.PushBackRangeToAIOVector(tio, iter, 4, IOVECTOR_STAIN);
+	EXPECT_TRUE(s7.IsSuccess());
+	EXPECT_EQ(s7.m_clReturnCode, 4);
+	EXPECT_TRUE(iter.IsEnd());
+	char buf2[18] = {2, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 5, 10, 15, 2, 3, 4, 5};
+	EXPECT_TRUE(CheckIOVectorData(buf2, 18, tio));
+
+	tio.Clear();
+
+	iov.GetIterator(13, iter);
+	CLStatus s8 = iov.PushBackRangeToAIOVector(tio, iter, 11, IOVECTOR_STAIN);
+	EXPECT_TRUE(s8.IsSuccess());
+	EXPECT_EQ(s8.m_clReturnCode, 10);
+	EXPECT_TRUE(iter.IsEnd());
+	char buf3[10] = {10, 15, 20, 0, 0, 1, 2, 3, 4, 5};
+	EXPECT_TRUE(CheckIOVectorData(buf3, 10, tio));
+
+	tio.Clear();
+
+	iov.GetIterator(13, iter);
+	CLStatus s9 = iov.PushBackRangeToAIOVector(tio, iter, 8, IOVECTOR_STAIN);
+	EXPECT_TRUE(s9.IsSuccess());
+	EXPECT_EQ(s9.m_clReturnCode, 8);
+	EXPECT_TRUE(iov.GetIndex(iter, index).IsSuccess());
+	EXPECT_EQ(index, 21);
+	char buf4[8] = {10, 15, 20, 0, 0, 1, 2, 3};
+	EXPECT_TRUE(CheckIOVectorData(buf4, 8, tio));
+
+	delete [] p1;
+	delete [] p2;
+	delete [] p3;
+	delete [] p4;
+	delete [] p5;
+}
+
+TEST(CLIOVectors, PushBackRangeToAIOVectorIterDel_Features_Test)
+{
+	CLIOVectors iov;
+	CLIOVectors tio;
+	CLIteratorForIOVectors iter;
+
+	char *p1 = new char[1];
+	*p1 = 2;
+
+	char *p2 = new char[10];
+	int i;
+	for(i = 0; i < 10; i++)
+		p2[i] = i;
+
+	char *p3 = new char[5];
+	for(i = 0; i < 5; i++)
+		p3[i] = i * 5;
+
+	char *p4 = new char[1];
+	*p4 = 0;
+
+	char *p5 = new char[6];
+	for(i = 0; i < 6; i++)
+		p5[i] = i;
+
+	EXPECT_TRUE(iov.PushBack(p1, 1, false).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p2, 10, false).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p3, 5, false).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p4, 1, false).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p5, 6, false).IsSuccess());
+
+	unsigned int index;
+	char buf[23] = {2, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 5, 10, 15, 20, 0, 0, 1, 2, 3, 4, 5};
+
+	iov.GetIterator(0, iter);
+	CLStatus s4 = iov.PushBackRangeToAIOVector(tio, iter, 1, IOVECTOR_DELETE);
+	EXPECT_TRUE(s4.IsSuccess());
+	EXPECT_EQ(s4.m_clReturnCode, 1);
+	EXPECT_TRUE(iov.GetIndex(iter, index).IsSuccess());
+	EXPECT_EQ(index, 1);
+	EXPECT_TRUE(CheckIOVectorData(buf, 1, tio));
+
+	CLStatus s5 = iov.PushBackRangeToAIOVector(tio, iter, 10, IOVECTOR_DELETE);
+	EXPECT_TRUE(s5.IsSuccess());
+	EXPECT_EQ(s5.m_clReturnCode, 10);
+	EXPECT_TRUE(iov.GetIndex(iter, index).IsSuccess());
+	EXPECT_EQ(index, 11);
+	EXPECT_TRUE(CheckIOVectorData(buf, 11, tio));
+
+	CLStatus s6 = iov.PushBackRangeToAIOVector(tio, iter, 12, IOVECTOR_DELETE);
+	EXPECT_TRUE(s6.IsSuccess());
+	EXPECT_EQ(s6.m_clReturnCode, 12);
+	EXPECT_TRUE(iter.IsEnd());
+	EXPECT_TRUE(CheckIOVectorData(buf, 23, tio));
 }

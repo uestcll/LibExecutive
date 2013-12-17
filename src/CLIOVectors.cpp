@@ -168,7 +168,7 @@ CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, CLIterato
 						Iter.m_pData = 0;
 				}
 				else
-					Iter.m_pData = Iter.m_pData + Length;
+					Iter.m_pData = (char *)Iter.m_Iter->IOVector.iov_base + Length;
 
 				return CLStatus(OriginalLength, 0);
 			}
