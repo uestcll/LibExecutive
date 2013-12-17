@@ -36,7 +36,7 @@ public:
 	CLStatus WriteBlock(unsigned int Index, char *pBuf, unsigned int Length);
 	CLStatus ReadBlock(unsigned int Index, char *pBuf, unsigned int Length);
 
-	CLStatus PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned int Index, unsigned int Length);
+	CLStatus PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned int Index, unsigned int Length, int DeleteAction = IOVECTOR_NON_DELETE);
 	CLStatus PushBackRangeToAIOVector(CLIOVectors& IOVectors, CLIteratorForIOVectors& Iter, unsigned int Length, int DeleteAction = IOVECTOR_NON_DELETE);
 
 	CLStatus FindIOVectors(CLIOVectors& IOVectors, bool bDelete);

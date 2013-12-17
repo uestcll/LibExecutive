@@ -68,9 +68,13 @@ CLStatus CLIOVectors::ReadBlock(unsigned int Index, char *pBuf, unsigned int Len
 	return TransferBlockByIndex(false, Index, pBuf, Length);
 }
 
-CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned int Index, unsigned int Length)
+CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned int Index, unsigned int Length, int DeleteAction)
 {
-	if(((Index + Length) > m_nDataLength) || (Length == 0))
+	if(((DeleteAction != IOVECTOR_DELETE) && 
+		(DeleteAction != IOVECTOR_NON_DELETE) && 
+		(DeleteAction != IOVECTOR_STAIN)) ||
+		(Length == 0)
+		)
 		return CLStatus(-1, NORMAL_ERROR);
 
 	CLIteratorForIOVectors iter;
@@ -78,7 +82,7 @@ CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, unsigned 
 	if(iter.IsEnd())
 		return CLStatus(-1, NORMAL_ERROR);
 
-	return PushBackRangeToAIOVector(IOVectors, iter, Length);
+	return PushBackRangeToAIOVector(IOVectors, iter, Length, DeleteAction);
 }
 
 CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, CLIteratorForIOVectors& Iter, unsigned int Length, int DeleteAction)
@@ -235,6 +239,8 @@ void CLIOVectors::PushBackIOVector(CLIOVectors& IOVectors)
 	{
 		m_IOVectors.push_back(*it);
 	}
+
+	m_nDataLength += IOVectors.m_nDataLength;
 }
 
 void CLIOVectors::DifferenceBetweenIOVectors(CLIOVectors& Operand, CLIOVectors& Difference)
