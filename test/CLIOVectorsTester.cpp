@@ -1253,6 +1253,20 @@ TEST(CLIOVectors, PushBackIOVector_Features_Test)
 	iov.PushBackIOVector(tio);
 	EXPECT_TRUE(CheckIOVectorData(buf, 23, iov));
 
+	iovec IOVEC[5];
+	IOVEC[0].iov_base = p1;
+	IOVEC[0].iov_len = 1;
+	IOVEC[1].iov_base = p2;
+	IOVEC[1].iov_len = 10;
+	IOVEC[2].iov_base = p3;
+	IOVEC[2].iov_len = 5;
+	IOVEC[3].iov_base = p4;
+	IOVEC[3].iov_len = 1;
+	IOVEC[4].iov_base = p5;
+	IOVEC[4].iov_len = 6;
+
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 5, iov));
+
 	iov.Clear();
 
 	EXPECT_TRUE(tio.PushBack(p1, 1, false).IsSuccess());
@@ -1263,23 +1277,267 @@ TEST(CLIOVectors, PushBackIOVector_Features_Test)
 
 	iov.PushBackIOVector(tio);
 	EXPECT_TRUE(CheckIOVectorData(buf, 23, iov));
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 5, iov));
 
 	iov.PushBackIOVector(tio);
 	char buf1[46] = {2, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 5, 10, 15, 20, 0, 0, 1, 2, 3, 4, 5, 2, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 5, 10, 15, 20, 0, 0, 1, 2, 3, 4, 5};
 	EXPECT_TRUE(CheckIOVectorData(buf1, 46, iov));
+
+	iovec IOVEC1[10];
+	IOVEC1[0].iov_base = p1;
+	IOVEC1[0].iov_len = 1;
+	IOVEC1[1].iov_base = p2;
+	IOVEC1[1].iov_len = 10;
+	IOVEC1[2].iov_base = p3;
+	IOVEC1[2].iov_len = 5;
+	IOVEC1[3].iov_base = p4;
+	IOVEC1[3].iov_len = 1;
+	IOVEC1[4].iov_base = p5;
+	IOVEC1[4].iov_len = 6;
+	IOVEC1[5].iov_base = p1;
+	IOVEC1[5].iov_len = 1;
+	IOVEC1[6].iov_base = p2;
+	IOVEC1[6].iov_len = 10;
+	IOVEC1[7].iov_base = p3;
+	IOVEC1[7].iov_len = 5;
+	IOVEC1[8].iov_base = p4;
+	IOVEC1[8].iov_len = 1;
+	IOVEC1[9].iov_base = p5;
+	IOVEC1[9].iov_len = 6;
+
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC1, 10, iov));
 
 	delete [] p1;
 	delete [] p2;
 	delete [] p3;
 	delete [] p4;
 	delete [] p5;
+}
 
-	/*iovec IOVEC[3];
+TEST(CLIOVectors, IsRangeOverlap_Features_Test)
+{
+	char *p1 = new char[1];
+	*p1 = 2;
+
+	char *p2 = new char[10];
+	int i;
+	for(i = 0; i < 10; i++)
+		p2[i] = i;
+
+	char *p3 = new char[5];
+	for(i = 0; i < 5; i++)
+		p3[i] = i * 5;
+
+	char *p4 = new char[1];
+	*p4 = 0;
+
+	char *p5 = new char[6];
+	for(i = 0; i < 6; i++)
+		p5[i] = i;
+
+	CLIOVectors iov;
+	iovec IOVEC;
+
+	IOVEC.iov_base = (char *)1;
+	IOVEC.iov_len = 2;
+
+	EXPECT_FALSE(iov.IsRangeOverlap(IOVEC));
+
+	EXPECT_TRUE(iov.PushBack(p1, 1, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p2, 10, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p3, 5, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p4, 1, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p5, 6, true).IsSuccess());
+
+	IOVEC.iov_base = p1 - 5;
+	IOVEC.iov_len = 5;
+	EXPECT_FALSE(iov.IsRangeOverlap(IOVEC));
+
+	IOVEC.iov_base = p1 + 1;
+	IOVEC.iov_len = 5;
+	EXPECT_FALSE(iov.IsRangeOverlap(IOVEC));
+
+	IOVEC.iov_base = p3 + 5;
+	IOVEC.iov_len = 5;
+	EXPECT_FALSE(iov.IsRangeOverlap(IOVEC));
+
+	IOVEC.iov_base = p5 + 6;
+	IOVEC.iov_len = 5;
+	EXPECT_FALSE(iov.IsRangeOverlap(IOVEC));
+
+	IOVEC.iov_base = p1;
+	IOVEC.iov_len = 5;
+	EXPECT_TRUE(iov.IsRangeOverlap(IOVEC));
+
+	IOVEC.iov_base = p3 - 3;
+	IOVEC.iov_len = 4;
+	EXPECT_TRUE(iov.IsRangeOverlap(IOVEC));
+
+	IOVEC.iov_base = p3 - 3;
+	IOVEC.iov_len = 5;
+	EXPECT_TRUE(iov.IsRangeOverlap(IOVEC));
+
+	IOVEC.iov_base = p3 - 3;
+	IOVEC.iov_len = 8;
+	EXPECT_TRUE(iov.IsRangeOverlap(IOVEC));
+
+	IOVEC.iov_base = p3 - 3;
+	IOVEC.iov_len = 9;
+	EXPECT_TRUE(iov.IsRangeOverlap(IOVEC));
+
+	IOVEC.iov_base = p3;
+	IOVEC.iov_len = 5;
+	EXPECT_TRUE(iov.IsRangeOverlap(IOVEC));
+
+	IOVEC.iov_base = p3 + 1;
+	IOVEC.iov_len = 3;
+	EXPECT_TRUE(iov.IsRangeOverlap(IOVEC));
+
+	IOVEC.iov_base = p3 + 2;
+	IOVEC.iov_len = 5;
+	EXPECT_TRUE(iov.IsRangeOverlap(IOVEC));
+
+	IOVEC.iov_base = p3 + 4;
+	IOVEC.iov_len = 3;
+	EXPECT_TRUE(iov.IsRangeOverlap(IOVEC));
+}
+
+TEST(CLIOVectors, FindIOVectors_Features_Test)
+{
+	char *p1 = new char[1];
+	*p1 = 2;
+
+	char *p2 = new char[10];
+	int i;
+	for(i = 0; i < 10; i++)
+		p2[i] = i;
+
+	char *p3 = new char[5];
+	for(i = 0; i < 5; i++)
+		p3[i] = i * 5;
+
+	char *p4 = new char[1];
+	*p4 = 0;
+
+	char *p5 = new char[6];
+	for(i = 0; i < 6; i++)
+		p5[i] = i;
+
+	CLIOVectors iov, tio;
+
+	CLStatus s1 = iov.FindIOVectors(tio, true);
+	EXPECT_FALSE(s1.IsSuccess());
+	EXPECT_EQ(s1.m_clErrorCode, NORMAL_ERROR);
+
+	EXPECT_TRUE(tio.PushBack(p2, 10, false).IsSuccess());
+	EXPECT_TRUE(tio.PushBack(p4, 1, false).IsSuccess());
+
+	CLStatus s2 = iov.FindIOVectors(tio, true);
+	EXPECT_FALSE(s2.IsSuccess());
+	EXPECT_EQ(s2.m_clErrorCode, NORMAL_ERROR);
+
+	EXPECT_TRUE(iov.PushBack(p1, 1, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p2, 10, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p3, 5, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p4, 1, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p5, 6, true).IsSuccess());
+
+	CLStatus s3 = iov.FindIOVectors(tio, false);
+	EXPECT_TRUE(s3.IsSuccess());
+
+	iovec IOVEC[5];
+	IOVEC[0].iov_base = p1;
+	IOVEC[0].iov_len = 1;
+	IOVEC[1].iov_base = p2;
+	IOVEC[1].iov_len = 10;
+	IOVEC[2].iov_base = p3;
+	IOVEC[2].iov_len = 5;
+	IOVEC[3].iov_base = p4;
+	IOVEC[3].iov_len = 1;
+	IOVEC[4].iov_base = p5;
+	IOVEC[4].iov_len = 6;
+
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 5, iov));
+
+	EXPECT_TRUE(tio.PushBack(p5 + 100, 1, false).IsSuccess());
+
+	CLStatus s4 = iov.FindIOVectors(tio, false);
+	EXPECT_FALSE(s4.IsSuccess());
+	EXPECT_EQ(s4.m_clErrorCode, NORMAL_ERROR);
+
+	tio.Clear();
+
+	EXPECT_TRUE(tio.PushBack(p2, 10, true).IsSuccess());
+	EXPECT_TRUE(tio.PushBack(p4, 1, true).IsSuccess());
+
+	CLStatus s5 = iov.FindIOVectors(tio, true);
+	EXPECT_TRUE(s5.IsSuccess());
+
+	IOVEC[0].iov_base = p1;
+	IOVEC[0].iov_len = 1;
+	IOVEC[1].iov_base = p3;
+	IOVEC[1].iov_len = 5;
+	IOVEC[2].iov_base = p5;
+	IOVEC[2].iov_len = 6;
+
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 3, iov));
+
+	IOVEC[0].iov_base = p2;
+	IOVEC[0].iov_len = 10;
+	IOVEC[1].iov_base = p4;
+	IOVEC[1].iov_len = 1;
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 2, tio));
+}
+
+TEST(CLIOVectors, FindIOVectors2_Features_Test)
+{
+	char *p1 = new char[1];
+	*p1 = 2;
+
+	char *p2 = new char[10];
+	int i;
+	for(i = 0; i < 10; i++)
+		p2[i] = i;
+
+	char *p3 = new char[5];
+	for(i = 0; i < 5; i++)
+		p3[i] = i * 5;
+
+	char *p4 = new char[1];
+	*p4 = 0;
+
+	char *p5 = new char[6];
+	for(i = 0; i < 6; i++)
+		p5[i] = i;
+
+	CLIOVectors iov, tio;
+
+	EXPECT_TRUE(iov.PushBack(p1, 1, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p2, 10, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p3, 5, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p4, 1, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p5, 6, true).IsSuccess());
+
+	EXPECT_TRUE(tio.PushBack(p3, 5, true).IsSuccess());
+	EXPECT_TRUE(tio.PushBack(p4, 1, true).IsSuccess());
+
+	CLStatus s6 = iov.FindIOVectors(tio, true);
+	EXPECT_TRUE(s6.IsSuccess());
+	
+	iovec IOVEC[5];
+	IOVEC[0].iov_base = p1;
+	IOVEC[0].iov_len = 1;
+	IOVEC[1].iov_base = p2;
+	IOVEC[1].iov_len = 10;
+	IOVEC[2].iov_base = p5;
+	IOVEC[2].iov_len = 6;
+
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 3, iov));
+
 	IOVEC[0].iov_base = p3;
-	IOVEC[0].iov_len = 4;
-	IOVEC[1].iov_base = p1;
-	IOVEC[1].iov_len = 4;
-	IOVEC[2].iov_base = p2;
-	IOVEC[2].iov_len = 4;
-	*/
+	IOVEC[0].iov_len = 5;
+	IOVEC[1].iov_base = p4;
+	IOVEC[1].iov_len = 1;
+
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 2, tio));
 }

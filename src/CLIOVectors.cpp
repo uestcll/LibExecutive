@@ -193,8 +193,8 @@ CLStatus CLIOVectors::PushBackRangeToAIOVector(CLIOVectors& IOVectors, CLIterato
 
 CLStatus CLIOVectors::FindIOVectors(CLIOVectors& IOVectors, bool bDelete)
 {
-	if(IOVectors.GetNumberOfIOVec() == 0)
-		return CLStatus(0, 0);
+	if((IOVectors.GetNumberOfIOVec() == 0) || (GetNumberOfIOVec() == 0))
+		return CLStatus(-1, NORMAL_ERROR);
 
 	list<SLIOVectorItem>::iterator it_target = m_IOVectors.begin();
 	list<SLIOVectorItem>::iterator it_source = IOVectors.m_IOVectors.begin();
@@ -220,9 +220,6 @@ CLStatus CLIOVectors::FindIOVectors(CLIOVectors& IOVectors, bool bDelete)
 	{
 		for(int i = 0; i < v.size(); i++)
 		{
-			if(v[i]->bDelete)
-				delete [] ((char *)v[i]->IOVector.iov_base);
-
 			m_nDataLength = m_nDataLength - v[i]->IOVector.iov_len;
 
 			m_IOVectors.erase(v[i]);
