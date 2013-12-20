@@ -24,10 +24,7 @@ CLStatus CLSTLqueue::PopData(CLIOVectors& IOVectors)
 {
 	unsigned int length = IOVectors.Size();
 	if(length < sizeof(unsigned long))
-	{
-		CLLogger::WriteLogMsg("In CLSTLqueue::PopData(), IOVectors.Size error", 0);
 		return CLStatus(-1, NORMAL_ERROR);
-	}
 
 	try
 	{

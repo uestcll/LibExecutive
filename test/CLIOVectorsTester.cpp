@@ -1541,3 +1541,173 @@ TEST(CLIOVectors, FindIOVectors2_Features_Test)
 
 	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 2, tio));
 }
+
+TEST(CLIOVectors, DifferenceBetweenIOVectors_Features_Test)
+{
+	CLIOVectors iov, tio, result;
+	
+	iov.DifferenceBetweenIOVectors(tio, result);
+	EXPECT_TRUE(CheckIOVectorStatus(0, 0, result));
+
+	char *p1 = new char[1];
+	*p1 = 2;
+
+	char *p2 = new char[10];
+	int i;
+	for(i = 0; i < 10; i++)
+		p2[i] = i;
+
+	char *p3 = new char[5];
+	for(i = 0; i < 5; i++)
+		p3[i] = i * 5;
+
+	char *p4 = new char[1];
+	*p4 = 0;
+
+	char *p5 = new char[6];
+	for(i = 0; i < 6; i++)
+		p5[i] = i;
+
+	EXPECT_TRUE(tio.PushBack(p3+1, 3, false).IsSuccess());
+	EXPECT_TRUE(tio.PushBack(p2, 10, false).IsSuccess());
+
+	iov.DifferenceBetweenIOVectors(tio, result);
+	EXPECT_TRUE(CheckIOVectorStatus(0, 0, result));
+
+	EXPECT_TRUE(iov.PushBack(p1, 1, false).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p2, 10, false).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p3, 5, false).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p4, 1, false).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p5, 6, false).IsSuccess());
+
+	iov.DifferenceBetweenIOVectors(tio, result);
+
+	iovec IOVEC[5];
+	IOVEC[0].iov_base = p1;
+	IOVEC[0].iov_len = 1;
+	IOVEC[1].iov_base = p2;
+	IOVEC[1].iov_len = 10;
+	IOVEC[2].iov_base = p3;
+	IOVEC[2].iov_len = 5;
+	IOVEC[3].iov_base = p4;
+	IOVEC[3].iov_len = 1;
+	IOVEC[4].iov_base = p5;
+	IOVEC[4].iov_len = 6;
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 5, iov));
+
+	IOVEC[0].iov_base = p1;
+	IOVEC[0].iov_len = 1;
+	IOVEC[1].iov_base = p3;
+	IOVEC[1].iov_len = 1;
+	IOVEC[2].iov_base = p3+4;
+	IOVEC[2].iov_len = 1;
+	IOVEC[3].iov_base = p4;
+	IOVEC[3].iov_len = 1;
+	IOVEC[4].iov_base = p5;
+	IOVEC[4].iov_len = 6;
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 5, result));
+
+	tio.Clear();
+	result.Clear();
+
+	EXPECT_TRUE(tio.PushBack(p1-10, 3, false).IsSuccess());
+	EXPECT_TRUE(tio.PushBack(p5+30, 10, false).IsSuccess());
+	iov.DifferenceBetweenIOVectors(tio, result);
+
+	IOVEC[0].iov_base = p1;
+	IOVEC[0].iov_len = 1;
+	IOVEC[1].iov_base = p2;
+	IOVEC[1].iov_len = 10;
+	IOVEC[2].iov_base = p3;
+	IOVEC[2].iov_len = 5;
+	IOVEC[3].iov_base = p4;
+	IOVEC[3].iov_len = 1;
+	IOVEC[4].iov_base = p5;
+	IOVEC[4].iov_len = 6;
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 5, iov));
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 5, result));
+
+	tio.Clear();
+	result.Clear();
+
+	EXPECT_TRUE(tio.PushBack(p2+3, 1, false).IsSuccess());
+	EXPECT_TRUE(tio.PushBack(p2+5, 2, false).IsSuccess());
+	EXPECT_TRUE(tio.PushBack(p2+1, 2, false).IsSuccess());
+
+	iov.DifferenceBetweenIOVectors(tio, result);
+
+	iovec IOVEC1[7];
+	IOVEC1[0].iov_base = p1;
+	IOVEC1[0].iov_len = 1;
+	IOVEC1[1].iov_base = p2;
+	IOVEC1[1].iov_len = 1;
+	IOVEC1[2].iov_base = p2+4;
+	IOVEC1[2].iov_len = 1;
+	IOVEC1[3].iov_base = p2+7;
+	IOVEC1[3].iov_len = 3;
+	IOVEC1[4].iov_base = p3;
+	IOVEC1[4].iov_len = 5;
+	IOVEC1[5].iov_base = p4;
+	IOVEC1[5].iov_len = 1;
+	IOVEC1[6].iov_base = p5;
+	IOVEC1[6].iov_len = 6;
+
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC1, 7, result));
+
+	tio.Clear();
+	result.Clear();
+
+	EXPECT_TRUE(tio.PushBack(p3+4, 2, false).IsSuccess());
+	EXPECT_TRUE(tio.PushBack(p3-1, 2, false).IsSuccess());
+	iov.DifferenceBetweenIOVectors(tio, result);
+	IOVEC[0].iov_base = p1;
+	IOVEC[0].iov_len = 1;
+	IOVEC[1].iov_base = p2;
+	IOVEC[1].iov_len = 10;
+	IOVEC[2].iov_base = p3+1;
+	IOVEC[2].iov_len = 3;
+	IOVEC[3].iov_base = p4;
+	IOVEC[3].iov_len = 1;
+	IOVEC[4].iov_base = p5;
+	IOVEC[4].iov_len = 6;
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 5, result));
+
+	tio.Clear();
+	result.Clear();
+
+	EXPECT_TRUE(tio.PushBack(p3+3, 5, false).IsSuccess());
+	EXPECT_TRUE(tio.PushBack(p3-1, 3, false).IsSuccess());
+	iov.DifferenceBetweenIOVectors(tio, result);
+	IOVEC[0].iov_base = p1;
+	IOVEC[0].iov_len = 1;
+	IOVEC[1].iov_base = p2;
+	IOVEC[1].iov_len = 10;
+	IOVEC[2].iov_base = p3+2;
+	IOVEC[2].iov_len = 1;
+	IOVEC[3].iov_base = p4;
+	IOVEC[3].iov_len = 1;
+	IOVEC[4].iov_base = p5;
+	IOVEC[4].iov_len = 6;
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 5, result));
+
+	tio.Clear();
+	result.Clear();
+
+	EXPECT_TRUE(tio.PushBack(p4-1, 3, false).IsSuccess());
+	iov.DifferenceBetweenIOVectors(tio, result);
+	IOVEC[0].iov_base = p1;
+	IOVEC[0].iov_len = 1;
+	IOVEC[1].iov_base = p2;
+	IOVEC[1].iov_len = 10;
+	IOVEC[2].iov_base = p3;
+	IOVEC[2].iov_len = 5;
+	IOVEC[3].iov_base = p5;
+	IOVEC[3].iov_len = 6;
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 4, result));
+
+	delete [] p1;
+	delete [] p2;
+	delete [] p3;
+	delete [] p4;
+	delete [] p5;
+}

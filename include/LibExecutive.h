@@ -35,5 +35,6 @@
 #include "CLSharedEventImpl.h"
 #include "CLIOVectors.h"
 #include "CLIteratorForIOVectors.h"
+#include "CLSTLqueue.h"
 
 #endif
