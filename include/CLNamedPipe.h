@@ -10,7 +10,7 @@ class CLIOVectors;
 class CLNamedPipe
 {
 public:
-	CLNamedPipe(const char* pstrNamedPipe, bool bReader, const char *pstrMutexName);
+	CLNamedPipe(const char* pstrNamedPipe, bool bReader, const char *pstrMutexName = 0);
 	virtual ~CLNamedPipe();
 
 	int GetFd();

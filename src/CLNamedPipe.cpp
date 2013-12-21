@@ -98,7 +98,7 @@ long CLNamedPipe::GetSizeForAtomWriting()
 
 CLStatus CLNamedPipe::Read(CLIOVectors& IOVectors)
 {
-	if(!m_bReader)
+	if(!m_bReader || (IOVectors.Size() == 0))
 		return CLStatus(-1, NORMAL_ERROR);
 
 	if(m_pMutex)
@@ -115,7 +115,7 @@ CLStatus CLNamedPipe::Read(CLIOVectors& IOVectors)
 
 CLStatus CLNamedPipe::Write(CLIOVectors& IOVectors)
 {
-	if(m_bReader)
+	if(m_bReader || (IOVectors.Size() == 0))
 		return CLStatus(-1, NORMAL_ERROR);
 
 	if(m_pMutex)

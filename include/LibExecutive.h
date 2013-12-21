@@ -36,5 +36,6 @@
 #include "CLIOVectors.h"
 #include "CLIteratorForIOVectors.h"
 #include "CLSTLqueue.h"
+#include "CLNamedPipe.h"
 
 #endif
