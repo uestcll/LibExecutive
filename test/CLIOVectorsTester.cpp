@@ -2,7 +2,7 @@
 #include <string.h>
 #include "LibExecutive.h"
 
-bool CheckIOVectorStatus(iovec *pIOV, int n, CLIOVectors& iovs)
+static bool CheckIOVectorStatus(iovec *pIOV, int n, CLIOVectors& iovs)
 {
 	if((pIOV == 0) && (n == 0))
 	{
@@ -51,7 +51,7 @@ bool CheckIOVectorStatus(iovec *pIOV, int n, CLIOVectors& iovs)
 	}
 }
 
-bool CheckIOVectorData(char *buf, int n, CLIOVectors& iovs)
+static bool CheckIOVectorData(char *buf, int n, CLIOVectors& iovs)
 {
 	CLIteratorForIOVectors iter;
 	iovs.GetIterator(0, iter);

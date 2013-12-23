@@ -59,8 +59,6 @@ void CLBufferManager::AddOccupiedIOVector(CLIOVectors& IOVector)
 CLStatus CLBufferManager::ReleaseOccupiedIOVector(CLIOVectors& IOVector)
 {
 	CLStatus s = m_pOccupiedView->FindIOVectors(IOVector, true);
-	if(!s.IsSuccess())
-		CLLogger::WriteLogMsg("In CLBufferManager::ReleaseOccupiedIOVector(), FindIOVectors error", 0);
 
 	if(m_bNeedDestroy && (m_pOccupiedView->Size() == 0))
 	{
@@ -91,7 +89,7 @@ CLStatus CLBufferManager::GetEmptyIOVector(CLIOVectors& IOVector)
 		iovec* pIO = m_pOverallView->GetIOVecArray();
 		int num = m_pOverallView->GetNumberOfIOVec();
 
-		for(int i = num - 1; i >= 0; i--)
+		for(int i = num - 1; i >= 0; i--)//bug
 		{
 			if(tmp.IsRangeOverlap(pIO[i]))
 				continue;

@@ -37,5 +37,6 @@
 #include "CLIteratorForIOVectors.h"
 #include "CLSTLqueue.h"
 #include "CLNamedPipe.h"
+#include "CLBufferManager.h"
 
 #endif
