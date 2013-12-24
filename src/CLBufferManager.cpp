@@ -53,7 +53,7 @@ CLBufferManager::~CLBufferManager()
 
 void CLBufferManager::AddOccupiedIOVector(CLIOVectors& IOVector)
 {
-	m_pOccupiedView->PushBackIOVector(IOVector);
+	m_pOccupiedView->PushBackIOVector(IOVector, IOVECTOR_NON_DELETE);
 }
 
 CLStatus CLBufferManager::ReleaseOccupiedIOVector(CLIOVectors& IOVector)
@@ -71,8 +71,8 @@ CLStatus CLBufferManager::ReleaseOccupiedIOVector(CLIOVectors& IOVector)
 CLStatus CLBufferManager::GetEmptyIOVector(CLIOVectors& IOVector)
 {
 	CLIOVectors tmp;
-	tmp.PushBackIOVector(*m_pOccupiedView);
-	tmp.PushBackIOVector(*m_pPartialDataView);
+	tmp.PushBackIOVector(*m_pOccupiedView, IOVECTOR_NON_DELETE);
+	tmp.PushBackIOVector(*m_pPartialDataView, IOVECTOR_NON_DELETE);
 
 	m_pOverallView->DifferenceBetweenIOVectors(tmp, IOVector);
 
@@ -113,21 +113,19 @@ CLStatus CLBufferManager::GetEmptyIOVector(CLIOVectors& IOVector)
 
 void CLBufferManager::GetPartialDataIOVector(CLIOVectors& IOVector)
 {
-	IOVector.PushBackIOVector(*m_pPartialDataView);
+	IOVector.PushBackIOVector(*m_pPartialDataView, IOVECTOR_NON_DELETE);
 }
 
 void CLBufferManager::SetPartialDataIOVector(CLIOVectors& IOVector)
 {
-	if(m_pPartialDataView)
-		delete m_pPartialDataView;
+	m_pPartialDataView->Clear();
 
-	m_pPartialDataView = new CLIOVectors;
-	m_pPartialDataView->PushBackIOVector(IOVector);
+	m_pPartialDataView->PushBackIOVector(IOVector, IOVECTOR_NON_DELETE);
 }
 
 void CLBufferManager::AddIOVectorToOverallView(CLIOVectors& IOVector)
 {
-	m_pOverallView->PushBackIOVector(IOVector);
+	m_pOverallView->PushBackIOVector(IOVector, IOVECTOR_DELETE);
 }
 
 void CLBufferManager::SetDestroyFlag()

@@ -82,7 +82,7 @@ CLStatus CLMessageReceiver::GetMessage(std::queue<CLMessage*>& qMsgContainer)
 	unsigned int length = DataIOVec.Size();
 	length = length + s1.m_clReturnCode;
 	
-	DataIOVec.PushBackIOVector(ReceiveIOVec);
+	DataIOVec.PushBackIOVector(ReceiveIOVec, IOVECTOR_NON_DELETE);
 
 	if(m_pProtocolDecapsulator)
 	{

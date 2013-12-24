@@ -41,7 +41,7 @@ public:
 
 	CLStatus FindIOVectors(CLIOVectors& IOVectors, bool bDelete);
 
-	void PushBackIOVector(CLIOVectors& IOVectors);
+	CLStatus PushBackIOVector(CLIOVectors& IOVectors, int DeleteAction = IOVECTOR_STAIN);
 
 	void DifferenceBetweenIOVectors(CLIOVectors& Operand, CLIOVectors& Difference);
 

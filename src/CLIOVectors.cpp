@@ -229,15 +229,51 @@ CLStatus CLIOVectors::FindIOVectors(CLIOVectors& IOVectors, bool bDelete)
 	return CLStatus(0, 0);
 }
 
-void CLIOVectors::PushBackIOVector(CLIOVectors& IOVectors)
+CLStatus CLIOVectors::PushBackIOVector(CLIOVectors& IOVectors, int DeleteAction)
 {
+	if((DeleteAction != IOVECTOR_DELETE) && 
+		(DeleteAction != IOVECTOR_NON_DELETE) && 
+		(DeleteAction != IOVECTOR_STAIN)
+		)
+		return CLStatus(-1, NORMAL_ERROR);
+
 	list<SLIOVectorItem>::iterator it = IOVectors.m_IOVectors.begin();
-	for(; it != IOVectors.m_IOVectors.end(); it++)
+
+	if(DeleteAction == IOVECTOR_STAIN)
 	{
-		m_IOVectors.push_back(*it);
+		for(; it != IOVectors.m_IOVectors.end(); it++)
+		{
+			m_IOVectors.push_back(*it);
+		}
+	}
+	else if(DeleteAction == IOVECTOR_DELETE)
+	{
+		for(; it != IOVectors.m_IOVectors.end(); it++)
+		{
+			SLIOVectorItem item;
+			item.IOVector.iov_base = it->IOVector.iov_base;
+			item.IOVector.iov_len = it->IOVector.iov_len;
+			item.bDelete = true;
+
+			m_IOVectors.push_back(item);
+		}
+	}
+	else
+	{
+		for(; it != IOVectors.m_IOVectors.end(); it++)
+		{
+			SLIOVectorItem item;
+			item.IOVector.iov_base = it->IOVector.iov_base;
+			item.IOVector.iov_len = it->IOVector.iov_len;
+			item.bDelete = false;
+
+			m_IOVectors.push_back(item);
+		}
 	}
 
 	m_nDataLength += IOVectors.m_nDataLength;
+
+	return CLStatus(0, 0);
 }
 
 void CLIOVectors::DifferenceBetweenIOVectors(CLIOVectors& Operand, CLIOVectors& Difference)

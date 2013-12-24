@@ -101,6 +101,27 @@ TEST(CLBufferManager, Constructor_Features_Test)
 	}
 }
 
+TEST(CLBufferManager, AddIOVectorToOverallView_Features_Test)
+{
+	CLBufferManager bm;
+
+	char *buf = new char[10];
+	CLIOVectors iov;
+	EXPECT_TRUE(iov.PushBack(buf, 10, false).IsSuccess());
+
+	bm.AddIOVectorToOverallView(iov);
+
+	CLBufferManagerInfo *pInfo = (CLBufferManagerInfo *)((char *)(&bm) + 8);
+
+	iovec *iov1 = pInfo->m_pOverallView->GetIOVecArray();
+
+	EXPECT_TRUE(pInfo->m_pOverallView->GetNumberOfIOVec() == 2);
+	EXPECT_TRUE((char *)(iov1[1].iov_base) == buf);
+	EXPECT_TRUE(iov1[1].iov_len == 10);
+
+	delete [] iov1;
+}
+
 TEST(CLBufferManager, AddOccupiedIOVector_Features_Test)
 {
 	CLBufferManager bm;
@@ -124,6 +145,44 @@ TEST(CLBufferManager, AddOccupiedIOVector_Features_Test)
 
 TEST(CLBufferManager, ReleaseOccupiedIOVector_Features_Test)
 {
+	{
+		CLBufferManager bm;
+		CLBufferManagerInfo *pInfo = (CLBufferManagerInfo *)((char *)(&bm) + 8);
+
+		iovec *pIO = pInfo->m_pOverallView->GetIOVecArray();
+		char *pbase = (char *)pIO->iov_base + 20;
+		CLIOVectors iov;
+		EXPECT_TRUE(iov.PushBack(pbase, 10).IsSuccess());
+
+		bm.AddOccupiedIOVector(iov);
+
+		EXPECT_TRUE(bm.ReleaseOccupiedIOVector(iov).IsSuccess());
+
+		EXPECT_TRUE(CheckIOVectorStatus(0, 0, *(pInfo->m_pOccupiedView)));
+
+		delete [] pIO;
+	}
+
+	{
+		CLBufferManager *pbm = new CLBufferManager();
+		CLBufferManagerInfo *pInfo = (CLBufferManagerInfo *)((char *)pbm + 8);
+
+		iovec *pIO = pInfo->m_pOverallView->GetIOVecArray();
+		char *pbase = (char *)pIO->iov_base + 20;
+		CLIOVectors iov;
+		EXPECT_TRUE(iov.PushBack(pbase, 10).IsSuccess());
+
+		pbm->AddOccupiedIOVector(iov);
+		pbm->SetDestroyFlag();		
+
+		EXPECT_TRUE(pbm->ReleaseOccupiedIOVector(iov).IsSuccess());
+
+		delete [] pIO;
+	}
+}
+
+TEST(CLBufferManager, SetPartialDataIOVector_Features_Test)
+{
 	CLBufferManager bm;
 	CLBufferManagerInfo *pInfo = (CLBufferManagerInfo *)((char *)(&bm) + 8);
 
@@ -132,11 +191,16 @@ TEST(CLBufferManager, ReleaseOccupiedIOVector_Features_Test)
 	CLIOVectors iov;
 	EXPECT_TRUE(iov.PushBack(pbase, 10).IsSuccess());
 
-	bm.AddOccupiedIOVector(iov);
+	bm.SetPartialDataIOVector(iov);
 
-	EXPECT_TRUE(bm.ReleaseOccupiedIOVector(iov).IsSuccess());
+	iovec io1;
+	io1.iov_base = pbase;
+	io1.iov_len = 10;
 
-	EXPECT_TRUE(CheckIOVectorStatus(0, 0, *(pInfo->m_pOccupiedView)));
+	EXPECT_TRUE(CheckIOVectorStatus(&io1, 1, *(pInfo->m_pPartialDataView)));
+
+	bm.SetPartialDataIOVector(iov);
+	EXPECT_TRUE(CheckIOVectorStatus(&io1, 1, *(pInfo->m_pPartialDataView)));
 
 	delete [] pIO;
 }
