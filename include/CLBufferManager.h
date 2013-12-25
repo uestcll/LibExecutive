@@ -2,6 +2,7 @@
 #define CLBufferManager_H
 
 #include "CLStatus.h"
+#include "CLMutex.h"
 
 class CLIOVectors;
 
@@ -41,6 +42,8 @@ private:
 	unsigned int m_DefaultBufferSize;
 
 	bool m_bNeedDestroy;
+
+	CLMutex m_Mutex;
 };
 
 #endif

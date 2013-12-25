@@ -1,6 +1,7 @@
 #include "CLBufferManager.h"
 #include "CLLogger.h"
 #include "CLIOVectors.h"
+#include "CLCriticalSection.h"
 
 #define THRESHOLD_FOR_STEP 1024
 #define DEFAULT_BUFFER_SIZE  4 * THRESHOLD_FOR_STEP
@@ -53,19 +54,31 @@ CLBufferManager::~CLBufferManager()
 
 void CLBufferManager::AddOccupiedIOVector(CLIOVectors& IOVector)
 {
+	CLCriticalSection cs(&m_Mutex);
+
 	m_pOccupiedView->PushBackIOVector(IOVector, IOVECTOR_NON_DELETE);
 }
 
 CLStatus CLBufferManager::ReleaseOccupiedIOVector(CLIOVectors& IOVector)
 {
-	CLStatus s = m_pOccupiedView->FindIOVectors(IOVector, true);
+	bool flag = false;
+	long r, e;
 
-	if(m_bNeedDestroy && (m_pOccupiedView->Size() == 0))
 	{
-		delete this;
-	}
+		CLCriticalSection cs(&m_Mutex);
 
-	return s;
+		CLStatus s = m_pOccupiedView->FindIOVectors(IOVector, true);
+		r = s.m_clReturnCode;
+		e = s.m_clErrorCode;
+
+		if(m_bNeedDestroy && (m_pOccupiedView->Size() == 0))
+			flag = true;
+	}
+	
+	if(flag)
+		delete this;
+
+	return CLStatus(r, e);
 }
 
 CLStatus CLBufferManager::GetEmptyIOVector(CLIOVectors& IOVector)
@@ -100,7 +113,7 @@ CLStatus CLBufferManager::GetEmptyIOVector(CLIOVectors& IOVector)
 			CLIOVectors del_iov;
 			del_iov.PushBack((char *)pIO[i].iov_base, pIO[i].iov_len, false);
 
-			//performance????
+			//bug
 			m_pOverallView->FindIOVectors(del_iov, true);
 			IOVector.FindIOVectors(del_iov, true);
 		}
@@ -130,13 +143,22 @@ void CLBufferManager::AddIOVectorToOverallView(CLIOVectors& IOVector)
 
 void CLBufferManager::SetDestroyFlag()
 {
-	m_bNeedDestroy = true;
-	
-	if(m_pPartialDataView)
-		delete m_pPartialDataView;
+	bool flag = false;
 
-	m_pPartialDataView = 0;
+	{
+		CLCriticalSection cs(&m_Mutex);
 
-	if(m_pOccupiedView->Size() == 0)
+		m_bNeedDestroy = true;
+
+		if(m_pPartialDataView)
+			delete m_pPartialDataView;
+
+		m_pPartialDataView = 0;
+
+		if(m_pOccupiedView->Size() == 0)
+			flag = true;
+	}
+
+	if(flag)
 		delete this;
 }

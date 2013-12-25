@@ -181,7 +181,7 @@ TEST(CLBufferManager, ReleaseOccupiedIOVector_Features_Test)
 	}
 }
 
-TEST(CLBufferManager, SetPartialDataIOVector_Features_Test)
+TEST(CLBufferManager, SetAndGetPartialDataIOVector_Features_Test)
 {
 	CLBufferManager bm;
 	CLBufferManagerInfo *pInfo = (CLBufferManagerInfo *)((char *)(&bm) + 8);
@@ -202,5 +202,21 @@ TEST(CLBufferManager, SetPartialDataIOVector_Features_Test)
 	bm.SetPartialDataIOVector(iov);
 	EXPECT_TRUE(CheckIOVectorStatus(&io1, 1, *(pInfo->m_pPartialDataView)));
 
+	CLIOVectors tio;
+	bm.GetPartialDataIOVector(tio);
+
+	EXPECT_TRUE(CheckIOVectorStatus(&io1, 1, tio));
+
 	delete [] pIO;
+}
+
+TEST(CLBufferManager, SetDestroyFlag_Features_Test)
+{
+	CLBufferManager *pbm = new CLBufferManager;
+	pbm->SetDestroyFlag();
+}
+
+TEST(CLBufferManager, GetEmptyIOVector_Features_Test)
+{
+
 }
