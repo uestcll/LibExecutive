@@ -102,21 +102,22 @@ CLStatus CLBufferManager::GetEmptyIOVector(CLIOVectors& IOVector)
 		iovec* pIO = m_pOverallView->GetIOVecArray();
 		int num = m_pOverallView->GetNumberOfIOVec();
 
-		for(int i = num - 1; i >= 0; i--)//bug
+		for(int i = num - 1; i >= 0; i--)
 		{
 			if(tmp.IsRangeOverlap(pIO[i]))
 				continue;
 
-			if((IOVector.Size() - pIO[i].iov_len) <= m_DefaultBufferSize)
-				continue;
-
 			CLIOVectors del_iov;
-			del_iov.PushBack((char *)pIO[i].iov_base, pIO[i].iov_len, false);
+			del_iov.PushBack((char *)pIO[i].iov_base, pIO[i].iov_len, true);
 
-			//bug
 			m_pOverallView->FindIOVectors(del_iov, true);
 			IOVector.FindIOVectors(del_iov, true);
+
+			if(IOVector.Size() <= m_DefaultBufferSize)
+				break;
 		}
+
+		delete [] pIO;
 
 		return CLStatus(0, 0);
 	}
