@@ -297,3 +297,113 @@ TEST(CLBufferManager, GetEmptyIOVector_Features2_Test)
 
 	pBM->SetDestroyFlag();
 }
+
+TEST(CLBufferManager, GetEmptyIOVector_Features3_Test)
+{
+	iovec IOVEC[4];
+	CLBufferManager *pBM = new CLBufferManager;
+
+	CLBufferManagerInfo *pInfo = (CLBufferManagerInfo *)((char *)pBM + 8);
+	iovec *pIO = pInfo->m_pOverallView->GetIOVecArray();
+
+	char *pBase = (char *)(pIO[0].iov_base);
+	CLIOVectors iov_occ;
+	EXPECT_TRUE(iov_occ.PushBack(pBase+1, 4095).IsSuccess());
+	pBM->AddOccupiedIOVector(iov_occ);
+	
+	CLIOVectors iov;
+	EXPECT_TRUE(pBM->GetEmptyIOVector(iov).IsSuccess());
+
+	iovec *pIO1 = pInfo->m_pOverallView->GetIOVecArray();
+	char *pBase1 = (char *)(pIO1[1].iov_base);
+
+	IOVEC[0].iov_base = pBase;
+	IOVEC[0].iov_len = 1;
+	IOVEC[1].iov_base = pBase1;
+	IOVEC[1].iov_len = 4096;
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 2, iov));
+
+	IOVEC[0].iov_base = pBase;
+	IOVEC[0].iov_len = 4096;
+	IOVEC[1].iov_base = pBase1;
+	IOVEC[1].iov_len = 4096;
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 2, *(pInfo->m_pOverallView)));
+
+	iov_occ.Clear();
+	EXPECT_TRUE(iov_occ.PushBack(pBase1+1, 4095).IsSuccess());
+	pBM->AddOccupiedIOVector(iov_occ);
+
+	iov.Clear();
+	EXPECT_TRUE(pBM->GetEmptyIOVector(iov).IsSuccess());
+
+	iovec *pIO2 = pInfo->m_pOverallView->GetIOVecArray();
+	char *pBase2 = (char *)(pIO2[2].iov_base);
+
+	IOVEC[0].iov_base = pBase;
+	IOVEC[0].iov_len = 1;
+	IOVEC[1].iov_base = pBase1;
+	IOVEC[1].iov_len = 1;
+	IOVEC[2].iov_base = pBase2;
+	IOVEC[2].iov_len = 4096;
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 3, iov));
+
+	IOVEC[0].iov_base = pBase;
+	IOVEC[0].iov_len = 4096;
+	IOVEC[1].iov_base = pBase1;
+	IOVEC[1].iov_len = 4096;
+	IOVEC[2].iov_base = pBase2;
+	IOVEC[2].iov_len = 4096;
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 3, *(pInfo->m_pOverallView)));
+
+	iov_occ.Clear();
+	EXPECT_TRUE(iov_occ.PushBack(pBase2+1, 4095).IsSuccess());
+	pBM->AddOccupiedIOVector(iov_occ);
+
+	iov.Clear();
+	EXPECT_TRUE(pBM->GetEmptyIOVector(iov).IsSuccess());
+
+	iovec *pIO3 = pInfo->m_pOverallView->GetIOVecArray();
+	char *pBase3 = (char *)(pIO3[3].iov_base);
+
+	IOVEC[0].iov_base = pBase;
+	IOVEC[0].iov_len = 1;
+	IOVEC[1].iov_base = pBase1;
+	IOVEC[1].iov_len = 1;
+	IOVEC[2].iov_base = pBase2;
+	IOVEC[2].iov_len = 1;
+	IOVEC[3].iov_base = pBase3;
+	IOVEC[3].iov_len = 4096;
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 4, iov));
+
+	IOVEC[0].iov_base = pBase;
+	IOVEC[0].iov_len = 4096;
+	IOVEC[1].iov_base = pBase1;
+	IOVEC[1].iov_len = 4096;
+	IOVEC[2].iov_base = pBase2;
+	IOVEC[2].iov_len = 4096;
+	IOVEC[3].iov_base = pBase3;
+	IOVEC[3].iov_len = 4096;
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 4, *(pInfo->m_pOverallView)));
+
+	iov_occ.Clear();
+	EXPECT_TRUE(iov_occ.PushBack(pBase+1, 4095).IsSuccess());
+	EXPECT_TRUE(iov_occ.PushBack(pBase1+1, 4095).IsSuccess());
+	EXPECT_TRUE(iov_occ.PushBack(pBase2+1, 4095).IsSuccess());
+	EXPECT_TRUE(pBM->ReleaseOccupiedIOVector(iov_occ).IsSuccess());
+
+	iov.Clear();
+	EXPECT_TRUE(pBM->GetEmptyIOVector(iov).IsSuccess());
+
+	IOVEC[0].iov_base = pBase;
+	IOVEC[0].iov_len = 4096;
+
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 1, *(pInfo->m_pOverallView)));
+	EXPECT_TRUE(CheckIOVectorStatus(IOVEC, 1, iov));
+
+	delete [] pIO3;
+	delete [] pIO2;
+	delete [] pIO1;
+	delete [] pIO;
+
+	pBM->SetDestroyFlag();
+}
