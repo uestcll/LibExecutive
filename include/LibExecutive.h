@@ -38,5 +38,7 @@
 #include "CLSTLqueue.h"
 #include "CLNamedPipe.h"
 #include "CLBufferManager.h"
+#include "CLDataReceiverBySTLqueue.h"
+#include "CLDataReceiverByNamedPipe.h"
 
 #endif

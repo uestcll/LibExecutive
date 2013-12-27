@@ -20,7 +20,7 @@ CLDataReceiverBySTLqueue::~CLDataReceiverBySTLqueue()
 
 CLStatus CLDataReceiverBySTLqueue::GetData(CLIOVectors& IOVectors, void *pContext)
 {
-	*((int *)pContext) = 0;
+	*((long *)pContext) = 0;
 
 	CLStatus s = m_pSTLqueue->PopData(IOVectors);
 	if((!s.IsSuccess()) && (s.m_clErrorCode == NORMAL_ERROR))
