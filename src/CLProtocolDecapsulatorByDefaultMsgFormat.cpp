@@ -2,7 +2,6 @@
 #include "CLProtocolDecapsulatorByDefaultMsgFormat.h"
 #include "CLIOVectors.h"
 #include "CLIteratorForIOVectors.h"
-#include "CLBufferManager.h"
 #include "ErrorCode.h"
 #include "CLLogger.h"
 
@@ -35,7 +34,7 @@ int CLProtocolDecapsulatorByDefaultMsgFormat::IsDataComplete(CLIOVectors& IOVect
 		return -1;
 }
 
-CLStatus CLProtocolDecapsulatorByDefaultMsgFormat::Decapsulate(CLIOVectors& IOVectorsForData, unsigned int Length, std::vector<CLIOVectors *>& vSerializedMsgs, CLBufferManager& BufferManager, void *pContext)
+CLStatus CLProtocolDecapsulatorByDefaultMsgFormat::Decapsulate(CLIOVectors& IOVectorsForData, unsigned int Length, std::vector<CLIOVectors *>& vSerializedMsgs, CLIOVectors& IOVectorsForPartialData, void *pContext)
 {
 	if((Length > IOVectorsForData.Size()) || (Length == 0))
 		return CLStatus(-1, NORMAL_ERROR);
@@ -50,21 +49,20 @@ CLStatus CLProtocolDecapsulatorByDefaultMsgFormat::Decapsulate(CLIOVectors& IOVe
 		if((LeftLength == 0) || (iter.IsEnd()))
 			return CLStatus(0, 0);
 
-		int r = IsDataComplete(IOVectorsForData, LeftLength, iter);
+		CLIteratorForIOVectors tmp_iter = iter;
+		int r = IsDataComplete(IOVectorsForData, LeftLength, tmp_iter);
 		if(r == -2)
 			return CLStatus(-1, NORMAL_ERROR);
 
 		if(r == -1)
 		{
-			CLIOVectors partial;
-			CLStatus s = IOVectorsForData.PushBackRangeToAIOVector(partial, iter, IOVectorsForData.Size());
+			CLStatus s = IOVectorsForData.PushBackRangeToAIOVector(IOVectorsForPartialData, iter, IOVectorsForData.Size());
 			if(!s.IsSuccess())
 			{
 				CLLogger::WriteLogMsg("In CLProtocolDecapsulatorByDefaultMsgFormat::Decapsulate(), IOVectorsForData.PushBackRangeToAIOVector error", 0);
 				return CLStatus(-1, NORMAL_ERROR);
 			}
 
-			BufferManager.SetPartialDataIOVector(partial);
 			return CLStatus(0, 0);
 		}
 
@@ -79,7 +77,6 @@ CLStatus CLProtocolDecapsulatorByDefaultMsgFormat::Decapsulate(CLIOVectors& IOVe
 
 		vSerializedMsgs.push_back(ptmp);
 
-		iter.Add(r);
 		LeftLength = LeftLength - r;
 	}
 }

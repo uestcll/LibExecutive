@@ -11,7 +11,7 @@ public:
 	CLProtocolDecapsulatorByDefaultMsgFormat();
 	virtual ~CLProtocolDecapsulatorByDefaultMsgFormat();
 
-	virtual CLStatus Decapsulate(CLIOVectors& IOVectorsForData, unsigned int Length, std::vector<CLIOVectors *>& vSerializedMsgs, CLBufferManager& BufferManager, void *pContext);
+	virtual CLStatus Decapsulate(CLIOVectors& IOVectorsForData, unsigned int Length, std::vector<CLIOVectors *>& vSerializedMsgs, CLIOVectors& IOVectorsForPartialData, void *pContext);
 
 private:
 	int IsDataComplete(CLIOVectors& IOVectorsForData, unsigned int LeftLength, CLIteratorForIOVectors& iter);

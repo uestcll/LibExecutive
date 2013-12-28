@@ -87,27 +87,42 @@ CLStatus CLMessageReceiver::GetMessage(std::queue<CLMessage*>& qMsgContainer)
 	if(m_pProtocolDecapsulator)
 	{
 		vector<CLIOVectors *> vSerializedMsgs;
-		CLStatus s2 = m_pProtocolDecapsulator->Decapsulate(DataIOVec, length, vSerializedMsgs, *m_pBufferManager, &Context);
-		if(!s2.IsSuccess())
-		{
-			CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pProtocolDecapsulator->Decapsulate error", 0);
-			return s2;
-		}
+		CLIOVectors IOVectorsForPartialData;
 
-		for(int i = 0; i < vSerializedMsgs.size(); i++)
+		try
 		{
-			CLMessage *pMsg = 0;
-			CLStatus s3 = m_pMsgDeserializer->Deserialize(*(vSerializedMsgs[i]), &pMsg, *m_pBufferManager);
-			if(!s3.IsSuccess() || (pMsg == 0))
+			CLStatus s2 = m_pProtocolDecapsulator->Decapsulate(DataIOVec, length, vSerializedMsgs, IOVectorsForPartialData, &Context);
+			if(!s2.IsSuccess())
 			{
-				CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pMsgDeserializer->Deserialize or pMsg == 0 error", 0);
-				return s3;
+				CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pProtocolDecapsulator->Decapsulate error", 0);
+				throw s2;
 			}
 
-			qMsgContainer.push(pMsg);
-		}
+			if(IOVectorsForPartialData.Size() != 0)
+				m_pBufferManager->SetPartialDataIOVector(IOVectorsForPartialData);
 
-		return CLStatus(0, 0);
+			for(int i = 0; i < vSerializedMsgs.size(); i++)
+			{
+				CLMessage *pMsg = 0;
+				CLStatus s3 = m_pMsgDeserializer->Deserialize(*(vSerializedMsgs[i]), &pMsg, *m_pBufferManager);
+				if(!s3.IsSuccess() || (pMsg == 0))
+				{
+					CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pMsgDeserializer->Deserialize or pMsg == 0 error", 0);
+					throw s3;
+				}
+
+				qMsgContainer.push(pMsg);
+			}
+
+			throw CLStatus(0, 0);
+		}
+		catch(CLStatus& s)
+		{
+			for(int i = 0; i < vSerializedMsgs.size(); i++)
+				delete vSerializedMsgs[i];
+
+			return s;
+		}
 	}
 
 	CLMessage *pMsg1 = 0;

@@ -40,5 +40,7 @@
 #include "CLBufferManager.h"
 #include "CLDataReceiverBySTLqueue.h"
 #include "CLDataReceiverByNamedPipe.h"
+#include "CLProtocolDecapsulatorBySplitPointer.h"
+#include "CLProtocolDecapsulatorByDefaultMsgFormat.h"
 
 #endif
