@@ -42,5 +42,6 @@
 #include "CLDataReceiverByNamedPipe.h"
 #include "CLProtocolDecapsulatorBySplitPointer.h"
 #include "CLProtocolDecapsulatorByDefaultMsgFormat.h"
+#include "CLMultiMsgDeserializer.h"
 
 #endif

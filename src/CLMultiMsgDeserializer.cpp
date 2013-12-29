@@ -42,7 +42,11 @@ CLStatus CLMultiMsgDeserializer::UnregisterDeserializer(unsigned long lMsgID)
 	{
 		delete it->second;
 		m_DeserializerTable.erase(it);
+
+		return CLStatus(0, 0);
 	}
+	else
+		return CLStatus(-1, NORMAL_ERROR);
 }
 
 CLStatus CLMultiMsgDeserializer::Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager)
@@ -53,7 +57,6 @@ CLStatus CLMultiMsgDeserializer::Deserialize(CLIOVectors& IOVectors, CLMessage *
 	if(IOVectors.Size() < HeadLength + MsgIDLength)
 	{
 		*ppMsg = 0;
-		CLLogger::WriteLogMsg("In CLMultiMsgDeserializer::Deserialize(), IOVectors.Size() error", 0);
 		return CLStatus(-1, NORMAL_ERROR);
 	}
 
