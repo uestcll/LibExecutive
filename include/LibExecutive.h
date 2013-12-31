@@ -43,5 +43,6 @@
 #include "CLProtocolDecapsulatorBySplitPointer.h"
 #include "CLProtocolDecapsulatorByDefaultMsgFormat.h"
 #include "CLMultiMsgDeserializer.h"
+#include "CLPointerToMsgDeserializer.h"
 
 #endif
