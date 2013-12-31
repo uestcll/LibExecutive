@@ -40,6 +40,7 @@ class CLMsg1ForCLMultiMsgDeserializerTest_Deserializer : public CLMessageDeseria
 public:
 	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager)
 	{
+		*ppMsg = (CLMessage *)10;
 		return CLStatus(0, 0);
 	}
 
@@ -53,7 +54,8 @@ class CLMsg2ForCLMultiMsgDeserializerTest_Deserializer : public CLMessageDeseria
 public:
 	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager)
 	{
-		return CLStatus(0, 0);
+		//*ppMsg = (CLMessage *)20;
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	virtual ~CLMsg2ForCLMultiMsgDeserializerTest_Deserializer()
@@ -112,5 +114,34 @@ TEST(CLMultiMsgDeserializer, Deserialize_Features_Test)
 	CLStatus s2 = dd.RegisterDeserializer(2, new CLMsg2ForCLMultiMsgDeserializerTest_Deserializer);
 	EXPECT_TRUE(s2.IsSuccess());
 
-	//..................
+	CLBufferManager bm;
+	CLMessage *pMsg=(CLMessage *)1;
+	CLIOVectors iov;
+
+	EXPECT_FALSE(dd.Deserialize(iov, &pMsg, bm).IsSuccess());
+	EXPECT_TRUE(pMsg == 0);
+	pMsg=(CLMessage *)1;
+
+	char *p1 = new char[1];
+	*p1 = 0;
+
+	char *p2 = new char[11];
+	for(int i = 0; i < 11; i++)
+		p2[i] = 0;
+
+	p2[3] = 1;
+
+	EXPECT_TRUE(iov.PushBack(p1, 1, true).IsSuccess());
+	EXPECT_TRUE(iov.PushBack(p2, 11, true).IsSuccess());
+	EXPECT_TRUE(dd.Deserialize(iov, &pMsg, bm).IsSuccess());
+	EXPECT_TRUE(pMsg == (CLMessage *)10);
+
+	p2[3] = 2;
+	EXPECT_FALSE(dd.Deserialize(iov, &pMsg, bm).IsSuccess());
+	EXPECT_TRUE(pMsg == (CLMessage *)0);
+	pMsg=(CLMessage *)1;
+
+	p2[3] = 3;
+	EXPECT_FALSE(dd.Deserialize(iov, &pMsg, bm).IsSuccess());
+	EXPECT_TRUE(pMsg == (CLMessage *)0);
 }

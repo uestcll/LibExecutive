@@ -54,38 +54,40 @@ CLStatus CLMultiMsgDeserializer::Deserialize(CLIOVectors& IOVectors, CLMessage *
 	const unsigned int HeadLength = sizeof(int);
 	const unsigned int MsgIDLength = sizeof(long);
 
-	if(IOVectors.Size() < HeadLength + MsgIDLength)
+	try
 	{
-		*ppMsg = 0;
-		return CLStatus(-1, NORMAL_ERROR);
-	}
+		if(IOVectors.Size() < HeadLength + MsgIDLength)
+			throw CLStatus(-1, NORMAL_ERROR);
 
-	unsigned long MsgID;
-	CLStatus s = IOVectors.ReadBlock(HeadLength, (char *)(&MsgID), sizeof(long));
-	if(!s.IsSuccess() || (s.m_clReturnCode != sizeof(long)))
-	{
-		*ppMsg = 0;
-		CLLogger::WriteLogMsg("In CLMultiMsgDeserializer::Deserialize(), IOVectors.ReadBlock error", 0);
-		return CLStatus(-1, NORMAL_ERROR);
-	}
-
-	map<unsigned long, CLMessageDeserializer*>::iterator it = m_DeserializerTable.find(MsgID);
-	if(it != m_DeserializerTable.end())
-	{
-		CLStatus s = it->second->Deserialize(IOVectors, ppMsg, BufferManager);
+		unsigned long MsgID;
+		CLStatus s = IOVectors.ReadBlock(HeadLength, (char *)(&MsgID), sizeof(long));
 		if(!s.IsSuccess())
 		{
-			*ppMsg = 0;
-			CLLogger::WriteLogMsg("In CLMultiMsgDeserializer::Deserialize(), it->second->Deserialize error", 0);
-			return CLStatus(-1, NORMAL_ERROR);
+			CLLogger::WriteLogMsg("In CLMultiMsgDeserializer::Deserialize(), IOVectors.ReadBlock error", 0);
+			throw CLStatus(-1, NORMAL_ERROR);
 		}
 
-		return CLStatus(0, 0);
+		if(s.m_clReturnCode != sizeof(long))
+			throw CLStatus(-1, NORMAL_ERROR);
+
+		map<unsigned long, CLMessageDeserializer*>::iterator it = m_DeserializerTable.find(MsgID);
+		if(it != m_DeserializerTable.end())
+		{
+			CLStatus s = it->second->Deserialize(IOVectors, ppMsg, BufferManager);
+			if(!s.IsSuccess())
+			{
+				CLLogger::WriteLogMsg("In CLMultiMsgDeserializer::Deserialize(), it->second->Deserialize error", 0);
+				throw CLStatus(-1, NORMAL_ERROR);
+			}
+
+			return CLStatus(0, 0);
+		}
+		else
+			throw CLStatus(-1, NORMAL_ERROR);
 	}
-	else
+	catch(CLStatus& s)
 	{
 		*ppMsg = 0;
-		CLLogger::WriteLogMsg("In CLMultiMsgDeserializer::Deserialize(), m_DeserializerTable.find error", 0);
-		return CLStatus(-1, NORMAL_ERROR);
+		return s;
 	}
 }
