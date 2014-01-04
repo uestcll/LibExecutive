@@ -64,7 +64,12 @@ CLMessageReceiver::~CLMessageReceiver()
 CLStatus CLMessageReceiver::GetMessage(std::queue<CLMessage*>& qMsgContainer)
 {
 	CLIOVectors ReceiveIOVec;
-	m_pBufferManager->GetEmptyIOVector(ReceiveIOVec);
+	CLStatus s11 = m_pBufferManager->GetEmptyIOVector(ReceiveIOVec);
+	if(!s11.IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pDataReceiver->GetEmptyIOVector error", 0);
+		return s11;
+	}
 
 	long Context = 0;
 	CLStatus s1 = m_pDataReceiver->GetData(ReceiveIOVec, &Context);
@@ -98,8 +103,7 @@ CLStatus CLMessageReceiver::GetMessage(std::queue<CLMessage*>& qMsgContainer)
 				throw s2;
 			}
 
-			if(IOVectorsForPartialData.Size() != 0)
-				m_pBufferManager->SetPartialDataIOVector(IOVectorsForPartialData);
+			m_pBufferManager->SetPartialDataIOVector(IOVectorsForPartialData);
 
 			for(int i = 0; i < vSerializedMsgs.size(); i++)
 			{
@@ -125,8 +129,16 @@ CLStatus CLMessageReceiver::GetMessage(std::queue<CLMessage*>& qMsgContainer)
 		}
 	}
 
+	CLIOVectors tmp_iov;
+	CLStatus s44 = DataIOVec.PushBackRangeToAIOVector(tmp_iov, 0, length);
+	if(!s44.IsSuccess() || (s44.m_clReturnCode != length))
+	{
+		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), DataIOVec.PushBackRangeToAIOVector error", 0);
+		return s44;
+	}
+
 	CLMessage *pMsg1 = 0;
-	CLStatus s4 = m_pMsgDeserializer->Deserialize(DataIOVec, &pMsg1, *m_pBufferManager);
+	CLStatus s4 = m_pMsgDeserializer->Deserialize(tmp_iov, &pMsg1, *m_pBufferManager);
 	if(!s4.IsSuccess() || (pMsg1 == 0))
 	{
 		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pMsgDeserializer->Deserialize or pMsg1 == 0 error", 0);

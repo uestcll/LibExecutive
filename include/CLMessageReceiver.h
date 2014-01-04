@@ -12,7 +12,6 @@ class CLDataReceiver;
 class CLIOVectors;
 class CLBufferManager;
 
-//add initialize and Uninitialize Unregister
 class CLMessageReceiver
 {
 public:
