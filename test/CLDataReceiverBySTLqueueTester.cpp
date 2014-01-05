@@ -9,6 +9,7 @@ TEST(CLDataReceiverBySTLqueue, GetData_Features_Test)
 	CLIOVectors iov;
 	long context = 1;
 
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
 	CLStatus s1 = q_stl.GetData(iov, &context);
 	EXPECT_FALSE(s1.IsSuccess());
 	EXPECT_EQ(s1.m_clErrorCode, NORMAL_ERROR);

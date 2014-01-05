@@ -47,5 +47,9 @@
 #include "CLMessageReceiver.h"
 #include "CLInitialDataPostChannelNotifier.h"
 #include "CLDataPostResultNotifier.h"
+#include "CLDataPostChannelBySTLqueueMaintainer.h"
+#include "CLDataPostChannelByNamedPipeMaintainer.h"
+#include "CLDataPosterBySTLqueue.h"
+#include "CLDataPosterByNamedPipe.h"
 
 #endif
