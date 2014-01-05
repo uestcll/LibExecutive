@@ -45,5 +45,7 @@
 #include "CLMultiMsgDeserializer.h"
 #include "CLPointerToMsgDeserializer.h"
 #include "CLMessageReceiver.h"
+#include "CLInitialDataPostChannelNotifier.h"
+#include "CLDataPostResultNotifier.h"
 
 #endif

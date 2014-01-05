@@ -5,11 +5,13 @@
 CLDataPostResultNotifier::CLDataPostResultNotifier()
 {
 	m_bDeleteMsg = false;
+	m_pMsg = 0;
 }
 
 CLDataPostResultNotifier::CLDataPostResultNotifier(bool bDeleteMsg)
 {
 	m_bDeleteMsg = bDeleteMsg;
+	m_pMsg = 0;
 }
 
 CLDataPostResultNotifier::~CLDataPostResultNotifier()
