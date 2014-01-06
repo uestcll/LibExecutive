@@ -77,6 +77,7 @@ TEST(CLMultiMsgDeserializer, RegisterDeserializer_Features_Test)
 	CLStatus s4 = dd.RegisterDeserializer(2, new CLMsg2ForCLMultiMsgDeserializerTest_Deserializer);
 	EXPECT_TRUE(s4.IsSuccess());
 	
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
 	CLStatus s3 = dd.RegisterDeserializer(1, new CLMsg1ForCLMultiMsgDeserializerTest_Deserializer);
 	EXPECT_FALSE(s3.IsSuccess());
 	EXPECT_EQ(s3.m_clErrorCode, NORMAL_ERROR);
@@ -137,6 +138,7 @@ TEST(CLMultiMsgDeserializer, Deserialize_Features_Test)
 	EXPECT_TRUE(pMsg == (CLMessage *)10);
 
 	p2[3] = 2;
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
 	EXPECT_FALSE(dd.Deserialize(iov, &pMsg, bm).IsSuccess());
 	EXPECT_TRUE(pMsg == (CLMessage *)0);
 	pMsg=(CLMessage *)1;
