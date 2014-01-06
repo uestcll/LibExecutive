@@ -1728,8 +1728,8 @@ TEST(CLIOVectors, DifferenceBetweenIOVectors_Features_Test)
 	tio.Clear();
 	result.Clear();
 
-	EXPECT_TRUE(tio.PushBack(p1-10, 3, false).IsSuccess());
-	EXPECT_TRUE(tio.PushBack(p5+30, 10, false).IsSuccess());
+	EXPECT_TRUE(tio.PushBack(p1-1, 1, false).IsSuccess());
+	EXPECT_TRUE(tio.PushBack(p5+6, 1, false).IsSuccess());
 	iov.DifferenceBetweenIOVectors(tio, result);
 
 	IOVEC[0].iov_base = p1;
@@ -1793,7 +1793,7 @@ TEST(CLIOVectors, DifferenceBetweenIOVectors_Features_Test)
 	tio.Clear();
 	result.Clear();
 
-	EXPECT_TRUE(tio.PushBack(p3+3, 5, false).IsSuccess());
+	EXPECT_TRUE(tio.PushBack(p3+3, 3, false).IsSuccess());
 	EXPECT_TRUE(tio.PushBack(p3-1, 3, false).IsSuccess());
 	iov.DifferenceBetweenIOVectors(tio, result);
 	IOVEC[0].iov_base = p1;

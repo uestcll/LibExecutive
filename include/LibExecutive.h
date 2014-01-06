@@ -51,5 +51,6 @@
 #include "CLDataPostChannelByNamedPipeMaintainer.h"
 #include "CLDataPosterBySTLqueue.h"
 #include "CLDataPosterByNamedPipe.h"
+#include "CLMultiMsgSerializer.h"
 
 #endif
