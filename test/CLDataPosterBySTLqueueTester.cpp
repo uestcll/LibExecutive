@@ -20,4 +20,10 @@ TEST(CLDataPosterBySTLqueue, PostData_Features_Test)
 	CLStatus s3 = dp.PostData(&iov);
 	EXPECT_TRUE(s3.IsSuccess());
 	EXPECT_EQ(s3.m_clReturnCode, 8);
+
+	long j = 0;
+	CLIOVectors iov1;
+	EXPECT_TRUE(iov1.PushBack((char *)(&j), 8).IsSuccess());
+	EXPECT_TRUE(q.PopData(iov1).IsSuccess());
+	EXPECT_EQ(j, 34);
 }
