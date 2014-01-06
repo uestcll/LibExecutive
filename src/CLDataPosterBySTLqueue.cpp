@@ -15,11 +15,8 @@ CLDataPosterBySTLqueue::~CLDataPosterBySTLqueue()
 
 CLStatus CLDataPosterBySTLqueue::PostData(CLIOVectors *pIOVectors)
 {
-	if(pIOVectors->Size() < sizeof(unsigned long))
-	{
-		CLLogger::WriteLogMsg("In CLDataPosterBySTLqueue::PostData(), pIOVector->Size error", 0);
+	if((pIOVectors == 0) || (pIOVectors->Size() < sizeof(unsigned long)))
 		return CLStatus(-1, DATA_POSTER_POST_ERROR);
-	}
 
 	unsigned long data = 0;
 	CLStatus s = pIOVectors->ReadBlock(0, (char *)(&data), sizeof(unsigned long));
