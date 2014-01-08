@@ -47,8 +47,7 @@ TEST(CLDataPosterByNamedPipe, PostData2_Features_Test)
 	CLIOVectors iov1;
 	long i = 34;
 	EXPECT_TRUE(iov1.PushBack((char *)(&i), 8).IsSuccess());
-	CLLogger::WriteLogMsg("The following bug is produced on purpose 2", 0);
 	CLStatus s = dp.PostData(&iov1);
 	EXPECT_FALSE(s.IsSuccess());
-	EXPECT_EQ(s.m_clErrorCode, DATA_POSTER_POST_ERROR);
+	EXPECT_EQ(s.m_clErrorCode, DATA_POSTER_POST_PENDING);
 }

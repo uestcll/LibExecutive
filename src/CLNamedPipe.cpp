@@ -162,7 +162,9 @@ CLStatus CLNamedPipe::UnsaftyWrite(CLIOVectors& IOVectors)
 	if(count == -1)
 	{
 		err = errno;
-		CLLogger::WriteLogMsg("In CLNamedPipe::Write(), writev error", errno);
+
+		if(err != EAGAIN)
+			CLLogger::WriteLogMsg("In CLNamedPipe::Write(), writev error", errno);
 	}
 
 	delete [] iov;

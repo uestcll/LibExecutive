@@ -61,6 +61,7 @@ CLMessagePoster::~CLMessagePoster()
 		delete m_pEvent;
 }
 
+//CLMsgLoopManagerForPrivateNamedPipe etc. call the following functions;
 CLStatus CLMessagePoster::Initialize(CLInitialDataPostChannelNotifier *pNotifier, void *pContext)
 {
 	if(pNotifier == 0)
@@ -73,13 +74,13 @@ CLStatus CLMessagePoster::Initialize(CLInitialDataPostChannelNotifier *pNotifier
 		return CLStatus(0, 0);
 	}
 
-	m_bInitial = true;
-
 	if(m_pProtocolEncapsulator)
 	{
 		CLStatus s = m_pProtocolEncapsulator->Initialize(m_UuidOfPoster);
 		if(!s.IsSuccess())
 		{
+			pNotifier->Notify(MSG_INITIALIZE_ERROR);
+			delete pNotifier;
 			CLLogger::WriteLogMsg("In CLMessagePoster::Initialize(), m_pProtocolEncapsulator->Initialize error", 0);
 			return CLStatus(-1, MSG_INITIALIZE_ERROR);
 		}
@@ -89,9 +90,10 @@ CLStatus CLMessagePoster::Initialize(CLInitialDataPostChannelNotifier *pNotifier
 	if(!s1.IsSuccess() && (s1.m_clErrorCode == DATA_POSTER_INITIALIZE_ERROR))
 	{
 		CLLogger::WriteLogMsg("In CLMessagePoster::Initialize(), m_pChannelMaintainer->Initialize error", 0);
-		delete  this;
+		return s1;
 	}
 
+	m_bInitial = true;
 	return s1;
 }
 

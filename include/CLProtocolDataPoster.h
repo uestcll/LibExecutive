@@ -15,7 +15,7 @@ public:
 	CLProtocolDataPoster();
 	virtual ~CLProtocolDataPoster();
 
-	void SetParameters(CLDataPoster *pDataPoster, CLDataPostResultNotifier *pResultNotifier, CLEvent *pEvent);
+	CLStatus SetParameters(CLDataPoster *pDataPoster, CLDataPostResultNotifier *pResultNotifier, CLEvent *pEvent);
 	bool IsSetParameters();
 
 	CLStatus PostProtocolData(CLIOVectors *pIOVectors);

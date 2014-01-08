@@ -53,5 +53,6 @@
 #include "CLDataPosterByNamedPipe.h"
 #include "CLMultiMsgSerializer.h"
 #include "CLMsgToPointerSerializer.h"
+#include "CLProtocolDataPoster.h"
 
 #endif

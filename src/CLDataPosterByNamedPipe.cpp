@@ -1,3 +1,4 @@
+#include <errno.h>
 #include "CLDataPosterByNamedPipe.h"
 #include "CLNamedPipe.h"
 #include "CLIOVectors.h"
@@ -21,6 +22,9 @@ CLStatus CLDataPosterByNamedPipe::PostData(CLIOVectors *pIOVectors)
 	CLStatus s = m_pNamedPipe->Write(*pIOVectors);
 	if(!s.IsSuccess())
 	{
+		if(s.m_clErrorCode == EAGAIN)
+			return CLStatus(-1, DATA_POSTER_POST_PENDING);
+
 		CLLogger::WriteLogMsg("In CLDataPosterByNamedPipe::PostData, m_pNamedPipe->Write error", 0);
 		return CLStatus(-1, DATA_POSTER_POST_ERROR);
 	}
