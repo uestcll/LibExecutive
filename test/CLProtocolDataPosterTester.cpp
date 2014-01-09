@@ -3,6 +3,8 @@
 
 TEST(CLProtocolDataPoster, SetParameters_Features_Test)
 {
+	CLLogger::WriteLogMsg("CLProtocolDataPoster Test", 0);
+
 	{
 		CLProtocolDataPoster pd;
 	}

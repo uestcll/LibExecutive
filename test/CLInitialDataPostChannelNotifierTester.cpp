@@ -19,6 +19,8 @@ protected:
 
 TEST(CLInitialDataPostChannelNotifier, Notify_Features_Test)
 {
+	CLLogger::WriteLogMsg("CLInitialDataPostChannelNotifier Test", 0);
+
 	CLInitialDataPostChannelNotifier initial;
 	EXPECT_TRUE(initial.Notify(DATA_POSTER_INITIALIZE_SUCCESS).IsSuccess());
 	EXPECT_TRUE(initial.Notify(DATA_POSTER_INITIALIZE_ERROR).IsSuccess());

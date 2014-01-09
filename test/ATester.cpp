@@ -22,6 +22,7 @@ void* TestThreadForCLLibExecutiveInitializerSingleton(void *arg)
 
 TEST(CLLibExecutiveInitializer, FirstCallDestroy)
 {
+	CLLogger::WriteLogMsg("CLLibExecutiveInitializer Test", 0);
 	EXPECT_FALSE(CLLibExecutiveInitializer::Destroy().IsSuccess());
 }
 

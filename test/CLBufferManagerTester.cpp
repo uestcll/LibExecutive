@@ -66,6 +66,8 @@ struct CLBufferManagerInfo
 
 TEST(CLBufferManager, Constructor_Features_Test)
 {
+	CLLogger::WriteLogMsg("CLBufferManager Test", 0);
+
 	{
 		CLBufferManager bm;
 		CLBufferManagerInfo *pInfo = (CLBufferManagerInfo *)((char *)(&bm) + 8);

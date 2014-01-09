@@ -65,6 +65,8 @@ public:
 
 TEST(CLMultiMsgDeserializer, RegisterDeserializer_Features_Test)
 {
+	CLLogger::WriteLogMsg("CLMultiMsgDeserializer Test", 0);
+
 	CLMultiMsgDeserializer dd;
 	
 	CLStatus s1 = dd.RegisterDeserializer(1, 0);

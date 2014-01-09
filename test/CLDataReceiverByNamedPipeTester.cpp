@@ -4,6 +4,8 @@
 
 TEST(CLDataReceiverByNamedPipe, GetData_Features_Test)
 {
+	CLLogger::WriteLogMsg("CLDataReceiverByNamedPipe Test", 0);
+
 	CLDataReceiverByNamedPipe dr("/tmp/CLNamedPipe_Read_Features_Test");
 
 	int fd = open("/tmp/CLNamedPipe_Read_Features_Test", O_WRONLY);
@@ -30,7 +32,19 @@ TEST(CLDataReceiverByNamedPipe, GetData_Features_Test)
 
 	iov.Clear();
 	CLStatus s2 = dr.GetData(iov, &context);
-	EXPECT_NE(context, 0);
 	EXPECT_FALSE(s2.IsSuccess());
 	EXPECT_EQ(s2.m_clErrorCode, NORMAL_ERROR);
+}
+
+TEST(CLDataReceiverByNamedPipe, GetData2_Features_Test)
+{
+	CLDataReceiverByNamedPipe dr("/tmp/CLNamedPipe_Read_Features_Test");
+
+	CLIOVectors iov;
+	char *p = new char[20];
+	EXPECT_TRUE(iov.PushBack(p, 20, true).IsSuccess());
+	long context = 0;
+	CLStatus s1 = dr.GetData(iov, &context);
+	EXPECT_EQ(s1.m_clErrorCode, RECEIVED_ZERO_BYTE);
+	EXPECT_NE(context, 0);
 }

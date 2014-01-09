@@ -3,6 +3,8 @@
 
 TEST(CLDataReceiverBySTLqueue, GetData_Features_Test)
 {
+	CLLogger::WriteLogMsg("CLDataReceiverBySTLqueue Test", 0);
+
 	CLSTLqueue qt;
 	CLDataReceiverBySTLqueue q_stl(&qt);
 

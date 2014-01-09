@@ -3,6 +3,8 @@
 
 TEST(CLDataPostChannelBySTLqueueMaintainer, FunctionReturnRight)
 {
+	CLLogger::WriteLogMsg("CLDataPostChannelBySTLqueueMaintainer Test", 0);
+
 	CLSTLqueue *q = new CLSTLqueue();
 	CLDataPostChannelBySTLqueueMaintainer maintainer(q);
 

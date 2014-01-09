@@ -63,6 +63,8 @@ public:
 
 TEST(CLMultiMsgSerializer, RegisterSerializer_Features_Test)
 {
+	CLLogger::WriteLogMsg("CLMultiMsgSerializer Test", 0);
+
 	CLMultiMsgSerializer dd;
 	
 	CLStatus s1 = dd.RegisterSerializer(1, 0);

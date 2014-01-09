@@ -7,6 +7,8 @@ using namespace std;
 
 TEST(CLMessageReceiver, GetMessage_Features_Test)
 {
+	CLLogger::WriteLogMsg("CLMessageReceiver Test", 0);
+
 	CLSTLqueue stl_queue;
 	queue<CLMessage *> qCon;
 	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(new CLBufferManager(), new CLDataReceiverBySTLqueue(&stl_queue), new CLPointerToMsgDeserializer(), new CLProtocolDecapsulatorBySplitPointer());

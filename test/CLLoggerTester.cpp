@@ -8,6 +8,8 @@
 
 TEST(CLLogger, WriteLog_pstrmsg_0)
 {
+	CLLogger::WriteLogMsg("CLLogger Test", 0);
+
 	CLLogger *pLogger = CLLogger::GetInstance();
 	EXPECT_TRUE(pLogger != 0);
 

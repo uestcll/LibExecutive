@@ -3,6 +3,8 @@
 
 TEST(CLDataPosterBySTLqueue, PostData_Features_Test)
 {
+	CLLogger::WriteLogMsg("CLDataPosterBySTLqueue Test", 0);
+
 	CLSTLqueue q;
 	CLDataPosterBySTLqueue dp(&q);
 

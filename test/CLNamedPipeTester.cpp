@@ -5,6 +5,8 @@
 
 TEST(CLNamedPipe, Read_Features_Test)
 {
+	CLLogger::WriteLogMsg("CLNamedPipe Test", 0);
+
 	CLNamedPipe pipe("/tmp/CLNamedPipe_Read_Features_Test", true);
 
 	EXPECT_EQ(pipe.GetSizeForAtomWriting(), 4096);

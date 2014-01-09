@@ -41,6 +41,8 @@ static void ValidatePool(const char* SharedName)
 
 TEST(CLSharedObjectAllocator, CheckingForPool)
 {
+	CLLogger::WriteLogMsg("CLSharedObjectAllocator Test", 0);
+
 	ValidatePool<SLSharedMutexItem>("shared_space_for_shared_mutex_allocator");
 	ValidatePool<SLSharedEventItem>("shared_space_for_shared_event_allocator");
 	ValidatePool<SLSharedConditionVariableItem>("shared_space_for_shared_condition_variable_allocator");

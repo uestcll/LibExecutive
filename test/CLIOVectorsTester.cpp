@@ -84,6 +84,8 @@ static bool CheckIOVectorData(char *buf, int n, CLIOVectors& iovs)
 
 TEST(CLIOVectors, OriginalStatus)
 {
+	CLLogger::WriteLogMsg("CLIOVectors Test", 0);
+
 	CLIOVectors iovs;
 	EXPECT_TRUE(CheckIOVectorStatus(0, 0, iovs));
 

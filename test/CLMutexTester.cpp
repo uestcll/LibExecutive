@@ -31,6 +31,8 @@ static void* TestThreadForCLMutex_MultiThread(void *arg)
 
 TEST(CLMutex, MultiThread)
 {
+	CLLogger::WriteLogMsg("CLMutex Test", 0);
+
 	TestStructForCLMutex *pT = new TestStructForCLMutex;
 	pT->pmutex = new CLMutex();
 	pT->i = 0;

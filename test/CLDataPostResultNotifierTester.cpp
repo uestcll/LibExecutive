@@ -3,6 +3,8 @@
 
 TEST(CLDataPostResultNotifier, Notify_Features_Test)
 {
+	CLLogger::WriteLogMsg("CLDataPostResultNotifier Test", 0);
+
 	CLDataPostResultNotifier notify;
 	EXPECT_TRUE(notify.Notify(MSG_POST_SUCCESS).IsSuccess());
 	EXPECT_TRUE(notify.Notify(MSG_POST_ERROR).IsSuccess());

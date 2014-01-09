@@ -12,6 +12,8 @@ void* TestThreadForCLLibExecutiveInitializerDestroy(void *arg)
 
 TEST(CLLibExecutiveInitializerDestroy, Normal)
 {
+	CLLogger::WriteLogMsg("CLLibExecutiveInitializerDestroy Test", 0);
+
 	pthread_t tid[NUM];	
 	for(long i = 0; i < NUM; i++)	
 	{		

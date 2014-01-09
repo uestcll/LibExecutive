@@ -142,7 +142,9 @@ CLStatus CLNamedPipe::UnsaftyRead(CLIOVectors& IOVectors)
 	if(count == -1)
 	{
 		err = errno;
-		CLLogger::WriteLogMsg("In CLNamedPipe::Read(), readv error", errno);
+
+		if(err != EAGAIN)
+			CLLogger::WriteLogMsg("In CLNamedPipe::Read(), readv error", errno);
 	}
 
 	delete [] iov;

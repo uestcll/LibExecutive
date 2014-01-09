@@ -55,6 +55,8 @@ static bool CheckIOVectorStatus(iovec *pIOV, int n, CLIOVectors& iovs)
 
 TEST(CLProtocolDecapsulatorBySplitPointer, Decapsulate_Features_Test)
 {
+	CLLogger::WriteLogMsg("CLProtocolDecapsulatorBySplitPointer Test", 0);
+
 	CLProtocolDecapsulatorBySplitPointer split;
 	CLIOVectors IOVectorsForData;
 	CLIOVectors IOVectorsForPartialData;

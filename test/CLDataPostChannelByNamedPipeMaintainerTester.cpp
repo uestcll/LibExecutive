@@ -3,6 +3,8 @@
 
 TEST(CLDataPostChannelByNamedPipeMaintainer, FunctionReturnRight)
 {
+	CLLogger::WriteLogMsg("CLDataPostChannelByNamedPipeMaintainer Test", 0);
+
 	const char *strPath = "/tmp/NamedPipe_For_CLDataPostChannelByNamedPipeMaintainer_Test";
 	CLNamedPipe pipe(strPath, true);
 

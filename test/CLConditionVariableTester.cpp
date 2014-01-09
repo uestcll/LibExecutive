@@ -30,6 +30,8 @@ void* TestThreadForCLConditionVariable(void *arg)
 
 TEST(CLConditionVariable, Normal)
 {
+	CLLogger::WriteLogMsg("CLConditionVariable Test", 0);
+
 	TestForCLConditionVariable *pT = new TestForCLConditionVariable();
 	pT->flag = 0;
 	pT->i = 0;

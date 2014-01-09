@@ -3,6 +3,8 @@
 
 TEST(CLMsgToPointerSerializer, Serialize_Features_Test)
 {
+	CLLogger::WriteLogMsg("CLMsgToPointerSerializer Test", 0);
+
 	CLMsgToPointerSerializer dd;
 	CLMessage *pMsg = (CLMessage *)1;
 	CLIOVectors iov;

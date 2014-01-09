@@ -3,6 +3,8 @@
 
 TEST(CLPointerToMsgDeserializer, Deserialize_Features_Test)
 {
+	CLLogger::WriteLogMsg("CLPointerToMsgDeserializer Test", 0);
+
 	CLBufferManager bm;
 	CLMessage *pMsg=(CLMessage *)1;
 	CLIOVectors iov;

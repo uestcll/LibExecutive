@@ -4,6 +4,8 @@
 
 TEST(CLDataPosterByNamedPipe, PostData_Features_Test)
 {
+	CLLogger::WriteLogMsg("CLDataPosterByNamedPipe Test", 0);
+
 	CLNamedPipe qr("/tmp/NamedPipe_For_CLDataPosterByNamedPipe_Test", true);
 	CLNamedPipe qw("/tmp/NamedPipe_For_CLDataPosterByNamedPipe_Test", false);
 

@@ -3,6 +3,8 @@
 
 TEST(CLSTLqueue, PushData_Features_Test)
 {
+	CLLogger::WriteLogMsg("CLSTLqueue Test", 0);
+
 	CLSTLqueue q;
 	EXPECT_TRUE(q.PushData(2).IsSuccess());
 

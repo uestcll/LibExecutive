@@ -29,6 +29,8 @@ static void* TestThreadForCLCriticalSection(void *arg)
 
 TEST(CLCriticalSection, Normal)
 {
+	CLLogger::WriteLogMsg("CLCriticalSection Test", 0);
+
 	TestForCLCriticalSection *pT = new TestForCLCriticalSection;
 	pT->i = 0;
 	

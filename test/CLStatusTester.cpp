@@ -8,6 +8,8 @@ static CLStatus f1()
 
 TEST(CLStatus, FunctionReturnRight)
 {
+	CLLogger::WriteLogMsg("CLStatus Test", 0);
+
 	CLStatus s = f1();
 	EXPECT_EQ(s.m_clReturnCode, 0);
 	EXPECT_EQ(s.m_clErrorCode, 2);

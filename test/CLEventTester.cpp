@@ -37,6 +37,8 @@ static void* TestThreadForCLEvent(void *arg)
 
 TEST(CLEvent, ResetAutomatically)
 {
+	CLLogger::WriteLogMsg("CLEvent Test", 0);
+
 	TestForCLEvent *pT = new TestForCLEvent;
 	pT->i = 0;
 

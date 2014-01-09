@@ -5,6 +5,8 @@
 
 TEST(CLSharedMemory, Normal)
 {
+	CLLogger::WriteLogMsg("CLSharedMemory Test", 0);
+
 	pid_t pid = fork();
 	if(pid == 0)
 	{
