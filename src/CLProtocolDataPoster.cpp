@@ -71,12 +71,13 @@ CLStatus CLProtocolDataPoster::PostProtocolData(CLIOVectors *pIOVectors)
 		return CLStatus(-1, DATA_POSTER_POST_ERROR);
 	}
 
+	m_pIOVectors = pIOVectors;
+
 	CLStatus s = m_pDataPoster->PostData(pIOVectors);
 	if(!s.IsSuccess())
 	{
 		if(s.m_clErrorCode == DATA_POSTER_POST_PENDING)
 		{
-			m_pIOVectors = pIOVectors;
 			m_pIOVectors->GetIterator(0, *m_pIterProtocolData);
 			m_LeftLength = pIOVectors->Size();
 			return s;
@@ -103,7 +104,6 @@ CLStatus CLProtocolDataPoster::PostProtocolData(CLIOVectors *pIOVectors)
 		}
 
 		m_pResultNotifer->Notify(result);
-		m_pIOVectors = pIOVectors;
 		delete this;
 
 		if(result == DATA_POSTER_POST_ERROR)
@@ -114,13 +114,14 @@ CLStatus CLProtocolDataPoster::PostProtocolData(CLIOVectors *pIOVectors)
 
 	if(s.m_clReturnCode < pIOVectors->Size())
 	{
-		m_pIOVectors = pIOVectors;
 		m_pIOVectors->GetIterator(s.m_clReturnCode, *m_pIterProtocolData);
 		m_LeftLength = pIOVectors->Size() - s.m_clReturnCode;
 
 		return CLStatus(-1, DATA_POSTER_POST_PARTIAL);
 	}
 
+	m_pResultNotifer->Notify(DATA_POSTER_POST_ERROR);
+	delete this;
 	return CLStatus(-1, DATA_POSTER_POST_ERROR);
 }
 
@@ -130,11 +131,13 @@ CLStatus CLProtocolDataPoster::PostLeftProtocolData()
 		return CLStatus(-1, DATA_POSTER_POST_ERROR);
 
 	CLIOVectors tmp_iov;
-	CLStatus s1 = m_pIOVectors->PushBackRangeToAIOVector(tmp_iov, *m_pIterProtocolData, m_LeftLength);
+	CLIteratorForIOVectors tmp_iter = *m_pIterProtocolData;
+	CLStatus s1 = m_pIOVectors->PushBackRangeToAIOVector(tmp_iov, tmp_iter, m_LeftLength);
 	if(!s1.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLProtocolDataPoster::PostLeftProtocolData(), m_pIOVectors->PushBackRangeToAIOVector error", 0);
 		m_pResultNotifer->Notify(DATA_POSTER_POST_ERROR);
+		delete this;
 		return CLStatus(-1, DATA_POSTER_POST_ERROR);
 	}
 
