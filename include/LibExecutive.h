@@ -54,5 +54,7 @@
 #include "CLMultiMsgSerializer.h"
 #include "CLMsgToPointerSerializer.h"
 #include "CLProtocolDataPoster.h"
+#include "CLMessagePoster.h"
+#include "CLProtocolEncapsulator.h"
 
 #endif

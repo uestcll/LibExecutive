@@ -90,7 +90,7 @@ CLStatus CLMessagePoster::Initialize(CLInitialDataPostChannelNotifier *pNotifier
 	if(!s1.IsSuccess() && (s1.m_clErrorCode == DATA_POSTER_INITIALIZE_ERROR))
 	{
 		CLLogger::WriteLogMsg("In CLMessagePoster::Initialize(), m_pChannelMaintainer->Initialize error", 0);
-		return s1;
+		return CLStatus(-1, MSG_INITIALIZE_ERROR);
 	}
 
 	m_bInitial = true;
@@ -99,11 +99,14 @@ CLStatus CLMessagePoster::Initialize(CLInitialDataPostChannelNotifier *pNotifier
 
 CLStatus CLMessagePoster::Uninitialize(void *pContext)
 {
+	if(!m_bInitial)
+		return CLStatus(-1, NORMAL_ERROR);
+
 	CLStatus s1 = m_pChannelMaintainer->Uninitialize(pContext);
 	if(!s1.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLMessagePoster::Uninitialize(), m_pChannelMaintainer->Uninitialize() error", 0);
-		return s1;
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	if(m_pProtocolEncapsulator)
@@ -112,7 +115,7 @@ CLStatus CLMessagePoster::Uninitialize(void *pContext)
 		if(!s2.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLMessagePoster::Uninitialize(), m_pProtocolEncapsulator->Uninitialize() error", 0);
-			return s2;
+			return CLStatus(-1, NORMAL_ERROR);
 		}
 	}
 
