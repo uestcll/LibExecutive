@@ -396,7 +396,31 @@ TEST(CLProtocolDataPoster, PostLeftProtocolData_POSTPARTIAL_Test)
 		}
 	}
 	
-
 	delete pwriter;
 	delete preader;
+}
+
+TEST(CLProtocolDataPoster, STL_PostProtocolData_Features_Test)
+{
+	CLProtocolDataPoster *pd = new CLProtocolDataPoster;
+	CLEvent e;
+	CLSTLqueue *q = new CLSTLqueue;
+	
+	EXPECT_TRUE(pd->SetParameters(new CLDataPosterBySTLqueue(q), new CLDataPostResultNotifier(false), &e).IsSuccess());
+
+	CLIOVectors *piov = new CLIOVectors;
+	long i = 32;
+	EXPECT_TRUE(piov->PushBack((char *)(&i), 8).IsSuccess());
+	CLStatus s1 = pd->PostProtocolData(piov);
+	EXPECT_TRUE(s1.IsSuccess());
+
+	EXPECT_TRUE(e.Wait().IsSuccess());
+
+	long j = 0;
+	CLIOVectors iov1;
+	EXPECT_TRUE(iov1.PushBack((char *)(&j), 8).IsSuccess());
+	EXPECT_TRUE(q->PopData(iov1).IsSuccess());
+	EXPECT_EQ(j, 32);
+
+	delete q;
 }
