@@ -3,6 +3,7 @@
 #include "CLMessage.h"
 #include "CLLogger.h"
 #include "CLExecutiveInitialFinishedNotifier.h"
+#include "ErrorCode.h"
 
 CLMessageLoopManager::CLMessageLoopManager(CLMessageObserver *pMessageObserver)
 {
@@ -70,10 +71,10 @@ CLStatus CLMessageLoopManager::EnterMessageLoop(void *pContext)
 	while(true)
 	{
 		CLStatus s5 = WaitForMessage();
-		if(!s5.IsSuccess())
+		if(!s5.IsSuccess() && (s5.m_clErrorCode == NORMAL_ERROR))
 		{
 			CLLogger::WriteLogMsg("In CLMessageLoopManager::EnterMessageLoop(), WaitForMessage error", 0);
-			continue;
+			break;
 		}
 
 		while(!m_MessageContainer.empty())

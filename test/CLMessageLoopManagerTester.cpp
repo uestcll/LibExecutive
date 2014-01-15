@@ -41,7 +41,8 @@ public:
 
 	virtual CLStatus Initialize(CLMessageLoopManager *pMessageLoop, void* pContext)
 	{
-		pMessageLoop->Register(ADD_MSG_ID, (CallBackForMessageLoop)(&TestObserverForCLMessageLoopManager::On_Add));
+		EXPECT_FALSE(pMessageLoop->Register(ADD_MSG_ID, 0).IsSuccess());
+		EXPECT_TRUE(pMessageLoop->Register(ADD_MSG_ID, (CallBackForMessageLoop)(&TestObserverForCLMessageLoopManager::On_Add)).IsSuccess());
 		return CLStatus(0, 0);
 	}
 
@@ -89,25 +90,29 @@ public:
 		return CLStatus(0, 0);
 	}
 
-	virtual CLMessage* WaitForMessage()
+	virtual CLStatus WaitForMessage()
 	{
-		return new CLTestAddMsgForCLMessageLoopManager(2, 5);
+		m_MessageContainer.push(new CLTestAddMsgForCLMessageLoopManager(2, 5));
+		return CLStatus(0, 0);
 	}
 };
 
-TEST(CLMessageLoopManager, Normal)
+TEST(CLMessageLoopManager, EnterMessageLoop_Features_Test)
 {
-	SLExecutiveInitialParameter i;
-	i.pContext = NULL;
+	CLLogger::WriteLogMsg("CLMessageLoopManager Test", 0);
 
+	SLExecutiveInitialParameter i;
+	i.pContext = 0;
 	CLThreadInitialFinishedNotifier j(0);
-	i.pNotifier = &j;
+	i.pNotifier = 0;
 
 	CLMessageLoopManager *p = new TestClassForCLMessageLoopManager(new TestObserverForCLMessageLoopManager);
 
 	EXPECT_FALSE(p->EnterMessageLoop(0).IsSuccess());
+	EXPECT_FALSE(p->EnterMessageLoop(&i).IsSuccess());
+	i.pNotifier = &j;
 
-	p->EnterMessageLoop(&i);
+	EXPECT_TRUE(p->EnterMessageLoop(&i).IsSuccess());
 
 	delete p;
 
