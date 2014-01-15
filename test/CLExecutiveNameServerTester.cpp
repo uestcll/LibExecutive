@@ -1,60 +1,60 @@
 #include <gtest/gtest.h>
 #include "LibExecutive.h"
 
-static int g_bfornameserver = 0;
-
-static int g_bforpst = 0;
-
-class CLFalseCommunication : public CLExecutiveCommunication
+TEST(CLExecutiveNameServer, Register_Features_Test)
 {
-public:
-	virtual CLStatus PostExecutiveMessage(CLMessage *pMessage)
-	{
-		g_bforpst++;
-		return CLStatus(0, 0);
-	}
+	CLLogger::WriteLogMsg("CLExecutiveNameServer Test", 0);
 
-	virtual ~CLFalseCommunication()
-	{
-		g_bfornameserver++;
-	}
-};
+	const char *strPipeName = "/tmp/NamedPipe_For_CLExecutiveNameServer_Test";
+	CLNamedPipe np(strPipeName, true);
+	CLMessagePoster *mp = new CLMessagePoster(new CLMsgToPointerSerializer, 0, new CLDataPostChannelByNamedPipeMaintainer(strPipeName), 0);
 
+	CLExecutiveNameServer *p = CLExecutiveNameServer::GetInstance();
+	EXPECT_NE(p, (CLExecutiveNameServer *)0);
 
-TEST(CLExecutiveNameServer, normal)
+	EXPECT_FALSE(p->Register(0, 0).IsSuccess());
+
+	EXPECT_FALSE(p->Register(0, mp).IsSuccess());
+
+	mp = new CLMessagePoster(new CLMsgToPointerSerializer, 0, new CLDataPostChannelByNamedPipeMaintainer(strPipeName), 0);
+
+	EXPECT_TRUE(p->Register("SDFdfd", mp).IsSuccess());
+
+	EXPECT_TRUE(p->ReleaseCommunicationPtr("SDFdfd").IsSuccess());
+
+	mp = new CLMessagePoster(new CLMsgToPointerSerializer, 0, new CLDataPostChannelByNamedPipeMaintainer(strPipeName), 0);
+
+	EXPECT_TRUE(p->Register("23", mp).IsSuccess());
+
+	mp = new CLMessagePoster(new CLMsgToPointerSerializer, 0, new CLDataPostChannelByNamedPipeMaintainer(strPipeName), 0);
+
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
+
+	EXPECT_FALSE(p->Register("23", mp).IsSuccess());
+
+	EXPECT_TRUE(p->ReleaseCommunicationPtr("23").IsSuccess());
+}
+
+TEST(CLExecutiveNameServer, GetCommunicationPtr)
 {
 	CLExecutiveNameServer *p = CLExecutiveNameServer::GetInstance();
-	CLExecutiveNameServer *p1 = CLExecutiveNameServer::GetInstance();
+	EXPECT_NE(p, (CLExecutiveNameServer *)0);
 
-	EXPECT_EQ((long)p, (long)p1);
+	EXPECT_EQ(p->GetCommunicationPtr(0), (CLMessagePoster *)0);
+	EXPECT_EQ(p->GetCommunicationPtr(""), (CLMessagePoster *)0);
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
+	EXPECT_EQ(p->GetCommunicationPtr("3423"), (CLMessagePoster *)0);
 
-	CLLogger::WriteLogMsg("The following is testing", 0);
+	const char *strPipeName = "/tmp/NamedPipe_For_CLExecutiveNameServer_Test";
+	CLNamedPipe np(strPipeName, true);
+	CLMessagePoster *mp = new CLMessagePoster(new CLMsgToPointerSerializer, 0, new CLDataPostChannelByNamedPipeMaintainer(strPipeName), 0);
+	EXPECT_TRUE(p->Register("SDFdfd", mp).IsSuccess());
 
-	EXPECT_TRUE((p->Register("1", new CLFalseCommunication)).IsSuccess());
-	EXPECT_FALSE((p->Register("1", 0)).IsSuccess());
-	EXPECT_TRUE((p->Register("11", new CLFalseCommunication)).IsSuccess());
-	EXPECT_TRUE((p->Register("111", new CLFalseCommunication)).IsSuccess());
+	CLMessagePoster *qq = p->GetCommunicationPtr("SDFdfd");
+	EXPECT_TRUE(qq == mp);
+	EXPECT_TRUE(p->ReleaseCommunicationPtr("SDFdfd").IsSuccess());
 
-	CLExecutiveCommunication *c1 = p->GetCommunicationPtr("1");
-	p->ReleaseCommunicationPtr("1");
-
-	CLExecutiveCommunication *c2 = p->GetCommunicationPtr("1");
-	p->ReleaseCommunicationPtr("1");
-
-	EXPECT_EQ((long)c1, (long)c2);
-
-	EXPECT_EQ((long)(p->GetCommunicationPtr("2")), 0);
-
-	EXPECT_FALSE((p->ReleaseCommunicationPtr("3")).IsSuccess());
-
-	p->ReleaseCommunicationPtr("1");
-	p->ReleaseCommunicationPtr("11");
-	p->ReleaseCommunicationPtr("111");
-
-	EXPECT_EQ(g_bfornameserver, 3);
-	g_bfornameserver = 0;
-
-	EXPECT_EQ((long)(p->GetCommunicationPtr("1")), 0);
+	EXPECT_TRUE(p->ReleaseCommunicationPtr("SDFdfd").IsSuccess());
 }
 
 TEST(CLExecutiveNameServer, ReleaseCommunicationPtr)
@@ -64,108 +64,49 @@ TEST(CLExecutiveNameServer, ReleaseCommunicationPtr)
 
 	EXPECT_FALSE(p->ReleaseCommunicationPtr(0).IsSuccess());
 	EXPECT_FALSE(p->ReleaseCommunicationPtr("").IsSuccess());
+
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
 	EXPECT_FALSE(p->ReleaseCommunicationPtr("1").IsSuccess());
 }
 
-TEST(CLExecutiveNameServer, GetCommunicationPtr)
+TEST(CLExecutiveNameServer, PostExecutiveMessage_Parameters_Test)
 {
-	CLExecutiveNameServer *p = CLExecutiveNameServer::GetInstance();
-	EXPECT_NE(p, (CLExecutiveNameServer *)0);
+	CLStatus s1 = CLExecutiveNameServer::PostExecutiveMessage(0, 0);
+	EXPECT_FALSE(s1.IsSuccess());
+	EXPECT_EQ(s1.m_clErrorCode, NORMAL_ERROR);
 
-	EXPECT_EQ(p->GetCommunicationPtr(0), (CLExecutiveCommunication *)0);
-	EXPECT_EQ(p->GetCommunicationPtr(""), (CLExecutiveCommunication *)0);
-	EXPECT_EQ(p->GetCommunicationPtr("3423"), (CLExecutiveCommunication *)0);
+	CLStatus s2 = CLExecutiveNameServer::PostExecutiveMessage(0, new CLMessage(9));
+	EXPECT_FALSE(s2.IsSuccess());
+	EXPECT_EQ(s2.m_clErrorCode, NORMAL_ERROR);
+
+	CLStatus s3 = CLExecutiveNameServer::PostExecutiveMessage("", new CLMessage(9));
+	EXPECT_FALSE(s3.IsSuccess());
+	EXPECT_EQ(s3.m_clErrorCode, NORMAL_ERROR);
+
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose 2", 0);
+	CLStatus s4 = CLExecutiveNameServer::PostExecutiveMessage("2323", new CLMessage(9));
+	EXPECT_FALSE(s4.IsSuccess());
+	EXPECT_EQ(s4.m_clErrorCode, NORMAL_ERROR);
 }
 
-TEST(CLExecutiveNameServer, Register)
+TEST(CLExecutiveNameServer, PostExecutiveMessage_Features_Test)
 {
-	CLExecutiveNameServer *p = CLExecutiveNameServer::GetInstance();
-	EXPECT_NE(p, (CLExecutiveNameServer *)0);
-
-	EXPECT_FALSE(p->Register(0, 0).IsSuccess());
-	EXPECT_FALSE(p->Register("", 0).IsSuccess());
-	EXPECT_FALSE(p->Register("DSDFSD", 0).IsSuccess());
-
-	EXPECT_FALSE(p->Register(0, new CLFalseCommunication).IsSuccess());
-	EXPECT_TRUE(p->Register("SDFdfd", new CLFalseCommunication).IsSuccess());
-
-	EXPECT_TRUE(p->ReleaseCommunicationPtr("SDFdfd").IsSuccess());
-
-	EXPECT_EQ(g_bfornameserver, 2);
-	g_bfornameserver = 0;
-
-	EXPECT_TRUE(p->Register("23", new CLFalseCommunication).IsSuccess());
-
-	EXPECT_FALSE(p->Register("23", new CLFalseCommunication).IsSuccess());
-
-	EXPECT_TRUE(p->ReleaseCommunicationPtr("23").IsSuccess());
-
-	EXPECT_EQ(g_bfornameserver, 2);
-	g_bfornameserver = 0;
-}
-
-static int g_bforpstmsgfornameserver = 0;
-
-class CLTestMsgForNameServer : public CLMessage
-{
-public:
-	CLTestMsgForNameServer(int id) : CLMessage(id)
-	{
-	}
-
-	virtual ~CLTestMsgForNameServer()
-	{
-		g_bforpstmsgfornameserver++;
-	}
-};
-
-class CLFalseCommunication2 : public CLExecutiveCommunication
-{
-public:
-	virtual CLStatus PostExecutiveMessage(CLMessage *pMessage)
-	{
-		delete pMessage;
-		return CLStatus(-1, 0);
-	}
-};
-
-TEST(CLExecutiveNameServer, PostExecutiveMessage)
-{
-	EXPECT_FALSE(CLExecutiveNameServer::PostExecutiveMessage(0, 0).IsSuccess());
-	EXPECT_FALSE(CLExecutiveNameServer::PostExecutiveMessage(0, new CLTestMsgForNameServer(9)).IsSuccess());
-	EXPECT_FALSE(CLExecutiveNameServer::PostExecutiveMessage("", new CLTestMsgForNameServer(9)).IsSuccess());
-	EXPECT_FALSE(CLExecutiveNameServer::PostExecutiveMessage("2323", new CLTestMsgForNameServer(9)).IsSuccess());
-
-	EXPECT_EQ(g_bforpstmsgfornameserver, 3);
-	g_bforpstmsgfornameserver = 0;
+	const char *strPipeName = "/tmp/NamedPipe_For_CLExecutiveNameServer_Test";
+	CLNamedPipe np(strPipeName, true);
+	CLMessagePoster *mp = new CLMessagePoster(new CLMsgToPointerSerializer, 0, new CLDataPostChannelByNamedPipeMaintainer(strPipeName), 0);
 
 	CLExecutiveNameServer *p = CLExecutiveNameServer::GetInstance();
 	EXPECT_NE(p, (CLExecutiveNameServer *)0);
 
-	EXPECT_TRUE((p->Register("111", new CLFalseCommunication)).IsSuccess());
-
-	CLMessage *pm = new CLTestMsgForNameServer(2);
-	EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage("111", pm).IsSuccess());
-
-	EXPECT_TRUE(p->ReleaseCommunicationPtr("111").IsSuccess());
-
-	EXPECT_EQ(g_bforpst, 1);
-	g_bforpst = 0;
-
-	EXPECT_EQ(g_bfornameserver, 1);
-	g_bfornameserver = 0;
-
-	delete pm;
-
-	EXPECT_EQ(g_bforpstmsgfornameserver, 1);
-	g_bforpstmsgfornameserver = 0;
-
-	EXPECT_TRUE((p->Register("111", new CLFalseCommunication2)).IsSuccess());
-	EXPECT_FALSE(CLExecutiveNameServer::PostExecutiveMessage("111", new CLTestMsgForNameServer(3)).IsSuccess());
-	EXPECT_TRUE(p->ReleaseCommunicationPtr("111").IsSuccess());
+	EXPECT_TRUE(p->Register("SDFdfd1", mp).IsSuccess());
 	
-	EXPECT_EQ(g_bforpstmsgfornameserver, 1);
-	g_bforpstmsgfornameserver = 0;
+	CLMessage *pmsg1 = new CLMessage(1);
+	EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage("SDFdfd1", pmsg1, true).IsSuccess());
+	CLIOVectors iov;
+	long j;
+	EXPECT_TRUE(iov.PushBack((char *)(&j), 8).IsSuccess());
+	EXPECT_TRUE(np.Read(iov).IsSuccess());
+	EXPECT_EQ(j, (long)pmsg1);
 
-	CLLogger::WriteLogMsg("The testing end", 0);
+	EXPECT_TRUE(p->ReleaseCommunicationPtr("SDFdfd1").IsSuccess());
 }

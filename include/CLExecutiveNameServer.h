@@ -19,7 +19,7 @@ class CLExecutiveNameServer
 {
 public:
 	static CLExecutiveNameServer* GetInstance();
-	static CLStatus PostExecutiveMessage(const char* pstrExecutiveName, CLMessage *pMessage);
+	static CLStatus PostExecutiveMessage(const char* pstrExecutiveName, CLMessage *pMessage, bool bDeleteMsg = false);
 	
 	friend class CLLibExecutiveInitializer;
 

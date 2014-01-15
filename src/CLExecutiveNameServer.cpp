@@ -20,50 +20,45 @@ CLExecutiveNameServer::~CLExecutiveNameServer()
 {
 }
 
-CLStatus CLExecutiveNameServer::PostExecutiveMessage(const char* pstrExecutiveName, CLMessage *pMessage)
+CLStatus CLExecutiveNameServer::PostExecutiveMessage(const char* pstrExecutiveName, CLMessage *pMessage, bool bDeleteMsg)
 {
 	if(pMessage == 0)
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 
-	if((pstrExecutiveName == 0) || (strlen(pstrExecutiveName) == 0))
+	try
 	{
-		delete pMessage;
-		return CLStatus(-1, 0);
-	}
+		if((pstrExecutiveName == 0) || (strlen(pstrExecutiveName) == 0))
+			throw CLStatus(-1, NORMAL_ERROR);
 
-	CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
-	if(pNameServer == 0)
-	{
-		CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), CLExecutiveNameServer::GetInstance error", 0);
-		delete pMessage;
-		return CLStatus(-1, 0);
-	}
+		CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
+		if(pNameServer == 0)
+		{
+			CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), CLExecutiveNameServer::GetInstance error", 0);
+			throw CLStatus(-1, NORMAL_ERROR);
+		}
 
-	CLMessagePoster* pComm = pNameServer->GetCommunicationPtr(pstrExecutiveName);
-	if(pComm == 0)
-	{
-		CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pNameServer->GetCommunicationPtr error", 0);
-		delete pMessage;
-		return CLStatus(-1, 0);
-	}	
+		CLMessagePoster* pComm = pNameServer->GetCommunicationPtr(pstrExecutiveName);
+		if(pComm == 0)
+		{
+			CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pNameServer->GetCommunicationPtr error", 0);
+			throw CLStatus(-1, NORMAL_ERROR);
+		}	
 
-	CLStatus s = pComm->PostMessage(pMessage, new CLDataPostResultNotifier, new CLProtocolDataPoster());
-	if(!s.IsSuccess() && (s.m_clErrorCode == MSG_POST_ERROR))
-	{
-		CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pComm->PostExecutiveMessage error", 0);
-
-		CLStatus s1 = pNameServer->ReleaseCommunicationPtr(pstrExecutiveName);
-		if(!s1.IsSuccess())
+		CLStatus s = pComm->PostMessage(pMessage, new CLDataPostResultNotifier(bDeleteMsg), new CLProtocolDataPoster());
+		
+		if(!(pNameServer->ReleaseCommunicationPtr(pstrExecutiveName).IsSuccess()))
 			CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pNameServer->ReleaseCommunicationPtr error", 0);
 
-		return CLStatus(-1, 0);
+		if(!s.IsSuccess() && (s.m_clErrorCode == MSG_POST_ERROR))
+			CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pComm->PostMessage error", 0);
+
+		return s;
 	}
-
-	CLStatus s2 = pNameServer->ReleaseCommunicationPtr(pstrExecutiveName);
-	if(!s2.IsSuccess())
-		CLLogger::WriteLogMsg("In CLExecutiveNameServer::PostExecutiveMessage(), pNameServer->ReleaseCommunicationPtr error", 0);
-
-	return CLStatus(0, 0);
+	catch(CLStatus& s)
+	{
+		delete pMessage;
+		return s;
+	}
 }
 
 CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLMessagePoster *pExecutiveCommunication)
