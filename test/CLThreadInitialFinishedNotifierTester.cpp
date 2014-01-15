@@ -1,29 +1,25 @@
 #include <gtest/gtest.h>
 #include "LibExecutive.h"
 
-class CLThreadForCLThreadInitialFinishedNotifier_Notify : public CLExecutiveFunctionProvider
+TEST(CLThreadInitialFinishedNotifier, NotifyInitialFinished_Parameters_Test)
 {
-public:
-	virtual CLStatus RunExecutiveFunction(void* pContext)
-	{
-		CLThreadInitialFinishedNotifier *p = (CLThreadInitialFinishedNotifier *)(pContext);
+	CLThreadInitialFinishedNotifier notifier(0);
+	EXPECT_FALSE(notifier.IsInitialSuccess());
 
-		EXPECT_TRUE(p->NotifyInitialFinished(true).IsSuccess());
+	EXPECT_FALSE(notifier.NotifyInitialFinished(true).IsSuccess());
+	EXPECT_TRUE(notifier.IsInitialSuccess());
+}
 
-		return CLStatus(0, 0);
-	}
-};
-
-TEST(CLThreadInitialFinishedNotifier, Notify)
+TEST(CLThreadInitialFinishedNotifier, NotifyInitialFinished_Features_Test)
 {
-	CLThread *p = new CLThread(new CLThreadForCLThreadInitialFinishedNotifier_Notify, false);
-
 	CLEvent event;
 	CLThreadInitialFinishedNotifier notifier(&event);
 
-	EXPECT_TRUE(p->Run(&notifier).IsSuccess());
-
+	EXPECT_TRUE(notifier.NotifyInitialFinished(true).IsSuccess());
 	EXPECT_TRUE(event.Wait().IsSuccess());
-
 	EXPECT_TRUE(notifier.IsInitialSuccess());
+
+	EXPECT_TRUE(notifier.NotifyInitialFinished(false).IsSuccess());
+	EXPECT_TRUE(event.Wait().IsSuccess());
+	EXPECT_FALSE(notifier.IsInitialSuccess());
 }
