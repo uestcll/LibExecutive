@@ -3,13 +3,6 @@
 
 static const int ADD_MSG_ID = 1; 
 
-static bool gformsg = false;
-static bool gfordes = false;
-static bool gfordes2 = false;
-static int gformsgdes = 0;
-static bool gforinit = false;
-static bool gforuninit = false;
-
 class CLTestAddMsgForCLMessageLoopManager : public CLMessage
 {
 public:
@@ -21,7 +14,6 @@ public:
 
 	virtual ~CLTestAddMsgForCLMessageLoopManager()
 	{
-		gformsgdes++;
 	}
 
 	int m_i;
@@ -32,15 +24,21 @@ class TestObserverForCLMessageLoopManager : public CLMessageObserver
 {
 public:
 	TestObserverForCLMessageLoopManager()
-	{}
+	{
+		j = 0;
+	}
 
 	virtual ~TestObserverForCLMessageLoopManager()
 	{
-		gfordes2 = true;
 	}
 
 	virtual CLStatus Initialize(CLMessageLoopManager *pMessageLoop, void* pContext)
 	{
+		if(j != 0)
+		{
+			return CLStatus(-1, 0);
+		}
+
 		EXPECT_FALSE(pMessageLoop->Register(ADD_MSG_ID, 0).IsSuccess());
 		EXPECT_TRUE(pMessageLoop->Register(ADD_MSG_ID, (CallBackForMessageLoop)(&TestObserverForCLMessageLoopManager::On_Add)).IsSuccess());
 		return CLStatus(0, 0);
@@ -58,43 +56,59 @@ public:
 
 		i++;
 
-		gformsg = true;
-
 		if(i == 2)
 			return CLStatus(QUIT_MESSAGE_LOOP, 0);
 		else
 			return CLStatus(0, 0);
 	}
+
+	int j;
 };
 
 class TestClassForCLMessageLoopManager : public CLMessageLoopManager
 {
 public:
 	TestClassForCLMessageLoopManager(CLMessageObserver *pMessageObserver) : CLMessageLoopManager(pMessageObserver)
-	{}
+	{
+		i = 0;
+		j = 0;
+		p = 0;
+	}
 
 	virtual ~TestClassForCLMessageLoopManager()
 	{
-		gfordes = true;
 	}
 
 	virtual CLStatus Initialize()
 	{
-		gforinit = true;
-		return CLStatus(0, 0);
+		if(i == 0)
+			return CLStatus(0, 0);
+		else
+			return CLStatus(-1, 0);
 	}
 
 	virtual CLStatus Uninitialize()
 	{
-		gforuninit = true;
-		return CLStatus(0, 0);
+		if(j == 0)
+			return CLStatus(0, 0);
+		else
+			return CLStatus(-1, 0);
 	}
 
 	virtual CLStatus WaitForMessage()
 	{
-		m_MessageContainer.push(new CLTestAddMsgForCLMessageLoopManager(2, 5));
+		if(p != 0)
+			return CLStatus(-1, NORMAL_ERROR);
+
+		for(int k = 0; k < 10; k++)
+			m_MessageContainer.push(new CLTestAddMsgForCLMessageLoopManager(2, 5));
+
 		return CLStatus(0, 0);
 	}
+
+	int i;
+	int j;
+	int p;
 };
 
 TEST(CLMessageLoopManager, EnterMessageLoop_Features_Test)
@@ -115,11 +129,44 @@ TEST(CLMessageLoopManager, EnterMessageLoop_Features_Test)
 	EXPECT_TRUE(p->EnterMessageLoop(&i).IsSuccess());
 
 	delete p;
+}
 
-	EXPECT_EQ(gformsgdes, 2);
-	EXPECT_TRUE(gfordes);
-	EXPECT_TRUE(gfordes2);
-	EXPECT_TRUE(gformsg);
-	EXPECT_TRUE(gforinit);
-	EXPECT_TRUE(gforuninit);
+TEST(CLMessageLoopManager, EnterMessageLoop_Failure_Test)
+{
+	SLExecutiveInitialParameter i;
+	i.pContext = 0;
+	CLThreadInitialFinishedNotifier j(0);
+	i.pNotifier = &j;
+
+	TestObserverForCLMessageLoopManager *q = new TestObserverForCLMessageLoopManager;
+	TestClassForCLMessageLoopManager *p = new TestClassForCLMessageLoopManager(q);
+	p->i = -1;
+
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
+	EXPECT_FALSE(p->EnterMessageLoop(&i).IsSuccess());
+	p->i = 0;
+
+	q->j = -1;
+	p->j = -1;
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose 2", 0);
+	EXPECT_FALSE(p->EnterMessageLoop(&i).IsSuccess());
+
+	delete p;
+}
+
+TEST(CLMessageLoopManager, EnterMessageLoop_WaitForMessageError_Test)
+{
+	SLExecutiveInitialParameter i;
+	i.pContext = 0;
+	CLThreadInitialFinishedNotifier j(0);
+	i.pNotifier = &j;
+
+	TestObserverForCLMessageLoopManager *q = new TestObserverForCLMessageLoopManager;
+	TestClassForCLMessageLoopManager *p = new TestClassForCLMessageLoopManager(q);
+	p->p = 1;
+
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
+	EXPECT_TRUE(p->EnterMessageLoop(&i).IsSuccess());
+
+	delete p;
 }
