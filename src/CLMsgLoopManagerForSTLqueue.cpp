@@ -33,6 +33,8 @@ CLMsgLoopManagerForSTLqueue::~CLMsgLoopManagerForSTLqueue()
 
 CLStatus CLMsgLoopManagerForSTLqueue::Initialize()
 {
+	CLMessagePoster *pMsgPoster = 0;
+
 	try
 	{
 		CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
@@ -42,18 +44,34 @@ CLStatus CLMsgLoopManagerForSTLqueue::Initialize()
 			throw CLStatus(-1, 0);
 		}
 
-		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), new CLMessagePoster(new CLMsgToPointerSerializer, 0, new CLDataPostChannelBySTLqueueMaintainer(m_pSTLqueue), m_pEvent));
+		pMsgPoster = new CLMessagePoster(new CLMsgToPointerSerializer, 0, new CLDataPostChannelBySTLqueueMaintainer(m_pSTLqueue), m_pEvent);
+
+		CLStatus s2 = pMsgPoster->Initialize(new CLInitialDataPostChannelNotifier(), 0);
+		if(!s2.IsSuccess() && (s2.m_clErrorCode == DATA_POSTER_INITIALIZE_ERROR))
+		{
+			CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::Initialize(), pMsgPoster->Initialize error", 0);
+			throw CLStatus(-1, 0);
+		}
+		//........................
+		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), pMsgPoster);
 		if(!s.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::Initialize(), pNameServer->Register error", 0);
-			throw s;
+			throw CLStatus(-1, 0);
 		}
 
 		return CLStatus(0, 0);
 	}
 	catch(CLStatus& s1)
 	{
-		delete m_pEvent;
+		if(pMsgPoster)
+			delete pMsgPoster;
+		else
+		{
+			delete m_pEvent;
+			delete m_pSTLqueue;
+		}
+
 		return s1;
 	}
 }

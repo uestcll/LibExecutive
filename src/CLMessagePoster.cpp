@@ -61,7 +61,6 @@ CLMessagePoster::~CLMessagePoster()
 		delete m_pEvent;
 }
 
-//CLMsgLoopManagerForPrivateNamedPipe etc. call the following functions;
 CLStatus CLMessagePoster::Initialize(CLInitialDataPostChannelNotifier *pNotifier, void *pContext)
 {
 	if(pNotifier == 0)
