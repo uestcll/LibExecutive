@@ -159,7 +159,12 @@ CLStatus CLExecutiveNameServer::ReleaseCommunicationPtr(const char* strExecutive
 	}
 
 	if(pTmp != 0)
+	{
+		if(!(pTmp->Uninitialize(0).IsSuccess()))
+			CLLogger::WriteLogMsg("In CLExecutiveNameServer::ReleaseCommunicationPtr(),pTmp->Uninitialize error", 0);
+
 		delete pTmp;
+	}
 		
 	return CLStatus(0, 0);
 }

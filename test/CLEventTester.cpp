@@ -141,3 +141,36 @@ TEST(CLEvent, Semaphore_shared)
 
 	wait(NULL);
 }
+
+static int g_dataforReleaseSemaphore = 0;
+
+static void* TestThreadForCLEventRelease(void *arg)
+{
+	CLEvent *p = (CLEvent *)arg;
+
+	sleep(5);
+
+	g_dataforReleaseSemaphore = 10;
+
+	EXPECT_TRUE(p->Set().IsSuccess());
+
+	return 0;
+}
+
+TEST(CLEvent, ReleaseSemaphore)
+{
+	CLEvent event(true);
+
+	for(int i = 0; i < 10; i++)
+	{
+		EXPECT_TRUE(event.Set().IsSuccess());
+	}
+
+	EXPECT_TRUE(event.ReleaseSemaphore(10).IsSuccess());
+
+	pthread_t tid;
+	pthread_create(&tid, 0, TestThreadForCLEventRelease, &event);
+
+	EXPECT_TRUE(event.Wait().IsSuccess());
+	EXPECT_EQ(g_dataforReleaseSemaphore, 10);
+}

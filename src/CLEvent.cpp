@@ -137,3 +137,25 @@ CLStatus CLEvent::Wait()
 	
 	return CLStatus(0, 0);
 }
+
+CLStatus CLEvent::ReleaseSemaphore(unsigned int steps)
+{
+	try
+	{
+		CLCriticalSection cs(&m_Mutex);
+
+		if((m_pEventInfo->bSemaphore != 0) && (m_pEventInfo->Flag >= steps))
+		{
+			m_pEventInfo->Flag = m_pEventInfo->Flag - steps;
+
+			return CLStatus(0, 0);
+		}
+
+		return CLStatus(-1, 0);
+	}
+	catch(const char* str)
+	{
+		CLLogger::WriteLogMsg("In CLEvent::ReleaseSemaphore(), exception arise", 0);
+		return CLStatus(-1, 0);
+	}
+}

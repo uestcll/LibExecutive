@@ -23,6 +23,8 @@ public:
 	CLStatus Set();
 	CLStatus Wait();
 
+	CLStatus ReleaseSemaphore(unsigned int steps);
+
 private:
 	CLEvent(const CLEvent&);
 	CLEvent& operator=(const CLEvent&);

@@ -17,12 +17,14 @@ TEST(CLExecutiveNameServer, Register_Features_Test)
 	EXPECT_FALSE(p->Register(0, mp).IsSuccess());
 
 	mp = new CLMessagePoster(new CLMsgToPointerSerializer, 0, new CLDataPostChannelByNamedPipeMaintainer(strPipeName), 0);
+	EXPECT_TRUE(mp->Initialize(new CLInitialDataPostChannelNotifier, 0).IsSuccess());
 
 	EXPECT_TRUE(p->Register("SDFdfd", mp).IsSuccess());
 
 	EXPECT_TRUE(p->ReleaseCommunicationPtr("SDFdfd").IsSuccess());
 
 	mp = new CLMessagePoster(new CLMsgToPointerSerializer, 0, new CLDataPostChannelByNamedPipeMaintainer(strPipeName), 0);
+	EXPECT_TRUE(mp->Initialize(new CLInitialDataPostChannelNotifier, 0).IsSuccess());
 
 	EXPECT_TRUE(p->Register("23", mp).IsSuccess());
 
@@ -48,6 +50,7 @@ TEST(CLExecutiveNameServer, GetCommunicationPtr)
 	const char *strPipeName = "/tmp/NamedPipe_For_CLExecutiveNameServer_Test";
 	CLNamedPipe np(strPipeName, true);
 	CLMessagePoster *mp = new CLMessagePoster(new CLMsgToPointerSerializer, 0, new CLDataPostChannelByNamedPipeMaintainer(strPipeName), 0);
+	EXPECT_TRUE(mp->Initialize(new CLInitialDataPostChannelNotifier, 0).IsSuccess());
 	EXPECT_TRUE(p->Register("SDFdfd", mp).IsSuccess());
 
 	CLMessagePoster *qq = p->GetCommunicationPtr("SDFdfd");
@@ -97,6 +100,8 @@ TEST(CLExecutiveNameServer, PostExecutiveMessage_Features_Test)
 
 	CLExecutiveNameServer *p = CLExecutiveNameServer::GetInstance();
 	EXPECT_NE(p, (CLExecutiveNameServer *)0);
+
+	EXPECT_TRUE(mp->Initialize(new CLInitialDataPostChannelNotifier, 0).IsSuccess());
 
 	EXPECT_TRUE(p->Register("SDFdfd1", mp).IsSuccess());
 	

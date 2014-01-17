@@ -13,6 +13,7 @@
 #include "CLMsgToPointerSerializer.h"
 #include "CLDataPostChannelBySTLqueueMaintainer.h"
 #include "CLProtocolDecapsulatorBySplitPointer.h"
+#include "CLInitialDataPostChannelNotifier.h"
 
 CLMsgLoopManagerForSTLqueue::CLMsgLoopManagerForSTLqueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName) : CLMessageLoopManager(pMsgObserver)
 {
@@ -52,11 +53,15 @@ CLStatus CLMsgLoopManagerForSTLqueue::Initialize()
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::Initialize(), pMsgPoster->Initialize error", 0);
 			throw CLStatus(-1, 0);
 		}
-		//........................
+		
 		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), pMsgPoster);
 		if(!s.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::Initialize(), pNameServer->Register error", 0);
+
+			if(!(pMsgPoster->Uninitialize(0).IsSuccess()))
+				CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::Initialize(), pMsgPoster->Uninitialize error", 0);
+
 			throw CLStatus(-1, 0);
 		}
 
@@ -97,5 +102,17 @@ CLStatus CLMsgLoopManagerForSTLqueue::WaitForMessage()
 		return CLStatus(-1, 0);
 	}
 
-	return m_pMsgReceiver->GetMessage(m_MessageContainer);
+	long old_size = m_MessageContainer.size();
+
+	CLStatus s1 = m_pMsgReceiver->GetMessage(m_MessageContainer);
+
+	long new_size = m_MessageContainer.size();
+
+	if(new_size > old_size)
+	{
+		if(!(m_pEvent->ReleaseSemaphore(new_size - old_size - 1).IsSuccess()))
+			CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::WaitForMessage(), m_pEvent->ReleaseSemaphore error", 0);
+	}
+
+	return s1;
 }
