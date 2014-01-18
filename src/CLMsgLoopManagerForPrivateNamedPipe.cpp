@@ -12,6 +12,7 @@
 #include "CLMsgToPointerSerializer.h"
 #include "CLDataPostChannelByNamedPipeMaintainer.h"
 #include "CLProtocolDecapsulatorBySplitPointer.h"
+#include "CLInitialDataPostChannelNotifier.h"
 
 using namespace std;
 
@@ -33,11 +34,15 @@ CLMsgLoopManagerForPrivateNamedPipe::CLMsgLoopManagerForPrivateNamedPipe(CLMessa
 
 CLMsgLoopManagerForPrivateNamedPipe::~CLMsgLoopManagerForPrivateNamedPipe()
 {
-	delete m_pMsgReceiver;
 }
 
 CLStatus CLMsgLoopManagerForPrivateNamedPipe::Initialize()
 {
+	if(m_pMsgReceiver == 0)
+		return CLStatus(-1, 0);
+
+	CLMessagePoster *pMsgPoster = 0;
+
 	try
 	{
 		CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
@@ -50,24 +55,47 @@ CLStatus CLMsgLoopManagerForPrivateNamedPipe::Initialize()
 		string strPath = EXECUTIVE_CHANNEL_PATH;
 		strPath += m_strThreadName;
 
-		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), new CLMessagePoster(new CLMsgToPointerSerializer(), 0, new CLDataPostChannelByNamedPipeMaintainer(strPath.c_str()), m_pEvent));
+		pMsgPoster = new CLMessagePoster(new CLMsgToPointerSerializer(), 0, new CLDataPostChannelByNamedPipeMaintainer(strPath.c_str()), m_pEvent);
+
+		CLStatus s2 = pMsgPoster->Initialize(new CLInitialDataPostChannelNotifier(), 0);
+		if(!s2.IsSuccess() && (s2.m_clErrorCode == DATA_POSTER_INITIALIZE_ERROR))
+		{
+			CLLogger::WriteLogMsg("In CLMsgLoopManagerForPrivateNamedPipe::Initialize(), pMsgPoster->Initialize error", 0);
+			throw CLStatus(-1, 0);
+		}
+
+		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), pMsgPoster, m_pMsgReceiver);
 		if(!s.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForPrivateNamedPipe::Initialize(), pNameServer->Register error", 0);
-			throw s;
+			
+			m_pMsgReceiver = 0;
+			return CLStatus(-1, 0);
 		}
 
 		return CLStatus(0, 0);
 	}
 	catch(CLStatus& s1)
 	{
-		delete m_pEvent;
+		if(m_pMsgReceiver)
+		{
+			delete m_pMsgReceiver;
+			m_pMsgReceiver = 0;
+		}
+
+		if(pMsgPoster)
+			delete pMsgPoster;
+		else
+			delete m_pEvent;
+
 		return s1;
 	}
 }
 
 CLStatus CLMsgLoopManagerForPrivateNamedPipe::Uninitialize()
 {
+	m_pMsgReceiver = 0;
+
 	CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
 	if(pNameServer == 0)
 	{
@@ -87,5 +115,17 @@ CLStatus CLMsgLoopManagerForPrivateNamedPipe::WaitForMessage()
 		return CLStatus(-1, 0);
 	}
 
-	return m_pMsgReceiver->GetMessage(m_MessageContainer);
+	long old_size = m_MessageContainer.size();
+
+	CLStatus s1 = m_pMsgReceiver->GetMessage(m_MessageContainer);
+
+	long new_size = m_MessageContainer.size();
+
+	if(new_size > old_size)
+	{
+		if(!(m_pEvent->ReleaseSemaphore(new_size - old_size - 1).IsSuccess()))
+			CLLogger::WriteLogMsg("In CLMsgLoopManagerForPrivateNamedPipe::WaitForMessage(), m_pEvent->ReleaseSemaphore error", 0);
+	}
+
+	return s1;
 }
