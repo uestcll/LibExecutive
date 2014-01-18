@@ -13,6 +13,7 @@
 #include "CLMessageSerializer.h"
 #include "CLProtocolDecapsulator.h"
 #include "CLProtocolEncapsulator.h"
+#include "CLInitialDataPostChannelNotifier.h"
 
 using namespace std;
 
@@ -39,11 +40,15 @@ CLMsgLoopManagerForShareNamedPipe::CLMsgLoopManagerForShareNamedPipe(CLMessageOb
 
 CLMsgLoopManagerForShareNamedPipe::~CLMsgLoopManagerForShareNamedPipe()
 {
-	delete m_pMsgReceiver;
 }
 
 CLStatus CLMsgLoopManagerForShareNamedPipe::Initialize()
 {
+	if(m_pMsgReceiver == 0)
+		return CLStatus(-1, 0);
+
+	CLMessagePoster *pMsgPoster = 0;
+
 	try
 	{
 		CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
@@ -56,24 +61,50 @@ CLStatus CLMsgLoopManagerForShareNamedPipe::Initialize()
 		string strPath = EXECUTIVE_CHANNEL_PATH;
 		strPath += m_strThreadName;
 
-		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), new CLMessagePoster(m_pMsgSerializer, m_pEncapsulator, new CLDataPostChannelByNamedPipeMaintainer(strPath.c_str()), m_pEvent));
+		pMsgPoster = new CLMessagePoster(m_pMsgSerializer, m_pEncapsulator, new CLDataPostChannelByNamedPipeMaintainer(strPath.c_str()), m_pEvent);
+		
+		CLStatus s2 = pMsgPoster->Initialize(new CLInitialDataPostChannelNotifier(), 0);
+		if(!s2.IsSuccess() && (s2.m_clErrorCode == DATA_POSTER_INITIALIZE_ERROR))
+		{
+			CLLogger::WriteLogMsg("In CLMsgLoopManagerForShareNamedPipe::Initialize(), pMsgPoster->Initialize error", 0);
+			throw CLStatus(-1, 0);
+		}
+
+		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), pMsgPoster);
 		if(!s.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForShareNamedPipe::Initialize(), pNameServer->Register error", 0);
-			throw s;
+
+			delete m_pMsgReceiver;
+			m_pMsgReceiver = 0;
+
+			return CLStatus(-1, 0);
 		}
 
 		return CLStatus(0, 0);
 	}
 	catch(CLStatus& s1)
 	{
-		delete m_pEvent;
+		if(m_pMsgReceiver)
+		{
+			delete m_pMsgReceiver;
+			m_pMsgReceiver = 0;
+		}
+
+		if(pMsgPoster)
+			delete pMsgPoster;
+		else
+			delete m_pEvent;
+
 		return s1;
 	}
 }
 
 CLStatus CLMsgLoopManagerForShareNamedPipe::Uninitialize()
 {
+	delete m_pMsgReceiver;
+	m_pMsgReceiver = 0;
+
 	CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
 	if(pNameServer == 0)
 	{
@@ -93,5 +124,17 @@ CLStatus CLMsgLoopManagerForShareNamedPipe::WaitForMessage()
 		return CLStatus(-1, 0);
 	}
 
-	return m_pMsgReceiver->GetMessage(m_MessageContainer);
+	long old_size = m_MessageContainer.size();
+
+	CLStatus s1 = m_pMsgReceiver->GetMessage(m_MessageContainer);
+
+	long new_size = m_MessageContainer.size();
+
+	if(new_size > old_size)
+	{
+		if(!(m_pEvent->ReleaseSemaphore(new_size - old_size - 1).IsSuccess()))
+			CLLogger::WriteLogMsg("In CLMsgLoopManagerForShareNamedPipe::WaitForMessage(), m_pEvent->ReleaseSemaphore error", 0);
+	}
+
+	return s1;
 }

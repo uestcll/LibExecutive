@@ -57,5 +57,6 @@
 #include "CLMessagePoster.h"
 #include "CLProtocolEncapsulator.h"
 #include "CLMsgLoopManagerForPrivateNamedPipe.h"
+#include "CLMsgLoopManagerForShareNamedPipe.h"
 
 #endif
