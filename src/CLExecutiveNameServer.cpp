@@ -63,39 +63,47 @@ CLStatus CLExecutiveNameServer::PostExecutiveMessage(const char* pstrExecutiveNa
 
 CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLMessagePoster *pExecutiveCommunication)
 {
-	if(pExecutiveCommunication == 0)
-		return CLStatus(-1, 0);
-
-	if((strExecutiveName == 0) || (strlen(strExecutiveName) == 0))
+	try
 	{
+		if(pExecutiveCommunication == 0)
+			return CLStatus(-1, 0);
+
+		if((strExecutiveName == 0) || (strlen(strExecutiveName) == 0))
+			throw CLStatus(-1, 0);
+
+		CLMutex mutex(&m_Mutex);	
+		CLCriticalSection cs(&mutex);
+
+		if(m_pNameServer == 0)
+		{
+			CLLogger::WriteLogMsg("In CLExecutiveNameServer::Register(), m_pNameServer is 0", 0);
+			throw CLStatus(-1, 0);
+		}
+
+		std::map<std::string, SLExecutiveCommunicationPtrCount*>::iterator it = m_NameTable.find(strExecutiveName);	
+		if(it != m_NameTable.end())
+		{
+			CLLogger::WriteLogMsg("In CLExecutiveNameServer::Register(), m_NameTable.find error", 0);
+			throw CLStatus(-1, 0);
+		}
+
+		SLExecutiveCommunicationPtrCount *p = new SLExecutiveCommunicationPtrCount;
+		p->pMsgPoster = pExecutiveCommunication;
+		p->nCount = 1;
+
+		m_NameTable[strExecutiveName] = p;
+
+		return CLStatus(0, 0);
+	}
+	catch(CLStatus& s)
+	{
+		if(!(pExecutiveCommunication->Uninitialize(0).IsSuccess()))
+			CLLogger::WriteLogMsg("In CLExecutiveNameServer::Register(), pExecutiveCommunication->Uninitialize error", 0);
+
 		delete pExecutiveCommunication;
-		return CLStatus(-1, 0);
-	}
 
-	CLMutex mutex(&m_Mutex);	
-	CLCriticalSection cs(&mutex);
-
-	if(m_pNameServer == 0)
-	{
-		CLLogger::WriteLogMsg("In CLExecutiveNameServer::Register(), m_pNameServer is 0", 0);
-		return CLStatus(-1, 0);
+		return s;
 	}
-	
-	std::map<std::string, SLExecutiveCommunicationPtrCount*>::iterator it = m_NameTable.find(strExecutiveName);	
-	if(it != m_NameTable.end())
-	{
-		delete pExecutiveCommunication;
-		CLLogger::WriteLogMsg("In CLExecutiveNameServer::Register(), m_NameTable.find error", 0);
-		return CLStatus(-1, 0);
-	}
-	
-	SLExecutiveCommunicationPtrCount *p = new SLExecutiveCommunicationPtrCount;
-	p->pMsgPoster = pExecutiveCommunication;
-	p->nCount = 1;
-	
-	m_NameTable[strExecutiveName] = p;
-	
-	return CLStatus(0, 0);
 }
 
 CLMessagePoster* CLExecutiveNameServer::GetCommunicationPtr(const char* strExecutiveName)

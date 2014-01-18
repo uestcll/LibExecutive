@@ -14,6 +14,8 @@ TEST(CLExecutiveNameServer, Register_Features_Test)
 
 	EXPECT_FALSE(p->Register(0, 0).IsSuccess());
 
+	EXPECT_TRUE(mp->Initialize(new CLInitialDataPostChannelNotifier, 0).IsSuccess());
+
 	EXPECT_FALSE(p->Register(0, mp).IsSuccess());
 
 	mp = new CLMessagePoster(new CLMsgToPointerSerializer, 0, new CLDataPostChannelByNamedPipeMaintainer(strPipeName), 0);
@@ -31,6 +33,8 @@ TEST(CLExecutiveNameServer, Register_Features_Test)
 	mp = new CLMessagePoster(new CLMsgToPointerSerializer, 0, new CLDataPostChannelByNamedPipeMaintainer(strPipeName), 0);
 
 	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
+
+	EXPECT_TRUE(mp->Initialize(new CLInitialDataPostChannelNotifier, 0).IsSuccess());
 
 	EXPECT_FALSE(p->Register("23", mp).IsSuccess());
 

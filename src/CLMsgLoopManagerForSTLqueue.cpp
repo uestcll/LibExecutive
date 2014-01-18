@@ -58,11 +58,7 @@ CLStatus CLMsgLoopManagerForSTLqueue::Initialize()
 		if(!s.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::Initialize(), pNameServer->Register error", 0);
-
-			if(!(pMsgPoster->Uninitialize(0).IsSuccess()))
-				CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::Initialize(), pMsgPoster->Uninitialize error", 0);
-
-			throw CLStatus(-1, 0);
+			return CLStatus(-1, 0);
 		}
 
 		return CLStatus(0, 0);
