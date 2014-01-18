@@ -15,7 +15,7 @@ public:
 		pMessageLoop->Register(2, (CallBackForMessageLoop)(&CLObserverTesterForCLMsgLoopManagerForSTLqueue::On_2));
 		pMessageLoop->Register(3, (CallBackForMessageLoop)(&CLObserverTesterForCLMsgLoopManagerForSTLqueue::On_3));
 
-		for(int i = 0; i < 4096/8; i++)
+		for(int i = 0; i < 4096 * 2/8; i++)
 		{
 			EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage("CLMsgLoopManagerForSTLqueueTester", new CLMessage(i+1)).IsSuccess());
 		}
@@ -42,15 +42,6 @@ public:
 		EXPECT_EQ(pm->m_clMsgID, 3);
 		g3 = true;
 		return CLStatus(QUIT_MESSAGE_LOOP, 0);
-	}
-};
-
-class CLObserverTester1ForCLMsgLoopManagerForSTLqueue : public CLMessageObserver
-{
-public:
-	virtual CLStatus Initialize(CLMessageLoopManager *pMessageLoop, void* pContext)
-	{
-		return CLStatus(-1, 0);
 	}
 };
 
@@ -84,6 +75,9 @@ void *TestThreadForCLMsgLoopManagerForSTLqueue(void *)
 	s.pNotifier = &notifier;
 
 	CLLogger::WriteLogMsg("The Following bug is produced on purpose 3", 0);
+	EXPECT_FALSE(pM->EnterMessageLoop(&s).IsSuccess());
+
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
 	EXPECT_FALSE(pM->EnterMessageLoop(&s).IsSuccess());
 
 	delete pM;
@@ -159,6 +153,15 @@ TEST(CLMsgLoopManagerForSTLqueue, MultiRegister)
 	EXPECT_TRUE(g3);
 }
 
+class CLObserverTester1ForCLMsgLoopManagerForSTLqueue : public CLMessageObserver
+{
+public:
+	virtual CLStatus Initialize(CLMessageLoopManager *pMessageLoop, void* pContext)
+	{
+		return CLStatus(-1, 0);
+	}
+};
+
 TEST(CLMsgLoopManagerForSTLqueue, ObserverInitializeFailure)
 {
 	CLMessageLoopManager *pM = new CLMsgLoopManagerForSTLqueue(new CLObserverTester1ForCLMsgLoopManagerForSTLqueue, "CLMsgLoopManagerForSTLqueueTester");
@@ -167,6 +170,9 @@ TEST(CLMsgLoopManagerForSTLqueue, ObserverInitializeFailure)
 	s.pContext = 0;
 	CLThreadInitialFinishedNotifier notifier(0);
 	s.pNotifier = &notifier;
+
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
+	EXPECT_FALSE((pM->EnterMessageLoop(&s)).IsSuccess());
 
 	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
 	EXPECT_FALSE((pM->EnterMessageLoop(&s)).IsSuccess());

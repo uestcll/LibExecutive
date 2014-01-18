@@ -15,14 +15,6 @@ CLMessageLoopManager::CLMessageLoopManager(CLMessageObserver *pMessageObserver)
 
 CLMessageLoopManager::~CLMessageLoopManager()
 {
-	while(!m_MessageContainer.empty())
-	{
-		CLMessage *pMsg = m_MessageContainer.front();
-		m_MessageContainer.pop();
-		if(pMsg)
-			delete pMsg;
-	}
-
 	delete m_pMessageObserver;
 }
 
@@ -98,6 +90,14 @@ CLStatus CLMessageLoopManager::EnterMessageLoop(void *pContext)
 
 		if(bQuit)
 			break;
+	}
+
+	while(!m_MessageContainer.empty())
+	{
+		CLMessage *pMsg = m_MessageContainer.front();
+		m_MessageContainer.pop();
+		if(pMsg)
+			delete pMsg;
 	}
 
 	CLStatus s4 = Uninitialize();

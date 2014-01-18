@@ -29,11 +29,13 @@ CLMsgLoopManagerForSTLqueue::CLMsgLoopManagerForSTLqueue(CLMessageObserver *pMsg
 
 CLMsgLoopManagerForSTLqueue::~CLMsgLoopManagerForSTLqueue()
 {
-	delete m_pMsgReceiver;
 }
 
 CLStatus CLMsgLoopManagerForSTLqueue::Initialize()
 {
+	if(m_pMsgReceiver == 0)
+		return CLStatus(-1, 0);
+
 	CLMessagePoster *pMsgPoster = 0;
 
 	try
@@ -54,10 +56,12 @@ CLStatus CLMsgLoopManagerForSTLqueue::Initialize()
 			throw CLStatus(-1, 0);
 		}
 		
-		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), pMsgPoster);
+		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), pMsgPoster, m_pMsgReceiver);
 		if(!s.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::Initialize(), pNameServer->Register error", 0);
+			
+			m_pMsgReceiver = 0;
 			return CLStatus(-1, 0);
 		}
 
@@ -65,6 +69,12 @@ CLStatus CLMsgLoopManagerForSTLqueue::Initialize()
 	}
 	catch(CLStatus& s1)
 	{
+		if(m_pMsgReceiver)
+		{
+			delete m_pMsgReceiver;
+			m_pMsgReceiver = 0;
+		}
+
 		if(pMsgPoster)
 			delete pMsgPoster;
 		else
@@ -79,6 +89,8 @@ CLStatus CLMsgLoopManagerForSTLqueue::Initialize()
 
 CLStatus CLMsgLoopManagerForSTLqueue::Uninitialize()
 {
+	m_pMsgReceiver = 0;
+
 	CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
 	if(pNameServer == 0)
 	{

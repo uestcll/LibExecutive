@@ -13,7 +13,6 @@ TEST(CLMessageReceiver, GetMessage_Features_Test)
 	queue<CLMessage *> qCon;
 	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(new CLBufferManager(), new CLDataReceiverBySTLqueue(&stl_queue), new CLPointerToMsgDeserializer(), new CLProtocolDecapsulatorBySplitPointer());
 	
-	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
 	CLStatus s1 = pMsgReceiver->GetMessage(qCon);
 	EXPECT_FALSE(s1.IsSuccess());
 	EXPECT_TRUE(s1.m_clErrorCode == MSG_RECEIVED_ZERO);
@@ -146,7 +145,6 @@ TEST(CLMessageReceiver, GetMessagePrivateNamedPipe_Features_Test)
 	queue<CLMessage *> qCon;
 	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(new CLBufferManager(), new CLDataReceiverByNamedPipe(strPath), new CLPointerToMsgDeserializer(), new CLProtocolDecapsulatorBySplitPointer);
 
-	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
 	CLStatus s11 = pMsgReceiver->GetMessage(qCon);
 	EXPECT_FALSE(s11.IsSuccess());
 	EXPECT_TRUE(s11.m_clErrorCode == MSG_RECEIVED_ZERO);
@@ -383,7 +381,6 @@ TEST(CLMessageReceiver, GetMessageNamedPipe_Features_Test)
 	EXPECT_TRUE(pdd->RegisterDeserializer(2, new CLMsg2ForCLMessageReceiverTest_Deserializer).IsSuccess());
 	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(new CLBufferManager(), new CLDataReceiverByNamedPipe(strPath), pdd, new CLProtocolDecapsulatorByDefaultMsgFormat);
 
-	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
 	CLStatus s11 = pMsgReceiver->GetMessage(qCon);
 	EXPECT_FALSE(s11.IsSuccess());
 	EXPECT_TRUE(s11.m_clErrorCode == MSG_RECEIVED_ZERO);

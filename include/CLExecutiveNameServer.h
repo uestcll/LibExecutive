@@ -7,11 +7,13 @@
 #include "CLStatus.h"
 
 class CLMessagePoster;
+class CLMessageReceiver;
 class CLMessage;
 
 struct SLExecutiveCommunicationPtrCount
 {
 	CLMessagePoster *pMsgPoster;
+	CLMessageReceiver *pMsgReceiver;
 	unsigned int nCount;
 };
 
@@ -24,7 +26,7 @@ public:
 	friend class CLLibExecutiveInitializer;
 
 public:
-	CLStatus Register(const char* strExecutiveName, CLMessagePoster *pExecutiveCommunication);
+	CLStatus Register(const char* strExecutiveName, CLMessagePoster *pExecutiveCommunication, CLMessageReceiver *pMsgReceiver = 0);
 	CLMessagePoster* GetCommunicationPtr(const char* strExecutiveName);
 	CLStatus ReleaseCommunicationPtr(const char* strExecutiveName);
 

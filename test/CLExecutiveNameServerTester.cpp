@@ -119,3 +119,40 @@ TEST(CLExecutiveNameServer, PostExecutiveMessage_Features_Test)
 
 	EXPECT_TRUE(p->ReleaseCommunicationPtr("SDFdfd1").IsSuccess());
 }
+
+TEST(CLExecutiveNameServer, MsgReceiver_Features_Test)
+{
+	const char *strPipeName = "/tmp/NamedPipe_For_CLExecutiveNameServer_Test";
+	
+	CLMessageReceiver *mr = new CLMessageReceiver(new CLBufferManager(), new CLDataReceiverByNamedPipe(strPipeName), new CLPointerToMsgDeserializer(), new CLProtocolDecapsulatorBySplitPointer);
+	
+	CLMessagePoster *mp = new CLMessagePoster(new CLMsgToPointerSerializer, 0, new CLDataPostChannelByNamedPipeMaintainer(strPipeName), 0);
+	EXPECT_TRUE(mp->Initialize(new CLInitialDataPostChannelNotifier, 0).IsSuccess());
+
+	CLExecutiveNameServer *p = CLExecutiveNameServer::GetInstance();
+	EXPECT_NE(p, (CLExecutiveNameServer *)0);
+
+	EXPECT_TRUE(p->Register("SDFdfd1", mp, mr).IsSuccess());
+
+	for(int i = 1; i < 40960 / 8; i++)
+	{
+		EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage("SDFdfd1", new CLMessage(i)).IsSuccess());
+	}
+
+	EXPECT_TRUE(p->ReleaseCommunicationPtr("SDFdfd1").IsSuccess());
+}
+
+TEST(CLExecutiveNameServer, MsgReceiver_Register_Test)
+{
+	const char *strPipeName = "/tmp/NamedPipe_For_CLExecutiveNameServer_Test";
+
+	CLMessageReceiver *mr = new CLMessageReceiver(new CLBufferManager(), new CLDataReceiverByNamedPipe(strPipeName), new CLPointerToMsgDeserializer(), new CLProtocolDecapsulatorBySplitPointer);
+
+	CLMessagePoster *mp = new CLMessagePoster(new CLMsgToPointerSerializer, 0, new CLDataPostChannelByNamedPipeMaintainer(strPipeName), 0);
+	EXPECT_TRUE(mp->Initialize(new CLInitialDataPostChannelNotifier, 0).IsSuccess());
+
+	CLExecutiveNameServer *p = CLExecutiveNameServer::GetInstance();
+	EXPECT_NE(p, (CLExecutiveNameServer *)0);
+
+	EXPECT_FALSE(p->Register("", mp, mr).IsSuccess());
+}

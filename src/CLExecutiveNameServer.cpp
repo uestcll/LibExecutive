@@ -1,4 +1,5 @@
 #include <string.h>
+#include <queue>
 #include "CLExecutiveNameServer.h"
 #include "CLCriticalSection.h"
 #include "CLLogger.h"
@@ -8,6 +9,7 @@
 #include "CLMutex.h"
 #include "CLDataPostResultNotifier.h"
 #include "CLProtocolDataPoster.h"
+#include "CLMessageReceiver.h"
 
 CLExecutiveNameServer* CLExecutiveNameServer::m_pNameServer = 0;
 pthread_mutex_t CLExecutiveNameServer::m_Mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -61,14 +63,11 @@ CLStatus CLExecutiveNameServer::PostExecutiveMessage(const char* pstrExecutiveNa
 	}
 }
 
-CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLMessagePoster *pExecutiveCommunication)
+CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLMessagePoster *pExecutiveCommunication, CLMessageReceiver *pMsgReceiver)
 {
 	try
 	{
-		if(pExecutiveCommunication == 0)
-			return CLStatus(-1, 0);
-
-		if((strExecutiveName == 0) || (strlen(strExecutiveName) == 0))
+		if((pExecutiveCommunication == 0) || (strExecutiveName == 0) || (strlen(strExecutiveName) == 0))
 			throw CLStatus(-1, 0);
 
 		CLMutex mutex(&m_Mutex);	
@@ -80,7 +79,7 @@ CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLMessage
 			throw CLStatus(-1, 0);
 		}
 
-		std::map<std::string, SLExecutiveCommunicationPtrCount*>::iterator it = m_NameTable.find(strExecutiveName);	
+		std::map<std::string, SLExecutiveCommunicationPtrCount*>::iterator it = m_NameTable.find(strExecutiveName);
 		if(it != m_NameTable.end())
 		{
 			CLLogger::WriteLogMsg("In CLExecutiveNameServer::Register(), m_NameTable.find error", 0);
@@ -89,6 +88,7 @@ CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLMessage
 
 		SLExecutiveCommunicationPtrCount *p = new SLExecutiveCommunicationPtrCount;
 		p->pMsgPoster = pExecutiveCommunication;
+		p->pMsgReceiver = pMsgReceiver;
 		p->nCount = 1;
 
 		m_NameTable[strExecutiveName] = p;
@@ -97,10 +97,16 @@ CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLMessage
 	}
 	catch(CLStatus& s)
 	{
-		if(!(pExecutiveCommunication->Uninitialize(0).IsSuccess()))
-			CLLogger::WriteLogMsg("In CLExecutiveNameServer::Register(), pExecutiveCommunication->Uninitialize error", 0);
+		if(pMsgReceiver)
+			delete pMsgReceiver;
 
-		delete pExecutiveCommunication;
+		if(pExecutiveCommunication)
+		{
+			if(!(pExecutiveCommunication->Uninitialize(0).IsSuccess()))
+				CLLogger::WriteLogMsg("In CLExecutiveNameServer::Register(), pExecutiveCommunication->Uninitialize error", 0);
+
+			delete pExecutiveCommunication;
+		}
 
 		return s;
 	}
@@ -138,6 +144,7 @@ CLStatus CLExecutiveNameServer::ReleaseCommunicationPtr(const char* strExecutive
 		return CLStatus(-1, 0);
 
 	CLMessagePoster *pTmp = 0;
+	CLMessageReceiver *pMsgReceiver = 0;
 	
 	{
 		CLMutex mutex(&m_Mutex);	
@@ -161,6 +168,8 @@ CLStatus CLExecutiveNameServer::ReleaseCommunicationPtr(const char* strExecutive
 		if(it->second->nCount == 0)
 		{
 			pTmp = it->second->pMsgPoster;
+			pMsgReceiver = it->second->pMsgReceiver;
+
 			delete it->second;
 			m_NameTable.erase(it);
 		}
@@ -168,6 +177,31 @@ CLStatus CLExecutiveNameServer::ReleaseCommunicationPtr(const char* strExecutive
 
 	if(pTmp != 0)
 	{
+		if(pMsgReceiver != 0)
+		{
+			std::queue<CLMessage*> MessageContainer;
+
+			for(;;)
+			{
+				CLStatus s11 = pMsgReceiver->GetMessage(MessageContainer);
+				if(!s11.IsSuccess())
+				{
+					if((s11.m_clErrorCode == NORMAL_ERROR) || (s11.m_clErrorCode == MSG_RECEIVED_ZERO))
+						break;
+				}
+			}
+
+			while(!MessageContainer.empty())
+			{
+				CLMessage *pMsg = MessageContainer.front();
+				MessageContainer.pop();
+				if(pMsg)
+					delete pMsg;
+			}
+
+			delete pMsgReceiver;
+		}
+
 		if(!(pTmp->Uninitialize(0).IsSuccess()))
 			CLLogger::WriteLogMsg("In CLExecutiveNameServer::ReleaseCommunicationPtr(),pTmp->Uninitialize error", 0);
 

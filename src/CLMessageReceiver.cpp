@@ -75,7 +75,7 @@ CLStatus CLMessageReceiver::GetMessage(std::queue<CLMessage*>& qMsgContainer)
 	CLStatus s1 = m_pDataReceiver->GetData(ReceiveIOVec, &Context);
 	if(!s1.IsSuccess())
 	{
-		if(s1.m_clReturnCode != RECEIVED_ZERO_BYTE)
+		if(s1.m_clErrorCode != RECEIVED_ZERO_BYTE)
 			CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pDataReceiver->GetData error", 0);
 
 		return s1;
