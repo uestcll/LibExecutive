@@ -67,6 +67,8 @@ TEST(CLMsgLoopManagerForPrivateNamedPipe, Normal)
 
 void *TestThreadForCLMsgLoopManagerForPrivateNamedPipe(void *)
 {
+	sleep(5);
+
 	CLMessageLoopManager *pM = new CLMsgLoopManagerForPrivateNamedPipe(new CLObserverTesterForCLMsgLoopManagerForPrivateNamedPipe, "CLMsgLoopManagerForPrivateNamedPipeTester");
 
 	SLExecutiveInitialParameter s;
@@ -81,8 +83,6 @@ void *TestThreadForCLMsgLoopManagerForPrivateNamedPipe(void *)
 	EXPECT_FALSE(pM->EnterMessageLoop(&s).IsSuccess());
 
 	delete pM;
-
-	sleep(5);
 
 	for(int i = 0; i < 3; i++)
 	{

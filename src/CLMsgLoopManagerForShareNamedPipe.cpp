@@ -133,7 +133,7 @@ CLStatus CLMsgLoopManagerForShareNamedPipe::WaitForMessage()
 	if(new_size > old_size)
 	{
 		if(!(m_pEvent->ReleaseSemaphore(new_size - old_size - 1).IsSuccess()))
-			CLLogger::WriteLogMsg("In CLMsgLoopManagerForShareNamedPipe::WaitForMessage(), m_pEvent->ReleaseSemaphore error", 0);
+			CLLogger::WriteLogMsg("In CLMsgLoopManagerForShareNamedPipe::WaitForMessage(), m_pEvent->ReleaseSemaphore error; but may be made by the sequence of sendmsg.set.(wait).sendmsg(compute new_size).set", 0);
 	}
 
 	return s1;

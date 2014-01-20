@@ -67,6 +67,8 @@ TEST(CLMsgLoopManagerForSTLqueue, Normal)
 
 void *TestThreadForCLMsgLoopManagerForSTLqueue(void *)
 {
+	sleep(5);
+
 	CLMessageLoopManager *pM = new CLMsgLoopManagerForSTLqueue(new CLObserverTesterForCLMsgLoopManagerForSTLqueue, "CLMsgLoopManagerForSTLqueueTester");
 
 	SLExecutiveInitialParameter s;
@@ -81,8 +83,6 @@ void *TestThreadForCLMsgLoopManagerForSTLqueue(void *)
 	EXPECT_FALSE(pM->EnterMessageLoop(&s).IsSuccess());
 
 	delete pM;
-
-	sleep(5);
 
 	for(int i = 0; i < 3; i++)
 	{

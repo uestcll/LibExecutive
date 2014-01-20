@@ -1,5 +1,9 @@
 #include <gtest/gtest.h>
+#include <unistd.h>
 #include "LibExecutive.h"
+
+static unsigned int gmsg1 = 0;
+static unsigned int gmsg2 = 0;
 
 class CLMsg1ForCLMsgLoopManagerForShareNamedPipeTest : public CLMessage
 {
@@ -12,6 +16,7 @@ public:
 
 	virtual ~CLMsg1ForCLMsgLoopManagerForShareNamedPipeTest()
 	{
+		gmsg1++;
 	}
 
 	int i;
@@ -27,6 +32,7 @@ public:
 
 	virtual ~CLMsg2ForCLMsgLoopManagerForShareNamedPipeTest()
 	{
+		gmsg2++;
 	}
 };
 
@@ -148,8 +154,8 @@ public:
 	}
 };
 
-static bool g1 = false;
-static bool g2 = false;
+static unsigned int g1 = 0;
+static unsigned int g2 = 0;
 
 class CLObserverTesterForCLMsgLoopManagerForShareNamedPipe : public CLMessageObserver
 {
@@ -159,11 +165,11 @@ public:
 		pMessageLoop->Register(1, (CallBackForMessageLoop)(&CLObserverTesterForCLMsgLoopManagerForShareNamedPipe::On_1));
 		pMessageLoop->Register(2, (CallBackForMessageLoop)(&CLObserverTesterForCLMsgLoopManagerForShareNamedPipe::On_2));
 
-		for(int i = 0; i < 10; i++)
+		for(int i = 0; i < 300; i++)
 		{
 			EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage("CLMsgLoopManagerForShareNamedPipeTester", new CLMsg1ForCLMsgLoopManagerForShareNamedPipeTest, true).IsSuccess());
 
-			if(i == 5)
+			if(i == 299)
 			{
 				EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage("CLMsgLoopManagerForShareNamedPipeTester", new CLMsg2ForCLMsgLoopManagerForShareNamedPipeTest, true).IsSuccess());
 			}
@@ -175,14 +181,14 @@ public:
 	CLStatus On_1(CLMessage *pm)
 	{
 		EXPECT_EQ(pm->m_clMsgID, 1);
-		g1 = true;
+		g1++;
 		return CLStatus(0, 0);
 	}
 
 	CLStatus On_2(CLMessage *pm)
 	{
 		EXPECT_EQ(pm->m_clMsgID, 2);
-		g2 = true;
+		g2++;
 		return CLStatus(QUIT_MESSAGE_LOOP, 0);
 	}
 };
@@ -190,6 +196,11 @@ public:
 TEST(CLMsgLoopManagerForShareNamedPipe, Normal)
 {
 	CLLogger::WriteLogMsg("CLMsgLoopManagerForShareNamedPipe Test", 0);
+
+	gmsg1 = 0;
+	gmsg2 = 0;
+	g1 = 0;
+	g2 = 0;
 
 	CLMultiMsgDeserializer *pd = new CLMultiMsgDeserializer();
 	EXPECT_TRUE(pd->RegisterDeserializer(1, new CLMsg1ForCLMsgLoopManagerForShareNamedPipeTest_Deserializer).IsSuccess());
@@ -210,6 +221,138 @@ TEST(CLMsgLoopManagerForShareNamedPipe, Normal)
 
 	delete pM;
 
-	EXPECT_TRUE(g1);
-	EXPECT_TRUE(g2);
+	EXPECT_EQ(gmsg1, 600);
+	EXPECT_EQ(gmsg2, 2);
+
+	EXPECT_EQ(g1, 300);
+	EXPECT_EQ(g2, 1);
+}
+
+void *TestThread1ForCLMsgLoopManagerForSharedNamedPipe(void *)
+{
+	sleep(5);
+
+	CLMultiMsgDeserializer *pd = new CLMultiMsgDeserializer();
+	EXPECT_TRUE(pd->RegisterDeserializer(1, new CLMsg1ForCLMsgLoopManagerForShareNamedPipeTest_Deserializer).IsSuccess());
+	EXPECT_TRUE(pd->RegisterDeserializer(2, new CLMsg2ForCLMsgLoopManagerForShareNamedPipeTest_Deserializer).IsSuccess());
+
+	CLMultiMsgSerializer *ps = new CLMultiMsgSerializer();
+	EXPECT_TRUE(ps->RegisterSerializer(1, new CLMsg1ForCLMsgLoopManagerForShareNamedPipeTest_Serializer).IsSuccess());
+	EXPECT_TRUE(ps->RegisterSerializer(2, new CLMsg2ForCLMsgLoopManagerForShareNamedPipeTest_Serializer).IsSuccess());
+
+	CLMessageLoopManager *pM = new CLMsgLoopManagerForShareNamedPipe(new CLObserverTesterForCLMsgLoopManagerForShareNamedPipe, "CLMsgLoopManagerForShareNamedPipeTester", 0, new CLProtocolDecapsulatorByDefaultMsgFormat(), ps, pd);
+
+	SLExecutiveInitialParameter s;
+	s.pContext = 0;
+	CLThreadInitialFinishedNotifier notifier(0);
+	s.pNotifier = &notifier;
+
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose 3", 0);
+	EXPECT_FALSE(pM->EnterMessageLoop(&s).IsSuccess());
+
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
+	EXPECT_FALSE(pM->EnterMessageLoop(&s).IsSuccess());
+
+	delete pM;
+
+	EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage("CLMsgLoopManagerForShareNamedPipeTester", new CLMsg1ForCLMsgLoopManagerForShareNamedPipeTest, true).IsSuccess());
+	EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage("CLMsgLoopManagerForShareNamedPipeTester", new CLMsg2ForCLMsgLoopManagerForShareNamedPipeTest, true).IsSuccess());
+
+	return 0;
+}
+
+class CLObserverTester1ForCLMsgLoopManagerForShareNamedPipe : public CLMessageObserver
+{
+public:
+	virtual CLStatus Initialize(CLMessageLoopManager *pMessageLoop, void* pContext)
+	{
+		pMessageLoop->Register(1, (CallBackForMessageLoop)(&CLObserverTesterForCLMsgLoopManagerForShareNamedPipe::On_1));
+		pMessageLoop->Register(2, (CallBackForMessageLoop)(&CLObserverTesterForCLMsgLoopManagerForShareNamedPipe::On_2));
+
+		return CLStatus(0, 0);
+	}
+
+	CLStatus On_1(CLMessage *pm)
+	{
+		EXPECT_EQ(pm->m_clMsgID, 1);
+		return CLStatus(0, 0);
+	}
+
+	CLStatus On_2(CLMessage *pm)
+	{
+		EXPECT_EQ(pm->m_clMsgID, 2);
+		return CLStatus(QUIT_MESSAGE_LOOP, 0);
+	}
+};
+
+TEST(CLMsgLoopManagerForShareNamedPipe, MultiRegister)
+{
+	CLMultiMsgDeserializer *pd = new CLMultiMsgDeserializer();
+	EXPECT_TRUE(pd->RegisterDeserializer(1, new CLMsg1ForCLMsgLoopManagerForShareNamedPipeTest_Deserializer).IsSuccess());
+	EXPECT_TRUE(pd->RegisterDeserializer(2, new CLMsg2ForCLMsgLoopManagerForShareNamedPipeTest_Deserializer).IsSuccess());
+
+	CLMultiMsgSerializer *ps = new CLMultiMsgSerializer();
+	EXPECT_TRUE(ps->RegisterSerializer(1, new CLMsg1ForCLMsgLoopManagerForShareNamedPipeTest_Serializer).IsSuccess());
+	EXPECT_TRUE(ps->RegisterSerializer(2, new CLMsg2ForCLMsgLoopManagerForShareNamedPipeTest_Serializer).IsSuccess());
+
+	CLMessageLoopManager *pM = new CLMsgLoopManagerForShareNamedPipe(new CLObserverTester1ForCLMsgLoopManagerForShareNamedPipe, "CLMsgLoopManagerForShareNamedPipeTester", 0, new CLProtocolDecapsulatorByDefaultMsgFormat(), ps, pd);
+
+	SLExecutiveInitialParameter s;
+	s.pContext = 0;
+	CLThreadInitialFinishedNotifier notifier(0);
+	s.pNotifier = &notifier;
+
+	pthread_t tid;
+	pthread_create(&tid, 0, TestThread1ForCLMsgLoopManagerForSharedNamedPipe, 0);
+
+	EXPECT_TRUE(pM->EnterMessageLoop(&s).IsSuccess());
+
+	delete pM;
+
+	pthread_join(tid, 0);
+}
+
+class CLObserverTester1ForCLMsgLoopManagerForSharedNamedPipe : public CLMessageObserver
+{
+public:
+	virtual CLStatus Initialize(CLMessageLoopManager *pMessageLoop, void* pContext)
+	{
+		for(int i = 0; i < 300; i++)
+		{
+			EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage("CLMsgLoopManagerForShareNamedPipeTester", new CLMsg1ForCLMsgLoopManagerForShareNamedPipeTest, true).IsSuccess());
+
+			if(i == 299)
+			{
+				EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage("CLMsgLoopManagerForShareNamedPipeTester", new CLMsg2ForCLMsgLoopManagerForShareNamedPipeTest, true).IsSuccess());
+			}
+		}
+
+		return CLStatus(-1, 0);
+	}
+};
+
+TEST(CLMsgLoopManagerForShareNamedPipe, ObserverInitializeFailure)
+{
+	CLMultiMsgDeserializer *pd = new CLMultiMsgDeserializer();
+	EXPECT_TRUE(pd->RegisterDeserializer(1, new CLMsg1ForCLMsgLoopManagerForShareNamedPipeTest_Deserializer).IsSuccess());
+	EXPECT_TRUE(pd->RegisterDeserializer(2, new CLMsg2ForCLMsgLoopManagerForShareNamedPipeTest_Deserializer).IsSuccess());
+
+	CLMultiMsgSerializer *ps = new CLMultiMsgSerializer();
+	EXPECT_TRUE(ps->RegisterSerializer(1, new CLMsg1ForCLMsgLoopManagerForShareNamedPipeTest_Serializer).IsSuccess());
+	EXPECT_TRUE(ps->RegisterSerializer(2, new CLMsg2ForCLMsgLoopManagerForShareNamedPipeTest_Serializer).IsSuccess());
+
+	CLMessageLoopManager *pM = new CLMsgLoopManagerForShareNamedPipe(new CLObserverTester1ForCLMsgLoopManagerForSharedNamedPipe, "CLMsgLoopManagerForShareNamedPipeTester", 0, new CLProtocolDecapsulatorByDefaultMsgFormat(), ps, pd);
+
+	SLExecutiveInitialParameter s;
+	s.pContext = 0;
+	CLThreadInitialFinishedNotifier notifier(0);
+	s.pNotifier = &notifier;
+
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
+	EXPECT_FALSE((pM->EnterMessageLoop(&s)).IsSuccess());
+
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
+	EXPECT_FALSE((pM->EnterMessageLoop(&s)).IsSuccess());
+
+	delete pM;
 }
