@@ -42,6 +42,8 @@ public:
 
 TEST(CLThread, Normal)
 {
+	CLLogger::WriteLogMsg("CLThread Test", 0);
+
 	CLThread *p = new CLThreadDriv(new CThreadFunctionForCLThread(), true);
 
 	EXPECT_FALSE((p->WaitForDeath()).IsSuccess());
@@ -69,17 +71,4 @@ TEST(CLThread, Normal2)
 
 	EXPECT_TRUE(bFlag1ForCLThread);
 	EXPECT_TRUE(bFlag2ForCLThread);
-}
-
-TEST(CLThread, Normal3)
-{
-	try
-	{
-		CLThread *p = new CLThreadDriv(0);
-		EXPECT_TRUE(false);
-	}
-	catch(const char *)
-	{
-		EXPECT_TRUE(true);
-	}
 }

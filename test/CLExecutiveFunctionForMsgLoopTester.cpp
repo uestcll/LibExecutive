@@ -48,9 +48,9 @@ protected:
 		return CLStatus(0, 0);
 	}
 	
-	virtual CLMessage* WaitForMessage()
+	virtual CLStatus WaitForMessage()
 	{
-		return 0;
+		return CLStatus(0, 0);
 	}
 	
 	virtual CLStatus DispatchMessage(CLMessage *pMessage)
@@ -60,27 +60,10 @@ protected:
 		
 };
 
-TEST(CLExecutiveFunctionForMsgLoop, parameter_null)
-{
-    try
-    {
-    	CLThread *p = new CLThread(new CLExecutiveFunctionForMsgLoop(0), true);
-    }
-	catch(const char *str)
-	{
-		if(strcmp(str, "In CLExecutiveFunctionForMsgLoop::CLExecutiveFunctionForMsgLoop(), pMsgLoopManager error") == 0)
-		{
-			EXPECT_TRUE(true);
-		}
-		else
-		{
-			EXPECT_TRUE(false);
-		}
-	}
-}
-
 TEST(CLExecutiveFunctionForMsgLoop, deconstructor_and_entermsgloop)
 {
+	CLLogger::WriteLogMsg("CLExecutiveFunctionForMsgLoop Test", 0);
+
 	CLThread *p = new CLThread(new CLExecutiveFunctionForMsgLoop(new CLMyMsgLoopManagerForExecutiveFunctionTest(new CLMyObserverforExecutiveFunctionTest)), true);
 	EXPECT_TRUE((p->Run((void *)2)).IsSuccess());
 

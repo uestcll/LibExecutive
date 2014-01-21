@@ -3,6 +3,8 @@
 
 TEST(CLProcess, Exception)
 {
+	CLLogger::WriteLogMsg("CLPointerToMsgDeserializer Test", 0);
+
 	CLProcess *p = new CLProcess(new CLProcessFunctionForExec, true);
 
 	EXPECT_FALSE((p->WaitForDeath()).IsSuccess());

@@ -11,8 +11,6 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	sleep(2);
-
 	{
 		CLEvent event("test_for_event_auto");
 		event.Set();
