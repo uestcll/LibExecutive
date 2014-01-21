@@ -148,7 +148,7 @@ TEST(CLMessageLoopManager, EnterMessageLoop_Failure_Test)
 
 	q->j = -1;
 	p->j = -1;
-	CLLogger::WriteLogMsg("The Following bug is produced on purpose 2", 0);
+	CLLogger::WriteLogMsg("2 The Following bug is produced on purpose 2", 0);
 	EXPECT_FALSE(p->EnterMessageLoop(&i).IsSuccess());
 
 	delete p;

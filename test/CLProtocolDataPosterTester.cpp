@@ -94,7 +94,7 @@ TEST(CLProtocolDataPoster, PostProtocolData_POSTERROR_Test)
 	CLIOVectors *piov = new CLIOVectors;
 	long i = 32;
 	EXPECT_TRUE(piov->PushBack((char *)(&i), 8).IsSuccess());
-	CLLogger::WriteLogMsg("The Following bug is produced on purpose 3", 0);
+	CLLogger::WriteLogMsg("3 The Following bug is produced on purpose 3", 0);
 	CLStatus s1 = pd->PostProtocolData(piov);
 	EXPECT_FALSE(s1.IsSuccess());
 	EXPECT_EQ(s1.m_clErrorCode, DATA_POSTER_POST_ERROR);
@@ -253,7 +253,7 @@ TEST(CLProtocolDataPoster, PostLeftProtocolData_POSTERROR_Test)
 
 	delete preader;
 
-	CLLogger::WriteLogMsg("The Following bug is produced on purpose 3", 0);
+	CLLogger::WriteLogMsg("3 The Following bug is produced on purpose 3", 0);
 
 	CLStatus s2 = pd->PostLeftProtocolData();
 	EXPECT_FALSE(s2.IsSuccess());

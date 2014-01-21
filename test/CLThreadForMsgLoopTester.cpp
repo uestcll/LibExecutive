@@ -278,4 +278,92 @@ TEST(CLThreadForMsgLoop, Shared_PIPE_QUEUE)
 	EXPECT_EQ(g_for_on2, 1);
 }
 
-//observer return failure.......decapsulator
+class CLFailureObserver_CLThreadForMsgLoop : public CLMessageObserver
+{
+public:
+	virtual CLStatus Initialize(CLMessageLoopManager *pMessageLoop, void* pContext)
+	{
+		return CLStatus(-1, 0);
+	}
+};
+
+TEST(CLThreadForMsgLoop, ObserverFailure)
+{
+	CLThreadForMsgLoop thread(new CLFailureObserver_CLThreadForMsgLoop, test_pipe_name, true, EXECUTIVE_IN_PROCESS_USE_STL_QUEUE);
+	
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
+	EXPECT_FALSE(thread.Run((void *)3).IsSuccess());
+}
+
+class CLEncapsulatorForCLThreadForMsgLoop : public CLProtocolEncapsulator
+{
+public:
+	virtual CLStatus Initialize(uuid_t uuidOfCommObj)
+	{
+		return CLStatus(0, 0);
+	}
+
+	virtual CLStatus Uninitialize()
+	{
+		return CLStatus(0, 0);
+	}
+
+	virtual CLStatus Encapsulate(CLIOVectors *pIOVectors)
+	{
+		for(int i = 0; i < pIOVectors->Size(); i++)
+		{
+			unsigned char c;
+			EXPECT_TRUE(pIOVectors->ReadBlock(i, (char *)&c, 1).IsSuccess());
+
+			c = ~c;
+
+			EXPECT_TRUE(pIOVectors->WriteBlock(i, (char *)&c, 1).IsSuccess());
+		}
+
+		return CLStatus(0, 0);
+	}
+};
+
+class CLDecapsulatorForCLThreadForMsgLoop : public CLProtocolDecapsulator
+{
+public:
+	CLDecapsulatorForCLThreadForMsgLoop(CLProtocolDecapsulator *p) : CLProtocolDecapsulator(p)
+	{
+	}
+
+	virtual CLStatus Decapsulate(CLIOVectors& IOVectorsForData, unsigned int Length, std::vector<CLIOVectors *>& vSerializedMsgs, CLIOVectors& IOVectorsForPartialData, void *pContext)
+	{
+		for(int i = 0; i < IOVectorsForData.Size(); i++)
+		{
+			unsigned char c;
+			EXPECT_TRUE(IOVectorsForData.ReadBlock(i, (char *)&c, 1).IsSuccess());
+
+			c = ~c;
+
+			EXPECT_TRUE(IOVectorsForData.WriteBlock(i, (char *)&c, 1).IsSuccess());
+		}
+
+		return m_pProtocolDecapsulator->Decapsulate(IOVectorsForData, Length, vSerializedMsgs, IOVectorsForPartialData, pContext);
+	}
+};
+
+TEST(CLThreadForMsgLoop, EnAndDecapsulator)
+{
+	g_for_on1 = 0;
+	g_for_on2 = 0;
+
+	{
+		CLThreadForMsgLoop thread(new CLPipeQueue_CLThreadForMsgLoop, test_pipe_name, true, EXECUTIVE_BETWEEN_PROCESS_USE_PIPE_QUEUE, new CLEncapsulatorForCLThreadForMsgLoop, new CLDecapsulatorForCLThreadForMsgLoop(new CLProtocolDecapsulatorByDefaultMsgFormat));
+
+		EXPECT_TRUE(thread.RegisterSerializer(1, new CLMsg1ForCLThreadForMsgLoopTest_Serializer).IsSuccess());
+		EXPECT_TRUE(thread.RegisterSerializer(2, new CLMsg2ForCLThreadForMsgLoopTest_Serializer).IsSuccess());
+
+		EXPECT_TRUE(thread.RegisterDeserializer(1, new CLMsg1ForCLThreadForMsgLoopTest_Deserializer).IsSuccess());
+		EXPECT_TRUE(thread.RegisterDeserializer(2, new CLMsg2ForCLThreadForMsgLoopTest_Deserializer).IsSuccess());
+
+		EXPECT_TRUE(thread.Run((void *)3).IsSuccess());
+	}
+
+	EXPECT_EQ(g_for_on1, 1);
+	EXPECT_EQ(g_for_on2, 1);
+}

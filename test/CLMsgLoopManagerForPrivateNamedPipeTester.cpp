@@ -76,7 +76,7 @@ void *TestThreadForCLMsgLoopManagerForPrivateNamedPipe(void *)
 	CLThreadInitialFinishedNotifier notifier(0);
 	s.pNotifier = &notifier;
 
-	CLLogger::WriteLogMsg("The Following bug is produced on purpose 3", 0);
+	CLLogger::WriteLogMsg("3 The Following bug is produced on purpose 3", 0);
 	EXPECT_FALSE(pM->EnterMessageLoop(&s).IsSuccess());
 
 	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);

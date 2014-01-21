@@ -90,7 +90,7 @@ TEST(CLExecutiveNameServer, PostExecutiveMessage_Parameters_Test)
 	EXPECT_FALSE(s3.IsSuccess());
 	EXPECT_EQ(s3.m_clErrorCode, NORMAL_ERROR);
 
-	CLLogger::WriteLogMsg("The Following bug is produced on purpose 2", 0);
+	CLLogger::WriteLogMsg("2 The Following bug is produced on purpose 2", 0);
 	CLStatus s4 = CLExecutiveNameServer::PostExecutiveMessage("2323", new CLMessage(9));
 	EXPECT_FALSE(s4.IsSuccess());
 	EXPECT_EQ(s4.m_clErrorCode, NORMAL_ERROR);

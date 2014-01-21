@@ -516,7 +516,7 @@ TEST(CLMessageReceiver, GetMessageNamedPipe2_Features_Test)
 	}
 	close(fd);
 
-	CLLogger::WriteLogMsg("The Following bug is produced on purpose 2", 0);
+	CLLogger::WriteLogMsg("2 The Following bug is produced on purpose 2", 0);
 	CLStatus s1 = pMsgReceiver->GetMessage(qCon);
 	EXPECT_FALSE(s1.IsSuccess());
 	EXPECT_TRUE(qCon.size() == 9);

@@ -159,7 +159,7 @@ TEST(CLMessagePoster, PostMessage_Features_Test)
 	pE->bSucc = 0;
 	i = 32;
 	ppd = new CLProtocolDataPoster();
-	CLLogger::WriteLogMsg("The Following bug is produced on purpose 4", 0);
+	CLLogger::WriteLogMsg("4 The Following bug is produced on purpose 4", 0);
 	CLStatus s3 = mp.PostMessage((CLMessage *)(i), new CLDataPostResultNotifier(), ppd);
 	EXPECT_FALSE(s3.IsSuccess());
 	EXPECT_EQ(s3.m_clErrorCode, MSG_POST_ERROR);
@@ -320,7 +320,7 @@ TEST(CLMessagePoster, PostLeftMessage_ERROR_Test)
 
 	delete np;
 
-	CLLogger::WriteLogMsg("The Following bug is produced on purpose 4", 0);
+	CLLogger::WriteLogMsg("4 The Following bug is produced on purpose 4", 0);
 	CLStatus s2 = mp.PostLeftMessage(ppd);
 	EXPECT_EQ(s2.m_clReturnCode, -1);
 	EXPECT_EQ(s2.m_clErrorCode, MSG_POST_ERROR);
