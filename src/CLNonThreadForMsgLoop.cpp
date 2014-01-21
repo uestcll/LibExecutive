@@ -11,7 +11,7 @@
 #include "CLLogger.h"
 #include "ErrorCode.h"
 
-CLNonThreadForMsgLoop::CLNonThreadForMsgLoop(CLMessageObserver *pMsgObserver, const char *pstrThreadName, int ExecutiveType)
+CLNonThreadForMsgLoop::CLNonThreadForMsgLoop(CLMessageObserver *pMsgObserver, const char *pstrThreadName, int ExecutiveType, CLProtocolEncapsulator *pEncapsulator, CLProtocolDecapsulator *pDecapsulator)
 {
 	if(pMsgObserver == 0)
 		throw "In CLNonThreadForMsgLoop::CLNonThreadForMsgLoop(), pMsgObserver error";
@@ -24,7 +24,10 @@ CLNonThreadForMsgLoop::CLNonThreadForMsgLoop(CLMessageObserver *pMsgObserver, co
 		m_pSerializer = new CLMultiMsgSerializer();
 		m_pDeserializer = new CLMultiMsgDeserializer();
 
-		m_pFunctionProvider = new CLExecutiveFunctionForMsgLoop(new CLMsgLoopManagerForShareNamedPipe(pMsgObserver, pstrThreadName, 0, new CLProtocolDecapsulatorByDefaultMsgFormat(), m_pSerializer, m_pDeserializer));
+		if(pDecapsulator == 0)
+			pDecapsulator = new CLProtocolDecapsulatorByDefaultMsgFormat();
+
+		m_pFunctionProvider = new CLExecutiveFunctionForMsgLoop(new CLMsgLoopManagerForShareNamedPipe(pMsgObserver, pstrThreadName, pEncapsulator, pDecapsulator, m_pSerializer, m_pDeserializer));
 
 		return;
 	}

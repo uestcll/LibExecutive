@@ -9,6 +9,8 @@ class CLMessageSerializer;
 class CLMessageDeserializer;
 class CLMultiMsgSerializer;
 class CLMultiMsgDeserializer;
+class CLProtocolDecapsulator;
+class CLProtocolEncapsulator;
 
 #define EXECUTIVE_IN_PROCESS_USE_STL_QUEUE 0
 #define EXECUTIVE_IN_PROCESS_USE_PIPE_QUEUE 1
@@ -17,7 +19,7 @@ class CLMultiMsgDeserializer;
 class CLNonThreadForMsgLoop
 {
 public:
-	CLNonThreadForMsgLoop(CLMessageObserver *pMsgObserver, const char *pstrThreadName, int ExecutiveType = EXECUTIVE_IN_PROCESS_USE_STL_QUEUE);
+	CLNonThreadForMsgLoop(CLMessageObserver *pMsgObserver, const char *pstrThreadName, int ExecutiveType = EXECUTIVE_IN_PROCESS_USE_STL_QUEUE, CLProtocolEncapsulator *pEncapsulator = 0, CLProtocolDecapsulator *pDecapsulator = 0);
 	virtual ~CLNonThreadForMsgLoop();
 
 	CLStatus Run(void *pContext);
