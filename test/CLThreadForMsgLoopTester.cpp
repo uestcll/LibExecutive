@@ -1,219 +1,157 @@
 #include <gtest/gtest.h>
 #include "LibExecutive.h"
 
-TEST(CLThreadForMsgLoop, Constructor)
-{
-	try
-	{
-		CLThreadForMsgLoop t(0, 0);
-	}
-	catch(...)
-	{
-		EXPECT_TRUE(true);
-		return;
-	}
-
-	EXPECT_TRUE(false);
-}
-
-TEST(CLThreadForMsgLoop, Constructor1)
-{
-	try
-	{
-		CLThreadForMsgLoop t(0, "ds");
-	}
-	catch(...)
-	{
-		EXPECT_TRUE(true);
-		return;
-	}
-
-	EXPECT_TRUE(false);
-}
-
-TEST(CLThreadForMsgLoop, Constructor2)
-{
-	try
-	{
-		CLThreadForMsgLoop t(0, "");
-	}
-	catch(...)
-	{
-		EXPECT_TRUE(true);
-		return;
-	}
-
-	EXPECT_TRUE(false);
-}
-
-TEST(CLThreadForMsgLoop, Constructor3)
-{
-	try
-	{
-		CLThreadForMsgLoop t((CLMessageObserver *)1, 0);
-	}
-	catch(...)
-	{
-		EXPECT_TRUE(true);
-		return;
-	}
-
-	EXPECT_TRUE(false);
-}
-
-TEST(CLThreadForMsgLoop, Constructor4)
-{
-	try
-	{
-		CLThreadForMsgLoop t((CLMessageObserver *)1, "");
-	}
-	catch(...)
-	{
-		EXPECT_TRUE(true);
-		return;
-	}
-
-	EXPECT_TRUE(false);
-}
-
-static const char *test_pipe_name = "test_for_CLMessageQueueByNamedPipe_PrivateQueueForSelfPostMsg";
-
-static int g_for_on1 = 0;
-static int g_for_on2 = 0;
-static int g_for_msg1 = 0;
-static int g_for_msg2 = 0;
-static int g_for_msg1_dese = 0;
-static int g_for_msg2_dese = 0;
-static int g_for_msg1_se = 0;
-static int g_for_msg2_se = 0;
-
-class CLMsg1ForCLThreadForMsgLoop : public CLMessage
+class CLMsg1ForCLThreadForMsgLoopTest : public CLMessage
 {
 public:
-	CLMsg1ForCLThreadForMsgLoop() : CLMessage(1)
+	CLMsg1ForCLThreadForMsgLoopTest() : CLMessage(1)
 	{
 		i = 2;
 		j = 3;
 	}
 
-	virtual ~CLMsg1ForCLThreadForMsgLoop()
+	virtual ~CLMsg1ForCLThreadForMsgLoopTest()
 	{
-		g_for_msg1++;
 	}
 
 	int i;
 	int j;
 };
 
-class CLMsg2ForCLThreadForMsgLoop : public CLMessage
+class CLMsg2ForCLThreadForMsgLoopTest : public CLMessage
 {
 public:
-	CLMsg2ForCLThreadForMsgLoop() : CLMessage(2)
+	CLMsg2ForCLThreadForMsgLoopTest() : CLMessage(2)
 	{
-		i = 4;
-		j = 6;
 	}
 
-	virtual ~CLMsg2ForCLThreadForMsgLoop()
+	virtual ~CLMsg2ForCLThreadForMsgLoopTest()
 	{
-		g_for_msg2++;
-	}
-
-	long i;
-	int j;
-};
-
-class CLMsg1ForCLThreadForMsgLoop_Deserializer : public CLMessageDeserializer
-{
-public:
-	virtual CLMessage *Deserialize(char *pBuffer)
-	{
-		CLMsg1ForCLThreadForMsgLoop *p = new CLMsg1ForCLThreadForMsgLoop;
-		p->i = *((int *)(pBuffer + sizeof(long)));
-		p->j = *((int *)(pBuffer + sizeof(long) + sizeof(int)));
-		return p;
-	}
-
-	virtual ~CLMsg1ForCLThreadForMsgLoop_Deserializer()
-	{
-		g_for_msg1_dese++;
 	}
 };
 
-class CLMsg2ForCLThreadForMsgLoop_Deserializer : public CLMessageDeserializer
+class CLMsg1ForCLThreadForMsgLoopTest_Serializer : public CLMessageSerializer
 {
 public:
-	virtual CLMessage *Deserialize(char *pBuffer)
+	virtual CLStatus Serialize(CLMessage *pMsg, CLIOVectors *pIOVectors)
 	{
-		CLMsg2ForCLThreadForMsgLoop *p = new CLMsg2ForCLThreadForMsgLoop;
-		p->i = *((long *)(pBuffer + sizeof(long)));
-		p->j = *((int *)(pBuffer + sizeof(long) + sizeof(long)));
-		return p;
+		CLMsg1ForCLThreadForMsgLoopTest *pm = dynamic_cast<CLMsg1ForCLThreadForMsgLoopTest *>(pMsg);
+		EXPECT_TRUE(pm != 0);
+
+		char *p = new char [20];
+
+		int *pHead = (int *)p;
+		*pHead = 16;
+
+		long *pid = (long *)(p + 4);
+		*pid = pm->m_clMsgID;
+
+		int *pi = (int *)(p + 12);
+		*pi = pm->i;
+
+		int *pj = (int *)(p + 16);
+		*pj = pm->j;
+
+		EXPECT_TRUE(pIOVectors->PushBack(p, 20, true).IsSuccess());
+
+		return CLStatus(0, 0);
 	}
 
-	virtual ~CLMsg2ForCLThreadForMsgLoop_Deserializer()
+	virtual ~CLMsg1ForCLThreadForMsgLoopTest_Serializer()
 	{
-		g_for_msg2_dese++;
 	}
 };
 
-class CLMsg1ForCLThreadForMsgLoop_Serializer : public CLMessageSerializer
+class CLMsg2ForCLThreadForMsgLoopTest_Serializer : public CLMessageSerializer
 {
 public:
-	virtual char *Serialize(CLMessage *pMsg, unsigned int *pFullLength, unsigned int HeadLength)
+	virtual CLStatus Serialize(CLMessage *pMsg, CLIOVectors *pIOVectors)
 	{
-		CLMsg1ForCLThreadForMsgLoop *p = dynamic_cast<CLMsg1ForCLThreadForMsgLoop *>(pMsg);
-		EXPECT_TRUE(p != 0);
+		CLMsg2ForCLThreadForMsgLoopTest *pm = dynamic_cast<CLMsg2ForCLThreadForMsgLoopTest *>(pMsg);
+		EXPECT_TRUE(pm != 0);
 
-		*pFullLength = HeadLength + 8 + 4 + 4;
-		char *pBuf = new char[*pFullLength];
+		char *p = new char [12];
 
-		long *pID = (long *)(pBuf + HeadLength);
-		*pID = p->m_clMsgID;
+		int *pHead = (int *)p;
+		*pHead = 8;
 
-		int *pi = (int *)(pBuf + HeadLength + 8);
-		*pi = p->i;
+		long *pid = (long *)(p + 4);
+		*pid = pm->m_clMsgID;
 
-		int *pj = (int *)(pBuf + HeadLength + 8 + 4);
-		*pj = p->j;
+		EXPECT_TRUE(pIOVectors->PushBack(p, 12, true).IsSuccess());
 
-		return pBuf;
+		return CLStatus(0, 0);
 	}
 
-	virtual ~CLMsg1ForCLThreadForMsgLoop_Serializer()
+	virtual ~CLMsg2ForCLThreadForMsgLoopTest_Serializer()
 	{
-		g_for_msg1_se++;
 	}
 };
 
-class CLMsg2ForCLThreadForMsgLoop_Serializer : public CLMessageSerializer
+class CLMsg1ForCLThreadForMsgLoopTest_Deserializer : public CLMessageDeserializer
 {
 public:
-	virtual char *Serialize(CLMessage *pMsg, unsigned int *pFullLength, unsigned int HeadLength)
+	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager)
 	{
-		CLMsg2ForCLThreadForMsgLoop *p = dynamic_cast<CLMsg2ForCLThreadForMsgLoop *>(pMsg);
-		EXPECT_TRUE(p != 0);
+		CLIteratorForIOVectors iter;
+		IOVectors.GetIterator(0, iter);
 
-		*pFullLength = HeadLength + 8 + 8 + 4;
-		char *pBuf = new char[*pFullLength];
+		int len = 0;
+		EXPECT_TRUE(IOVectors.ReadBlock(iter, (char *)(&len), 4).IsSuccess());
+		EXPECT_EQ(len, 16);
 
-		long *pID = (long *)(pBuf + HeadLength);
-		*pID = p->m_clMsgID;
+		long id = 0;
+		EXPECT_TRUE(IOVectors.ReadBlock(iter, (char *)(&id), 8).IsSuccess());
+		EXPECT_EQ(id, 1);
 
-		long *pi = (long *)(pBuf + HeadLength + 8);
-		*pi = p->i;
+		int x = 0;
+		EXPECT_TRUE(IOVectors.ReadBlock(iter, (char *)(&x), 4).IsSuccess());
+		EXPECT_EQ(x, 2);
 
-		int *pj = (int *)(pBuf + HeadLength + 8 + 8);
-		*pj = p->j;
+		int y = 0;
+		EXPECT_TRUE(IOVectors.ReadBlock(iter, (char *)(&y), 4).IsSuccess());
+		EXPECT_EQ(y, 3);
 
-		return pBuf;
+		*ppMsg = new CLMsg1ForCLThreadForMsgLoopTest();
+
+		return CLStatus(0, 0);
 	}
 
-	virtual ~CLMsg2ForCLThreadForMsgLoop_Serializer()
+	virtual ~CLMsg1ForCLThreadForMsgLoopTest_Deserializer()
 	{
-		g_for_msg2_se++;
 	}
 };
+
+class CLMsg2ForCLThreadForMsgLoopTest_Deserializer : public CLMessageDeserializer
+{
+public:
+	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager)
+	{
+		CLIteratorForIOVectors iter;
+		IOVectors.GetIterator(0, iter);
+
+		int len = 0;
+		EXPECT_TRUE(IOVectors.ReadBlock(iter, (char *)(&len), 4).IsSuccess());
+		EXPECT_EQ(len, 8);
+
+		long id = 0;
+		EXPECT_TRUE(IOVectors.ReadBlock(iter, (char *)(&id), 8).IsSuccess());
+		EXPECT_EQ(id, 2);
+
+		*ppMsg = new CLMsg2ForCLThreadForMsgLoopTest();
+
+		return CLStatus(0, 0);
+	}
+
+	virtual ~CLMsg2ForCLThreadForMsgLoopTest_Deserializer()
+	{
+	}
+};
+
+static const char *test_pipe_name = "test_for_CLThreadForMsgLoop_PrivateQueueForSelfPostMsg";
+
+static int g_for_on1 = 0;
+static int g_for_on2 = 0;
 
 class CLSTLQueue_CLThreadForMsgLoop : public CLMessageObserver
 {
@@ -225,10 +163,10 @@ public:
 		pMessageLoop->Register(1, (CallBackForMessageLoop)(&CLSTLQueue_CLThreadForMsgLoop::On_1));
 		pMessageLoop->Register(2, (CallBackForMessageLoop)(&CLSTLQueue_CLThreadForMsgLoop::On_2));
 
-		CLMessage *p = new CLMsg1ForCLThreadForMsgLoop;
+		CLMessage *p = new CLMsg1ForCLThreadForMsgLoopTest;
 		EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p).IsSuccess());
 
-		p = new CLMsg2ForCLThreadForMsgLoop;
+		p = new CLMsg2ForCLThreadForMsgLoopTest;
 		EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p).IsSuccess());
 
 		return CLStatus(0, 0);
@@ -236,7 +174,7 @@ public:
 
 	CLStatus On_1(CLMessage *pm)
 	{
-		CLMsg1ForCLThreadForMsgLoop *p = dynamic_cast<CLMsg1ForCLThreadForMsgLoop*>(pm);
+		CLMsg1ForCLThreadForMsgLoopTest *p = dynamic_cast<CLMsg1ForCLThreadForMsgLoopTest*>(pm);
 		EXPECT_TRUE(p != 0);
 
 		g_for_on1++;
@@ -246,7 +184,7 @@ public:
 
 	CLStatus On_2(CLMessage *pm)
 	{
-		CLMsg2ForCLThreadForMsgLoop *p = dynamic_cast<CLMsg2ForCLThreadForMsgLoop*>(pm);
+		CLMsg2ForCLThreadForMsgLoopTest *p = dynamic_cast<CLMsg2ForCLThreadForMsgLoopTest*>(pm);
 		EXPECT_TRUE(p != 0);
 
 		g_for_on2++;
@@ -257,6 +195,8 @@ public:
 
 TEST(CLThreadForMsgLoop, STL_QUEUE)
 {
+	CLLogger::WriteLogMsg("CLThreadForMsgLoop Test", 0);
+
 	{
 		CLThreadForMsgLoop thread(new CLSTLQueue_CLThreadForMsgLoop, test_pipe_name, true, EXECUTIVE_IN_PROCESS_USE_STL_QUEUE);
 		EXPECT_TRUE(thread.Run((void *)3).IsSuccess());
@@ -264,17 +204,12 @@ TEST(CLThreadForMsgLoop, STL_QUEUE)
 
 	EXPECT_EQ(g_for_on1, 1);
 	EXPECT_EQ(g_for_on2, 1);
-	EXPECT_EQ(g_for_msg1, 1);
-	EXPECT_EQ(g_for_msg2, 1);
 }
-
 
 TEST(CLThreadForMsgLoop, PRIVATE_PIPE_QUEUE)
 {
 	g_for_on1 = 0;
 	g_for_on2 = 0;
-	g_for_msg1 = 0;
-	g_for_msg2 = 0;
 
 	{
 		CLThreadForMsgLoop thread(new CLSTLQueue_CLThreadForMsgLoop, test_pipe_name, true, EXECUTIVE_IN_PROCESS_USE_PIPE_QUEUE);
@@ -283,8 +218,6 @@ TEST(CLThreadForMsgLoop, PRIVATE_PIPE_QUEUE)
 
 	EXPECT_EQ(g_for_on1, 1);
 	EXPECT_EQ(g_for_on2, 1);
-	EXPECT_EQ(g_for_msg1, 1);
-	EXPECT_EQ(g_for_msg2, 1);
 }
 
 class CLPipeQueue_CLThreadForMsgLoop : public CLMessageObserver
@@ -297,26 +230,15 @@ public:
 		pMessageLoop->Register(1, (CallBackForMessageLoop)(&CLPipeQueue_CLThreadForMsgLoop::On_1));
 		pMessageLoop->Register(2, (CallBackForMessageLoop)(&CLPipeQueue_CLThreadForMsgLoop::On_2));
 
-		CLSharedExecutiveCommunicationByNamedPipe *queue = new CLSharedExecutiveCommunicationByNamedPipe(test_pipe_name);
-		EXPECT_TRUE(queue->RegisterSerializer(1, new CLMsg1ForCLThreadForMsgLoop_Serializer).IsSuccess());
-		EXPECT_TRUE(queue->RegisterSerializer(2, new CLMsg2ForCLThreadForMsgLoop_Serializer).IsSuccess());
-
-		EXPECT_TRUE(CLExecutiveNameServer::GetInstance()->Register(test_pipe_name, queue).IsSuccess());
-
-		CLMessage *p = new CLMsg1ForCLThreadForMsgLoop;
-		EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p).IsSuccess());
-
-		p = new CLMsg2ForCLThreadForMsgLoop;
-		EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, p).IsSuccess());
-
-		EXPECT_TRUE(CLExecutiveNameServer::GetInstance()->ReleaseCommunicationPtr(test_pipe_name).IsSuccess());
+		EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, new CLMsg1ForCLThreadForMsgLoopTest, true).IsSuccess());
+		EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, new CLMsg2ForCLThreadForMsgLoopTest, true).IsSuccess());
 
 		return CLStatus(0, 0);
 	}
 
 	CLStatus On_1(CLMessage *pm)
 	{
-		CLMsg1ForCLThreadForMsgLoop *p = dynamic_cast<CLMsg1ForCLThreadForMsgLoop*>(pm);
+		CLMsg1ForCLThreadForMsgLoopTest *p = dynamic_cast<CLMsg1ForCLThreadForMsgLoopTest*>(pm);
 		EXPECT_TRUE(p != 0);
 
 		g_for_on1++;
@@ -326,7 +248,7 @@ public:
 
 	CLStatus On_2(CLMessage *pm)
 	{
-		CLMsg2ForCLThreadForMsgLoop *p = dynamic_cast<CLMsg2ForCLThreadForMsgLoop*>(pm);
+		CLMsg2ForCLThreadForMsgLoopTest *p = dynamic_cast<CLMsg2ForCLThreadForMsgLoopTest*>(pm);
 		EXPECT_TRUE(p != 0);
 
 		g_for_on2++;
@@ -339,22 +261,21 @@ TEST(CLThreadForMsgLoop, Shared_PIPE_QUEUE)
 {
 	g_for_on1 = 0;
 	g_for_on2 = 0;
-	g_for_msg1 = 0;
-	g_for_msg2 = 0;
 
 	{
 		CLThreadForMsgLoop thread(new CLPipeQueue_CLThreadForMsgLoop, test_pipe_name, true, EXECUTIVE_BETWEEN_PROCESS_USE_PIPE_QUEUE);
-		EXPECT_TRUE(thread.RegisterDeserializer(1, new CLMsg1ForCLThreadForMsgLoop_Deserializer).IsSuccess());
-		EXPECT_TRUE(thread.RegisterDeserializer(2, new CLMsg2ForCLThreadForMsgLoop_Deserializer).IsSuccess());
+
+		EXPECT_TRUE(thread.RegisterSerializer(1, new CLMsg1ForCLThreadForMsgLoopTest_Serializer).IsSuccess());
+		EXPECT_TRUE(thread.RegisterSerializer(2, new CLMsg2ForCLThreadForMsgLoopTest_Serializer).IsSuccess());
+
+		EXPECT_TRUE(thread.RegisterDeserializer(1, new CLMsg1ForCLThreadForMsgLoopTest_Deserializer).IsSuccess());
+		EXPECT_TRUE(thread.RegisterDeserializer(2, new CLMsg2ForCLThreadForMsgLoopTest_Deserializer).IsSuccess());
+
 		EXPECT_TRUE(thread.Run((void *)3).IsSuccess());
 	}
 
 	EXPECT_EQ(g_for_on1, 1);
 	EXPECT_EQ(g_for_on2, 1);
-	EXPECT_EQ(g_for_msg1, 2);
-	EXPECT_EQ(g_for_msg2, 2);
-	EXPECT_EQ(g_for_msg1_dese, 1);
-	EXPECT_EQ(g_for_msg2_dese, 1);
-	EXPECT_EQ(g_for_msg1_se, 1);
-	EXPECT_EQ(g_for_msg2_se, 1);
 }
+
+//observer return failure.......decapsulator

@@ -13,7 +13,7 @@
 #include "CLLogger.h"
 #include "ErrorCode.h"
 
-CLThreadForMsgLoop::CLThreadForMsgLoop(CLMessageObserver *pMsgObserver, const char *pstrThreadName, bool bWaitForDeath, int ExecutiveType)
+CLThreadForMsgLoop::CLThreadForMsgLoop(CLMessageObserver *pMsgObserver, const char *pstrThreadName, bool bWaitForDeath, int ExecutiveType, CLProtocolEncapsulator *pEncapsulator, CLProtocolDecapsulator *pDecapsulator)
 {
 	if(pMsgObserver == 0)
 		throw "In CLThreadForMsgLoop::CLThreadForMsgLoop(), pMsgObserver error";
@@ -27,7 +27,11 @@ CLThreadForMsgLoop::CLThreadForMsgLoop(CLMessageObserver *pMsgObserver, const ch
 	{
 		m_pSerializer = new CLMultiMsgSerializer();
 		m_pDeserializer = new CLMultiMsgDeserializer();
-		m_pThread = new CLThread(new CLExecutiveFunctionForMsgLoop(new CLMsgLoopManagerForShareNamedPipe(pMsgObserver, pstrThreadName, 0, new CLProtocolDecapsulatorByDefaultMsgFormat(), m_pSerializer, m_pDeserializer)), bWaitForDeath);
+
+		if(pDecapsulator == 0)
+			pDecapsulator = new CLProtocolDecapsulatorByDefaultMsgFormat();
+
+		m_pThread = new CLThread(new CLExecutiveFunctionForMsgLoop(new CLMsgLoopManagerForShareNamedPipe(pMsgObserver, pstrThreadName, pEncapsulator, pDecapsulator, m_pSerializer, m_pDeserializer)), bWaitForDeath);
 
 		return;
 	}

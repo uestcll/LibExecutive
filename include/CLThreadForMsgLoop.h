@@ -10,11 +10,13 @@ class CLMessageSerializer;
 class CLMessageDeserializer;
 class CLMultiMsgSerializer;
 class CLMultiMsgDeserializer;
+class CLProtocolDecapsulator;
+class CLProtocolEncapsulator;
 
 class CLThreadForMsgLoop
 {
 public:
-	CLThreadForMsgLoop(CLMessageObserver *pMsgObserver, const char *pstrThreadName, bool bWaitForDeath = false, int ExecutiveType = EXECUTIVE_IN_PROCESS_USE_STL_QUEUE);
+	CLThreadForMsgLoop(CLMessageObserver *pMsgObserver, const char *pstrThreadName, bool bWaitForDeath = false, int ExecutiveType = EXECUTIVE_IN_PROCESS_USE_STL_QUEUE, CLProtocolEncapsulator *pEncapsulator = 0, CLProtocolDecapsulator *pDecapsulator = 0);
 	virtual ~CLThreadForMsgLoop();
 
 	CLStatus Run(void *pContext);
