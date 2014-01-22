@@ -150,9 +150,14 @@ public:
 
 static const char *test_pipe_name = "test_for_CLNonThreadForMsgLoop_PrivateQueueForSelfPostMsg";
 static const char *test1_pipe_name = "test1_for_CLNonThreadForMsgLoop_PrivateQueueForSelfPostMsg";
+static const char *test1_pipe_namepath = "/tmp/test1_for_CLNonThreadForMsgLoop_PrivateQueueForSelfPostMsg";
 
 static int g_for_on1 = 0;
 static int g_for_on2 = 0;
+
+static int count = 100000;
+
+static bool bflagdestroy = false;
 
 class CLObserverForCLNonThreadStressTest : public CLMessageObserver
 {
@@ -164,7 +169,7 @@ public:
 		pMessageLoop->Register(1, (CallBackForMessageLoop)(&CLObserverForCLNonThreadStressTest::On_1));
 		pMessageLoop->Register(2, (CallBackForMessageLoop)(&CLObserverForCLNonThreadStressTest::On_2));
 
-		EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, new CLMsg1ForCLNonThreadForMsgLoopTest).IsSuccess());
+		EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, new CLMsg1ForCLNonThreadForMsgLoopTest, bflagdestroy).IsSuccess());
 
 		return CLStatus(0, 0);
 	}
@@ -174,10 +179,38 @@ public:
 		CLMsg1ForCLNonThreadForMsgLoopTest *p = dynamic_cast<CLMsg1ForCLNonThreadForMsgLoopTest*>(pm);
 		EXPECT_TRUE(p != 0);
 
-		for(int i = 0; i < 1000000; i++)
+		CLMessagePoster *poster = CLExecutiveNameServer::GetInstance()->GetCommunicationPtr(test_pipe_name);
+		EXPECT_TRUE(poster != 0);
+
+		for(int i = 0; i < count; i++)
 		{
-			EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, new CLMsg2ForCLNonThreadForMsgLoopTest).IsSuccess());
+			CLProtocolDataPoster *pd = new CLProtocolDataPoster();
+			CLStatus s = poster->PostMessage(new CLMsg2ForCLNonThreadForMsgLoopTest, new CLDataPostResultNotifier(bflagdestroy), pd);
+			if(!s.IsSuccess())
+			{
+				EXPECT_TRUE(s.m_clErrorCode != MSG_POST_ERROR);
+				
+				if(s.m_clErrorCode == MSG_POST_ERROR)
+					break;
+
+				while(true)
+				{
+					CLStatus s1 = poster->PostLeftMessage(pd);
+					if(!s1.IsSuccess())
+					{
+						EXPECT_TRUE(s1.m_clErrorCode != MSG_POST_ERROR);
+
+						if(s1.m_clErrorCode == MSG_POST_ERROR)
+							break;
+
+						continue;
+					}
+					break;
+				}
+			}
 		}
+
+		EXPECT_TRUE(CLExecutiveNameServer::GetInstance()->ReleaseCommunicationPtr(test_pipe_name).IsSuccess());
 
 		return CLStatus(0, 0);
 	}
@@ -228,7 +261,7 @@ public:
 
 		g_for_on2++;
 
-		if(g_for_on2 == 1000000)
+		if(g_for_on2 == count)
 		{
 			EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test1_pipe_name, new CLMsg2ForCLNonThreadForMsgLoopTest).IsSuccess());
 
@@ -249,93 +282,55 @@ TEST(CLNonThreadForMsgLoop, STL_QUEUE)
 	EXPECT_TRUE(thread.Run((void *)3).IsSuccess());
 
 	EXPECT_EQ(g_for_on1, 1);
-	EXPECT_EQ(g_for_on2, 1000000);
+	EXPECT_EQ(g_for_on2, count);
 }
 
-/*
-static const int count = 1000000;
-
-class CLStressTester : public CLExecutiveFunctionProvider
-{
-public:
-	virtual CLStatus RunExecutiveFunction(void* pContext)
-	{
-		for(int i = 0; i < count; i++)
-		{
-			CLStatus s = CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, new CLMsg1ForCLNonThreadForMsgLoop);
-			if(!s.IsSuccess())
-			{
-				sleep(1);
-				CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, new CLMsg1ForCLNonThreadForMsgLoop);
-			}
-		}
-	}
-};
-
-class CLStressObserverForCLNonThreadForMsgLoop : public CLMessageObserver
-{
-	CLThread *pthread;
-
-public:
-	virtual CLStatus Initialize(CLMessageLoopManager *pMessageLoop, void* pContext)
-	{
-		pMessageLoop->Register(1, (CallBackForMessageLoop)(&CLStressObserverForCLNonThreadForMsgLoop::On_1));
-
-		pthread = new CLThread(new CLStressTester, true);
-		EXPECT_TRUE(pthread->Run().IsSuccess());
-
-		return CLStatus(0, 0);
-	}
-
-	CLStatus On_1(CLMessage *pm)
-	{
-		CLMsg1ForCLNonThreadForMsgLoop *p = dynamic_cast<CLMsg1ForCLNonThreadForMsgLoop*>(pm);
-		EXPECT_TRUE(p != 0);
-
-		g_for_on1++;
-
-		if(g_for_on1 == count)
-		{
-			pthread->WaitForDeath();
-			return CLStatus(QUIT_MESSAGE_LOOP, 0);
-		}
-		else
-			return CLStatus(0, 0);
-	}
-};
-
-TEST(CLNonThreadForMsgLoop, STL_QUEUE_STRESS)
+TEST(CLNonThreadForMsgLoop, PRIVATE_PIPE_QUEUE)
 {
 	g_for_on1 = 0;
-	g_for_msg1 = 0;
+	g_for_on2 = 0;
 
-	CLNonThreadForMsgLoop thread(new CLStressObserverForCLNonThreadForMsgLoop, test_pipe_name, EXECUTIVE_IN_PROCESS_USE_STL_QUEUE);
-	EXPECT_TRUE(thread.Run(0).IsSuccess());
+	CLNonThreadForMsgLoop thread(new CLSTLQueue_CLNonThreadForMsgLoop, test_pipe_name, EXECUTIVE_IN_PROCESS_USE_PIPE_QUEUE);
+	EXPECT_TRUE(thread.Run((void *)3).IsSuccess());
 
-	EXPECT_EQ(g_for_on1, count);
-	EXPECT_EQ(g_for_msg1, count);
+	EXPECT_EQ(g_for_on1, 1);
+	EXPECT_EQ(g_for_on2, count);
 }
 
-TEST(CLNonThreadForMsgLoop, PRIVATE_PIPE_QUEUE_STRESS)
+TEST(CLNonThreadForMsgLoop, Shared_PIPE_QUEUE)
 {
 	g_for_on1 = 0;
-	g_for_msg1 = 0;
+	g_for_on2 = 0;
 
-	CLNonThreadForMsgLoop thread(new CLStressObserverForCLNonThreadForMsgLoop, test_pipe_name, EXECUTIVE_IN_PROCESS_USE_PIPE_QUEUE);
-	EXPECT_TRUE(thread.Run(0).IsSuccess());
+	bflagdestroy = true;
 
-	EXPECT_EQ(g_for_on1, count);
-	EXPECT_EQ(g_for_msg1, count);
+	CLNonThreadForMsgLoop thread(new CLSTLQueue_CLNonThreadForMsgLoop, test_pipe_name, EXECUTIVE_BETWEEN_PROCESS_USE_PIPE_QUEUE);
+
+	EXPECT_TRUE(thread.RegisterSerializer(1, new CLMsg1ForCLNonThreadForMsgLoopTest_Serializer).IsSuccess());
+	EXPECT_TRUE(thread.RegisterSerializer(2, new CLMsg2ForCLNonThreadForMsgLoopTest_Serializer).IsSuccess());
+
+	EXPECT_TRUE(thread.RegisterDeserializer(1, new CLMsg1ForCLNonThreadForMsgLoopTest_Deserializer).IsSuccess());
+	EXPECT_TRUE(thread.RegisterDeserializer(2, new CLMsg2ForCLNonThreadForMsgLoopTest_Deserializer).IsSuccess());
+
+	EXPECT_TRUE(thread.Run((void *)3).IsSuccess());
+
+	EXPECT_EQ(g_for_on1, 1);
+	EXPECT_EQ(g_for_on2, count);
 }
 
 class CLStressObserverForCLNonThreadForMsgLoop_Process : public CLMessageObserver
 {
 public:
+	CLProcess *process;
+
 	virtual CLStatus Initialize(CLMessageLoopManager *pMessageLoop, void* pContext)
 	{
-		pMessageLoop->Register(1, (CallBackForMessageLoop)(&CLStressObserverForCLNonThreadForMsgLoop_Process::On_1));
+		EXPECT_EQ((long)pContext, 3);
 
-		CLProcess *process = new CLProcess(new CLProcessFunctionForExec, false);
+		pMessageLoop->Register(1, (CallBackForMessageLoop)(&CLStressObserverForCLNonThreadForMsgLoop_Process::On_1));
+		pMessageLoop->Register(2, (CallBackForMessageLoop)(&CLStressObserverForCLNonThreadForMsgLoop_Process::On_2));
+
+		process = new CLProcess(new CLProcessFunctionForExec(), true);
 		EXPECT_TRUE((process->Run((void *)"../test_for_exec/test_for_CLNonThreadForMsgLoop_Stress_Testing/main")).IsSuccess());
 
 		return CLStatus(0, 0);
@@ -343,29 +338,68 @@ public:
 
 	CLStatus On_1(CLMessage *pm)
 	{
-		CLMsg1ForCLNonThreadForMsgLoop *p = dynamic_cast<CLMsg1ForCLNonThreadForMsgLoop*>(pm);
+		CLMsg1ForCLNonThreadForMsgLoopTest *p = dynamic_cast<CLMsg1ForCLNonThreadForMsgLoopTest*>(pm);
 		EXPECT_TRUE(p != 0);
 
 		g_for_on1++;
 
-		if(g_for_on1 == count)
+		CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
+		EXPECT_TRUE(pNameServer != 0);
+
+		CLEvent *m_pEvent = new CLEvent(test1_pipe_name, true);
+		CLMultiMsgSerializer *m_pMsgSerializer = new CLMultiMsgSerializer;
+		EXPECT_TRUE(m_pMsgSerializer->RegisterSerializer(1, new CLMsg1ForCLNonThreadForMsgLoopTest_Serializer).IsSuccess());
+		EXPECT_TRUE(m_pMsgSerializer->RegisterSerializer(2, new CLMsg2ForCLNonThreadForMsgLoopTest_Serializer).IsSuccess());
+
+		CLMessagePoster *pMsgPoster = new CLMessagePoster(m_pMsgSerializer, 0, new CLDataPostChannelByNamedPipeMaintainer(test1_pipe_namepath), m_pEvent);
+		EXPECT_TRUE(pMsgPoster->Initialize(new CLInitialDataPostChannelNotifier(), 0).IsSuccess());
+
+		EXPECT_TRUE(pNameServer->Register(test1_pipe_name, pMsgPoster).IsSuccess());
+
+		EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test1_pipe_name, new CLMsg1ForCLNonThreadForMsgLoopTest, true).IsSuccess());
+
+		return CLStatus(0, 0);
+	}
+
+	CLStatus On_2(CLMessage *pm)
+	{
+		CLMsg2ForCLNonThreadForMsgLoopTest *p = dynamic_cast<CLMsg2ForCLNonThreadForMsgLoopTest*>(pm);
+		EXPECT_TRUE(p != 0);
+
+		g_for_on2++;
+
+		if(g_for_on2 == count)
+		{
+			EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test1_pipe_name, new CLMsg2ForCLNonThreadForMsgLoopTest, true).IsSuccess());
+
+			CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
+			EXPECT_TRUE(pNameServer != 0);
+			pNameServer->ReleaseCommunicationPtr(test1_pipe_name);
+
+			process->WaitForDeath();
+
 			return CLStatus(QUIT_MESSAGE_LOOP, 0);
-		else
-			return CLStatus(0, 0);
+		}
+
+		return CLStatus(0, 0);
 	}
 };
 
 TEST(CLNonThreadForMsgLoop, SHARED_PIPE_QUEUE_STRESS)
 {
 	g_for_on1 = 0;
-	g_for_msg1 = 0;
+	g_for_on2 = 0;
 
-	{
-		CLNonThreadForMsgLoop thread(new CLStressObserverForCLNonThreadForMsgLoop_Process, test_pipe_name, EXECUTIVE_BETWEEN_PROCESS_USE_PIPE_QUEUE);
-		EXPECT_TRUE(thread.RegisterDeserializer(1, new CLMsg1ForCLNonThreadForMsgLoop_Deserializer).IsSuccess());
-		EXPECT_TRUE(thread.Run(0).IsSuccess());
-	}
+	CLNonThreadForMsgLoop thread(new CLStressObserverForCLNonThreadForMsgLoop_Process, test_pipe_name, EXECUTIVE_BETWEEN_PROCESS_USE_PIPE_QUEUE);
 
-	EXPECT_EQ(g_for_on1, count);
-	EXPECT_EQ(g_for_msg1, count);
-}*/
+	EXPECT_TRUE(thread.RegisterSerializer(1, new CLMsg1ForCLNonThreadForMsgLoopTest_Serializer).IsSuccess());
+	EXPECT_TRUE(thread.RegisterSerializer(2, new CLMsg2ForCLNonThreadForMsgLoopTest_Serializer).IsSuccess());
+
+	EXPECT_TRUE(thread.RegisterDeserializer(1, new CLMsg1ForCLNonThreadForMsgLoopTest_Deserializer).IsSuccess());
+	EXPECT_TRUE(thread.RegisterDeserializer(2, new CLMsg2ForCLNonThreadForMsgLoopTest_Deserializer).IsSuccess());
+
+	EXPECT_TRUE(thread.Run((void *)3).IsSuccess());
+
+	EXPECT_EQ(g_for_on1, 1);
+	EXPECT_EQ(g_for_on2, count);
+}
