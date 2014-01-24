@@ -13,8 +13,11 @@ public:
 private:
 	CLLibExecutiveInitializer();
 	~CLLibExecutiveInitializer();
+
 	CLLibExecutiveInitializer(const CLLibExecutiveInitializer&);
 	CLLibExecutiveInitializer& operator=(const CLLibExecutiveInitializer&);
+
+	static void HandleSIGCHLD(int signo);
 
 private:
 	static bool m_bInitialized;

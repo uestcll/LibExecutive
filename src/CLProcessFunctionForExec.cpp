@@ -20,12 +20,7 @@ CLProcessFunctionForExec::~CLProcessFunctionForExec()
 
 CLStatus CLProcessFunctionForExec::RunExecutiveFunction(void* pCmdLine)
 {
-	if(pCmdLine == 0)
-		return CLStatus(-1, 0);
-
 	int len = strlen((char *)pCmdLine);
-	if(len == 0)
-		return CLStatus(-1, 0);
 
 	char *pstrCmdLine = new char[len + 1];
 	strcpy(pstrCmdLine, (char *)pCmdLine);

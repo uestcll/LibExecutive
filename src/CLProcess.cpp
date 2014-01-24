@@ -11,6 +11,7 @@
 #include "CLProcess.h"
 #include "CLExecutiveFunctionProvider.h"
 #include "CLLogger.h"
+#include "CLLibExecutiveInitializer.h"
 
 using namespace std;
 
@@ -19,17 +20,6 @@ using namespace std;
 
 CLProcess::CLProcess(CLExecutiveFunctionProvider *pExecutiveFunctionProvider) : CLExecutive(pExecutiveFunctionProvider)
 {
-	m_bProcessCreated = false;
-	m_bWaitForDeath = false;
-	m_bExecSuccess = true;
-	m_ProcessID = -1;
-}
-
-CLProcess::CLProcess(CLExecutiveFunctionProvider *pExecutiveFunctionProvider, bool bWaitForDeath) : CLExecutive(pExecutiveFunctionProvider)
-{
-	m_bProcessCreated = false;
-	m_bWaitForDeath = bWaitForDeath;
-	m_bExecSuccess = true;
 	m_ProcessID = -1;
 }
 
@@ -45,78 +35,35 @@ void CLProcess::RunChildFunction(void *pstrCmdLine)
 
 	m_pExecutiveFunctionProvider->RunExecutiveFunction(pstrCmdLine);
 
-	m_bExecSuccess = false;
-
-	_exit(0);
+	exit(0);
 }
 
 CLStatus CLProcess::Run(void *pstrCmdLine)
 {
-	if(m_bProcessCreated)
-		return CLStatus(-1, 0);
-
-	pid_t pid = vfork();
-	if(pid == -1)
-	{
-		CLLogger::WriteLogMsg("In CLProcess::Run(), vfork error", errno);
-		delete this;
-		return CLStatus(-1, 0);
-	}
-
-	if(pid == 0)
-	{
-		if(m_bWaitForDeath)
-			RunChildFunction(pstrCmdLine);
-		else
-		{
-			pid_t pid1 = vfork();
-			if(pid1 == -1)
-			{
-				CLLogger::WriteLogMsg("In CLProcess::Run(), vfork2 error", errno);
-				m_bExecSuccess = false;
-				_exit(0);
-			}
-
-			if(pid1 == 0)
-				RunChildFunction(pstrCmdLine);
-
-			_exit(0);
-		}
-	}
-
-	if(!m_bWaitForDeath)
-		if(waitpid(pid, 0, 0) == -1)
-			CLLogger::WriteLogMsg("In CLProcess::Run(), waitpid error", errno);
-
-	if(!m_bExecSuccess)
+	if((pstrCmdLine == 0) || (strlen((char *)pstrCmdLine) == 0))
 	{
 		delete this;
 		return CLStatus(-1, 0);
 	}
 
-	m_bProcessCreated = true;
-
-	if(!m_bWaitForDeath)
+	m_ProcessID = fork();
+	if(m_ProcessID == -1)
+	{
+		CLLogger::WriteLogMsg("In CLProcess::Run(), fork error", errno);
 		delete this;
+		return CLStatus(-1, 0);
+	}
 
+	if(m_ProcessID == 0)
+		RunChildFunction(pstrCmdLine);
+
+	delete this;
 	return CLStatus(0, 0);
 }
 
 CLStatus CLProcess::WaitForDeath()
 {
-	if(!m_bWaitForDeath)
-		return CLStatus(-1, 0);
-
-	if(!m_bProcessCreated)
-		return CLStatus(-1, 0);
-
-	if(waitpid(m_ProcessID, 0, 0) == -1)
-	{
-		CLLogger::WriteLogMsg("In CLProcess::WaitForDeath(), waitpid error", errno);
-		return CLStatus(-1, errno);
-	}
-
-	delete this;
+	CLLogger::WriteLogMsg("In CLProcess::WaitForDeath(), not implement", 0);
 
 	return CLStatus(0, 0);
 }

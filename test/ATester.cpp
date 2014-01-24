@@ -22,7 +22,6 @@ void* TestThreadForCLLibExecutiveInitializerSingleton(void *arg)
 
 TEST(CLLibExecutiveInitializer, FirstCallDestroy)
 {
-	CLLogger::WriteLogMsg("CLLibExecutiveInitializer Test", 0);
 	EXPECT_FALSE(CLLibExecutiveInitializer::Destroy().IsSuccess());
 }
 
@@ -38,6 +37,8 @@ TEST(CLLibExecutiveInitializer, Singleton)
 	{		
 		pthread_join(tid[i], 0);	
 	}	
+
+	CLLogger::WriteLogMsg("CLLibExecutiveInitializer Test", 0);
 
 	long j = (long)CLLogger::GetInstance();	
 	long k = (long)CLExecutiveNameServer::GetInstance();

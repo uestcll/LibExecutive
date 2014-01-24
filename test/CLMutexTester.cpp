@@ -116,7 +116,7 @@ TEST(CLMutex, RecordLock)
 
 		CLLibExecutiveInitializer::Destroy();
 
-		_exit(0);
+		exit(0);
 	}
 	
 	{

@@ -1,4 +1,7 @@
 #include <pthread.h>
+#include <signal.h>
+#include <errno.h>
+#include <sys/wait.h>
 #include "CLLibExecutiveInitializer.h"
 #include "CLLogger.h"
 #include "CLExecutiveNameServer.h"
@@ -11,6 +14,14 @@ pthread_mutex_t CLLibExecutiveInitializer::m_MutexForInitializer = PTHREAD_MUTEX
 
 bool CLLibExecutiveInitializer::m_bInitialized = false;
 bool CLLibExecutiveInitializer::m_bDestroyed = false;
+
+void CLLibExecutiveInitializer::HandleSIGCHLD(int signo)
+{
+	if(signo == SIGCHLD)
+	{
+		while(waitpid(-1, 0, WNOHANG) > 0);
+	}
+}
 
 CLStatus CLLibExecutiveInitializer::Initialize()
 {
@@ -37,6 +48,18 @@ CLStatus CLLibExecutiveInitializer::Initialize()
 		CLStatus s = CLLogger::Create();
 		if(!s.IsSuccess())
 			throw s;
+
+		if(signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+		{
+			CLLogger::WriteLogMsg("In CLLibExecutiveInitializer::Initialize(), signal error", errno);
+			throw CLStatus(-1, 0);
+		}
+
+		if(signal(SIGCHLD, CLLibExecutiveInitializer::HandleSIGCHLD) == SIG_ERR)
+		{
+			CLLogger::WriteLogMsg("In CLLibExecutiveInitializer::Initialize(), signal2 error", errno);
+			throw CLStatus(-1, 0);
+		}
 
 		CLStatus s2 = CLSharedObjectAllocator<CLSharedMutexImpl, pthread_mutex_t>::Create();
 		if(!s2.IsSuccess())
@@ -102,6 +125,8 @@ CLStatus CLLibExecutiveInitializer::Destroy()
 	{
 		if((!m_bInitialized) || (m_bDestroyed))
 			throw CLStatus(-1, 0);
+
+		HandleSIGCHLD(SIGCHLD);
 
 		CLStatus s1 = CLExecutiveNameServer::Destroy();
 		if(!s1.IsSuccess())
