@@ -11,7 +11,7 @@ struct TestStructForCLMutex
 	int i;
 };
 
-static const int count = 1000000;
+static const int count = 100000;
 
 static void* TestThreadForCLMutex_MultiThread(void *arg)
 {
@@ -99,26 +99,11 @@ TEST(CLMutex, RecordLock)
 	long i = 0;
 	write(fd, &i, sizeof(long));
 
-	pid_t pid = fork();
-	if(pid == 0)
-	{
-		{
-			CLMutex mutex("testforrecordlock", MUTEX_USE_RECORD_LOCK);
+	CLEvent event("test_for_event_auto");
 
-			TestStructForCLMutex sl;
-			sl.i = fd;
-			sl.pmutex = &mutex;
+	CLProcess *process = new CLProcess(new CLProcessFunctionForExec);
+	EXPECT_TRUE(process->Run((void *)"../test_for_exec/test_for_CLMutex_RecordingLock/main").IsSuccess());
 
-			thread_for_record_and_pthread(&sl);
-
-			close(fd);
-		}
-
-		CLLibExecutiveInitializer::Destroy();
-
-		exit(0);
-	}
-	
 	{
 		CLMutex mutex("testforrecordlock", MUTEX_USE_RECORD_LOCK);
 
@@ -129,7 +114,7 @@ TEST(CLMutex, RecordLock)
 		thread_for_record_and_pthread(&sl);
 	}
 	
-	waitpid(pid, 0, 0);
+	EXPECT_TRUE(event.Wait().IsSuccess());
 
 	long k = 0;
 	lseek(fd, SEEK_SET, 0);
@@ -146,32 +131,14 @@ TEST(CLMutex, RecordLockAndPthread)
 	long i = 0;
 	write(fd, &i, sizeof(long));
 
-	pid_t pid = fork();
-	if(pid == 0)
-	{
-		{
-			CLMutex mutex("mutex_forrecord_and_pthread", MUTEX_USE_RECORD_LOCK_AND_PTHREAD);
-			TestStructForCLMutex sl;
-			sl.i = fd;
-			sl.pmutex = &mutex;
+	CLEvent event("test_for_event_auto");
 
-			pthread_t tid;
-			pthread_create(&tid, 0, thread_for_record_and_pthread, &sl);
-
-			thread_for_record_and_pthread(&sl);
-
-			pthread_join(tid, 0);
-
-			close(fd);			
-		}
-
-		CLLibExecutiveInitializer::Destroy();
-
-		_exit(0);
-	}
+	CLProcess *process = new CLProcess(new CLProcessFunctionForExec);
+	EXPECT_TRUE(process->Run((void *)"../test_for_exec/test_for_CLMutex_RecordingLockAndPThread/main").IsSuccess());
 
 	{
 		CLMutex mutex("mutex_forrecord_and_pthread", MUTEX_USE_RECORD_LOCK_AND_PTHREAD);
+
 		TestStructForCLMutex sl;
 		sl.i = fd;
 		sl.pmutex = &mutex;
@@ -184,7 +151,7 @@ TEST(CLMutex, RecordLockAndPthread)
 		pthread_join(tid, 0);
 	}
 
-	waitpid(pid, 0, 0);
+	EXPECT_TRUE(event.Wait().IsSuccess());
 
 	long k = 0;
 	lseek(fd, SEEK_SET, 0);
@@ -197,38 +164,19 @@ TEST(CLMutex, RecordLockAndPthread)
 
 TEST(CLMutex, RecordLockAndPthread2)
 {
-	int fd = open("/tmp/test_for_record_lock_and_pthread2", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+	int fd = open("/tmp/test_for_record_lock_and_pthread", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
 	long i = 0;
 	write(fd, &i, sizeof(long));
 
 	pthread_mutex_t pmutex = PTHREAD_MUTEX_INITIALIZER;
 
-	pid_t pid = fork();
-	if(pid == 0)
-	{
-		{
-			CLMutex mutex("mutex_forrecord_and_pthread2", &pmutex);
-			TestStructForCLMutex sl;
-			sl.i = fd;
-			sl.pmutex = &mutex;
+	CLEvent event("test_for_event_auto");
 
-			pthread_t tid;
-			pthread_create(&tid, 0, thread_for_record_and_pthread, &sl);
-
-			thread_for_record_and_pthread(&sl);
-
-			pthread_join(tid, 0);
-
-			close(fd);			
-		}
-
-		CLLibExecutiveInitializer::Destroy();
-
-		_exit(0);
-	}
+	CLProcess *process = new CLProcess(new CLProcessFunctionForExec);
+	EXPECT_TRUE(process->Run((void *)"../test_for_exec/test_for_CLMutex_RecordingLockAndPThread/main").IsSuccess());
 
 	{
-		CLMutex mutex("mutex_forrecord_and_pthread2", &pmutex);
+		CLMutex mutex("mutex_forrecord_and_pthread", &pmutex);
 		TestStructForCLMutex sl;
 		sl.i = fd;
 		sl.pmutex = &mutex;
@@ -241,7 +189,7 @@ TEST(CLMutex, RecordLockAndPthread2)
 		pthread_join(tid, 0);
 	}
 
-	waitpid(pid, 0, 0);
+	EXPECT_TRUE(event.Wait().IsSuccess());
 
 	long k = 0;
 	lseek(fd, SEEK_SET, 0);
@@ -273,22 +221,10 @@ TEST(CLMutex, SharedMutexByPthread)
 	long *pg = (long *)(psm->GetAddress());
 	*pg = 0;
 
-	pid_t pid = fork();
-	if(pid == 0)
-	{
-		pthread_t tid;
-		pthread_create(&tid, 0, thread_for_shared_mutex_bypthread, pg);
+	CLEvent event("test_for_event_auto");
 
-		thread_for_shared_mutex_bypthread(pg);
-
-		pthread_join(tid, 0);
-
-		delete psm;
-
-		CLLibExecutiveInitializer::Destroy();
-
-		_exit(0);
-	}
+	CLProcess *process = new CLProcess(new CLProcessFunctionForExec);
+	EXPECT_TRUE(process->Run((void *)"../test_for_exec/test_for_CLMutex_SharePThread/main").IsSuccess());
 
 	pthread_t tid;
 	pthread_create(&tid, 0, thread_for_shared_mutex_bypthread, pg);
@@ -297,7 +233,7 @@ TEST(CLMutex, SharedMutexByPthread)
 
 	pthread_join(tid, 0);
 
-	waitpid(pid, 0, 0);
+	EXPECT_TRUE(event.Wait().IsSuccess());
 
 	EXPECT_EQ(*pg, 4*count);
 
