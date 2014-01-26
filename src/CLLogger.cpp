@@ -68,6 +68,44 @@ CLStatus CLLogger::WriteLog(const char *pstrMsg, long lErrorCode)
 	return CLStatus(0, 0);
 }
 
+CLStatus CLLogger::WriteLogDirectly(const char *pstrMsg, long lErrorCode)
+{
+	if((pstrMsg == 0) || (strlen(pstrMsg) == 0))
+		return CLStatus(-1, 0);
+
+	int fd = open(LOG_FILE_NAME, O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR); 
+	if(fd == -1)
+		return CLStatus(-1, 0);
+
+	char buf[MAX_SIZE];
+	snprintf(buf, MAX_SIZE, "	Error code: %ld\r\n",  lErrorCode);
+
+	int r = pthread_mutex_lock(&m_Mutex);
+	if(r != 0)
+	{
+		if(close(fd) == -1)
+			return CLStatus(-1, errno);
+
+		return CLStatus(-1, r);
+	}
+
+	try
+	{
+		throw WriteMsgAndErrcodeToFile(fd, pstrMsg, buf);
+	}
+	catch(CLStatus &s)
+	{
+		r = pthread_mutex_unlock(&m_Mutex);
+		
+		int r1 = close(fd);
+
+		if((r != 0) || (r1 == -1))
+			return CLStatus(-1, 0);
+
+		return s;
+	}
+}
+
 CLStatus CLLogger::WriteMsgAndErrcodeToFile(int fd, const char *pstrMsg, const char *pstrErrcode)
 {
 	int len = strlen(pstrErrcode) + strlen(pstrMsg) + 1;

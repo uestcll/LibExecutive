@@ -8,6 +8,9 @@ class CLLogger
 {
 public:
 	static CLLogger* GetInstance();
+
+	static CLStatus WriteLogDirectly(const char *pstrMsg, long lErrorCode);
+
 	static CLStatus WriteLogMsg(const char *pstrMsg, long lErrorCode);
 	CLStatus WriteLog(const char *pstrMsg, long lErrorCode);
 
@@ -17,7 +20,7 @@ private:
 	static CLStatus Destroy();
 	static CLStatus Create();
 
-	CLStatus WriteMsgAndErrcodeToFile(int fd, const char *pstrMsg, const char *pstrErrcode);
+	static CLStatus WriteMsgAndErrcodeToFile(int fd, const char *pstrMsg, const char *pstrErrcode);
 
 private:
 	CLLogger(const CLLogger&);

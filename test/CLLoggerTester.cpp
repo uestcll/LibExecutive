@@ -6,6 +6,12 @@
 #include "LibExecutive.h"
 #include "CLLogger.h"
 
+TEST(CLLogger, WriteLogDirectly_Parameters_Test)
+{
+	EXPECT_FALSE(CLLogger::WriteLogDirectly(0, 0).IsSuccess());
+	EXPECT_FALSE(CLLogger::WriteLogDirectly("", 0).IsSuccess());
+}
+
 TEST(CLLogger, WriteLog_pstrmsg_0)
 {
 	CLLogger::WriteLogMsg("CLLogger Test", 0);
@@ -80,6 +86,30 @@ TEST(CLLogger, Features)
 			continue;
 
 		EXPECT_EQ(strcmp(buf, "nihao	Error code: 0\r\n"), 0);
+	}
+
+	fclose(fp);
+}
+
+TEST(CLLogger, WriteLogDirectly_Features_Test)
+{
+	int num = GetNumberOfLinesOfLogFile();
+
+	const int n = 20;
+	for(int i = 0; i < n; i++)
+		CLLogger::WriteLogDirectly("okoko", 0);
+
+	FILE *fp = fopen("logger", "r");
+
+	for(int i = 0; i < n + num; i++)
+	{
+		char buf[256] = {0};
+		fgets(buf, 256, fp);
+
+		if(i < num)
+			continue;
+
+		EXPECT_EQ(strcmp(buf, "okoko	Error code: 0\r\n"), 0);
 	}
 
 	fclose(fp);
