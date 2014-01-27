@@ -330,7 +330,7 @@ public:
 		pMessageLoop->Register(1, (CallBackForMessageLoop)(&CLStressObserverForCLNonThreadForMsgLoop_Process::On_1));
 		pMessageLoop->Register(2, (CallBackForMessageLoop)(&CLStressObserverForCLNonThreadForMsgLoop_Process::On_2));
 
-		process = new CLProcess(new CLProcessFunctionForExec(), true);
+		process = new CLProcess(new CLProcessFunctionForExec());
 		EXPECT_TRUE((process->Run((void *)"../test_for_exec/test_for_CLNonThreadForMsgLoop_Stress_Testing/main")).IsSuccess());
 
 		return CLStatus(0, 0);
@@ -375,8 +375,6 @@ public:
 			CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
 			EXPECT_TRUE(pNameServer != 0);
 			pNameServer->ReleaseCommunicationPtr(test1_pipe_name);
-
-			process->WaitForDeath();
 
 			return CLStatus(QUIT_MESSAGE_LOOP, 0);
 		}

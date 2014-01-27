@@ -38,7 +38,6 @@ static void ValidatePool(const char* SharedName)
 	}
 }
 
-
 TEST(CLSharedObjectAllocator, CheckingForPool)
 {
 	CLLogger::WriteLogMsg("CLSharedObjectAllocator Test", 0);
@@ -51,7 +50,6 @@ TEST(CLSharedObjectAllocator, CheckingForPool)
 template<typename TSharedObjectAllocator>
 static void TestForAllocate(const char* name)
 {
-
 	char *p1 = (char *)TSharedObjectAllocator::Get(name);
 	SLSharedObjectHead *p2 = (SLSharedObjectHead *)(p1 - sizeof(SLSharedObjectHead));
 
@@ -71,7 +69,7 @@ TEST(CLSharedConditionVariableAllocator, CheckingForAllocate)
 	TestForAllocate<CLSharedObjectAllocator<CLSharedConditionVariableImpl,pthread_cond_t> >("CV_For_CLSharedConditionVariableAllocator_CheckingForAllocate");
 }
 
-const int count = 1000000;
+const int count = 100000;
 
 static void *thread_for_CLSharedMutexAllocator_MultiProcess_MuiltThread(void *arg)
 {
@@ -102,25 +100,10 @@ TEST(CLSharedMutexAllocator, MultiProcess)
 {
 	const char *shared_name = "shared_resource_for_CLSharedMutexAllocator_MultiProcess";
 
-	pid_t pid = fork();
-	if(pid == 0)
-	{
-		{
-			CLSharedMemory sm(shared_name, sizeof(long));
-			long *p = (long *)sm.GetAddress();
+	CLEvent event("test_for_event_auto");
 
-			pthread_t tid;
-			pthread_create(&tid, 0, thread_for_CLSharedMutexAllocator_MultiProcess_MuiltThread, p);
-
-			thread_for_CLSharedMutexAllocator_MultiProcess_MuiltThread(p);
-
-			pthread_join(tid, 0);
-		}
-
-		CLLibExecutiveInitializer::Destroy();
-
-		_exit(0);
-	}
+	CLProcess *process = new CLProcess(new CLProcessFunctionForExec);
+	EXPECT_TRUE(process->Run((void *)"../test_for_exec/test_for_CLSharedMutexAllocator/main").IsSuccess());
 
 	CLSharedMemory sm(shared_name, sizeof(long));
 	long *p = (long *)sm.GetAddress();
@@ -132,11 +115,10 @@ TEST(CLSharedMutexAllocator, MultiProcess)
 
 	pthread_join(tid, 0);
 
-	waitpid(pid, 0, 0);
+	EXPECT_TRUE(event.Wait().IsSuccess());
 
 	EXPECT_EQ(*p, 4 * count);
 }
-
 
 TEST(CLSharedConditionVariableAllocator, MultiProcess)
 {
@@ -150,37 +132,10 @@ TEST(CLSharedConditionVariableAllocator, MultiProcess)
 	long *flag = (long *)(((char *)p) + 8);
 	*flag = 0;
 
-	pid_t pid = fork();
-	if(pid == 0)
-	{
-		sleep(2);
+	CLEvent event("test_for_event_auto");
 
-		{
-			CLMutex mutex(name_mutex, MUTEX_USE_SHARED_PTHREAD);
-
-			{
-				CLCriticalSection cs(&mutex);
-
-				*flag = 1;
-
-				*p = 5;
-			}
-
-			pthread_cond_t *pCV = CLSharedObjectAllocator<CLSharedConditionVariableImpl,pthread_cond_t>::Get(name_cv);
-
-			CLConditionVariable cv(pCV);
-
-			EXPECT_TRUE((cv.Wakeup()).IsSuccess());
-
-			EXPECT_TRUE((CLSharedObjectAllocator<CLSharedConditionVariableImpl,pthread_cond_t>::Release(name_cv).IsSuccess()));
-		}
-
-		delete psm;
-
-		CLLibExecutiveInitializer::Destroy();
-
-		_exit(0);
-	}
+	CLProcess *process = new CLProcess(new CLProcessFunctionForExec);
+	EXPECT_TRUE(process->Run((void *)"../test_for_exec/test_for_CLSharedConditionVariableAllocator/main").IsSuccess());
 
 	CLMutex mutex(name_mutex, MUTEX_USE_SHARED_PTHREAD);
 
@@ -199,7 +154,7 @@ TEST(CLSharedConditionVariableAllocator, MultiProcess)
 
 	EXPECT_EQ(*p, 5);
 
-	waitpid(pid, 0, 0);
+	EXPECT_TRUE(event.Wait().IsSuccess());
 
 	delete psm;
 }

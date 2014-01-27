@@ -11,7 +11,7 @@ struct TestForCLEvent
 	int i;
 };
 
-static const int count = 1000000;
+static const int count = 100000;
 
 static void* TestThreadForCLEvent(void *arg)
 {
@@ -94,54 +94,6 @@ TEST(CLEvent, Semaphore)
 	pthread_join(tid, 0);
 }
 
-TEST(CLEvent, ResetAutomatically_shared)
-{
-	CLEvent event("test_for_event_auto");
-	pid_t pid = fork();
-	if(pid == 0)
-	{
-		{
-			CLEvent event("test_for_event_auto");
-			EXPECT_TRUE(event.Set().IsSuccess());
-		}
-
-		CLLibExecutiveInitializer::Destroy();
-
-		_exit(0);
-	}
-
-	EXPECT_TRUE(event.Wait().IsSuccess());
-
-	wait(NULL);
-}
-
-TEST(CLEvent, Semaphore_shared)
-{
-	CLEvent event("test_for_event_semaphore", true);
-
-	pid_t pid = fork();
-	if(pid == 0)
-	{
-		{
-			sleep(2);
-			CLEvent event("test_for_event_semaphore", true);
-			EXPECT_TRUE(event.Set().IsSuccess());
-			EXPECT_TRUE(event.Set().IsSuccess());
-			EXPECT_TRUE(event.Set().IsSuccess());
-		}
-
-		CLLibExecutiveInitializer::Destroy();
-
-		_exit(0);
-	}
-
-	EXPECT_TRUE(event.Wait().IsSuccess());
-	EXPECT_TRUE(event.Wait().IsSuccess());
-	EXPECT_TRUE(event.Wait().IsSuccess());
-
-	wait(NULL);
-}
-
 static int g_dataforReleaseSemaphore = 0;
 
 static void* TestThreadForCLEventRelease(void *arg)
@@ -173,4 +125,28 @@ TEST(CLEvent, ReleaseSemaphore)
 
 	EXPECT_TRUE(event.Wait().IsSuccess());
 	EXPECT_EQ(g_dataforReleaseSemaphore, 10);
+
+	pthread_join(tid, 0);
+}
+
+TEST(CLEvent, ResetAutomatically_shared)
+{
+	CLEvent event("test_for_event_auto");
+	
+	CLProcess *process = new CLProcess(new CLProcessFunctionForExec);
+	EXPECT_TRUE(process->Run((void *)"../test_for_exec/test_for_CLEvent_Auto/main").IsSuccess());
+
+	EXPECT_TRUE(event.Wait().IsSuccess());
+}
+
+TEST(CLEvent, Semaphore_shared)
+{
+	CLEvent event("test_for_event_semaphore", true);
+
+	CLProcess *process = new CLProcess(new CLProcessFunctionForExec);
+	EXPECT_TRUE(process->Run((void *)"../test_for_exec/test_for_CLEvent_Semaphore/main").IsSuccess());
+
+	event.Wait();
+	event.Wait();
+	event.Wait();
 }

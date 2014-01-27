@@ -7,30 +7,17 @@ TEST(CLSharedMemory, Normal)
 {
 	CLLogger::WriteLogMsg("CLSharedMemory Test", 0);
 
-	pid_t pid = fork();
-	if(pid == 0)
-	{
-		sleep(2);
-
-		{
-			CLSharedMemory sm("test_for_shared_memory_normal");
-			long *p = (long *)sm.GetAddress();
-			EXPECT_EQ(*p, 5);
-			EXPECT_EQ(sm.GetRefCount(), 2);
-
-			*p = *p + 1;
-		}
-
-		CLLibExecutiveInitializer::Destroy();
-		_exit(0);
-	}
-
 	CLSharedMemory sm("test_for_shared_memory_normal", sizeof(long));
 	long *p = (long *)sm.GetAddress();
 	*p = 5;
 	EXPECT_EQ(sm.GetRefCount(), 1);
 
-	sleep(5);
+	CLEvent event("test_for_event_auto");
+
+	CLProcess *process = new CLProcess(new CLProcessFunctionForExec);
+	EXPECT_TRUE(process->Run((void *)"../test_for_exec/test_for_CLSharedMemory/main").IsSuccess());
+
+	EXPECT_TRUE(event.Wait().IsSuccess());
 
 	EXPECT_EQ(*p, 6);
 	EXPECT_EQ(sm.GetRefCount(), 1);

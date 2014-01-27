@@ -9,7 +9,7 @@ struct TestForCLCriticalSection
 	int i;
 };
 
-static const int count = 1000000;
+static const int count = 100000;
 
 static void* TestThreadForCLCriticalSection(void *arg)
 {

@@ -19,7 +19,7 @@ void* TestThreadForCLConditionVariable(void *arg)
 
 	pT->flag = 1;
 
-	pT->i  = 5;
+	pT->i = 5;
 	
 	EXPECT_TRUE((pT->mutex.Unlock()).IsSuccess());
 
@@ -65,6 +65,7 @@ static int g_i_for_cond = 0;
 void* TestThreadForCLConditionVariable2(void *arg)
 {
 	sleep(2);
+	
 	{
 		CLCriticalSection cs(&g_mutex_for_cond);
 
@@ -107,33 +108,10 @@ TEST(CLConditionVariable, Multi_process_for_Shared_Cond)
 	long *flag = (long *)(((char *)p) + 8);
 	*flag = 0;
 
-	pid_t pid = fork();
-	if(pid == 0)
-	{
-		sleep(2);
+	CLEvent event("test_for_event_auto");
 
-		{
-			CLMutex mutex("mutex_for_test_for_multi_process_for_shared_cond", MUTEX_USE_SHARED_PTHREAD);
-
-			{
-				CLCriticalSection cs(&mutex);
-
-				*flag = 1;
-
-				*p = 5;
-			}
-
-			CLConditionVariable cv("test_conditoin_variable_for_multiprocess");
-
-			EXPECT_TRUE((cv.Wakeup()).IsSuccess());
-		}
-
-		delete psm;
-
-		CLLibExecutiveInitializer::Destroy();
-
-		_exit(0);
-	}
+	CLProcess *process = new CLProcess(new CLProcessFunctionForExec);
+	EXPECT_TRUE(process->Run((void *)"../test_for_exec/test_for_CLConditionVariable/main").IsSuccess());
 
 	CLMutex mutex("mutex_for_test_for_multi_process_for_shared_cond", MUTEX_USE_SHARED_PTHREAD);
 
@@ -148,7 +126,7 @@ TEST(CLConditionVariable, Multi_process_for_Shared_Cond)
 
 	EXPECT_EQ(*p, 5);
 
-	waitpid(pid, 0, 0);
+	EXPECT_TRUE(event.Wait().IsSuccess());
 
 	delete psm;
 }
