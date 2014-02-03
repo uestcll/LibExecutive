@@ -9,7 +9,8 @@ TEST(CLSocket, GetSocket)
 {
 	CLLogger::WriteLogMsg("CLSocket Test", 0);
 
-	CLSocket s;
+	CLSocket s("3600");
+
 	int fd = s.GetSocket();
 	EXPECT_TRUE(fd != -1);
 
@@ -23,11 +24,12 @@ TEST(CLSocket, GetSocket)
 	EXPECT_TRUE(val != -1);
 
 	EXPECT_TRUE(val & O_NONBLOCK);
+
 }
 
 TEST(CLSocket, BlockSocket)
 {
-	CLSocket s(true);
+	CLSocket s("3600", true);
 	int fd = s.GetSocket();
 	EXPECT_TRUE(fd != -1);
 

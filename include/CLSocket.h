@@ -3,16 +3,17 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <vector>
+#include "DefinitionForConst.h"
 #include "CLStatus.h"
 
 class CLSocket
 {
 public:
-	CLSocket(bool bBlock = false, int family = AF_INET, int type = SOCK_STREAM);
+	CLSocket(const char *pstrServiceOrPort, bool bBlock = false, const char *pstrHostNameOrIP = 0, int backlog = LISTEN_BACKLOG);
 	virtual ~CLSocket();
 
 	int GetSocket();
-	CLStatus InitialServer(int port, int backlog, const char *strBoundIP = 0);
 
 private:
 	CLSocket(const CLSocket&);
@@ -20,7 +21,6 @@ private:
 
 private:
 	int m_SocketFd;
-	int m_Family;
 };
 
 #endif

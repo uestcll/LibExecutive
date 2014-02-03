@@ -32,4 +32,6 @@ const int IOVECTOR_DELETE = 0;
 const int IOVECTOR_STAIN = 1;
 const int IOVECTOR_NON_DELETE = 2;
 
+const int LISTEN_BACKLOG = 128;
+
 #endif
