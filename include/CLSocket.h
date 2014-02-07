@@ -7,6 +7,9 @@
 #include "DefinitionForConst.h"
 #include "CLStatus.h"
 
+class CLIOVectors;
+struct addrinfo;
+
 class CLSocket
 {
 public:
@@ -15,12 +18,16 @@ public:
 
 	int GetSocket();
 
+	CLStatus Read(CLIOVectors& IOVectors);
+	CLStatus Write(CLIOVectors& IOVectors, struct addrinfo *pAddrInfo = 0);
+
 private:
 	CLSocket(const CLSocket&);
 	CLSocket& operator=(const CLSocket&);
 
 private:
 	int m_SocketFd;
+	bool m_bBlock;
 };
 
 #endif

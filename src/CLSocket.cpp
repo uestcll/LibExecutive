@@ -6,6 +6,8 @@
 #include <string.h>
 #include "CLSocket.h"
 #include "CLLogger.h"
+#include "CLIOVectors.h"
+#include "ErrorCode.h"
 
 CLSocket::CLSocket(const char *pstrServiceOrPort, bool bBlock, const char *pstrHostNameOrIP, int backlog)
 {
@@ -13,6 +15,7 @@ CLSocket::CLSocket(const char *pstrServiceOrPort, bool bBlock, const char *pstrH
 		throw "In CLSocket::CLSocket(), pstrServiceOrPort error";
 
 	m_SocketFd = -1;
+	m_bBlock = bBlock;
 
 	struct addrinfo hints, *results;
 
@@ -96,4 +99,46 @@ CLSocket::~CLSocket()
 int CLSocket::GetSocket()
 {
 	return m_SocketFd;
+}
+
+CLStatus CLSocket::Read(CLIOVectors& IOVectors)
+{
+	return CLStatus(0, 0);
+}
+
+CLStatus CLSocket::Write(CLIOVectors& IOVectors, struct addrinfo *pAddrInfo)
+{
+	if(IOVectors.Size() == 0)
+		return CLStatus(-1, NORMAL_ERROR);
+
+	struct msghdr msg;
+
+	if(pAddrInfo == 0)
+	{
+		msg.msg_name = 0;
+		msg.msg_namelen = 0;
+	}
+	else
+	{
+		msg.msg_name = pAddrInfo->ai_addr;
+		msg.msg_namelen = pAddrInfo->ai_addrlen;
+	}
+	
+	struct iovec *iov = IOVectors.GetIOVecArray();
+	if(iov == 0)
+		return CLStatus(-1, NORMAL_ERROR);
+
+	msg.msg_iov = iov;
+	msg.msg_iovlen = IOVectors.GetNumberOfIOVec();
+
+	msg.msg_control = 0;
+	msg.msg_controllen = 0;
+	msg.msg_flags = 0;
+
+	ssize_t result = sendmsg(m_SocketFd, &msg, 0);
+	int err = errno;
+
+	delete [] iov;
+
+	return CLStatus(result, err);
 }
