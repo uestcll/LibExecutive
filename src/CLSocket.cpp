@@ -101,6 +101,14 @@ int CLSocket::GetSocket()
 	return m_SocketFd;
 }
 
+CLStatus CLSocket::Accept(CLSocket **ppSocket)
+{
+	if(ppSocket == 0)
+		return CLStatus(-1, NORMAL_ERROR);
+
+	int r = accept(m_SocketFd, )
+}
+
 CLStatus CLSocket::Read(CLIOVectors& IOVectors, struct addrinfo *pAddrInfo)
 {
 	return ReadOrWrite(false, IOVectors, pAddrInfo);

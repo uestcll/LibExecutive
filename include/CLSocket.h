@@ -18,6 +18,8 @@ public:
 
 	int GetSocket();
 
+	CLStatus Accept(CLSocket **ppSocket);
+
 	CLStatus Read(CLIOVectors& IOVectors, struct addrinfo *pAddrInfo = 0);
 	CLStatus Write(CLIOVectors& IOVectors, struct addrinfo *pAddrInfo = 0);
 
