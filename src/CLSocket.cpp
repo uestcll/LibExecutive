@@ -101,12 +101,17 @@ int CLSocket::GetSocket()
 	return m_SocketFd;
 }
 
-CLStatus CLSocket::Read(CLIOVectors& IOVectors)
+CLStatus CLSocket::Read(CLIOVectors& IOVectors, struct addrinfo *pAddrInfo)
 {
-	return CLStatus(0, 0);
+	return ReadOrWrite(false, IOVectors, pAddrInfo);
 }
 
 CLStatus CLSocket::Write(CLIOVectors& IOVectors, struct addrinfo *pAddrInfo)
+{
+	return ReadOrWrite(true, IOVectors, pAddrInfo);
+}
+
+CLStatus CLSocket::ReadOrWrite(bool bWrite, CLIOVectors& IOVectors, struct addrinfo *pAddrInfo)
 {
 	if(IOVectors.Size() == 0)
 		return CLStatus(-1, NORMAL_ERROR);
@@ -123,7 +128,7 @@ CLStatus CLSocket::Write(CLIOVectors& IOVectors, struct addrinfo *pAddrInfo)
 		msg.msg_name = pAddrInfo->ai_addr;
 		msg.msg_namelen = pAddrInfo->ai_addrlen;
 	}
-	
+
 	struct iovec *iov = IOVectors.GetIOVecArray();
 	if(iov == 0)
 		return CLStatus(-1, NORMAL_ERROR);
@@ -135,7 +140,12 @@ CLStatus CLSocket::Write(CLIOVectors& IOVectors, struct addrinfo *pAddrInfo)
 	msg.msg_controllen = 0;
 	msg.msg_flags = 0;
 
-	ssize_t result = sendmsg(m_SocketFd, &msg, 0);
+	ssize_t result;
+	if(bWrite)
+		result = sendmsg(m_SocketFd, &msg, 0);
+	else
+		result = recvmsg(m_SocketFd, &msg, 0);
+
 	int err = errno;
 
 	delete [] iov;
