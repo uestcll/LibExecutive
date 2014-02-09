@@ -9,6 +9,15 @@
 #include "CLIOVectors.h"
 #include "ErrorCode.h"
 
+CLSocket::CLSocket(bool bBlock)
+{
+	m_SocketFd == -1;
+	m_bBlock = bBlock;
+
+	m_pCurrentAddrInfo = 0;
+	m_pServerAddrInfoListForClient = 0;
+}
+
 CLSocket::CLSocket(const char *pstrServiceOrPort, bool bBlock, const char *pstrHostNameOrIP, int backlog)
 {
 	if((pstrServiceOrPort == 0) || (strlen(pstrServiceOrPort) == 0))
@@ -16,6 +25,9 @@ CLSocket::CLSocket(const char *pstrServiceOrPort, bool bBlock, const char *pstrH
 
 	m_SocketFd = -1;
 	m_bBlock = bBlock;
+
+	m_pCurrentAddrInfo = 0;
+	m_pServerAddrInfoListForClient = 0;
 
 	struct addrinfo hints, *results;
 
@@ -90,10 +102,64 @@ CLSocket::CLSocket(const char *pstrServiceOrPort, bool bBlock, const char *pstrH
 	}
 }
 
+CLSocket::CLSocket(int SocketFd, bool bBlock)
+{
+	if(SocketFd < 0)
+		throw "In CLSocket::CLSocket2(), SocketFd error";
+
+	m_SocketFd = SocketFd;
+	m_bBlock = bBlock;
+
+	m_pCurrentAddrInfo = 0;
+	m_pServerAddrInfoListForClient = 0;
+
+	try
+	{
+		int optval = 1;
+
+		if(setsockopt(SocketFd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) == -1)
+		{
+			CLLogger::WriteLogMsg("In CLSocket::CLSocket2(), setsockopt error", errno);
+			throw "In CLSocket::CLSocket2(), setsockopt error";
+		}
+
+		if(bBlock = false)
+		{
+			int val;
+			if((val = fcntl(SocketFd, F_GETFL, 0)) < 0)
+			{
+				CLLogger::WriteLogMsg("In CLSocket::CLSocket2(), fcntl error", errno);
+				throw "In CLSocket::CLSocket2(), fcntl error";
+			}
+
+			val |= O_NONBLOCK;
+
+			if(fcntl(SocketFd, F_SETFL, val) < 0)
+			{
+				CLLogger::WriteLogMsg("In CLSocket::CLSocket2(), fcntl 2 error", errno);
+				throw "In CLSocket::CLSocket2(), fcntl 2 error";
+			}
+		}
+	}
+	catch(const char *str)
+	{
+		if(close(SocketFd) == -1)
+			CLLogger::WriteLogMsg("In CLSocket::CLSocket2(), close error", errno);
+
+		throw str;
+	}
+}
+
 CLSocket::~CLSocket()
 {
-	if(close(m_SocketFd) == -1)
-		CLLogger::WriteLogMsg("In CLSocket::~CLSocket(), close error", errno);
+	if(m_pServerAddrInfoListForClient != 0)
+		freeaddrinfo(m_pServerAddrInfoListForClient);
+
+	if(m_SocketFd != -1)
+	{
+		if(close(m_SocketFd) == -1)
+			CLLogger::WriteLogMsg("In CLSocket::~CLSocket(), close error", errno);
+	}
 }
 
 int CLSocket::GetSocket()
@@ -106,7 +172,63 @@ CLStatus CLSocket::Accept(CLSocket **ppSocket)
 	if(ppSocket == 0)
 		return CLStatus(-1, NORMAL_ERROR);
 
-	int r = accept(m_SocketFd, )
+	int r = accept(m_SocketFd, 0, 0);
+
+	if(r == -1)
+		return CLStatus(-1, errno);
+
+	*ppSocket = new CLSocket(r, m_bBlock);
+
+	return CLStatus(0, 0);
+}
+
+CLStatus CLSocket::Connect(const char *pstrHostNameOrIP, const char *pstrServiceOrPort)
+{
+	if(m_SocketFd != -1)
+		return CLStatus(-1, NORMAL_ERROR);
+
+	if(m_pServerAddrInfoListForClient == 0)
+	{
+		struct addrinfo hints;
+
+		bzero(&hints, sizeof(hints));
+		hints.ai_family = AF_UNSPEC;
+		hints.ai_socktype = SOCK_STREAM;
+
+		if(getaddrinfo(pstrHostNameOrIP, pstrServiceOrPort, &hints, &m_pServerAddrInfoListForClient) != 0)
+		{
+			CLLogger::WriteLogMsg("In CLSocket::Connect(), getaddrinfo error", errno);
+			return CLStatus(-1, NORMAL_ERROR);
+		}
+
+		m_pCurrentAddrInfo = m_pServerAddrInfoListForClient;
+	}
+
+	if(m_pCurrentAddrInfo == 0)
+		return CLStatus(-1, ***);
+
+	
+	m_pCurrentAddrInfo = m_pCurrentAddrInfo->ai_next;
+
+	for(struct addrinfo *ptmp = results; ptmp != 0; ptmp = ptmp->ai_next)
+	{
+		int fd = socket(ptmp->ai_family, ptmp->ai_socktype, ptmp->ai_protocol);
+		if(fd == -1)
+		{
+			CLLogger::WriteLogMsg("In CLSocket::Connect(), socket error", errno);
+			continue;
+		}
+
+		//......................
+	}
+
+	freeaddrinfo(results);
+
+	if(m_SocketFd == -1)
+	{
+		CLLogger::WriteLogMsg("In CLSocket::Connect(), m_SocketFd == -1", 0);
+		return CLStatus(-1, NORMAL_ERROR);
+	}
 }
 
 CLStatus CLSocket::Read(CLIOVectors& IOVectors, struct addrinfo *pAddrInfo)
