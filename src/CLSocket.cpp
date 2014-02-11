@@ -1,13 +1,10 @@
 #include <string.h>
 #include "CLSocket.h"
 #include "CLTCPListenSocket.h"
+#include "CLTCPClientSocket.h"
 #include "CLIOVectors.h"
 #include "CLLogger.h"
 #include "ErrorCode.h"
-
-CLSocket::CLSocket(bool bBlock)
-{
-}
 
 CLSocket::CLSocket(const char *pstrServiceOrPort, bool bBlock, const char *pstrHostNameOrIP, int backlog)
 {
@@ -23,6 +20,17 @@ CLSocket::CLSocket(int SocketFd, bool bBlock)
 		throw "In CLSocket::CLSocket(), SocketFd error";
 
 	m_pSocket = new CLBaseSocket(SocketFd, bBlock);
+}
+
+CLSocket::CLSocket(const char *pstrHostNameOrIP, const char *pstrServiceOrPort, bool bBlock)
+{
+	if((pstrServiceOrPort == 0) || (strlen(pstrServiceOrPort) == 0))
+		throw "In CLSocket::CLSocket(), pstrServiceOrPort error";
+
+	if((pstrHostNameOrIP == 0) || (strlen(pstrHostNameOrIP) == 0))
+		throw "In CLSocket::CLSocket(), pstrHostNameOrIP error";
+
+	m_pSocket = new CLTCPClientSocket(pstrHostNameOrIP, pstrServiceOrPort, bBlock);
 }
 
 CLSocket::~CLSocket()
@@ -50,51 +58,14 @@ CLStatus CLSocket::Accept(CLSocket **ppSocket)
 	}
 }
 
-CLStatus CLSocket::Connect(const char *pstrHostNameOrIP, const char *pstrServiceOrPort)
+CLStatus CLSocket::Connect()
 {
-	if(m_SocketFd != -1)
-		return CLStatus(-1, NORMAL_ERROR);
-
-	if(m_pServerAddrInfoListForClient == 0)
+	CLTCPClientSocket *p = dynamic_cast<CLTCPClientSocket *>(m_pSocket);
+	if(p != 0)
+		return p->Connect();
+	else
 	{
-		struct addrinfo hints;
-
-		bzero(&hints, sizeof(hints));
-		hints.ai_family = AF_UNSPEC;
-		hints.ai_socktype = SOCK_STREAM;
-
-		if(getaddrinfo(pstrHostNameOrIP, pstrServiceOrPort, &hints, &m_pServerAddrInfoListForClient) != 0)
-		{
-			CLLogger::WriteLogMsg("In CLSocket::Connect(), getaddrinfo error", errno);
-			return CLStatus(-1, NORMAL_ERROR);
-		}
-
-		m_pCurrentAddrInfo = m_pServerAddrInfoListForClient;
-	}
-
-	if(m_pCurrentAddrInfo == 0)
-		return CLStatus(-1, ***);
-
-	
-	m_pCurrentAddrInfo = m_pCurrentAddrInfo->ai_next;
-
-	for(struct addrinfo *ptmp = results; ptmp != 0; ptmp = ptmp->ai_next)
-	{
-		int fd = socket(ptmp->ai_family, ptmp->ai_socktype, ptmp->ai_protocol);
-		if(fd == -1)
-		{
-			CLLogger::WriteLogMsg("In CLSocket::Connect(), socket error", errno);
-			continue;
-		}
-
-		//......................
-	}
-
-	freeaddrinfo(results);
-
-	if(m_SocketFd == -1)
-	{
-		CLLogger::WriteLogMsg("In CLSocket::Connect(), m_SocketFd == -1", 0);
+		CLLogger::WriteLogMsg("In CLSocket::Connect(), dynamic_cast error", 0);
 		return CLStatus(-1, NORMAL_ERROR);
 	}
 }

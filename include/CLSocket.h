@@ -11,9 +11,9 @@ struct addrinfo;
 class CLSocket
 {
 public:
-	//CLSocket(bool bBlock = false);
 	CLSocket(const char *pstrServiceOrPort, bool bBlock = false, const char *pstrHostNameOrIP = 0, int backlog = LISTEN_BACKLOG);
 	CLSocket(int SocketFd, bool bBlock);
+	CLSocket(const char *pstrHostNameOrIP, const char *pstrServiceOrPort, bool bBlock = false);
 	virtual ~CLSocket();
 
 	int GetSocket();
@@ -31,11 +31,6 @@ private:
 
 private:
 	CLBaseSocket *m_pSocket;
-	//int m_SocketFd;
-	//bool m_bBlock;
-
-	//struct addrinfo *m_pServerAddrInfoListForClient;
-	//struct addrinfo *m_pCurrentAddrInfo;
 };
 
 #endif

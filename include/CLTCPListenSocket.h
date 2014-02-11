@@ -2,7 +2,6 @@
 #define CLTCPListenSocket_H
 
 #include "CLBaseSocket.h"
-#include "CLStatus.h"
 
 class CLSocket;
 
