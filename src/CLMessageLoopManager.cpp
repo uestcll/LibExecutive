@@ -21,7 +21,7 @@ CLMessageLoopManager::~CLMessageLoopManager()
 CLStatus CLMessageLoopManager::Register(unsigned long lMsgID, CallBackForMessageLoop pMsgProcessFunction)
 {
 	if(pMsgProcessFunction == 0)
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	
 	m_MsgMappingTable[lMsgID] = pMsgProcessFunction;
 
@@ -33,14 +33,14 @@ CLStatus CLMessageLoopManager::EnterMessageLoop(void *pContext)
 	SLExecutiveInitialParameter *para = (SLExecutiveInitialParameter *)pContext;
 
 	if((para == 0) || (para->pNotifier == 0))
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	
 	CLStatus s = Initialize();
 	if(!s.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLMessageLoopManager::EnterMessageLoop(), Initialize error", 0);
 		para->pNotifier->NotifyInitialFinished(false);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	CLStatus s1 = m_pMessageObserver->Initialize(this, para->pContext);
@@ -53,7 +53,7 @@ CLStatus CLMessageLoopManager::EnterMessageLoop(void *pContext)
 			CLLogger::WriteLogMsg("In CLMessageLoopManager::EnterMessageLoop(), Uninitialize() error", 0);	
 
 		para->pNotifier->NotifyInitialFinished(false);		
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	para->pNotifier->NotifyInitialFinished(true);
@@ -104,7 +104,7 @@ CLStatus CLMessageLoopManager::EnterMessageLoop(void *pContext)
 	if(!s4.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLMessageLoopManager::EnterMessageLoop(), Uninitialize() error", 0);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	return CLStatus(0, 0);
@@ -118,7 +118,7 @@ CLStatus CLMessageLoopManager::DispatchMessage(CLMessage *pMessage)
 	if(it == m_MsgMappingTable.end())
 	{
 		CLLogger::WriteLogMsg("In CLMessageLoopManager::MessageDispatch(), it == m_MsgMappingTable.end", 0);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 	
 	CallBackForMessageLoop pFunction = it->second;

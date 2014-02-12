@@ -24,7 +24,7 @@ CLThread::~CLThread()
 CLStatus CLThread::Run(void *pContext)
 {
 	if(m_bThreadCreated)
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	
 	m_pContext = pContext;
 
@@ -33,7 +33,7 @@ CLStatus CLThread::Run(void *pContext)
 	{
 		CLLogger::WriteLogMsg("In CLThread::Run(), pthread_create error", r);
 		delete this;
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	m_bThreadCreated = true;
@@ -90,16 +90,16 @@ void* CLThread::StartFunctionOfThread(void *pThis)
 CLStatus CLThread::WaitForDeath()
 {
 	if(!m_bWaitForDeath)
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 
 	if(!m_bThreadCreated)
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 
 	int r = pthread_join(m_ThreadID, 0);
 	if(r != 0)
 	{
 		CLLogger::WriteLogMsg("In CLThread::WaitForDeath(), pthread_join error", r);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	delete this;

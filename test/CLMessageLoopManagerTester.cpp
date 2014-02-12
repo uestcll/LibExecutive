@@ -36,7 +36,7 @@ public:
 	{
 		if(j != 0)
 		{
-			return CLStatus(-1, 0);
+			return CLStatus(-1, NORMAL_ERROR);
 		}
 
 		EXPECT_FALSE(pMessageLoop->Register(ADD_MSG_ID, 0).IsSuccess());
@@ -84,7 +84,7 @@ public:
 		if(i == 0)
 			return CLStatus(0, 0);
 		else
-			return CLStatus(-1, 0);
+			return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	virtual CLStatus Uninitialize()
@@ -92,7 +92,7 @@ public:
 		if(j == 0)
 			return CLStatus(0, 0);
 		else
-			return CLStatus(-1, 0);
+			return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	virtual CLStatus WaitForMessage()

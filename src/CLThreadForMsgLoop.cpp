@@ -68,7 +68,7 @@ CLThreadForMsgLoop::~CLThreadForMsgLoop()
 CLStatus CLThreadForMsgLoop::Run(void *pContext)
 {
 	if(m_pThread == 0)
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 
 	CLEvent event;
 	CLThreadInitialFinishedNotifier notifier(&event);
@@ -83,7 +83,7 @@ CLStatus CLThreadForMsgLoop::Run(void *pContext)
 		CLLogger::WriteLogMsg("In CLThreadForMsgLoop::Run(), m_pThread->Run error", 0);
 		m_bWaitForDeath = false;
 		m_pThread = 0;
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	CLStatus s1 = event.Wait();
@@ -93,7 +93,7 @@ CLStatus CLThreadForMsgLoop::Run(void *pContext)
 	if(notifier.IsInitialSuccess())
 		return CLStatus(0, 0);
 	else
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 }
 
 CLStatus CLThreadForMsgLoop::RegisterSerializer(unsigned long lMsgID, CLMessageSerializer *pSerializer)

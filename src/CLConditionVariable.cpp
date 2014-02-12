@@ -72,7 +72,7 @@ CLConditionVariable::~CLConditionVariable()
 CLStatus CLConditionVariable::Wait(CLMutex *pMutex)
 {
 	if(pMutex == NULL)
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 
 	CLMutexInterface *pInterface = pMutex->GetMutexInterface();
 	CLMutexByPThread *p1 = dynamic_cast<CLMutexByPThread *>(pInterface);
@@ -90,13 +90,13 @@ CLStatus CLConditionVariable::Wait(CLMutex *pMutex)
 	else
 	{
 		CLLogger::WriteLogMsg("In CLConditionVariable::Wait, pMutex error", 0);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	if(r != 0)
 	{
 		CLLogger::WriteLogMsg("In CLConditionVariable::Wait, pthread_cond_wait error", r);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 	else
 	{
@@ -110,7 +110,7 @@ CLStatus CLConditionVariable::Wakeup()
 	if(r != 0)
 	{
 		CLLogger::WriteLogMsg("In CLConditionVariable::Wakeup, pthread_cond_signal error", r);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 	else
 	{
@@ -124,7 +124,7 @@ CLStatus CLConditionVariable::WakeupAll()
 	if(r != 0)
 	{
 		CLLogger::WriteLogMsg("In CLConditionVariable::WakeupAll, pthread_cond_broadcast error", r);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 	else
 	{

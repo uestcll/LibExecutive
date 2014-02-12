@@ -122,7 +122,7 @@ CLStatus CLSharedObjectAllocator<TSharedObjectPool, TSharedObject>::Release(cons
 {
 	CLSharedObjectAllocator *p = CLSharedObjectAllocator::GetInstance();
 	if(p == 0)
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 
 	return p->ReleaseSharedObject(pstrEventName);
 }
@@ -145,7 +145,7 @@ CLStatus CLSharedObjectAllocator<TSharedObjectPool, TSharedObject>::Create()
 		catch(const char *str)
 		{
 			CLLogger::WriteLogMsg(str, 0);
-			return CLStatus(-1, 0);
+			return CLStatus(-1, NORMAL_ERROR);
 		} 
 	}
 	return CLStatus(0, 0);
@@ -179,7 +179,7 @@ CLStatus CLSharedObjectAllocator<TSharedObjectPool, TSharedObject>::Destroy()
 	delete mutex;
 
 	if(isReturn)
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 
 	m_pAllocator = 0;
 
@@ -223,11 +223,11 @@ template<typename TSharedObjectPool, typename TSharedObject>
 CLStatus CLSharedObjectAllocator<TSharedObjectPool, TSharedObject>::ReleaseSharedObject(const char *pstrObjectName)
 {
 	if(pstrObjectName == 0)
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 
 	int len = strlen(pstrObjectName);
 	if((len == 0) || (len >= LENGTH_OF_SHARED_OBJECT_NAME))
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 
 	bool isReturn = false;
 	long m_ReturnCode = 0;
@@ -253,7 +253,7 @@ CLStatus CLSharedObjectAllocator<TSharedObjectPool, TSharedObject>::ReleaseShare
 	delete mutex;
 
 	if(isReturn)
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 
 	return CLStatus(m_ReturnCode, m_ErrorCode);
 }

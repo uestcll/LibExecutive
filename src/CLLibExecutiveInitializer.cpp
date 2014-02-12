@@ -52,13 +52,13 @@ CLStatus CLLibExecutiveInitializer::Initialize()
 		if(signal(SIGPIPE, SIG_IGN) == SIG_ERR)
 		{
 			CLLogger::WriteLogMsg("In CLLibExecutiveInitializer::Initialize(), signal error", errno);
-			throw CLStatus(-1, 0);
+			throw CLStatus(-1, NORMAL_ERROR);
 		}
 
 		if(signal(SIGCHLD, CLLibExecutiveInitializer::HandleSIGCHLD) == SIG_ERR)
 		{
 			CLLogger::WriteLogMsg("In CLLibExecutiveInitializer::Initialize(), signal2 error", errno);
-			throw CLStatus(-1, 0);
+			throw CLStatus(-1, NORMAL_ERROR);
 		}
 
 		CLStatus s2 = CLSharedObjectAllocator<CLSharedMutexImpl, pthread_mutex_t>::Create();
@@ -106,7 +106,7 @@ CLStatus CLLibExecutiveInitializer::Initialize()
 		if(r != 0)
 			return CLStatus(-1, r);
 
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 }
 
@@ -124,7 +124,7 @@ CLStatus CLLibExecutiveInitializer::Destroy()
 	try
 	{
 		if((!m_bInitialized) || (m_bDestroyed))
-			throw CLStatus(-1, 0);
+			throw CLStatus(-1, NORMAL_ERROR);
 
 		HandleSIGCHLD(SIGCHLD);
 
@@ -177,6 +177,6 @@ CLStatus CLLibExecutiveInitializer::Destroy()
 		if(r != 0)
 			return CLStatus(-1, r);
 
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 }

@@ -39,7 +39,7 @@ CLMsgLoopManagerForPrivateNamedPipe::~CLMsgLoopManagerForPrivateNamedPipe()
 CLStatus CLMsgLoopManagerForPrivateNamedPipe::Initialize()
 {
 	if(m_pMsgReceiver == 0)
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 
 	CLMessagePoster *pMsgPoster = 0;
 
@@ -49,7 +49,7 @@ CLStatus CLMsgLoopManagerForPrivateNamedPipe::Initialize()
 		if(pNameServer == 0)
 		{
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForPrivateNamedPipe::Initialize(), CLExecutiveNameServer::GetInstance error", 0);
-			throw CLStatus(-1, 0);
+			throw CLStatus(-1, NORMAL_ERROR);
 		}
 
 		string strPath = EXECUTIVE_CHANNEL_PATH;
@@ -61,7 +61,7 @@ CLStatus CLMsgLoopManagerForPrivateNamedPipe::Initialize()
 		if(!s2.IsSuccess() && (s2.m_clErrorCode == DATA_POSTER_INITIALIZE_ERROR))
 		{
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForPrivateNamedPipe::Initialize(), pMsgPoster->Initialize error", 0);
-			throw CLStatus(-1, 0);
+			throw CLStatus(-1, NORMAL_ERROR);
 		}
 
 		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), pMsgPoster, m_pMsgReceiver);
@@ -70,7 +70,7 @@ CLStatus CLMsgLoopManagerForPrivateNamedPipe::Initialize()
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForPrivateNamedPipe::Initialize(), pNameServer->Register error", 0);
 			
 			m_pMsgReceiver = 0;
-			return CLStatus(-1, 0);
+			return CLStatus(-1, NORMAL_ERROR);
 		}
 
 		return CLStatus(0, 0);
@@ -100,7 +100,7 @@ CLStatus CLMsgLoopManagerForPrivateNamedPipe::Uninitialize()
 	if(pNameServer == 0)
 	{
 		CLLogger::WriteLogMsg("In CLMsgLoopManagerForPrivateNamedPipe::Uninitialize(), CLExecutiveNameServer::GetInstance error", 0);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	return pNameServer->ReleaseCommunicationPtr(m_strThreadName.c_str());
@@ -112,7 +112,7 @@ CLStatus CLMsgLoopManagerForPrivateNamedPipe::WaitForMessage()
 	if(!s.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLMsgLoopManagerForPrivateNamedPipe::WaitForMessage(), m_Event.Wait error", 0);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	long old_size = m_MessageContainer.size();

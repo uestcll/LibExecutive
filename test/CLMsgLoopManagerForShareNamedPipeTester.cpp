@@ -327,7 +327,7 @@ public:
 			}
 		}
 
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 };
 

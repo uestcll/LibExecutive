@@ -34,7 +34,7 @@ CLMsgLoopManagerForSTLqueue::~CLMsgLoopManagerForSTLqueue()
 CLStatus CLMsgLoopManagerForSTLqueue::Initialize()
 {
 	if(m_pMsgReceiver == 0)
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 
 	CLMessagePoster *pMsgPoster = 0;
 
@@ -44,7 +44,7 @@ CLStatus CLMsgLoopManagerForSTLqueue::Initialize()
 		if(pNameServer == 0)
 		{
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::Initialize(), CLExecutiveNameServer::GetInstance error", 0);
-			throw CLStatus(-1, 0);
+			throw CLStatus(-1, NORMAL_ERROR);
 		}
 
 		pMsgPoster = new CLMessagePoster(new CLMsgToPointerSerializer, 0, new CLDataPostChannelBySTLqueueMaintainer(m_pSTLqueue), m_pEvent);
@@ -53,7 +53,7 @@ CLStatus CLMsgLoopManagerForSTLqueue::Initialize()
 		if(!s2.IsSuccess() && (s2.m_clErrorCode == DATA_POSTER_INITIALIZE_ERROR))
 		{
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::Initialize(), pMsgPoster->Initialize error", 0);
-			throw CLStatus(-1, 0);
+			throw CLStatus(-1, NORMAL_ERROR);
 		}
 		
 		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), pMsgPoster, m_pMsgReceiver);
@@ -62,7 +62,7 @@ CLStatus CLMsgLoopManagerForSTLqueue::Initialize()
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::Initialize(), pNameServer->Register error", 0);
 			
 			m_pMsgReceiver = 0;
-			return CLStatus(-1, 0);
+			return CLStatus(-1, NORMAL_ERROR);
 		}
 
 		return CLStatus(0, 0);
@@ -95,7 +95,7 @@ CLStatus CLMsgLoopManagerForSTLqueue::Uninitialize()
 	if(pNameServer == 0)
 	{
 		CLLogger::WriteLogMsg("In CLMsgLoopManagerForMsgQueue::Uninitialize(), CLExecutiveNameServer::GetInstance error", 0);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	return pNameServer->ReleaseCommunicationPtr(m_strThreadName.c_str());
@@ -107,7 +107,7 @@ CLStatus CLMsgLoopManagerForSTLqueue::WaitForMessage()
 	if(!s.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::WaitForMessage(), m_Event.Wait error", 0);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	long old_size = m_MessageContainer.size();

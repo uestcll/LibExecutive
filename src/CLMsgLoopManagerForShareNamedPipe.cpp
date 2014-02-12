@@ -45,7 +45,7 @@ CLMsgLoopManagerForShareNamedPipe::~CLMsgLoopManagerForShareNamedPipe()
 CLStatus CLMsgLoopManagerForShareNamedPipe::Initialize()
 {
 	if(m_pMsgReceiver == 0)
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 
 	CLMessagePoster *pMsgPoster = 0;
 
@@ -55,7 +55,7 @@ CLStatus CLMsgLoopManagerForShareNamedPipe::Initialize()
 		if(pNameServer == 0)
 		{
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForShareNamedPipe::Initialize(), CLExecutiveNameServer::GetInstance error", 0);
-			throw CLStatus(-1, 0);
+			throw CLStatus(-1, NORMAL_ERROR);
 		}
 
 		string strPath = EXECUTIVE_CHANNEL_PATH;
@@ -67,7 +67,7 @@ CLStatus CLMsgLoopManagerForShareNamedPipe::Initialize()
 		if(!s2.IsSuccess() && (s2.m_clErrorCode == DATA_POSTER_INITIALIZE_ERROR))
 		{
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForShareNamedPipe::Initialize(), pMsgPoster->Initialize error", 0);
-			throw CLStatus(-1, 0);
+			throw CLStatus(-1, NORMAL_ERROR);
 		}
 
 		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), pMsgPoster);
@@ -78,7 +78,7 @@ CLStatus CLMsgLoopManagerForShareNamedPipe::Initialize()
 			delete m_pMsgReceiver;
 			m_pMsgReceiver = 0;
 
-			return CLStatus(-1, 0);
+			return CLStatus(-1, NORMAL_ERROR);
 		}
 
 		return CLStatus(0, 0);
@@ -109,7 +109,7 @@ CLStatus CLMsgLoopManagerForShareNamedPipe::Uninitialize()
 	if(pNameServer == 0)
 	{
 		CLLogger::WriteLogMsg("In CLMsgLoopManagerForShareNamedPipe::Uninitialize(), CLExecutiveNameServer::GetInstance error", 0);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	return pNameServer->ReleaseCommunicationPtr(m_strThreadName.c_str());
@@ -121,7 +121,7 @@ CLStatus CLMsgLoopManagerForShareNamedPipe::WaitForMessage()
 	if(!s.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLMsgLoopManagerForShareNamedPipe::WaitForMessage(), m_Event.Wait error", 0);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	long old_size = m_MessageContainer.size();

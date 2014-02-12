@@ -34,7 +34,7 @@ CLStatus CLTCPClientSocket::Connect()
 		hints.ai_family = AF_UNSPEC;
 		hints.ai_socktype = SOCK_STREAM;
 
-		if(getaddrinfo(m_strHostNameOrIP.c_str(), m_pstrServiceOrPort.c_str(), &hints, &m_pServerAddrInfoListForClient) != 0)
+		if(getaddrinfo(m_strHostNameOrIP.c_str(), m_strServiceOrPort.c_str(), &hints, &m_pServerAddrInfoListForClient) != 0)
 		{
 			CLLogger::WriteLogMsg("In CLTCPClientSocket::Connect(), getaddrinfo error", errno);
 			return CLStatus(-1, NORMAL_ERROR);
@@ -43,22 +43,38 @@ CLStatus CLTCPClientSocket::Connect()
 		m_pCurrentAddrInfo = m_pServerAddrInfoListForClient;
 	}
 
-	//.......................
 	if(m_pCurrentAddrInfo == 0)
-		return CLStatus(-1, ***);
-
-
-	m_pCurrentAddrInfo = m_pCurrentAddrInfo->ai_next;
-
-	for(struct addrinfo *ptmp = results; ptmp != 0; ptmp = ptmp->ai_next)
 	{
-		int fd = socket(ptmp->ai_family, ptmp->ai_socktype, ptmp->ai_protocol);
-		if(fd == -1)
+		freeaddrinfo(m_pServerAddrInfoListForClient);
+		m_pServerAddrInfoListForClient = 0;
+
+		return CLStatus(-1, TRY_CONNECT_END);
+	}
+
+	try
+	{
+		m_SocketFd = socket(m_pCurrentAddrInfo->ai_family, m_pCurrentAddrInfo->ai_socktype, m_pCurrentAddrInfo->ai_protocol);
+		if(m_SocketFd == -1)
 		{
-			CLLogger::WriteLogMsg("In CLSocket::Connect(), socket error", errno);
-			continue;
+			CLLogger::WriteLogMsg("In CLTCPClientSocket::Connect(), socket error", errno);
+			throw CLStatus(-1, NORMAL_ERROR);
 		}
 
-		//......................
+		if(!InitialSocket(m_SocketFd, m_bBlock).IsSuccess())
+		{
+			if(close(m_SocketFd) == -1)
+				CLLogger::WriteLogMsg("In CLTCPClientSocket::Connect(), close error", errno);
+
+			m_SocketFd = -1;
+
+			throw CLStatus(-1, NORMAL_ERROR);
+		}
+
+
+	}
+	catch(CLStatus& s)
+	{
+		m_pCurrentAddrInfo = m_pCurrentAddrInfo->ai_next;
+		return s;
 	}
 }

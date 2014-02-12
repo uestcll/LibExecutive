@@ -84,7 +84,7 @@ CLStatus CLSharedMemory::DeleteSharedMemory()
 		if(shmctl(m_SharedMemoryID, IPC_RMID, 0) == -1)
 		{
 			CLLogger::WriteLogMsg("In CLSharedMemory::~CLSharedMemory(), shmctl IPC_RMID error", errno);
-			return CLStatus(-1, 0);
+			return CLStatus(-1, NORMAL_ERROR);
 		}
 	}
 

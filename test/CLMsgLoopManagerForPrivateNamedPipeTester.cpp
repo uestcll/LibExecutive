@@ -163,7 +163,7 @@ public:
 			EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage("CLMsgLoopManagerForPrivateNamedPipeTester", new CLMessage(i+1)).IsSuccess());
 		}
 
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 };
 

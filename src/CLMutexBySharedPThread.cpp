@@ -41,7 +41,7 @@ CLStatus CLMutexBySharedPThread::Lock()
 	if(r != 0)
 	{
 		CLLogger::WriteLogMsg("In CLMutexBySharedPThread::Lock(), pthread_mutex_lock error", r);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	return CLStatus(0, 0);
@@ -53,7 +53,7 @@ CLStatus CLMutexBySharedPThread::Unlock()
 	if(r != 0)
 	{
 		CLLogger::WriteLogMsg("In CLMutexBySharedPThread::Unlock(), pthread_mutex_unlock error", r);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	return CLStatus(0, 0);

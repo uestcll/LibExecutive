@@ -17,13 +17,13 @@ CLStatus CLThreadInitialFinishedNotifier::NotifyInitialFinished(bool bInitialSuc
 	m_bSuccess = bInitialSuccess;
 
 	if(m_pEvent == 0)
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	
 	CLStatus s = m_pEvent->Set();
 	if(!s.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLThreadInitialFinishedNotifier::NotifyInitialFinished(), m_pEvent->Set error", 0);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 	
 	return CLStatus(0, 0);

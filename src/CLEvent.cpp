@@ -91,14 +91,14 @@ CLStatus CLEvent::Set()
 	catch(const char *str)
 	{
 		CLLogger::WriteLogMsg("In CLEvent::Set(), exception arise", 0);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	CLStatus s = m_Cond.Wakeup();
 	if(!s.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLEvent::Set(), m_Cond.Wakeup error", 0);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	return CLStatus(0, 0);
@@ -116,7 +116,7 @@ CLStatus CLEvent::Wait()
 			if(!s.IsSuccess())
 			{
 				CLLogger::WriteLogMsg("In CLEvent::Wait(), m_Cond.Wait error", 0);
-				return CLStatus(-1, 0);
+				return CLStatus(-1, NORMAL_ERROR);
 			}
 		}
 
@@ -132,7 +132,7 @@ CLStatus CLEvent::Wait()
 	catch(const char* str)
 	{
 		CLLogger::WriteLogMsg("In CLEvent::Wait(), exception arise", 0);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 	
 	return CLStatus(0, 0);
@@ -151,11 +151,11 @@ CLStatus CLEvent::ReleaseSemaphore(unsigned int steps)
 			return CLStatus(0, 0);
 		}
 
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 	catch(const char* str)
 	{
 		CLLogger::WriteLogMsg("In CLEvent::ReleaseSemaphore(), exception arise", 0);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 }

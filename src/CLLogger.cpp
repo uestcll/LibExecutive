@@ -28,19 +28,19 @@ CLStatus CLLogger::WriteLogMsg(const char *pstrMsg, long lErrorCode)
 {
 	CLLogger *pLog = CLLogger::GetInstance();
 	if(pLog == 0)
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	
 	CLStatus s = pLog->WriteLog(pstrMsg, lErrorCode);
 	if(s.IsSuccess())
 		return CLStatus(0, 0);
 	else
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 }
 
 CLStatus CLLogger::WriteLog(const char *pstrMsg, long lErrorCode)
 {
 	if((pstrMsg == 0) || (strlen(pstrMsg) == 0))
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 
 	char buf[MAX_SIZE];
 	snprintf(buf, MAX_SIZE, "	Error code: %ld\r\n", lErrorCode);
@@ -52,7 +52,7 @@ CLStatus CLLogger::WriteLog(const char *pstrMsg, long lErrorCode)
 	try
 	{
 		if(m_pLog == 0)
-			throw CLStatus(-1, 0);
+			throw CLStatus(-1, NORMAL_ERROR);
 
 		throw WriteMsgAndErrcodeToFile(m_Fd, pstrMsg, buf);
 	}
@@ -71,11 +71,11 @@ CLStatus CLLogger::WriteLog(const char *pstrMsg, long lErrorCode)
 CLStatus CLLogger::WriteLogDirectly(const char *pstrMsg, long lErrorCode)
 {
 	if((pstrMsg == 0) || (strlen(pstrMsg) == 0))
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 
 	int fd = open(LOG_FILE_NAME, O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR); 
 	if(fd == -1)
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 
 	char buf[MAX_SIZE];
 	snprintf(buf, MAX_SIZE, "	Error code: %ld\r\n",  lErrorCode);
@@ -100,7 +100,7 @@ CLStatus CLLogger::WriteLogDirectly(const char *pstrMsg, long lErrorCode)
 		int r1 = close(fd);
 
 		if((r != 0) || (r1 == -1))
-			return CLStatus(-1, 0);
+			return CLStatus(-1, NORMAL_ERROR);
 
 		return s;
 	}
@@ -123,7 +123,7 @@ CLStatus CLLogger::WriteMsgAndErrcodeToFile(int fd, const char *pstrMsg, const c
 	if(fcntl(fd, F_SETLKW, &lock) == -1)
     {
         delete [] p;
-        return CLStatus(-1, 0);
+        return CLStatus(-1, NORMAL_ERROR);
     }
 
 	ssize_t writedbytes = write(fd, p, len - 1);

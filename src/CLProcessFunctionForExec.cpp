@@ -48,11 +48,11 @@ CLStatus CLProcessFunctionForExec::RunExecutiveFunction(void* pCmdLine)
 		if(getcwd(old_directory, MAX_LENGTH_OF_PATH) == 0)
 		{
 			CLLogger::WriteLogDirectly("In CLProcessFunctionForExec::RunExecutiveFunction(), getcwd error", 0);
-			throw CLStatus(-1, 0);
+			throw CLStatus(-1, NORMAL_ERROR);
 		}
 
 		if(!SetWorkDirectory(argv[0]).IsSuccess())
-			throw CLStatus(-1, 0);
+			throw CLStatus(-1, NORMAL_ERROR);
 
 		execv(argv[0], argv);
 
@@ -61,7 +61,7 @@ CLStatus CLProcessFunctionForExec::RunExecutiveFunction(void* pCmdLine)
 
 		CLLogger::WriteLogDirectly("In CLProcessFunctionForExec::RunExecutiveFunction(), execv error", errno);
 
-		throw CLStatus(-1, 0);
+		throw CLStatus(-1, NORMAL_ERROR);
 	}
 	catch(CLStatus& s)
 	{
@@ -85,7 +85,7 @@ CLStatus CLProcessFunctionForExec::SetWorkDirectory(char *pstrArgv0)
 	if(str.length() == pos + 1)
 	{
 		CLLogger::WriteLogDirectly("In CLProcessFunctionForExec::SetWorkDirectory(), argv0 error", 0);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	string strFileName = str.substr(pos + 1);
@@ -94,7 +94,7 @@ CLStatus CLProcessFunctionForExec::SetWorkDirectory(char *pstrArgv0)
 	if(chdir(strDirectory.c_str()) == -1)
 	{
 		CLLogger::WriteLogDirectly("In CLProcessFunctionForExec::SetWorkDirectory(), chdir error", 0);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	return CLStatus(0, 0);

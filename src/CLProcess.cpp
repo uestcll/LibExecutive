@@ -43,7 +43,7 @@ CLStatus CLProcess::Run(void *pstrCmdLine)
 	if((pstrCmdLine == 0) || (strlen((char *)pstrCmdLine) == 0))
 	{
 		delete this;
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	m_ProcessID = fork();
@@ -51,7 +51,7 @@ CLStatus CLProcess::Run(void *pstrCmdLine)
 	{
 		CLLogger::WriteLogMsg("In CLProcess::Run(), fork error", errno);
 		delete this;
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	if(m_ProcessID == 0)
@@ -86,7 +86,7 @@ CLStatus CLProcess::CloseFileDescriptor()
 	if(pDir == 0)
 	{
 		CLLogger::WriteLogDirectly("In CLProcess::CloseFileDescriptor(), opendir error", 0);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	while(struct dirent *pDirent = readdir(pDir))
@@ -123,7 +123,7 @@ CLStatus CLProcess::CloseFileDescriptor()
 	if(closedir(pDir) == -1)
 	{
 		CLLogger::WriteLogDirectly("In CLProcess::CloseFileDescriptor(), closedir error", errno);
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 
 	return CLStatus(0, 0);

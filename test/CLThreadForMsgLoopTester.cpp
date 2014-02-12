@@ -283,7 +283,7 @@ class CLFailureObserver_CLThreadForMsgLoop : public CLMessageObserver
 public:
 	virtual CLStatus Initialize(CLMessageLoopManager *pMessageLoop, void* pContext)
 	{
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 	}
 };
 

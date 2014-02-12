@@ -68,7 +68,7 @@ CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLMessage
 	try
 	{
 		if((pExecutiveCommunication == 0) || (strExecutiveName == 0) || (strlen(strExecutiveName) == 0))
-			throw CLStatus(-1, 0);
+			throw CLStatus(-1, NORMAL_ERROR);
 
 		CLMutex mutex(&m_Mutex);	
 		CLCriticalSection cs(&mutex);
@@ -76,14 +76,14 @@ CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLMessage
 		if(m_pNameServer == 0)
 		{
 			CLLogger::WriteLogMsg("In CLExecutiveNameServer::Register(), m_pNameServer is 0", 0);
-			throw CLStatus(-1, 0);
+			throw CLStatus(-1, NORMAL_ERROR);
 		}
 
 		std::map<std::string, SLExecutiveCommunicationPtrCount*>::iterator it = m_NameTable.find(strExecutiveName);
 		if(it != m_NameTable.end())
 		{
 			CLLogger::WriteLogMsg("In CLExecutiveNameServer::Register(), m_NameTable.find error", 0);
-			throw CLStatus(-1, 0);
+			throw CLStatus(-1, NORMAL_ERROR);
 		}
 
 		SLExecutiveCommunicationPtrCount *p = new SLExecutiveCommunicationPtrCount;
@@ -141,7 +141,7 @@ CLMessagePoster* CLExecutiveNameServer::GetCommunicationPtr(const char* strExecu
 CLStatus CLExecutiveNameServer::ReleaseCommunicationPtr(const char* strExecutiveName)
 {
 	if((strExecutiveName == 0) || (strlen(strExecutiveName) == 0))
-		return CLStatus(-1, 0);
+		return CLStatus(-1, NORMAL_ERROR);
 
 	CLMessagePoster *pTmp = 0;
 	CLMessageReceiver *pMsgReceiver = 0;
@@ -153,14 +153,14 @@ CLStatus CLExecutiveNameServer::ReleaseCommunicationPtr(const char* strExecutive
 		if(m_pNameServer == 0)
 		{
 			CLLogger::WriteLogMsg("In CLExecutiveNameServer::ReleaseCommunicationPtr(), m_pNameServer is 0", 0);
-			return CLStatus(-1, 0);
+			return CLStatus(-1, NORMAL_ERROR);
 		}
 
 		std::map<std::string, SLExecutiveCommunicationPtrCount*>::iterator it = m_NameTable.find(strExecutiveName);
 		if(it == m_NameTable.end())
 		{
 			CLLogger::WriteLogMsg("In CLExecutiveNameServer::ReleaseCommunicationPtr(), m_NameTable.find error", 0);
-			return CLStatus(-1, 0);
+			return CLStatus(-1, NORMAL_ERROR);
 		}
 
 		it->second->nCount--;
