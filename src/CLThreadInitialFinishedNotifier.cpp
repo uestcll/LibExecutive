@@ -1,6 +1,7 @@
 #include "CLThreadInitialFinishedNotifier.h"
 #include "CLEvent.h"
 #include "CLLogger.h"
+#include "ErrorCode.h"
 
 CLThreadInitialFinishedNotifier::CLThreadInitialFinishedNotifier(CLEvent *pEvent)
 {

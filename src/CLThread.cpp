@@ -2,6 +2,7 @@
 #include "CLExecutiveFunctionProvider.h"
 #include "CLEvent.h"
 #include "CLLogger.h"
+#include "ErrorCode.h"
 
 CLThread::CLThread(CLExecutiveFunctionProvider *pExecutiveFunctionProvider) : CLExecutive(pExecutiveFunctionProvider)
 {

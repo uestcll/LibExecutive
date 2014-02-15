@@ -100,13 +100,13 @@ TEST(CLSharedMutexAllocator, MultiProcess)
 {
 	const char *shared_name = "shared_resource_for_CLSharedMutexAllocator_MultiProcess";
 
+	CLSharedMemory sm(shared_name, sizeof(long));
+	long *p = (long *)sm.GetAddress();
+
 	CLEvent event("test_for_event_auto");
 
 	CLProcess *process = new CLProcess(new CLProcessFunctionForExec);
 	EXPECT_TRUE(process->Run((void *)"../test_for_exec/test_for_CLSharedMutexAllocator/main").IsSuccess());
-
-	CLSharedMemory sm(shared_name, sizeof(long));
-	long *p = (long *)sm.GetAddress();
 
 	pthread_t tid;
 	pthread_create(&tid, 0, thread_for_CLSharedMutexAllocator_MultiProcess_MuiltThread, p);

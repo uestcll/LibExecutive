@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include "CLLogger.h"
 #include "DefinitionForConst.h"
+#include "ErrorCode.h"
 
 #define MAX_SIZE 265
 

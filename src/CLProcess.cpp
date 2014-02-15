@@ -12,6 +12,7 @@
 #include "CLExecutiveFunctionProvider.h"
 #include "CLLogger.h"
 #include "CLLibExecutiveInitializer.h"
+#include "ErrorCode.h"
 
 using namespace std;
 

@@ -9,6 +9,7 @@
 #include "CLLogger.h"
 #include "CLCriticalSection.h"
 #include "DefinitionForConst.h"
+#include "ErrorCode.h"
 
 using namespace std;
 

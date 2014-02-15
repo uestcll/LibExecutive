@@ -5,6 +5,7 @@
 #include <string>
 #include "CLProcessFunctionForExec.h"
 #include "CLLogger.h"
+#include "ErrorCode.h"
 
 using namespace std;
 

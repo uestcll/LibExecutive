@@ -11,6 +11,7 @@
 #include "CLLogger.h"
 #include "CLStatus.h"
 #include "DefinitionForConst.h"
+#include "ErrorCode.h"
 
 template<typename TSharedObjectPool, typename TSharedObject>
 class CLSharedObjectAllocator

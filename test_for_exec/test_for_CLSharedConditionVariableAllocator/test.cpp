@@ -39,6 +39,8 @@ int main(int argc, char* argv[])
 
 		CLSharedObjectAllocator<CLSharedConditionVariableImpl,pthread_cond_t>::Release(name_cv);
 
+		delete psm;
+
 		throw CLStatus(0, 0);
 	}
 	catch(CLStatus& s)

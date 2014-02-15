@@ -5,6 +5,7 @@
 #include "CLLogger.h"
 #include "CLCriticalSection.h"
 #include "CLMutex.h"
+#include "ErrorCode.h"
 
 CLSharedObjectsImpl::CLSharedObjectsImpl()
 {

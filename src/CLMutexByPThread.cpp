@@ -1,5 +1,6 @@
 #include "CLMutexByPThread.h"
 #include "CLLogger.h"
+#include "ErrorCode.h"
 
 CLMutexByPThread::CLMutexByPThread()
 {
