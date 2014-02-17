@@ -20,7 +20,8 @@ public:
 
 	CLStatus Accept(CLSocket **ppSocket);
 
-	CLStatus Connect(const char *pstrHostNameOrIP, const char *pstrServiceOrPort);
+	CLStatus Connect();
+	void NotifyConnectResults(bool bResults);
 
 	CLStatus Read(CLIOVectors& IOVectors, struct addrinfo *pAddrInfo = 0);
 	CLStatus Write(CLIOVectors& IOVectors, struct addrinfo *pAddrInfo = 0);

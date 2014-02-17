@@ -13,6 +13,7 @@ public:
 	virtual ~CLTCPClientSocket();
 
 	virtual CLStatus Connect();
+	virtual void NotifyConnectResults(bool bResults);
 
 private:
 	CLTCPClientSocket(const CLTCPClientSocket&);

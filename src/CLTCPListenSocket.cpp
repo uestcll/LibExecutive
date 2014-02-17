@@ -21,8 +21,6 @@ CLTCPListenSocket::CLTCPListenSocket(const char *pstrHostNameOrIP, const char *p
 		throw "In CLTCPListenSocket::CLTCPListenSocket(), getaddrinfo error";
 	}
 
-	int optval = 1;
-
 	for(struct addrinfo *ptmp = results; ptmp != 0; ptmp = ptmp->ai_next)
 	{
 		int fd = socket(ptmp->ai_family, ptmp->ai_socktype, ptmp->ai_protocol);
@@ -77,7 +75,14 @@ CLStatus CLTCPListenSocket::Accept(CLSocket **ppSocket)
 {
 	int r = accept(m_SocketFd, 0, 0);
 	if(r == -1)
-		return CLStatus(-1, errno);
+	{
+		if((errno == EAGAIN) || (errno == EWOULDBLOCK))
+			return CLStatus(-1, ACCEPT_PENDING);
+
+		CLLogger::WriteLogMsg("In CLTCPListenSocket::Accept(), accept error", errno);
+
+		return CLStatus(-1, NORMAL_ERROR);
+	}
 
 	*ppSocket = new CLSocket(r, m_bBlock);
 

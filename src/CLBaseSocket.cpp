@@ -115,7 +115,15 @@ CLStatus CLBaseSocket::ReadOrWrite(bool bWrite, CLIOVectors& IOVectors, struct a
 	else
 		result = recvmsg(m_SocketFd, &msg, 0);
 
-	int err = errno;
+	int err;
+
+	if(result == -1)
+	{
+		if((errno == EAGAIN) || (errno == EWOULDBLOCK))
+			//........................
+	}
+	else
+		err = 0;
 
 	delete [] iov;
 

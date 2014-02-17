@@ -70,6 +70,18 @@ CLStatus CLSocket::Connect()
 	}
 }
 
+void CLSocket::NotifyConnectResults(bool bResults)
+{
+	CLTCPClientSocket *p = dynamic_cast<CLTCPClientSocket *>(m_pSocket);
+	if(p != 0)
+		return p->NotifyConnectResults(bResults);
+	else
+	{
+		CLLogger::WriteLogMsg("In CLSocket::NotifyConnectResults(), dynamic_cast error", 0);
+		return;
+	}
+}
+
 CLStatus CLSocket::Read(CLIOVectors& IOVectors, struct addrinfo *pAddrInfo)
 {
 	if(IOVectors.Size() == 0)
