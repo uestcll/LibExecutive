@@ -52,7 +52,7 @@ TEST(CLSocket, TCPServerBlockV4)
 	CLEvent event("test_for_socket_tcpserver");
 
 	CLProcess *process = new CLProcess(new CLProcessFunctionForExec);
-	EXPECT_TRUE(process->Run((void *)"../test_for_exec/test_for_CLSocketTCPClient/main").IsSuccess());
+	EXPECT_TRUE(process->Run((void *)"../test_for_exec/test_for_CLSocketTCPClient/main 1").IsSuccess());
 
 	CLStatus r3 = s.Accept(0);
 	EXPECT_TRUE(r3.m_clReturnCode == -1);
@@ -113,7 +113,7 @@ TEST(CLSocket, TCPServerNonBlockV4)
 	CLEvent event("test_for_socket_tcpserver");
 
 	CLProcess *process = new CLProcess(new CLProcessFunctionForExec);
-	EXPECT_TRUE(process->Run((void *)"../test_for_exec/test_for_CLSocketTCPClient/main").IsSuccess());
+	EXPECT_TRUE(process->Run((void *)"../test_for_exec/test_for_CLSocketTCPClient/main 1").IsSuccess());
 
 	while(true)
 	{
@@ -151,4 +151,58 @@ TEST(CLSocket, TCPServerNonBlockV4)
 	delete psocket;
 
 	EXPECT_TRUE(event.Wait().IsSuccess());
+}
+
+TEST(CLSocket, TCPServerBlockV4_Error)
+{
+	CLSocket s("3600", true);
+
+	CLEvent event("test_for_socket_tcpserver");
+	CLEvent event2("test_for_socket_tcpserver_accept_error");
+
+	CLProcess *process = new CLProcess(new CLProcessFunctionForExec);
+	EXPECT_TRUE(process->Run((void *)"../test_for_exec/test_for_CLSocketTCPClient/main 2").IsSuccess());
+
+	EXPECT_TRUE(event2.Wait().IsSuccess());
+
+	CLSocket *psocket = 0;
+	EXPECT_TRUE(s.Accept(&psocket).IsSuccess());
+	EXPECT_TRUE(psocket != 0);
+
+	char *pbuf = "nihaookok";
+	CLIOVectors iov;
+	EXPECT_TRUE(iov.PushBack(pbuf, 9).IsSuccess());
+
+	CLStatus r1 = psocket->Read(iov);
+	EXPECT_TRUE(r1.m_clReturnCode == 0);
+
+	CLStatus r2 = psocket->Write(iov);
+	EXPECT_TRUE(r2.m_clReturnCode == 9);
+
+	sleep(3);
+
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
+
+	CLStatus r3 = psocket->Write(iov);
+	EXPECT_TRUE(r3.m_clReturnCode == -1);
+	EXPECT_TRUE(r3.m_clErrorCode == NORMAL_ERROR);
+
+	delete psocket;
+
+	EXPECT_TRUE(event.Wait().IsSuccess());
+}
+
+TEST(CLSocket, TCPClientBlockV4)
+{
+	CLSocket s("127.0.0.1", "3600", true);
+
+	CLEvent event("test_for_socket_tcpserver");
+	CLEvent event2("test_for_socket_tcpclient_notify");
+
+	CLProcess *process = new CLProcess(new CLProcessFunctionForExec);
+	EXPECT_TRUE(process->Run((void *)"../test_for_exec/test_for_CLSocketTCPClient/main 3").IsSuccess());
+
+	EXPECT_TRUE(event2.Wait().IsSuccess());
+
+	//............................
 }
