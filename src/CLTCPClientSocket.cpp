@@ -2,6 +2,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <errno.h>
+#include <strings.h>
 #include "CLTCPClientSocket.h"
 #include "ErrorCode.h"
 #include "CLLogger.h"

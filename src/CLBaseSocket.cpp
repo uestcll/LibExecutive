@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <netdb.h>
 #include "CLBaseSocket.h"
 #include "CLIOVectors.h"
 #include "ErrorCode.h"
@@ -38,7 +39,7 @@ CLStatus CLBaseSocket::InitialSocket(int SocketFd, bool bBlock)
 		return CLStatus(-1, NORMAL_ERROR);
 	}
 
-	if(bBlock = false)
+	if(bBlock == false)
 	{
 		int val;
 		if((val = fcntl(SocketFd, F_GETFL, 0)) < 0)
@@ -120,7 +121,12 @@ CLStatus CLBaseSocket::ReadOrWrite(bool bWrite, CLIOVectors& IOVectors, struct a
 	if(result == -1)
 	{
 		if((errno == EAGAIN) || (errno == EWOULDBLOCK))
-			//........................
+			err = IO_PENDING;
+		else
+		{
+			CLLogger::WriteLogMsg("In CLBaseSocket::ReadOrWrite(), sendmsg or recvmsg error", errno);
+			err = NORMAL_ERROR;
+		}
 	}
 	else
 		err = 0;

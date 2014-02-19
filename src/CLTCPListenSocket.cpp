@@ -2,9 +2,12 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <errno.h>
+#include <strings.h>
+#include <unistd.h>
 #include "CLTCPListenSocket.h"
 #include "CLSocket.h"
 #include "CLLogger.h"
+#include "ErrorCode.h"
 
 CLTCPListenSocket::CLTCPListenSocket(const char *pstrHostNameOrIP, const char *pstrServiceOrPort, int backlog, bool bBlock) : CLBaseSocket(bBlock)
 {
