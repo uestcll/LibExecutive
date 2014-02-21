@@ -17,8 +17,6 @@ private:
 	CLLibExecutiveInitializer(const CLLibExecutiveInitializer&);
 	CLLibExecutiveInitializer& operator=(const CLLibExecutiveInitializer&);
 
-	static void HandleSIGCHLD(int signo);
-
 private:
 	static bool m_bInitialized;
 	static bool m_bDestroyed;

@@ -15,14 +15,6 @@ pthread_mutex_t CLLibExecutiveInitializer::m_MutexForInitializer = PTHREAD_MUTEX
 bool CLLibExecutiveInitializer::m_bInitialized = false;
 bool CLLibExecutiveInitializer::m_bDestroyed = false;
 
-void CLLibExecutiveInitializer::HandleSIGCHLD(int signo)
-{
-	if(signo == SIGCHLD)
-	{
-		while(waitpid(-1, 0, WNOHANG) > 0);
-	}
-}
-
 CLStatus CLLibExecutiveInitializer::Initialize()
 {
 	int r = pthread_mutex_lock(&m_MutexForInitializer);
@@ -55,9 +47,18 @@ CLStatus CLLibExecutiveInitializer::Initialize()
 			throw CLStatus(-1, NORMAL_ERROR);
 		}
 
-		if(signal(SIGCHLD, CLLibExecutiveInitializer::HandleSIGCHLD) == SIG_ERR)
+		struct sigaction act;
+		act.sa_handler = SIG_DFL;
+		if(sigemptyset(&act.sa_mask) == -1)
 		{
-			CLLogger::WriteLogMsg("In CLLibExecutiveInitializer::Initialize(), signal2 error", errno);
+			CLLogger::WriteLogMsg("In CLLibExecutiveInitializer::Initialize(), sigemptyset error", errno);
+			throw CLStatus(-1, NORMAL_ERROR);
+		}
+
+		act.sa_flags = SA_NOCLDWAIT;
+		if(sigaction(SIGCHLD, &act, 0) == -1)
+		{
+			CLLogger::WriteLogMsg("In CLLibExecutiveInitializer::Initialize(), sigaction error", errno);
 			throw CLStatus(-1, NORMAL_ERROR);
 		}
 
@@ -125,8 +126,6 @@ CLStatus CLLibExecutiveInitializer::Destroy()
 	{
 		if((!m_bInitialized) || (m_bDestroyed))
 			throw CLStatus(-1, NORMAL_ERROR);
-
-		HandleSIGCHLD(SIGCHLD);
 
 		CLStatus s1 = CLExecutiveNameServer::Destroy();
 		if(!s1.IsSuccess())
