@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/select.h>
+#include <time.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <strings.h>
@@ -70,14 +72,14 @@ TEST(CLSocket, TCPServerBlockV4)
 
 	EXPECT_TRUE(psocket != 0);
 
-	char *pbuf = "nihaookok";
+	const char *pbuf = "nihaookok";
 	CLIOVectors iov;
 
 	CLStatus r5 = psocket->Write(iov);
 	EXPECT_TRUE(r5.m_clReturnCode == -1);
 	EXPECT_TRUE(r5.m_clErrorCode == NORMAL_ERROR);
 
-	EXPECT_TRUE(iov.PushBack(pbuf, 9).IsSuccess());
+	EXPECT_TRUE(iov.PushBack((char *)pbuf, 9).IsSuccess());
 
 	CLStatus r = psocket->Write(iov);
 	EXPECT_TRUE(r.m_clReturnCode == 9);
@@ -123,9 +125,9 @@ TEST(CLSocket, TCPServerNonBlockV4)
 
 	EXPECT_TRUE(psocket != 0);
 
-	char *pbuf = "nihaookok";
+	const char *pbuf = "nihaookok";
 	CLIOVectors iov;
-	EXPECT_TRUE(iov.PushBack(pbuf, 9).IsSuccess());
+	EXPECT_TRUE(iov.PushBack((char *)pbuf, 9).IsSuccess());
 
 	CLStatus r3 = psocket->Read(iov);
 	EXPECT_TRUE(r3.m_clReturnCode == -1);
@@ -169,9 +171,9 @@ TEST(CLSocket, TCPServerBlockV4_Error)
 	EXPECT_TRUE(s.Accept(&psocket).IsSuccess());
 	EXPECT_TRUE(psocket != 0);
 
-	char *pbuf = "nihaookok";
+	const char *pbuf = "nihaookok";
 	CLIOVectors iov;
-	EXPECT_TRUE(iov.PushBack(pbuf, 9).IsSuccess());
+	EXPECT_TRUE(iov.PushBack((char *)pbuf, 9).IsSuccess());
 
 	CLStatus r1 = psocket->Read(iov);
 	EXPECT_TRUE(r1.m_clReturnCode == 0);
@@ -194,6 +196,15 @@ TEST(CLSocket, TCPServerBlockV4_Error)
 
 TEST(CLSocket, TCPClientBlockV4)
 {
+	{
+		CLSocket s("3600", true);
+
+		CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
+		CLStatus r1 = s.Connect();
+		EXPECT_TRUE(r1.m_clReturnCode == -1);
+		EXPECT_TRUE(r1.m_clErrorCode == NORMAL_ERROR);
+	}
+
 	CLSocket s("127.0.0.1", "3600", true);
 
 	CLEvent event("test_for_socket_tcpserver");
@@ -204,5 +215,77 @@ TEST(CLSocket, TCPClientBlockV4)
 
 	EXPECT_TRUE(event2.Wait().IsSuccess());
 
-	//............................
+	EXPECT_TRUE(s.Connect().IsSuccess());
+
+	CLStatus r1 = s.Connect();
+	EXPECT_TRUE(r1.m_clReturnCode == -1);
+	EXPECT_TRUE(r1.m_clErrorCode == NORMAL_ERROR);
+
+	char pbuf[15];
+	bzero(pbuf, 15);
+	CLIOVectors iov;
+	EXPECT_TRUE(iov.PushBack(pbuf, 15).IsSuccess());
+	CLStatus r = s.Read(iov);
+	EXPECT_TRUE(r.m_clReturnCode == 13);
+
+	const char *str = "Hello World\n";
+	EXPECT_TRUE(strcmp(str, pbuf) == 0);
+
+	EXPECT_TRUE(event.Wait().IsSuccess());
+}
+
+TEST(CLSocket, TCPClientBlockV4_Error)
+{
+	CLSocket s("127.0.0.1", "3600", true);
+
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
+	CLStatus r1 = s.Connect();
+	EXPECT_TRUE(r1.m_clReturnCode == -1);
+	EXPECT_TRUE(r1.m_clErrorCode == TRY_CONNECT_END);
+}
+
+TEST(CLSocket, TCPClientNonBlockV4)
+{
+	CLSocket s("192.157.2.4", "3600");
+
+	CLStatus r = s.Connect();
+	EXPECT_TRUE(r.m_clReturnCode == -1);
+	EXPECT_TRUE(r.m_clErrorCode == CONNECT_PENDING);
+
+	int fd = s.GetSocket();
+	int maxfdp1 = fd + 1;
+	fd_set rd;
+	fd_set wr;
+	FD_ZERO(&rd);
+	FD_ZERO(&wr);
+	FD_SET(fd, &rd);
+	FD_SET(fd, &wr);
+
+	int num = select(maxfdp1, &rd, &wr, 0, 0);
+	EXPECT_EQ(num, 2);
+	EXPECT_TRUE(FD_ISSET(fd, &rd));
+	EXPECT_TRUE(FD_ISSET(fd, &wr));
+
+	int err = 0;
+	socklen_t len = 4;
+	if(getsockopt(fd, SOL_SOCKET, SO_ERROR, &err, &len) < 0)
+	{
+		err = 2;
+	}
+	else if(err != 0)
+	{
+		err = 2;
+	}
+
+	EXPECT_EQ(err, 2);
+
+	CLStatus r1 = s.Connect();
+	EXPECT_TRUE(r1.m_clReturnCode == -1);
+	EXPECT_TRUE(r1.m_clErrorCode == NORMAL_ERROR);
+
+	s.NotifyConnectResults(false);
+
+	CLStatus r2 = s.Connect();
+	EXPECT_TRUE(r2.m_clReturnCode == -1);
+	EXPECT_TRUE(r2.m_clErrorCode == TRY_CONNECT_END);
 }

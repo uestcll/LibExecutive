@@ -3,6 +3,7 @@
 #include <netinet/in.h>
 #include <memory.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 #include "LibExecutive.h"
 
 using namespace std;
@@ -107,6 +108,13 @@ void TCPServer()
 		return;
 	}
 
+	int optval = 1;
+	if(setsockopt(nListenSocket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) == -1)
+	{
+		std::cout << "setsockopt error" << std::endl;
+		return;
+	}
+
 	sockaddr_in ServerAddress;
 	memset(&ServerAddress, 0, sizeof(sockaddr_in));
 	ServerAddress.sin_family = AF_INET;
@@ -147,7 +155,7 @@ void TCPServer()
 	::close(nConnectedSocket);
 	::close(nListenSocket);
 
-	return 0;
+	return;
 }
 
 int main(int argc, char* argv[])
@@ -168,7 +176,7 @@ int main(int argc, char* argv[])
 
 		if(argv[1][0] == '3')
 			TCPServer();
-		
+
 		throw CLStatus(0, 0);
 	}
 	catch(CLStatus& s)
