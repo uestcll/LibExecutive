@@ -34,4 +34,7 @@ const int IOVECTOR_NON_DELETE = 2;
 
 const int LISTEN_BACKLOG = 128;
 
+const int SOCKET_TYPE_TCP = 1;
+const int SOCKET_TYPE_UDP = 2;
+
 #endif

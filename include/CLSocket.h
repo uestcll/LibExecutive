@@ -11,7 +11,7 @@ struct addrinfo;
 class CLSocket
 {
 public:
-	CLSocket(const char *pstrServiceOrPort, bool bBlock = false, const char *pstrHostNameOrIP = 0, int backlog = LISTEN_BACKLOG);
+	CLSocket(const char *pstrServiceOrPort, int SocketType = SOCKET_TYPE_TCP, bool bBlock = false, const char *pstrHostNameOrIP = 0, int backlog = LISTEN_BACKLOG);
 	CLSocket(int SocketFd, bool bBlock);
 	CLSocket(const char *pstrHostNameOrIP, const char *pstrServiceOrPort, bool bBlock = false);
 	virtual ~CLSocket();

@@ -6,12 +6,17 @@
 #include "CLLogger.h"
 #include "ErrorCode.h"
 
-CLSocket::CLSocket(const char *pstrServiceOrPort, bool bBlock, const char *pstrHostNameOrIP, int backlog)
+CLSocket::CLSocket(const char *pstrServiceOrPort, int SocketType, bool bBlock, const char *pstrHostNameOrIP, int backlog)
 {
 	if((pstrServiceOrPort == 0) || (strlen(pstrServiceOrPort) == 0))
 		throw "In CLSocket::CLSocket(), pstrServiceOrPort error";
 
-	m_pSocket = new CLTCPListenSocket(pstrHostNameOrIP, pstrServiceOrPort, backlog, bBlock);
+	if(SOCKET_TYPE_TCP == SocketType)
+		m_pSocket = new CLTCPListenSocket(pstrHostNameOrIP, pstrServiceOrPort, backlog, bBlock);
+	else if(SOCKET_TYPE_UDP == SocketType)
+		m_pSocket = new CLUDPServerSocket(pstrHostNameOrIP, pstrServiceOrPort, bBlock);
+
+	throw "In CLSocket::CLSocket(), SocketType error";
 }
 
 CLSocket::CLSocket(int SocketFd, bool bBlock)
