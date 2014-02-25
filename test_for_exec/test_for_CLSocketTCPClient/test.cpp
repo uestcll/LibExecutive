@@ -158,6 +158,133 @@ void TCPServer()
 	return;
 }
 
+void UDPClient()
+{
+	int nClientSocket = -1;
+	try
+	{
+		nClientSocket = socket(AF_INET, SOCK_DGRAM, 0);
+		if(-1 == nClientSocket)
+		{
+			cout << "socket error" << endl;
+			return;
+		}
+
+		sockaddr_in ServerAddress;
+		memset(&ServerAddress, 0, sizeof(sockaddr_in));
+		ServerAddress.sin_family = AF_INET;
+		if(inet_pton(AF_INET, "127.0.0.1", &ServerAddress.sin_addr) != 1)
+		{
+			cout << "inet_pton error" << endl;
+			throw CLStatus(0, 0);
+		}
+
+		ServerAddress.sin_port = htons(3600);
+
+		const char *pbuf = "nihaookok";
+		if(sendto(nClientSocket, pbuf, 9, 0, (sockaddr*)&ServerAddress, sizeof(ServerAddress)) == -1)
+		{
+			cout << "sendto error" << endl;
+			throw CLStatus(0, 0);
+		}
+
+		throw CLStatus(0, 0);
+	}
+	catch(CLStatus& s)
+	{
+		if(nClientSocket != -1)
+			close(nClientSocket);
+	}
+}
+
+void UDPClientError()
+{
+	int nClientSocket = -1;
+	try
+	{
+		nClientSocket = socket(AF_INET, SOCK_DGRAM, 0);
+		if(-1 == nClientSocket)
+		{
+			cout << "socket error" << endl;
+			throw CLStatus(0, 0);
+		}
+
+		sockaddr_in ServerAddress;
+		memset(&ServerAddress, 0, sizeof(sockaddr_in));
+		ServerAddress.sin_family = AF_INET;
+		if(inet_pton(AF_INET, "127.0.0.1", &ServerAddress.sin_addr) != 1)
+		{
+			cout << "inet_pton error" << endl;
+			throw CLStatus(0, 0);
+		}
+
+		ServerAddress.sin_port = htons(3600);
+
+		const char *pbuf = "nihaookok";
+		if(sendto(nClientSocket, pbuf, 9, 0, (sockaddr*)&ServerAddress, sizeof(ServerAddress)) == -1)
+		{
+			cout << "sendto error" << endl;
+			throw CLStatus(0, 0);
+		}
+
+		throw CLStatus(0, 0);
+	}
+	catch(CLStatus& s)
+	{
+		if(nClientSocket != -1)
+			close(nClientSocket);
+
+		CLEvent event("test_for_socket_tcpserver_accept_error");
+		event.Set();
+	}
+}
+
+void UDPServer()
+{
+	int nListenSocket = ::socket(AF_INET, SOCK_DGRAM, 0);
+	if(-1 == nListenSocket)
+	{
+		std::cout << "socket error" << std::endl;
+		return;
+	}
+
+	int optval = 1;
+	if(setsockopt(nListenSocket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) == -1)
+	{
+		std::cout << "setsockopt error" << std::endl;
+		return;
+	}
+
+	sockaddr_in ServerAddress;
+	memset(&ServerAddress, 0, sizeof(sockaddr_in));
+	ServerAddress.sin_family = AF_INET;
+	ServerAddress.sin_addr.s_addr = htonl(INADDR_ANY);
+	ServerAddress.sin_port = htons(3600);
+
+	if(::bind(nListenSocket, (sockaddr *)&ServerAddress, sizeof(sockaddr_in)) == -1)
+	{
+		std::cout << "bind error" << std::endl;
+		::close(nListenSocket);
+		return;
+	}
+
+	{
+		CLEvent event("test_for_socket_tcpclient_notify");
+		event.Set();
+	}
+
+	char buf[5];
+	sockaddr_storage addr;
+	socklen_t len;
+	recvfrom(nListenSocket, buf, 5, 0, (sockaddr*)&addr, &len);
+
+	sendto(nListenSocket, buf, 5, 0, (sockaddr*)&addr, len);
+
+	::close(nListenSocket);
+
+	return;
+}
+
 int main(int argc, char* argv[])
 {
 	if(!CLLibExecutiveInitializer::Initialize().IsSuccess())
@@ -176,6 +303,15 @@ int main(int argc, char* argv[])
 
 		if(argv[1][0] == '3')
 			TCPServer();
+
+		if(argv[1][0] == '4')
+			UDPClient();
+
+		if(argv[1][0] == '5')
+			UDPClientError();
+
+		if(argv[1][0] == '6')
+			UDPServer();
 
 		throw CLStatus(0, 0);
 	}

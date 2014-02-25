@@ -6,14 +6,14 @@
 
 class CLBaseSocket;
 class CLIOVectors;
-struct addrinfo;
+class CLSocketAddress;
 
 class CLSocket
 {
 public:
 	CLSocket(const char *pstrServiceOrPort, int SocketType = SOCKET_TYPE_TCP, bool bBlock = false, const char *pstrHostNameOrIP = 0, int backlog = LISTEN_BACKLOG);
 	CLSocket(int SocketFd, bool bBlock);
-	CLSocket(const char *pstrHostNameOrIP, const char *pstrServiceOrPort, bool bBlock = false);
+	CLSocket(const char *pstrHostNameOrIP, const char *pstrServiceOrPort, int SocketType = SOCKET_TYPE_TCP, bool bBlock = false);
 	virtual ~CLSocket();
 
 	int GetSocket();
@@ -23,8 +23,8 @@ public:
 	CLStatus Connect();
 	void NotifyConnectResults(bool bResults);
 
-	CLStatus Read(CLIOVectors& IOVectors, struct addrinfo *pAddrInfo = 0);
-	CLStatus Write(CLIOVectors& IOVectors, struct addrinfo *pAddrInfo = 0);
+	CLStatus Read(CLIOVectors& IOVectors, CLSocketAddress *pSocketAddress = 0);
+	CLStatus Write(CLIOVectors& IOVectors, CLSocketAddress *pSocketAddress = 0);
 
 private:
 	CLSocket(const CLSocket&);

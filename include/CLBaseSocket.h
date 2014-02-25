@@ -4,7 +4,7 @@
 #include "CLStatus.h"
 
 class CLIOVectors;
-struct addrinfo;
+class CLSocketAddress;
 
 class CLBaseSocket
 {
@@ -15,11 +15,11 @@ public:
 
 	virtual int GetSocket();
 
-	virtual CLStatus Read(CLIOVectors& IOVectors, struct addrinfo *pAddrInfo);
-	virtual CLStatus Write(CLIOVectors& IOVectors, struct addrinfo *pAddrInfo);
+	virtual CLStatus Read(CLIOVectors& IOVectors, CLSocketAddress *pSocketAddress);
+	virtual CLStatus Write(CLIOVectors& IOVectors, CLSocketAddress *pSocketAddress);
 
 protected:
-	CLStatus ReadOrWrite(bool bWrite, CLIOVectors& IOVectors, struct addrinfo *pAddrInfo);
+	CLStatus ReadOrWrite(bool bWrite, CLIOVectors& IOVectors, CLSocketAddress *pSocketAddress);
 	CLStatus InitialSocket(int SocketFd, bool bBlock);
 
 private:

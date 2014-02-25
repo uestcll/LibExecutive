@@ -1,11 +1,10 @@
 #include <gtest/gtest.h>
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <sys/select.h>
 #include <time.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <strings.h>
+#include <netdb.h>
 #include "LibExecutive.h"
 
 TEST(CLSocket, GetSocket)
@@ -31,7 +30,7 @@ TEST(CLSocket, GetSocket)
 
 TEST(CLSocket, BlockSocket)
 {
-	CLSocket s("3600", true);
+	CLSocket s("3600", SOCKET_TYPE_TCP, true);
 	int fd = s.GetSocket();
 	EXPECT_TRUE(fd != -1);
 
@@ -49,7 +48,7 @@ TEST(CLSocket, BlockSocket)
 
 TEST(CLSocket, TCPServerBlockV4)
 {
-	CLSocket s("3600", true);
+	CLSocket s("3600", SOCKET_TYPE_TCP, true);
 
 	CLEvent event("test_for_socket_tcpserver");
 
@@ -157,7 +156,7 @@ TEST(CLSocket, TCPServerNonBlockV4)
 
 TEST(CLSocket, TCPServerBlockV4_Error)
 {
-	CLSocket s("3600", true);
+	CLSocket s("3600", SOCKET_TYPE_TCP, true);
 
 	CLEvent event("test_for_socket_tcpserver");
 	CLEvent event2("test_for_socket_tcpserver_accept_error");
@@ -197,7 +196,7 @@ TEST(CLSocket, TCPServerBlockV4_Error)
 TEST(CLSocket, TCPClientBlockV4)
 {
 	{
-		CLSocket s("3600", true);
+		CLSocket s("3600", SOCKET_TYPE_TCP, true);
 
 		CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
 		CLStatus r1 = s.Connect();
@@ -205,7 +204,7 @@ TEST(CLSocket, TCPClientBlockV4)
 		EXPECT_TRUE(r1.m_clErrorCode == NORMAL_ERROR);
 	}
 
-	CLSocket s("127.0.0.1", "3600", true);
+	CLSocket s("127.0.0.1", "3600", SOCKET_TYPE_TCP, true);
 
 	CLEvent event("test_for_socket_tcpserver");
 	CLEvent event2("test_for_socket_tcpclient_notify");
@@ -236,7 +235,7 @@ TEST(CLSocket, TCPClientBlockV4)
 
 TEST(CLSocket, TCPClientBlockV4_Error)
 {
-	CLSocket s("127.0.0.1", "3600", true);
+	CLSocket s("127.0.0.1", "3600", SOCKET_TYPE_TCP, true);
 
 	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
 	CLStatus r1 = s.Connect();
@@ -288,4 +287,160 @@ TEST(CLSocket, TCPClientNonBlockV4)
 	CLStatus r2 = s.Connect();
 	EXPECT_TRUE(r2.m_clReturnCode == -1);
 	EXPECT_TRUE(r2.m_clErrorCode == TRY_CONNECT_END);
+}
+
+TEST(CLSocket, UDP_GetSocket)
+{
+	CLSocket s("3600", SOCKET_TYPE_UDP);
+
+	int fd = s.GetSocket();
+	EXPECT_TRUE(fd != -1);
+
+	int optval = 10;
+	socklen_t len = 4;
+	EXPECT_TRUE(getsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, &len) != -1);
+	EXPECT_TRUE(optval == 1);
+	EXPECT_TRUE(len == 4);
+
+	int val = fcntl(fd, F_GETFL);
+	EXPECT_TRUE(val != -1);
+
+	EXPECT_TRUE(val & O_NONBLOCK);
+}
+
+TEST(CLSocket, UDP_BlockSocket)
+{
+	CLSocket s("3600", SOCKET_TYPE_UDP, true);
+	int fd = s.GetSocket();
+	EXPECT_TRUE(fd != -1);
+
+	int optval = 10;
+	socklen_t len = 4;
+	EXPECT_TRUE(getsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, &len) != -1);
+	EXPECT_TRUE(optval == 1);
+	EXPECT_TRUE(len == 4);
+
+	int val = fcntl(fd, F_GETFL);
+	EXPECT_TRUE(val != -1);
+
+	EXPECT_FALSE(val & O_NONBLOCK);
+}
+
+TEST(CLSocket, UDPServerBlockV4)
+{
+	CLSocket s("3600", SOCKET_TYPE_UDP, true);
+
+	CLEvent event("test_for_socket_tcpserver");
+
+	CLProcess *process = new CLProcess(new CLProcessFunctionForExec);
+	EXPECT_TRUE(process->Run((void *)"../test_for_exec/test_for_CLSocketTCPClient/main 4").IsSuccess());
+
+	char buf[10];
+	bzero(buf, 10);
+	CLIOVectors iov;
+	EXPECT_TRUE(iov.PushBack(buf, 10).IsSuccess());
+
+	CLSocketAddress addr;
+	CLStatus r = s.Read(iov, &addr);
+	EXPECT_TRUE(r.m_clReturnCode == 9);
+	EXPECT_TRUE(r.m_clErrorCode == 0);
+
+	const char *pbuf = "nihaookok";
+	
+	EXPECT_TRUE(strcmp(pbuf, pbuf) == 0);
+
+	EXPECT_TRUE(event.Wait().IsSuccess());
+}
+
+TEST(CLSocket, UDPServerNonBlockV4)
+{
+	CLSocket s("3600", SOCKET_TYPE_UDP);
+
+	CLEvent event("test_for_socket_tcpserver");
+
+	CLProcess *process = new CLProcess(new CLProcessFunctionForExec);
+	EXPECT_TRUE(process->Run((void *)"../test_for_exec/test_for_CLSocketTCPClient/main 4").IsSuccess());
+
+	char buf[10];
+	bzero(buf, 10);
+	CLIOVectors iov;
+	EXPECT_TRUE(iov.PushBack(buf, 10).IsSuccess());
+
+	while(true)
+	{
+		CLSocketAddress addr;
+		CLStatus r = s.Read(iov, &addr);
+		if(r.m_clReturnCode == 9)
+			break;
+	}
+
+	const char *pbuf = "nihaookok";
+
+	EXPECT_TRUE(strcmp(pbuf, pbuf) == 0);
+
+	EXPECT_TRUE(event.Wait().IsSuccess());
+}
+
+TEST(CLSocket, UDPServerBlockV4_Error)
+{
+	CLSocket s("3600", SOCKET_TYPE_UDP, true);
+
+	CLEvent event("test_for_socket_tcpserver");
+	CLEvent event2("test_for_socket_tcpserver_accept_error");
+
+	CLProcess *process = new CLProcess(new CLProcessFunctionForExec);
+	EXPECT_TRUE(process->Run((void *)"../test_for_exec/test_for_CLSocketTCPClient/main 5").IsSuccess());
+
+	EXPECT_TRUE(event2.Wait().IsSuccess());
+
+	char buf[10];
+	bzero(buf, 10);
+	CLIOVectors iov;
+	EXPECT_TRUE(iov.PushBack(buf, 9).IsSuccess());
+
+	CLSocketAddress addr;
+	CLStatus r = s.Read(iov, &addr);
+	EXPECT_TRUE(r.m_clReturnCode == 9);
+	EXPECT_TRUE(r.m_clErrorCode == 0);
+	
+	CLStatus r1 = s.Write(iov, &addr);
+	EXPECT_TRUE(r1.m_clReturnCode == 9);
+	EXPECT_TRUE(r1.m_clErrorCode == 0);
+
+	EXPECT_TRUE(event.Wait().IsSuccess());
+}
+
+TEST(CLSocket, UDPClientBlockV4)
+{
+	CLSocket s("127.0.0.1", "3600", SOCKET_TYPE_UDP, true);
+
+	CLEvent event("test_for_socket_tcpserver");
+	CLEvent event2("test_for_socket_tcpclient_notify");
+
+	CLProcess *process = new CLProcess(new CLProcessFunctionForExec);
+	EXPECT_TRUE(process->Run((void *)"../test_for_exec/test_for_CLSocketTCPClient/main 6").IsSuccess());
+
+	EXPECT_TRUE(event2.Wait().IsSuccess());
+
+	const char *p = "hello";
+	CLIOVectors iov;
+	EXPECT_TRUE(iov.PushBack((char *)p, 5).IsSuccess());
+	CLStatus r1 = s.Write(iov);
+	EXPECT_TRUE(r1.m_clReturnCode == 5);
+	EXPECT_TRUE(r1.m_clErrorCode == 0);
+
+	char buf[10];
+	bzero(buf, 10);
+	CLIOVectors iov1;
+	EXPECT_TRUE(iov1.PushBack(buf, 5).IsSuccess());
+
+	CLStatus r2 = s.Read(iov1);
+	EXPECT_TRUE(r2.m_clReturnCode == 5);
+	EXPECT_TRUE(r2.m_clErrorCode == 0);
+
+	EXPECT_TRUE(strcmp(p, buf) == 0);
+
+	EXPECT_TRUE(event.Wait().IsSuccess());
+
+	//..........................
 }

@@ -9,7 +9,7 @@ struct addrinfo;
 class CLUDPClientSocket : public CLBaseSocket
 {
 public:
-	CLUDPClientSocket();
+	CLUDPClientSocket(const char *pstrHostNameOrIP, const char *pstrServiceOrPort, bool bBlock);
 	virtual ~CLUDPClientSocket();
 
 private:

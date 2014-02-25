@@ -2,6 +2,8 @@
 #include "CLSocket.h"
 #include "CLTCPListenSocket.h"
 #include "CLTCPClientSocket.h"
+#include "CLUDPServerSocket.h"
+#include "CLUDPClientSocket.h"
 #include "CLIOVectors.h"
 #include "CLLogger.h"
 #include "ErrorCode.h"
@@ -15,8 +17,8 @@ CLSocket::CLSocket(const char *pstrServiceOrPort, int SocketType, bool bBlock, c
 		m_pSocket = new CLTCPListenSocket(pstrHostNameOrIP, pstrServiceOrPort, backlog, bBlock);
 	else if(SOCKET_TYPE_UDP == SocketType)
 		m_pSocket = new CLUDPServerSocket(pstrHostNameOrIP, pstrServiceOrPort, bBlock);
-
-	throw "In CLSocket::CLSocket(), SocketType error";
+	else
+		throw "In CLSocket::CLSocket(), SocketType error";
 }
 
 CLSocket::CLSocket(int SocketFd, bool bBlock)
@@ -27,7 +29,7 @@ CLSocket::CLSocket(int SocketFd, bool bBlock)
 	m_pSocket = new CLBaseSocket(SocketFd, bBlock);
 }
 
-CLSocket::CLSocket(const char *pstrHostNameOrIP, const char *pstrServiceOrPort, bool bBlock)
+CLSocket::CLSocket(const char *pstrHostNameOrIP, const char *pstrServiceOrPort, int SocketType, bool bBlock)
 {
 	if((pstrServiceOrPort == 0) || (strlen(pstrServiceOrPort) == 0))
 		throw "In CLSocket::CLSocket(), pstrServiceOrPort error";
@@ -35,7 +37,12 @@ CLSocket::CLSocket(const char *pstrHostNameOrIP, const char *pstrServiceOrPort, 
 	if((pstrHostNameOrIP == 0) || (strlen(pstrHostNameOrIP) == 0))
 		throw "In CLSocket::CLSocket(), pstrHostNameOrIP error";
 
-	m_pSocket = new CLTCPClientSocket(pstrHostNameOrIP, pstrServiceOrPort, bBlock);
+	if(SOCKET_TYPE_TCP == SocketType)
+		m_pSocket = new CLTCPClientSocket(pstrHostNameOrIP, pstrServiceOrPort, bBlock);
+	else if(SOCKET_TYPE_UDP == SocketType)
+		m_pSocket = new CLUDPClientSocket(pstrHostNameOrIP, pstrServiceOrPort, bBlock);
+	else
+		throw "In CLSocket::CLSocket() 2, SocketType error";
 }
 
 CLSocket::~CLSocket()
@@ -87,18 +94,18 @@ void CLSocket::NotifyConnectResults(bool bResults)
 	}
 }
 
-CLStatus CLSocket::Read(CLIOVectors& IOVectors, struct addrinfo *pAddrInfo)
+CLStatus CLSocket::Read(CLIOVectors& IOVectors, CLSocketAddress *pSocketAddress)
 {
 	if(IOVectors.Size() == 0)
 		return CLStatus(-1, NORMAL_ERROR);
 
-	return m_pSocket->Read(IOVectors, pAddrInfo);
+	return m_pSocket->Read(IOVectors, pSocketAddress);
 }
 
-CLStatus CLSocket::Write(CLIOVectors& IOVectors, struct addrinfo *pAddrInfo)
+CLStatus CLSocket::Write(CLIOVectors& IOVectors, CLSocketAddress *pSocketAddress)
 {
 	if(IOVectors.Size() == 0)
 		return CLStatus(-1, NORMAL_ERROR);
 
-	return m_pSocket->Write(IOVectors, pAddrInfo);
+	return m_pSocket->Write(IOVectors, pSocketAddress);
 }

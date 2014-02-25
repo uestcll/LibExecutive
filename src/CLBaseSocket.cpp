@@ -1,11 +1,10 @@
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <netdb.h>
 #include "CLBaseSocket.h"
 #include "CLIOVectors.h"
+#include "CLSocketAddress.h"
 #include "ErrorCode.h"
 #include "CLLogger.h"
 
@@ -74,29 +73,29 @@ int CLBaseSocket::GetSocket()
 	return m_SocketFd;
 }
 
-CLStatus CLBaseSocket::Read(CLIOVectors& IOVectors, struct addrinfo *pAddrInfo)
+CLStatus CLBaseSocket::Read(CLIOVectors& IOVectors, CLSocketAddress *pSocketAddress)
 {
-	return ReadOrWrite(false, IOVectors, pAddrInfo);
+	return ReadOrWrite(false, IOVectors, pSocketAddress);
 }
 
-CLStatus CLBaseSocket::Write(CLIOVectors& IOVectors, struct addrinfo *pAddrInfo)
+CLStatus CLBaseSocket::Write(CLIOVectors& IOVectors, CLSocketAddress *pSocketAddress)
 {
-	return ReadOrWrite(true, IOVectors, pAddrInfo);
+	return ReadOrWrite(true, IOVectors, pSocketAddress);
 }
-
-CLStatus CLBaseSocket::ReadOrWrite(bool bWrite, CLIOVectors& IOVectors, struct addrinfo *pAddrInfo)
+//bug
+CLStatus CLBaseSocket::ReadOrWrite(bool bWrite, CLIOVectors& IOVectors, CLSocketAddress *pSocketAddress)
 {
 	struct msghdr msg;
 
-	if(pAddrInfo == 0)
+	if(pSocketAddress == 0)
 	{
 		msg.msg_name = 0;
 		msg.msg_namelen = 0;
 	}
 	else
 	{
-		msg.msg_name = pAddrInfo->ai_addr;
-		msg.msg_namelen = pAddrInfo->ai_addrlen;
+		msg.msg_name = pSocketAddress->GetAddress();
+		msg.msg_namelen = pSocketAddress->GetAddressLength();
 	}
 
 	struct iovec *iov = IOVectors.GetIOVecArray();

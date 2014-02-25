@@ -59,5 +59,6 @@
 #include "CLMsgLoopManagerForPrivateNamedPipe.h"
 #include "CLMsgLoopManagerForShareNamedPipe.h"
 #include "CLSocket.h"
+#include "CLSocketAddress.h"
 
 #endif
