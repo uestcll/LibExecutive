@@ -11,8 +11,13 @@ class CLSocketAddress;
 class CLSocket
 {
 public:
+	//server
 	CLSocket(const char *pstrServiceOrPort, int SocketType = SOCKET_TYPE_TCP, bool bBlock = false, const char *pstrHostNameOrIP = 0, int backlog = LISTEN_BACKLOG);
+
+	//connected socket
 	CLSocket(int SocketFd, bool bBlock);
+
+	//client
 	CLSocket(const char *pstrHostNameOrIP, const char *pstrServiceOrPort, int SocketType = SOCKET_TYPE_TCP, bool bBlock = false);
 	virtual ~CLSocket();
 

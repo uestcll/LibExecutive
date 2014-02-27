@@ -82,7 +82,7 @@ CLStatus CLBaseSocket::Write(CLIOVectors& IOVectors, CLSocketAddress *pSocketAdd
 {
 	return ReadOrWrite(true, IOVectors, pSocketAddress);
 }
-//bug
+
 CLStatus CLBaseSocket::ReadOrWrite(bool bWrite, CLIOVectors& IOVectors, CLSocketAddress *pSocketAddress)
 {
 	struct msghdr msg;

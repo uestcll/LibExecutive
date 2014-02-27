@@ -1,9 +1,12 @@
-main : test.o CLBufferManager.o CLConditionVariable.o CLCriticalSection.o CLDataPostChannelByNamedPipeMaintainer.o CLDataPostChannelBySTLqueueMaintainer.o CLDataPostChannelMaintainer.o CLDataPoster.o CLDataPosterByNamedPipe.o CLDataPosterBySTLqueue.o CLDataPostResultNotifier.o CLDataReceiver.o CLDataReceiverByNamedPipe.o CLDataReceiverBySTLqueue.o CLEvent.o CLExecutive.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLInitialDataPostChannelNotifier.o CLIOVectors.o CLIteratorForIOVectors.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessagePoster.o CLMessageReceiver.o CLMessageSerializer.o CLMsgLoopManagerForPrivateNamedPipe.o CLMsgLoopManagerForShareNamedPipe.o CLMsgLoopManagerForSTLqueue.o CLMsgToPointerSerializer.o CLMultiMsgDeserializer.o CLMultiMsgSerializer.o CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o CLNamedPipe.o CLNonThreadForMsgLoop.o CLPointerToMsgDeserializer.o CLProcess.o CLProcessFunctionForExec.o CLProtocolDataPoster.o CLProtocolDecapsulator.o CLProtocolDecapsulatorByDefaultMsgFormat.o CLProtocolDecapsulatorBySplitPointer.o CLProtocolEncapsulator.o CLSharedConditionVariableImpl.o CLSharedEventImpl.o CLSharedMemory.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLStatus.o CLSTLqueue.o CLThread.o CLThreadForMsgLoop.o CLThreadInitialFinishedNotifier.o 
-	g++ -I../../lib/gtest-1.4.0/include -o main test.o CLBufferManager.o CLConditionVariable.o CLCriticalSection.o CLDataPostChannelByNamedPipeMaintainer.o CLDataPostChannelBySTLqueueMaintainer.o CLDataPostChannelMaintainer.o CLDataPoster.o CLDataPosterByNamedPipe.o CLDataPosterBySTLqueue.o CLDataPostResultNotifier.o CLDataReceiver.o CLDataReceiverByNamedPipe.o CLDataReceiverBySTLqueue.o CLEvent.o CLExecutive.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLInitialDataPostChannelNotifier.o CLIOVectors.o CLIteratorForIOVectors.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessagePoster.o CLMessageReceiver.o CLMessageSerializer.o CLMsgLoopManagerForPrivateNamedPipe.o CLMsgLoopManagerForShareNamedPipe.o CLMsgLoopManagerForSTLqueue.o CLMsgToPointerSerializer.o CLMultiMsgDeserializer.o CLMultiMsgSerializer.o CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o CLNamedPipe.o CLNonThreadForMsgLoop.o CLPointerToMsgDeserializer.o CLProcess.o CLProcessFunctionForExec.o CLProtocolDataPoster.o CLProtocolDecapsulator.o CLProtocolDecapsulatorByDefaultMsgFormat.o CLProtocolDecapsulatorBySplitPointer.o CLProtocolEncapsulator.o CLSharedConditionVariableImpl.o CLSharedEventImpl.o CLSharedMemory.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLStatus.o CLSTLqueue.o CLThread.o CLThreadForMsgLoop.o CLThreadInitialFinishedNotifier.o ../../lib/gtest-1.4.0/libgtest.a -g -lpthread -luuid
+main : test.o CLBaseSocket.o CLBufferManager.o CLConditionVariable.o CLCriticalSection.o CLDataPostChannelByNamedPipeMaintainer.o CLDataPostChannelBySTLqueueMaintainer.o CLDataPostChannelMaintainer.o CLDataPoster.o CLDataPosterByNamedPipe.o CLDataPosterBySTLqueue.o CLDataPostResultNotifier.o CLDataReceiver.o CLDataReceiverByNamedPipe.o CLDataReceiverBySTLqueue.o CLEvent.o CLExecutive.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLInitialDataPostChannelNotifier.o CLIOMultiplexing.o CLIOMultiplexingBySelect.o CLIOVectors.o CLIteratorForIOVectors.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessagePoster.o CLMessageReceiver.o CLMessageSerializer.o CLMsgLoopManagerForIOMultiplexing.o CLMsgLoopManagerForPrivateNamedPipe.o CLMsgLoopManagerForShareNamedPipe.o CLMsgLoopManagerForSTLqueue.o CLMsgToPointerSerializer.o CLMultiMsgDeserializer.o CLMultiMsgSerializer.o CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o CLNamedPipe.o CLNonThreadForMsgLoop.o CLPointerToMsgDeserializer.o CLProcess.o CLProcessFunctionForExec.o CLProtocolDataPoster.o CLProtocolDecapsulator.o CLProtocolDecapsulatorByDefaultMsgFormat.o CLProtocolDecapsulatorBySplitPointer.o CLProtocolEncapsulator.o CLSharedConditionVariableImpl.o CLSharedEventImpl.o CLSharedMemory.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLSocket.o CLSocketAddress.o CLStatus.o CLSTLqueue.o CLTCPClientSocket.o CLTCPListenSocket.o CLThread.o CLThreadForMsgLoop.o CLThreadInitialFinishedNotifier.o CLUDPClientSocket.o CLUDPServerSocket.o 
+	g++ -I../../lib/gtest-1.4.0/include -o main test.o CLBaseSocket.o CLBufferManager.o CLConditionVariable.o CLCriticalSection.o CLDataPostChannelByNamedPipeMaintainer.o CLDataPostChannelBySTLqueueMaintainer.o CLDataPostChannelMaintainer.o CLDataPoster.o CLDataPosterByNamedPipe.o CLDataPosterBySTLqueue.o CLDataPostResultNotifier.o CLDataReceiver.o CLDataReceiverByNamedPipe.o CLDataReceiverBySTLqueue.o CLEvent.o CLExecutive.o CLExecutiveFunctionForMsgLoop.o CLExecutiveFunctionProvider.o CLExecutiveInitialFinishedNotifier.o CLExecutiveNameServer.o CLInitialDataPostChannelNotifier.o CLIOMultiplexing.o CLIOMultiplexingBySelect.o CLIOVectors.o CLIteratorForIOVectors.o CLLibExecutiveInitializer.o CLLogger.o CLMessage.o CLMessageDeserializer.o CLMessageLoopManager.o CLMessageObserver.o CLMessagePoster.o CLMessageReceiver.o CLMessageSerializer.o CLMsgLoopManagerForIOMultiplexing.o CLMsgLoopManagerForPrivateNamedPipe.o CLMsgLoopManagerForShareNamedPipe.o CLMsgLoopManagerForSTLqueue.o CLMsgToPointerSerializer.o CLMultiMsgDeserializer.o CLMultiMsgSerializer.o CLMutex.o CLMutexByPThread.o CLMutexByRecordLocking.o CLMutexByRecordLockingAndPThread.o CLMutexBySharedPThread.o CLMutexInterface.o CLNamedPipe.o CLNonThreadForMsgLoop.o CLPointerToMsgDeserializer.o CLProcess.o CLProcessFunctionForExec.o CLProtocolDataPoster.o CLProtocolDecapsulator.o CLProtocolDecapsulatorByDefaultMsgFormat.o CLProtocolDecapsulatorBySplitPointer.o CLProtocolEncapsulator.o CLSharedConditionVariableImpl.o CLSharedEventImpl.o CLSharedMemory.o CLSharedMutexImpl.o CLSharedObjectsImpl.o CLSocket.o CLSocketAddress.o CLStatus.o CLSTLqueue.o CLTCPClientSocket.o CLTCPListenSocket.o CLThread.o CLThreadForMsgLoop.o CLThreadInitialFinishedNotifier.o CLUDPClientSocket.o CLUDPServerSocket.o ../../lib/gtest-1.4.0/libgtest.a -g -lpthread -luuid
 	rm *.o
 
 test.o : test.cpp
 	g++ -I../../lib/gtest-1.4.0/include -o test.o -c test.cpp -I../../include -g
+
+CLBaseSocket.o : ../../src/CLBaseSocket.cpp
+	g++ -o CLBaseSocket.o -c ../../src/CLBaseSocket.cpp -I../../include -g
 
 CLBufferManager.o : ../../src/CLBufferManager.cpp
 	g++ -o CLBufferManager.o -c ../../src/CLBufferManager.cpp -I../../include -g
@@ -65,6 +68,12 @@ CLExecutiveNameServer.o : ../../src/CLExecutiveNameServer.cpp
 CLInitialDataPostChannelNotifier.o : ../../src/CLInitialDataPostChannelNotifier.cpp
 	g++ -o CLInitialDataPostChannelNotifier.o -c ../../src/CLInitialDataPostChannelNotifier.cpp -I../../include -g
 
+CLIOMultiplexing.o : ../../src/CLIOMultiplexing.cpp
+	g++ -o CLIOMultiplexing.o -c ../../src/CLIOMultiplexing.cpp -I../../include -g
+
+CLIOMultiplexingBySelect.o : ../../src/CLIOMultiplexingBySelect.cpp
+	g++ -o CLIOMultiplexingBySelect.o -c ../../src/CLIOMultiplexingBySelect.cpp -I../../include -g
+
 CLIOVectors.o : ../../src/CLIOVectors.cpp
 	g++ -o CLIOVectors.o -c ../../src/CLIOVectors.cpp -I../../include -g
 
@@ -97,6 +106,9 @@ CLMessageReceiver.o : ../../src/CLMessageReceiver.cpp
 
 CLMessageSerializer.o : ../../src/CLMessageSerializer.cpp
 	g++ -o CLMessageSerializer.o -c ../../src/CLMessageSerializer.cpp -I../../include -g
+
+CLMsgLoopManagerForIOMultiplexing.o : ../../src/CLMsgLoopManagerForIOMultiplexing.cpp
+	g++ -o CLMsgLoopManagerForIOMultiplexing.o -c ../../src/CLMsgLoopManagerForIOMultiplexing.cpp -I../../include -g
 
 CLMsgLoopManagerForPrivateNamedPipe.o : ../../src/CLMsgLoopManagerForPrivateNamedPipe.cpp
 	g++ -o CLMsgLoopManagerForPrivateNamedPipe.o -c ../../src/CLMsgLoopManagerForPrivateNamedPipe.cpp -I../../include -g
@@ -179,11 +191,23 @@ CLSharedMutexImpl.o : ../../src/CLSharedMutexImpl.cpp
 CLSharedObjectsImpl.o : ../../src/CLSharedObjectsImpl.cpp
 	g++ -o CLSharedObjectsImpl.o -c ../../src/CLSharedObjectsImpl.cpp -I../../include -g
 
+CLSocket.o : ../../src/CLSocket.cpp
+	g++ -o CLSocket.o -c ../../src/CLSocket.cpp -I../../include -g
+
+CLSocketAddress.o : ../../src/CLSocketAddress.cpp
+	g++ -o CLSocketAddress.o -c ../../src/CLSocketAddress.cpp -I../../include -g
+
 CLStatus.o : ../../src/CLStatus.cpp
 	g++ -o CLStatus.o -c ../../src/CLStatus.cpp -I../../include -g
 
 CLSTLqueue.o : ../../src/CLSTLqueue.cpp
 	g++ -o CLSTLqueue.o -c ../../src/CLSTLqueue.cpp -I../../include -g
+
+CLTCPClientSocket.o : ../../src/CLTCPClientSocket.cpp
+	g++ -o CLTCPClientSocket.o -c ../../src/CLTCPClientSocket.cpp -I../../include -g
+
+CLTCPListenSocket.o : ../../src/CLTCPListenSocket.cpp
+	g++ -o CLTCPListenSocket.o -c ../../src/CLTCPListenSocket.cpp -I../../include -g
 
 CLThread.o : ../../src/CLThread.cpp
 	g++ -o CLThread.o -c ../../src/CLThread.cpp -I../../include -g
@@ -193,4 +217,10 @@ CLThreadForMsgLoop.o : ../../src/CLThreadForMsgLoop.cpp
 
 CLThreadInitialFinishedNotifier.o : ../../src/CLThreadInitialFinishedNotifier.cpp
 	g++ -o CLThreadInitialFinishedNotifier.o -c ../../src/CLThreadInitialFinishedNotifier.cpp -I../../include -g
+
+CLUDPClientSocket.o : ../../src/CLUDPClientSocket.cpp
+	g++ -o CLUDPClientSocket.o -c ../../src/CLUDPClientSocket.cpp -I../../include -g
+
+CLUDPServerSocket.o : ../../src/CLUDPServerSocket.cpp
+	g++ -o CLUDPServerSocket.o -c ../../src/CLUDPServerSocket.cpp -I../../include -g
 

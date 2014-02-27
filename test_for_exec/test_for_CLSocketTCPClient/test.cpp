@@ -275,14 +275,72 @@ void UDPServer()
 
 	char buf[5];
 	sockaddr_storage addr;
-	socklen_t len;
-	recvfrom(nListenSocket, buf, 5, 0, (sockaddr*)&addr, &len);
+	socklen_t len = sizeof(sockaddr_storage);
+	if(recvfrom(nListenSocket, buf, 5, 0, (sockaddr*)&addr, &len) == -1)
+	{
+		std::cout << "recvfrom error" << std::endl;
+		::close(nListenSocket);
+		return;
+	}
 
-	sendto(nListenSocket, buf, 5, 0, (sockaddr*)&addr, len);
+	if(sendto(nListenSocket, buf, 5, 0, (sockaddr*)&addr, len) == -1)
+		std::cout << "recvfrom error" << std::endl;
 
 	::close(nListenSocket);
 
 	return;
+}
+
+void UDPClient2()
+{
+	int nClientSocket = -1;
+	try
+	{
+		nClientSocket = socket(AF_INET, SOCK_DGRAM, 0);
+		if(-1 == nClientSocket)
+		{
+			cout << "socket error" << endl;
+			return;
+		}
+
+		sockaddr_in ServerAddress;
+		memset(&ServerAddress, 0, sizeof(sockaddr_in));
+		ServerAddress.sin_family = AF_INET;
+		if(inet_pton(AF_INET, "127.0.0.1", &ServerAddress.sin_addr) != 1)
+		{
+			cout << "inet_pton error" << endl;
+			throw CLStatus(0, 0);
+		}
+
+		ServerAddress.sin_port = htons(3600);
+
+		const char *pbuf = "nihaookok";
+		if(sendto(nClientSocket, pbuf, 9, 0, (sockaddr*)&ServerAddress, sizeof(ServerAddress)) == -1)
+		{
+			cout << "sendto error" << endl;
+			throw CLStatus(0, 0);
+		}
+
+		char buf[10];
+		memset(buf, 0, 10);
+		sockaddr_storage addr;
+		socklen_t len = sizeof(sockaddr_storage);
+		if(recvfrom(nClientSocket, buf, 9, 0, (sockaddr*)&addr, &len) == -1)
+		{
+			std::cout << "recvfrom error" << std::endl;
+			throw CLStatus(0, 0);
+		}
+
+		if(strcmp(pbuf, buf) != 0)
+			cout << "strcmp error" << endl;
+
+		throw CLStatus(0, 0);
+	}
+	catch(CLStatus& s)
+	{
+		if(nClientSocket != -1)
+			close(nClientSocket);
+	}
 }
 
 int main(int argc, char* argv[])
@@ -312,6 +370,9 @@ int main(int argc, char* argv[])
 
 		if(argv[1][0] == '6')
 			UDPServer();
+
+		if(argv[1][0] == '7')
+			UDPClient2();
 
 		throw CLStatus(0, 0);
 	}
