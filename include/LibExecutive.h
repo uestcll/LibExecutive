@@ -60,5 +60,6 @@
 #include "CLMsgLoopManagerForShareNamedPipe.h"
 #include "CLSocket.h"
 #include "CLSocketAddress.h"
+#include "CLDataReceiverByAccept.h"
 
 #endif
