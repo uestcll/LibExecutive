@@ -58,6 +58,51 @@ void NormalTCPClient()
 	}
 }
 
+void NormalTCPClient2()
+{
+	int nClientSocket = -1;
+	try
+	{
+		nClientSocket = socket(AF_INET, SOCK_STREAM, 0);
+		if(-1 == nClientSocket)
+		{
+			cout << "socket error" << endl;
+			return;
+		}
+
+		sockaddr_in ServerAddress;
+		memset(&ServerAddress, 0, sizeof(sockaddr_in));
+		ServerAddress.sin_family = AF_INET;
+		if(inet_pton(AF_INET, "127.0.0.1", &ServerAddress.sin_addr) != 1)
+		{
+			cout << "inet_pton error" << endl;
+			throw CLStatus(0, 0);
+		}
+
+		ServerAddress.sin_port = htons(3600);
+
+		if(connect(nClientSocket, (sockaddr*)&ServerAddress, sizeof(ServerAddress)) == -1)
+		{
+			cout << "connect error" << endl;
+			throw CLStatus(0, 0);
+		}
+
+		{
+			CLEvent event2("test_for_CLDataReceiverByTCPSocket_Pending");
+			event2.Set();
+		}
+
+		sleep(5);
+
+		throw CLStatus(0, 0);
+	}
+	catch(CLStatus& s)
+	{
+		if(nClientSocket != -1)
+			close(nClientSocket);
+	}
+}
+
 void NormalTCPClientAcceptError()
 {
 	int nClientSocket = -1;
@@ -373,6 +418,9 @@ int main(int argc, char* argv[])
 
 		if(argv[1][0] == '7')
 			UDPClient2();
+
+		if(argv[1][0] == '8')
+			NormalTCPClient2();
 
 		throw CLStatus(0, 0);
 	}
