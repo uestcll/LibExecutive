@@ -61,5 +61,6 @@
 #include "CLSocket.h"
 #include "CLSocketAddress.h"
 #include "CLDataReceiverByAccept.h"
+#include "CLDataReceiverByTCPSocket.h"
 
 #endif

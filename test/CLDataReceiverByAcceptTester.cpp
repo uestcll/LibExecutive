@@ -58,3 +58,15 @@ TEST(CLDataReceiverByAccept, GetData_Pending_Test)
 	EXPECT_TRUE(psocket == 0);
 	EXPECT_TRUE(context == (long)(ps->GetSocket()));
 }
+
+TEST(CLDataReceiverByAccept, GetData_Parameter_Test)
+{
+	CLSocket *ps = new CLSocket("3600");
+	CLDataReceiverByAccept dr(ps);
+
+	CLIOVectors iov;
+	long context = 0;
+	CLStatus r1 = dr.GetData(iov, &context);
+	EXPECT_TRUE(r1.m_clReturnCode == -1);
+	EXPECT_TRUE(r1.m_clErrorCode == NORMAL_ERROR);
+}

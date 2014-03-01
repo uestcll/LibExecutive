@@ -20,6 +20,9 @@ CLDataReceiverByAccept::~CLDataReceiverByAccept()
 
 CLStatus CLDataReceiverByAccept::GetData(CLIOVectors& IOVectors, void *pContext)
 {
+	if(IOVectors.Size() < sizeof(unsigned long))
+		return CLStatus(-1, NORMAL_ERROR);
+
 	CLSocket *pConnectedSocket = 0;
 	*((long *)pContext) = (long)(m_pSocket->GetSocket());
 
