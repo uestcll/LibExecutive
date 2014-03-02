@@ -37,4 +37,9 @@ const int LISTEN_BACKLOG = 128;
 const int SOCKET_TYPE_TCP = 1;
 const int SOCKET_TYPE_UDP = 2;
 
+const int MESSAGE_ID_BASE = 10000;
+const int MESSAGE_ID_BASE_USER_DEFINED = 20000;
+
+const int MESSAGE_ID_FOR_CLIENT_ARRIVED = MESSAGE_ID_BASE + 100;
+
 #endif

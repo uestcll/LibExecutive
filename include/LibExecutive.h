@@ -62,5 +62,7 @@
 #include "CLSocketAddress.h"
 #include "CLDataReceiverByAccept.h"
 #include "CLDataReceiverByTCPSocket.h"
+#include "CLClientArrivedMsg.h"
+#include "CLClientArrivedMsgDeserializer.h"
 
 #endif
