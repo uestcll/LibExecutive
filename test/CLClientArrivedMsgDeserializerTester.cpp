@@ -10,13 +10,13 @@ TEST(CLClientArrivedMsgDeserializer, Deserialize_Features_Test)
 	CLIOVectors iov;
 	CLClientArrivedMsgDeserializer pt;
 
-	EXPECT_FALSE(pt.Deserialize(iov, &pMsg, bm).IsSuccess());
+	EXPECT_FALSE(pt.Deserialize(iov, &pMsg, bm, 0).IsSuccess());
 	EXPECT_TRUE(pMsg == 0);
 	pMsg=(CLMessage *)1;
 
 	long sock_addr = 2;
 	EXPECT_TRUE(iov.PushBack((char *)(&sock_addr), 8).IsSuccess());
-	EXPECT_TRUE(pt.Deserialize(iov, &pMsg, bm).IsSuccess());
+	EXPECT_TRUE(pt.Deserialize(iov, &pMsg, bm, 0).IsSuccess());
 	EXPECT_TRUE(pMsg != 0);
 
 	CLClientArrivedMsg *pc = dynamic_cast<CLClientArrivedMsg *>(pMsg);
@@ -26,6 +26,6 @@ TEST(CLClientArrivedMsgDeserializer, Deserialize_Features_Test)
 	delete pc;
 
 	sock_addr = 0;
-	EXPECT_FALSE(pt.Deserialize(iov, &pMsg, bm).IsSuccess());
+	EXPECT_FALSE(pt.Deserialize(iov, &pMsg, bm, 0).IsSuccess());
 	EXPECT_TRUE(pMsg == 0);
 }

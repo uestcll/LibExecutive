@@ -92,7 +92,7 @@ public:
 class CLMsg1ForCLNonThreadForMsgLoopTest_Deserializer : public CLMessageDeserializer
 {
 public:
-	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager)
+	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager, void *pContext)
 	{
 		CLIteratorForIOVectors iter;
 		IOVectors.GetIterator(0, iter);
@@ -122,7 +122,7 @@ public:
 class CLMsg2ForCLNonThreadForMsgLoopTest_Deserializer : public CLMessageDeserializer
 {
 public:
-	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager)
+	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager, void *pContext)
 	{
 		CLIteratorForIOVectors iter;
 		IOVectors.GetIterator(0, iter);

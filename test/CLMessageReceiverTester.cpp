@@ -300,7 +300,7 @@ public:
 class CLMsg1ForCLMessageReceiverTest_Deserializer : public CLMessageDeserializer
 {
 public:
-	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager)
+	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager, void *context)
 	{
 		CLIteratorForIOVectors iter;
 		IOVectors.GetIterator(0, iter);
@@ -334,7 +334,7 @@ public:
 class CLMsg2ForCLMessageReceiverTest_Deserializer : public CLMessageDeserializer
 {
 public:
-	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager)
+	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager, void *context)
 	{
 		CLIteratorForIOVectors iter;
 		IOVectors.GetIterator(0, iter);
@@ -360,7 +360,7 @@ public:
 class CLMsg3ForCLMessageReceiverTest_Deserializer : public CLMessageDeserializer
 {
 public:
-	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager)
+	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager, void *context)
 	{
 		*ppMsg = 0;
 
@@ -588,7 +588,7 @@ public:
 class CLMsg4ForCLMessageReceiverTest_Deserializer : public CLMessageDeserializer
 {
 public:
-	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager)
+	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager, void *context)
 	{
 		CLIteratorForIOVectors iter;
 		IOVectors.GetIterator(0, iter);
@@ -699,7 +699,7 @@ public:
 class CLMsg5ForCLMessageReceiverTest_Deserializer : public CLMessageDeserializer
 {
 public:
-	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager)
+	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager, void *context)
 	{
 		CLIteratorForIOVectors iter;
 		IOVectors.GetIterator(0, iter);

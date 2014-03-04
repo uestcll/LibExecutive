@@ -49,7 +49,7 @@ CLStatus CLMultiMsgDeserializer::UnregisterDeserializer(unsigned long lMsgID)
 		return CLStatus(-1, NORMAL_ERROR);
 }
 
-CLStatus CLMultiMsgDeserializer::Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager)
+CLStatus CLMultiMsgDeserializer::Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager, void *pContext)
 {
 	const unsigned int HeadLength = sizeof(int);
 	const unsigned int MsgIDLength = sizeof(long);
@@ -73,7 +73,7 @@ CLStatus CLMultiMsgDeserializer::Deserialize(CLIOVectors& IOVectors, CLMessage *
 		map<unsigned long, CLMessageDeserializer*>::iterator it = m_DeserializerTable.find(MsgID);
 		if(it != m_DeserializerTable.end())
 		{
-			CLStatus s = it->second->Deserialize(IOVectors, ppMsg, BufferManager);
+			CLStatus s = it->second->Deserialize(IOVectors, ppMsg, BufferManager, pContext);
 			if(!s.IsSuccess())
 			{
 				CLLogger::WriteLogMsg("In CLMultiMsgDeserializer::Deserialize(), it->second->Deserialize error", 0);

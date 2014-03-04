@@ -108,7 +108,7 @@ CLStatus CLMessageReceiver::GetMessage(std::queue<CLMessage*>& qMsgContainer)
 			for(int i = 0; i < vSerializedMsgs.size(); i++)
 			{
 				CLMessage *pMsg = 0;
-				CLStatus s3 = m_pMsgDeserializer->Deserialize(*(vSerializedMsgs[i]), &pMsg, *m_pBufferManager);
+				CLStatus s3 = m_pMsgDeserializer->Deserialize(*(vSerializedMsgs[i]), &pMsg, *m_pBufferManager, &Context);
 				if(!s3.IsSuccess() || (pMsg == 0))
 				{
 					CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pMsgDeserializer->Deserialize or pMsg == 0 error", 0);
@@ -138,7 +138,7 @@ CLStatus CLMessageReceiver::GetMessage(std::queue<CLMessage*>& qMsgContainer)
 	}
 
 	CLMessage *pMsg1 = 0;
-	CLStatus s4 = m_pMsgDeserializer->Deserialize(tmp_iov, &pMsg1, *m_pBufferManager);
+	CLStatus s4 = m_pMsgDeserializer->Deserialize(tmp_iov, &pMsg1, *m_pBufferManager, &Context);
 	if(!s4.IsSuccess() || (pMsg1 == 0))
 	{
 		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pMsgDeserializer->Deserialize or pMsg1 == 0 error", 0);

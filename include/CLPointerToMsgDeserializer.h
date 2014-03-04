@@ -9,7 +9,7 @@ public:
 	CLPointerToMsgDeserializer();
 	virtual ~CLPointerToMsgDeserializer();
 
-	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager);
+	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager, void *pContext);
 
 private:
 	CLPointerToMsgDeserializer(const CLPointerToMsgDeserializer&);

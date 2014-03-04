@@ -97,7 +97,7 @@ public:
 class CLMsg1ForCLMsgLoopManagerForShareNamedPipeTest_Deserializer : public CLMessageDeserializer
 {
 public:
-	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager)
+	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager, void *context)
 	{
 		CLIteratorForIOVectors iter;
 		IOVectors.GetIterator(0, iter);
@@ -131,7 +131,7 @@ public:
 class CLMsg2ForCLMsgLoopManagerForShareNamedPipeTest_Deserializer : public CLMessageDeserializer
 {
 public:
-	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager)
+	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager, void *context)
 	{
 		CLIteratorForIOVectors iter;
 		IOVectors.GetIterator(0, iter);

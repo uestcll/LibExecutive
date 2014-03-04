@@ -13,7 +13,7 @@ CLClientArrivedMsgDeserializer::~CLClientArrivedMsgDeserializer()
 {
 }
 
-CLStatus CLClientArrivedMsgDeserializer::Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager)
+CLStatus CLClientArrivedMsgDeserializer::Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager, void *pContext)
 {
 	try
 	{

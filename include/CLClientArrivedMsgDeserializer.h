@@ -9,7 +9,7 @@ public:
 	CLClientArrivedMsgDeserializer();
 	virtual ~CLClientArrivedMsgDeserializer();
 
-	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager);
+	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager, void *pContext);
 
 private:
 	CLClientArrivedMsgDeserializer(const CLClientArrivedMsgDeserializer&);

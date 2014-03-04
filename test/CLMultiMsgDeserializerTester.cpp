@@ -38,7 +38,7 @@ public:
 class CLMsg1ForCLMultiMsgDeserializerTest_Deserializer : public CLMessageDeserializer
 {
 public:
-	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager)
+	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager, void *context)
 	{
 		*ppMsg = (CLMessage *)10;
 		return CLStatus(0, 0);
@@ -52,7 +52,7 @@ public:
 class CLMsg2ForCLMultiMsgDeserializerTest_Deserializer : public CLMessageDeserializer
 {
 public:
-	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager)
+	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager, void *context)
 	{
 		//*ppMsg = (CLMessage *)20;
 		return CLStatus(-1, NORMAL_ERROR);
@@ -121,7 +121,7 @@ TEST(CLMultiMsgDeserializer, Deserialize_Features_Test)
 	CLMessage *pMsg=(CLMessage *)1;
 	CLIOVectors iov;
 
-	EXPECT_FALSE(dd.Deserialize(iov, &pMsg, bm).IsSuccess());
+	EXPECT_FALSE(dd.Deserialize(iov, &pMsg, bm, 0).IsSuccess());
 	EXPECT_TRUE(pMsg == 0);
 	pMsg=(CLMessage *)1;
 
@@ -136,16 +136,16 @@ TEST(CLMultiMsgDeserializer, Deserialize_Features_Test)
 
 	EXPECT_TRUE(iov.PushBack(p1, 1, true).IsSuccess());
 	EXPECT_TRUE(iov.PushBack(p2, 11, true).IsSuccess());
-	EXPECT_TRUE(dd.Deserialize(iov, &pMsg, bm).IsSuccess());
+	EXPECT_TRUE(dd.Deserialize(iov, &pMsg, bm, 0).IsSuccess());
 	EXPECT_TRUE(pMsg == (CLMessage *)10);
 
 	p2[3] = 2;
 	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
-	EXPECT_FALSE(dd.Deserialize(iov, &pMsg, bm).IsSuccess());
+	EXPECT_FALSE(dd.Deserialize(iov, &pMsg, bm, 0).IsSuccess());
 	EXPECT_TRUE(pMsg == (CLMessage *)0);
 	pMsg=(CLMessage *)1;
 
 	p2[3] = 3;
-	EXPECT_FALSE(dd.Deserialize(iov, &pMsg, bm).IsSuccess());
+	EXPECT_FALSE(dd.Deserialize(iov, &pMsg, bm, 0).IsSuccess());
 	EXPECT_TRUE(pMsg == (CLMessage *)0);
 }

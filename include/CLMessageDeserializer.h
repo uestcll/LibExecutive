@@ -13,7 +13,7 @@ public:
 	CLMessageDeserializer();
 	virtual ~CLMessageDeserializer();
 
-	virtual CLStatus Deserialize(CLIOVectors& pIOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager) = 0;
+	virtual CLStatus Deserialize(CLIOVectors& pIOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager, void *pContext) = 0;
 
 private:
 	CLMessageDeserializer(const CLMessageDeserializer&);

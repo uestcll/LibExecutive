@@ -13,7 +13,7 @@ public:
 	CLStatus RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer);
 	CLStatus UnregisterDeserializer(unsigned long lMsgID);
 
-	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager);
+	virtual CLStatus Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager, void *pContext);
 
 private:
 	CLMultiMsgDeserializer(const CLMultiMsgDeserializer&);

@@ -13,7 +13,7 @@ CLPointerToMsgDeserializer::~CLPointerToMsgDeserializer()
 {
 }
 
-CLStatus CLPointerToMsgDeserializer::Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager)
+CLStatus CLPointerToMsgDeserializer::Deserialize(CLIOVectors& IOVectors, CLMessage **ppMsg, CLBufferManager& BufferManager, void *pContext)
 {
 	try
 	{
