@@ -1,29 +1,31 @@
 #include <gtest/gtest.h>
 #include "LibExecutive.h"
-/*
-TEST(CLPointerToMsgDeserializer, Deserialize_Features_Test)
+
+TEST(CLClientArrivedMsgDeserializer, Deserialize_Features_Test)
 {
-	CLLogger::WriteLogMsg("CLPointerToMsgDeserializer Test", 0);
+	CLLogger::WriteLogMsg("CLClientArrivedMsgDeserializer Test", 0);
 
 	CLBufferManager bm;
 	CLMessage *pMsg=(CLMessage *)1;
 	CLIOVectors iov;
-	CLPointerToMsgDeserializer pt;
+	CLClientArrivedMsgDeserializer pt;
 
 	EXPECT_FALSE(pt.Deserialize(iov, &pMsg, bm).IsSuccess());
 	EXPECT_TRUE(pMsg == 0);
 	pMsg=(CLMessage *)1;
 
-	char buf[8];
-	for(int i = 0; i < 8; i++)
-		buf[i] = 0;
-
-	EXPECT_TRUE(iov.PushBack(buf, 8).IsSuccess());
-	EXPECT_FALSE(pt.Deserialize(iov, &pMsg, bm).IsSuccess());
-	EXPECT_TRUE(pMsg == 0);
-	pMsg=(CLMessage *)1;
-
-	buf[0] = 10;
+	long sock_addr = 2;
+	EXPECT_TRUE(iov.PushBack((char *)(&sock_addr), 8).IsSuccess());
 	EXPECT_TRUE(pt.Deserialize(iov, &pMsg, bm).IsSuccess());
-	EXPECT_TRUE(pMsg == (CLMessage *)10);
-}*/
+	EXPECT_TRUE(pMsg != 0);
+
+	CLClientArrivedMsg *pc = dynamic_cast<CLClientArrivedMsg *>(pMsg);
+	EXPECT_TRUE(pc != 0);
+	EXPECT_TRUE(((long)pc->GetSocket() == 2));
+
+	delete pc;
+
+	sock_addr = 0;
+	EXPECT_FALSE(pt.Deserialize(iov, &pMsg, bm).IsSuccess());
+	EXPECT_TRUE(pMsg == 0);
+}
