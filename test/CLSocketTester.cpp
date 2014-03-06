@@ -5,6 +5,8 @@
 #include <fcntl.h>
 #include <strings.h>
 #include <netdb.h>
+#include <uuid/uuid.h>
+#include <string.h>
 #include "LibExecutive.h"
 
 TEST(CLSocket, GetSocket)
@@ -26,6 +28,19 @@ TEST(CLSocket, GetSocket)
 	EXPECT_TRUE(val != -1);
 
 	EXPECT_TRUE(val & O_NONBLOCK);
+
+	uuid_t socket_id;
+	char *pid = (char *)socket_id;
+	char zero[16];
+	for(int i = 0; i < 16; i++)
+	{
+		pid[i] = 0;
+		zero[i] = 0;
+	}
+
+	s.GetUuid(socket_id);
+
+	EXPECT_TRUE(memcmp(socket_id, zero, 16) != 0);
 }
 
 TEST(CLSocket, BlockSocket)

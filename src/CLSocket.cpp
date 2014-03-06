@@ -64,7 +64,6 @@ int CLSocket::GetSocket()
 void CLSocket::GetUuid(uuid_t uuid)
 {
 	uuid_copy(uuid, m_UuidOfSocket);
-	//...........
 }
 
 CLStatus CLSocket::Accept(CLSocket **ppSocket)
