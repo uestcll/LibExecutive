@@ -96,6 +96,11 @@ long CLNamedPipe::GetSizeForAtomWriting()
 	return m_lSizeForAtomWriting;
 }
 
+CLUuid CLNamedPipe::GetUuid()
+{
+	return m_UuidOfNamedPipe;
+}
+
 CLStatus CLNamedPipe::Read(CLIOVectors& IOVectors)
 {
 	if(!m_bReader || (IOVectors.Size() == 0))

@@ -47,3 +47,8 @@ CLStatus CLDataReceiverByAccept::GetData(CLIOVectors& IOVectors, void *pContext)
 
 	return CLStatus(-1, NORMAL_ERROR);
 }
+
+CLUuid CLDataReceiverByAccept::GetUuid()
+{
+	return m_pSocket->GetUuid();
+}

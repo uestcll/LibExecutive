@@ -2,6 +2,7 @@
 #define CLMsgLoopManagerForSTLqueue_H
 
 #include <string>
+#include "CLUuid.h"
 #include "CLMessageLoopManager.h"
 
 class CLMessageReceiver;
@@ -29,6 +30,7 @@ private:
 	std::string m_strThreadName;
 	CLMessageReceiver *m_pMsgReceiver;
 	CLEvent *m_pEvent;
+	CLUuid m_Uuid;
 	CLSTLqueue *m_pSTLqueue;
 };
 

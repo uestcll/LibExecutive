@@ -11,6 +11,7 @@ public:
 	virtual ~CLDataReceiverByNamedPipe();
 
 	virtual CLStatus GetData(CLIOVectors& IOVectors, void *pContext);
+	virtual CLUuid GetUuid();
 
 private:
 	CLDataReceiverByNamedPipe(const CLDataReceiverByNamedPipe&);

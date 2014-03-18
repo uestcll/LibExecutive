@@ -71,20 +71,25 @@ CLStatus CLMessageLoopManager::EnterMessageLoop(void *pContext)
 
 		while(!m_MessageContainer.empty())
 		{
-			CLMessage *pMsg = m_MessageContainer.front();
+			SLMessageAndSource *pInfo = m_MessageContainer.front();
 			m_MessageContainer.pop();
-
-			if(pMsg)
+			if(pInfo && pInfo->pMsg)
 			{
-				CLStatus s3 = DispatchMessage(pMsg);
+				CLStatus s3 = DispatchMessage(pInfo);
 
-				delete pMsg;
+				delete pInfo->pMsg;
+
+				delete pInfo;
 
 				if(s3.m_clReturnCode == QUIT_MESSAGE_LOOP)
 				{
 					bQuit = true;
 					break;
 				}
+			}
+			else if(pInfo)
+			{
+				delete pInfo;
 			}
 		}
 
@@ -94,10 +99,15 @@ CLStatus CLMessageLoopManager::EnterMessageLoop(void *pContext)
 
 	while(!m_MessageContainer.empty())
 	{
-		CLMessage *pMsg = m_MessageContainer.front();
+		SLMessageAndSource *pInfo = m_MessageContainer.front();
 		m_MessageContainer.pop();
-		if(pMsg)
-			delete pMsg;
+		if(pInfo)
+		{
+			if(pInfo->pMsg)
+				delete pInfo->pMsg;
+
+			delete pInfo;
+		}
 	}
 
 	CLStatus s4 = Uninitialize();
@@ -110,10 +120,10 @@ CLStatus CLMessageLoopManager::EnterMessageLoop(void *pContext)
 	return CLStatus(0, 0);
 }
 
-CLStatus CLMessageLoopManager::DispatchMessage(CLMessage *pMessage)
+CLStatus CLMessageLoopManager::DispatchMessage(SLMessageAndSource *pMsgInfo)
 {
 	std::map<unsigned long, CallBackForMessageLoop>::iterator it;
-	it = m_MsgMappingTable.find(pMessage->m_clMsgID);
+	it = m_MsgMappingTable.find(pMsgInfo->pMsg->m_clMsgID);
 
 	if(it == m_MsgMappingTable.end())
 	{
@@ -123,5 +133,5 @@ CLStatus CLMessageLoopManager::DispatchMessage(CLMessage *pMessage)
 	
 	CallBackForMessageLoop pFunction = it->second;
 
-	return (m_pMessageObserver->*pFunction)(pMessage);
+	return (m_pMessageObserver->*pFunction)(pMsgInfo->pMsg, pMsgInfo->ChannelUuid);
 }

@@ -29,7 +29,9 @@ CLMsgLoopManagerForPrivateNamedPipe::CLMsgLoopManagerForPrivateNamedPipe(CLMessa
 	strPath += pstrThreadName;
 
 	m_pEvent = new CLEvent(true);
-	m_pMsgReceiver = new CLMessageReceiver(new CLBufferManager(), new CLDataReceiverByNamedPipe(strPath.c_str()), new CLPointerToMsgDeserializer(), new CLProtocolDecapsulatorBySplitPointer);
+	CLDataReceiver *pDataReceiver = new CLDataReceiverByNamedPipe(strPath.c_str());
+	m_Uuid = pDataReceiver->GetUuid();
+	m_pMsgReceiver = new CLMessageReceiver(&m_Uuid, new CLBufferManager(), pDataReceiver, new CLPointerToMsgDeserializer(), new CLProtocolDecapsulatorBySplitPointer);
 }
 
 CLMsgLoopManagerForPrivateNamedPipe::~CLMsgLoopManagerForPrivateNamedPipe()
@@ -64,7 +66,7 @@ CLStatus CLMsgLoopManagerForPrivateNamedPipe::Initialize()
 			throw CLStatus(-1, NORMAL_ERROR);
 		}
 
-		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), pMsgPoster, m_pMsgReceiver);
+		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), m_Uuid, pMsgPoster, m_pMsgReceiver);
 		if(!s.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForPrivateNamedPipe::Initialize(), pNameServer->Register error", 0);

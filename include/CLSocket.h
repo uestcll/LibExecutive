@@ -1,7 +1,7 @@
 #ifndef CLSocket_H
 #define CLSocket_H
 
-#include <uuid/uuid.h>
+#include "CLUuid.h"
 #include "DefinitionForConst.h"
 #include "CLStatus.h"
 
@@ -23,7 +23,7 @@ public:
 	virtual ~CLSocket();
 
 	int GetSocket();
-	void GetUuid(uuid_t uuid);
+	CLUuid GetUuid();
 
 	CLStatus Accept(CLSocket **ppSocket);
 
@@ -39,7 +39,7 @@ private:
 
 private:
 	CLBaseSocket *m_pSocket;
-	uuid_t m_UuidOfSocket;
+	CLUuid m_UuidOfSocket;
 };
 
 #endif

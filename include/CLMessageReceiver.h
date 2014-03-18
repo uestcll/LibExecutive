@@ -11,14 +11,16 @@ class CLProtocolDecapsulator;
 class CLDataReceiver;
 class CLIOVectors;
 class CLBufferManager;
+class CLUuid;
+struct SLMessageAndSource;
 
 class CLMessageReceiver
 {
 public:
-	CLMessageReceiver(CLBufferManager *pBufferManager, CLDataReceiver *pDataReceiver, CLMessageDeserializer *pMsgDeserializer, CLProtocolDecapsulator *pProtocolDecapsulator = 0);
+	CLMessageReceiver(CLUuid *pChannelUuid, CLBufferManager *pBufferManager, CLDataReceiver *pDataReceiver, CLMessageDeserializer *pMsgDeserializer, CLProtocolDecapsulator *pProtocolDecapsulator = 0);
 	virtual ~CLMessageReceiver();
 
-	CLStatus GetMessage(std::queue<CLMessage*>& qMsgContainer);
+	CLStatus GetMessage(std::queue<SLMessageAndSource*>& qMsgContainer);
 
 private:
 	CLMessageReceiver(const CLMessageReceiver&);
@@ -29,6 +31,8 @@ private:
 	CLDataReceiver *m_pDataReceiver;
 	CLProtocolDecapsulator *m_pProtocolDecapsulator;
 	CLBufferManager *m_pBufferManager;
+	
+	CLUuid *m_pChannelUuid;
 };
 
 #endif

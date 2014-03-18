@@ -3,13 +3,14 @@
 
 #include <map>
 #include <queue>
+#include "CLUuid.h"
 #include "CLStatus.h"
 
 class CLMessageObserver;
 class CLMessage;
 class CLExecutiveInitialFinishedNotifier;
 
-typedef CLStatus (CLMessageObserver::*CallBackForMessageLoop)(CLMessage *);
+typedef CLStatus (CLMessageObserver::*CallBackForMessageLoop)(CLMessage *, CLUuid);
 
 #define QUIT_MESSAGE_LOOP 1
 
@@ -17,6 +18,12 @@ struct SLExecutiveInitialParameter
 {
 	void *pContext;
 	CLExecutiveInitialFinishedNotifier *pNotifier;
+};
+
+struct SLMessageAndSource
+{
+	CLMessage *pMsg;
+	CLUuid ChannelUuid;
 };
 
 class CLMessageLoopManager
@@ -35,7 +42,7 @@ protected:
 	virtual CLStatus Uninitialize() = 0;
 	
 	virtual CLStatus WaitForMessage() = 0;
-	virtual CLStatus DispatchMessage(CLMessage *pMessage);
+	virtual CLStatus DispatchMessage(SLMessageAndSource *pMsgInfo);
 
 private:
 	CLMessageLoopManager(const CLMessageLoopManager&);
@@ -44,7 +51,7 @@ private:
 protected:
 	CLMessageObserver *m_pMessageObserver;
 	std::map<unsigned long, CallBackForMessageLoop> m_MsgMappingTable;
-	std::queue<CLMessage*> m_MessageContainer;
+	std::queue<SLMessageAndSource*> m_MessageContainer;
 };
 
 #endif

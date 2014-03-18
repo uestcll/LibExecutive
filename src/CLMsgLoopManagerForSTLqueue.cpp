@@ -23,8 +23,8 @@ CLMsgLoopManagerForSTLqueue::CLMsgLoopManagerForSTLqueue(CLMessageObserver *pMsg
 	m_strThreadName = pstrThreadName;
 	m_pEvent = new CLEvent(true);
 	m_pSTLqueue = new CLSTLqueue();
-
-	m_pMsgReceiver = new CLMessageReceiver(new CLBufferManager(), new CLDataReceiverBySTLqueue(m_pSTLqueue), new CLPointerToMsgDeserializer(), new CLProtocolDecapsulatorBySplitPointer());
+	m_Uuid = m_pSTLqueue->GetUuid();
+	m_pMsgReceiver = new CLMessageReceiver(&m_Uuid, new CLBufferManager(), new CLDataReceiverBySTLqueue(m_pSTLqueue), new CLPointerToMsgDeserializer(), new CLProtocolDecapsulatorBySplitPointer());
 }
 
 CLMsgLoopManagerForSTLqueue::~CLMsgLoopManagerForSTLqueue()
@@ -56,7 +56,7 @@ CLStatus CLMsgLoopManagerForSTLqueue::Initialize()
 			throw CLStatus(-1, NORMAL_ERROR);
 		}
 		
-		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), pMsgPoster, m_pMsgReceiver);
+		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), m_Uuid, pMsgPoster, m_pMsgReceiver);
 		if(!s.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::Initialize(), pNameServer->Register error", 0);

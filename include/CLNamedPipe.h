@@ -2,6 +2,7 @@
 #define CLNamedPipe_H
 
 #include <string>
+#include "CLUuid.h"
 #include "CLStatus.h"
 
 class CLMutex;
@@ -14,6 +15,7 @@ public:
 	virtual ~CLNamedPipe();
 
 	int GetFd();
+	CLUuid GetUuid();
 	long GetSizeForAtomWriting();
 
 	CLStatus Read(CLIOVectors& IOVectors);
@@ -36,6 +38,8 @@ private:
 	long m_lSizeForAtomWriting;
 	bool m_bReader;
 	CLMutex *m_pMutex;
+
+	CLUuid m_UuidOfNamedPipe;
 };
 
 #endif

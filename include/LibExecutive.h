@@ -64,5 +64,6 @@
 #include "CLDataReceiverByTCPSocket.h"
 #include "CLClientArrivedMsg.h"
 #include "CLClientArrivedMsgDeserializer.h"
+#include "CLUuid.h"
 
 #endif

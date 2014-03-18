@@ -32,3 +32,8 @@ CLStatus CLDataReceiverByNamedPipe::GetData(CLIOVectors& IOVectors, void *pConte
 		return CLStatus(-1, NORMAL_ERROR);
 	}
 }
+
+CLUuid CLDataReceiverByNamedPipe::GetUuid()
+{
+	return m_NamedPipe.GetUuid();
+}

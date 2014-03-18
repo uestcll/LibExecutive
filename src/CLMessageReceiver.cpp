@@ -1,8 +1,10 @@
 #include <memory.h>
+#include "CLMessageLoopManager.h"
 #include "CLMessageReceiver.h"
 #include "CLMessageDeserializer.h"
 #include "CLProtocolDecapsulator.h"
 #include "CLDataReceiver.h"
+#include "CLUuid.h"
 #include "CLIOVectors.h"
 #include "CLLogger.h"
 #include "ErrorCode.h"
@@ -10,7 +12,7 @@
 
 using namespace std;
 
-CLMessageReceiver::CLMessageReceiver(CLBufferManager *pBufferManager, CLDataReceiver *pDataReceiver, CLMessageDeserializer *pMsgDeserializer, CLProtocolDecapsulator *pProtocolDecapsulator)
+CLMessageReceiver::CLMessageReceiver(CLUuid *pChannelUuid, CLBufferManager *pBufferManager, CLDataReceiver *pDataReceiver, CLMessageDeserializer *pMsgDeserializer, CLProtocolDecapsulator *pProtocolDecapsulator)
 {
 	try
 	{
@@ -27,6 +29,8 @@ CLMessageReceiver::CLMessageReceiver(CLBufferManager *pBufferManager, CLDataRece
 		m_pProtocolDecapsulator = pProtocolDecapsulator;
 		m_pMsgDeserializer = pMsgDeserializer;
 		m_pBufferManager = pBufferManager;
+
+		m_pChannelUuid = new CLUuid(*pChannelUuid);
 	}
 	catch(const char *s)
 	{
@@ -59,9 +63,12 @@ CLMessageReceiver::~CLMessageReceiver()
 
 	if(m_pDataReceiver)
 		delete m_pDataReceiver;
+
+	if(m_pChannelUuid)
+		delete m_pChannelUuid;
 }
 
-CLStatus CLMessageReceiver::GetMessage(std::queue<CLMessage*>& qMsgContainer)
+CLStatus CLMessageReceiver::GetMessage(std::queue<SLMessageAndSource*>& qMsgContainer)
 {
 	CLIOVectors ReceiveIOVec;
 	CLStatus s11 = m_pBufferManager->GetEmptyIOVector(ReceiveIOVec);
@@ -115,7 +122,11 @@ CLStatus CLMessageReceiver::GetMessage(std::queue<CLMessage*>& qMsgContainer)
 					throw s3;
 				}
 
-				qMsgContainer.push(pMsg);
+				SLMessageAndSource *pMsgInfo = new SLMessageAndSource;
+				pMsgInfo->pMsg = pMsg;
+				pMsgInfo->ChannelUuid = *m_pChannelUuid;
+
+				qMsgContainer.push(pMsgInfo);
 			}
 
 			throw CLStatus(0, 0);
@@ -145,7 +156,11 @@ CLStatus CLMessageReceiver::GetMessage(std::queue<CLMessage*>& qMsgContainer)
 		return s4;
 	}
 
-	qMsgContainer.push(pMsg1);
+	SLMessageAndSource *pMsgInfo1 = new SLMessageAndSource;
+	pMsgInfo1->pMsg = pMsg1;
+	pMsgInfo1->ChannelUuid = *m_pChannelUuid;
+
+	qMsgContainer.push(pMsgInfo1);
 
 	return CLStatus(0, 0);
 }

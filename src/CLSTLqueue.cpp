@@ -13,6 +13,11 @@ CLSTLqueue::~CLSTLqueue()
 {
 }
 
+CLUuid CLSTLqueue::GetUuid()
+{
+	return m_UuidOfSTLqueue;
+}
+
 unsigned long CLSTLqueue::PopOneData()
 {
 	unsigned long l = m_DataQueue.front();

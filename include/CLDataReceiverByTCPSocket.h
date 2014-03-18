@@ -12,6 +12,7 @@ public:
 	virtual ~CLDataReceiverByTCPSocket();
 
 	virtual CLStatus GetData(CLIOVectors& IOVectors, void *pContext);
+	virtual CLUuid GetUuid();
 
 private:
 	CLDataReceiverByTCPSocket(const CLDataReceiverByTCPSocket&);

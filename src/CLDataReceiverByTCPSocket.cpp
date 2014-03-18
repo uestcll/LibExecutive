@@ -39,3 +39,8 @@ CLStatus CLDataReceiverByTCPSocket::GetData(CLIOVectors& IOVectors, void *pConte
 
 	return CLStatus(-1, NORMAL_ERROR);
 }
+
+CLUuid CLDataReceiverByTCPSocket::GetUuid()
+{
+	return m_pSocket->GetUuid();
+}

@@ -12,6 +12,7 @@ public:
 	virtual ~CLDataReceiverBySTLqueue();
 
 	virtual CLStatus GetData(CLIOVectors& IOVectors, void *pContext);
+	virtual CLUuid GetUuid();
 
 private:
 	CLDataReceiverBySTLqueue(const CLDataReceiverBySTLqueue&);

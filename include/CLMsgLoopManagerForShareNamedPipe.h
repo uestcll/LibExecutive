@@ -2,6 +2,7 @@
 #define CLMsgLoopManagerForShareNamedPipe_H
 
 #include <string>
+#include "CLUuid.h"
 #include "CLMessageLoopManager.h"
 
 class CLMessageReceiver;
@@ -31,6 +32,7 @@ private:
 private:
 	std::string m_strThreadName;
 	CLMessageReceiver *m_pMsgReceiver;
+	CLUuid m_Uuid;
 	CLEvent *m_pEvent;
 
 	CLMessageSerializer *m_pMsgSerializer;

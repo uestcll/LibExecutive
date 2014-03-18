@@ -35,7 +35,10 @@ CLMsgLoopManagerForShareNamedPipe::CLMsgLoopManagerForShareNamedPipe(CLMessageOb
 	m_pDecapsulator = pDecapsulator;
 	m_pEncapsulator = pEncapsulator;
 
-	m_pMsgReceiver = new CLMessageReceiver(new CLBufferManager(), new CLDataReceiverByNamedPipe(strPath.c_str()), m_pMsgDeserializer, m_pDecapsulator);
+	CLDataReceiver *pDataReceiver = new CLDataReceiverByNamedPipe(strPath.c_str());
+	m_Uuid = pDataReceiver->GetUuid();
+
+	m_pMsgReceiver = new CLMessageReceiver(&m_Uuid, new CLBufferManager(), pDataReceiver, m_pMsgDeserializer, m_pDecapsulator);
 }
 
 CLMsgLoopManagerForShareNamedPipe::~CLMsgLoopManagerForShareNamedPipe()
@@ -70,7 +73,7 @@ CLStatus CLMsgLoopManagerForShareNamedPipe::Initialize()
 			throw CLStatus(-1, NORMAL_ERROR);
 		}
 
-		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), pMsgPoster);
+		CLStatus s = pNameServer->Register(m_strThreadName.c_str(), m_Uuid, pMsgPoster);
 		if(!s.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForShareNamedPipe::Initialize(), pNameServer->Register error", 0);

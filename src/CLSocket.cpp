@@ -13,8 +13,6 @@ CLSocket::CLSocket(const char *pstrServiceOrPort, int SocketType, bool bBlock, c
 	if((pstrServiceOrPort == 0) || (strlen(pstrServiceOrPort) == 0))
 		throw "In CLSocket::CLSocket(), pstrServiceOrPort error";
 
-	uuid_generate(m_UuidOfSocket);
-
 	if(SOCKET_TYPE_TCP == SocketType)
 		m_pSocket = new CLTCPListenSocket(pstrHostNameOrIP, pstrServiceOrPort, backlog, bBlock);
 	else if(SOCKET_TYPE_UDP == SocketType)
@@ -28,8 +26,6 @@ CLSocket::CLSocket(int SocketFd, bool bBlock)
 	if(SocketFd < 0)
 		throw "In CLSocket::CLSocket(), SocketFd error";
 
-	uuid_generate(m_UuidOfSocket);
-
 	m_pSocket = new CLBaseSocket(SocketFd, bBlock);
 }
 
@@ -40,8 +36,6 @@ CLSocket::CLSocket(const char *pstrHostNameOrIP, const char *pstrServiceOrPort, 
 
 	if((pstrHostNameOrIP == 0) || (strlen(pstrHostNameOrIP) == 0))
 		throw "In CLSocket::CLSocket(), pstrHostNameOrIP error";
-
-	uuid_generate(m_UuidOfSocket);
 
 	if(SOCKET_TYPE_TCP == SocketType)
 		m_pSocket = new CLTCPClientSocket(pstrHostNameOrIP, pstrServiceOrPort, bBlock);
@@ -61,9 +55,9 @@ int CLSocket::GetSocket()
 	return m_pSocket->GetSocket();
 }
 
-void CLSocket::GetUuid(uuid_t uuid)
+CLUuid CLSocket::GetUuid()
 {
-	uuid_copy(uuid, m_UuidOfSocket);
+	return m_UuidOfSocket;
 }
 
 CLStatus CLSocket::Accept(CLSocket **ppSocket)

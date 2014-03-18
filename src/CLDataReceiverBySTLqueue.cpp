@@ -28,3 +28,8 @@ CLStatus CLDataReceiverBySTLqueue::GetData(CLIOVectors& IOVectors, void *pContex
 
 	return s;
 }
+
+CLUuid CLDataReceiverBySTLqueue::GetUuid()
+{
+	return m_pSTLqueue->GetUuid();
+}
