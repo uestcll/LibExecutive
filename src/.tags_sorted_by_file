@@ -1,0 +1,443 @@
+AddDataStartIndex	CLBuffer.cpp	/^CLStatus CLBuffer::AddDataStartIndex(const int& addDataLen)$/;"	f	class:CLBuffer
+AddUsedBufferLen	CLBuffer.cpp	/^CLStatus CLBuffer::AddUsedBufferLen(const int& addUsedLen)$/;"	f	class:CLBuffer
+CLBuffer	CLBuffer.cpp	/^CLBuffer::CLBuffer(int itemSize) : m_iItemSize(itemSize), m_ciDataStartIndex(m_iDataStartIndex), m_ciUsedBufferLen(m_iUsedBufferLen)$/;"	f	class:CLBuffer
+CheckForRestBuffer	CLBuffer.cpp	/^CLStatus CLBuffer::CheckForRestBuffer()$/;"	f	class:CLBuffer
+DataStartIndex	CLBuffer.cpp	/^CLStatus CLBuffer::DataStartIndex(const int& newIndex)$/;"	f	class:CLBuffer
+DataStartIndex	CLBuffer.cpp	/^const int& CLBuffer::DataStartIndex() const $/;"	f	class:CLBuffer
+GetDataIOVecs	CLBuffer.cpp	/^CLStatus CLBuffer::GetDataIOVecs(CLIOVector& IOVector)$/;"	f	class:CLBuffer
+GetIOVecs	CLBuffer.cpp	/^CLStatus CLBuffer::GetIOVecs(int index, int len, CLIOVector& IOVector)$/;"	f	class:CLBuffer
+GetRestBufPtr	CLBuffer.cpp	/^CLStatus CLBuffer::GetRestBufPtr(char** pBuf, int &restLen)$/;"	f	class:CLBuffer
+GetRestIOVecs	CLBuffer.cpp	/^CLStatus CLBuffer::GetRestIOVecs(CLIOVector& IOVector)$/;"	f	class:CLBuffer
+NewBuffer	CLBuffer.cpp	/^CLStatus CLBuffer::NewBuffer(int size)$/;"	f	class:CLBuffer
+PushBackIOVecs	CLBuffer.cpp	/^CLStatus CLBuffer::PushBackIOVecs(CLIOVector& IOVector)$/;"	f	class:CLBuffer
+ReadData	CLBuffer.cpp	/^CLStatus CLBuffer::ReadData(char* pBuffer, const int& index, const int& len)$/;"	f	class:CLBuffer
+UsedBufferLen	CLBuffer.cpp	/^const int& CLBuffer::UsedBufferLen() const$/;"	f	class:CLBuffer
+WriteData	CLBuffer.cpp	/^CLStatus CLBuffer::WriteData(char* pBuffer, const int& len)$/;"	f	class:CLBuffer
+~CLBuffer	CLBuffer.cpp	/^CLBuffer::~CLBuffer()$/;"	f	class:CLBuffer
+CLConditionVariable	CLConditionVariable.cpp	/^CLConditionVariable::CLConditionVariable()$/;"	f	class:CLConditionVariable
+CLConditionVariable	CLConditionVariable.cpp	/^CLConditionVariable::CLConditionVariable(const char* pstrCondName)$/;"	f	class:CLConditionVariable
+CLConditionVariable	CLConditionVariable.cpp	/^CLConditionVariable::CLConditionVariable(pthread_cond_t *pCond)$/;"	f	class:CLConditionVariable
+Wait	CLConditionVariable.cpp	/^CLStatus CLConditionVariable::Wait(CLMutex *pMutex)$/;"	f	class:CLConditionVariable
+Wakeup	CLConditionVariable.cpp	/^CLStatus CLConditionVariable::Wakeup()$/;"	f	class:CLConditionVariable
+WakeupAll	CLConditionVariable.cpp	/^CLStatus CLConditionVariable::WakeupAll()$/;"	f	class:CLConditionVariable
+~CLConditionVariable	CLConditionVariable.cpp	/^CLConditionVariable::~CLConditionVariable()$/;"	f	class:CLConditionVariable
+CLCriticalSection	CLCriticalSection.cpp	/^CLCriticalSection::CLCriticalSection(CLMutex *pMutex)$/;"	f	class:CLCriticalSection
+~CLCriticalSection	CLCriticalSection.cpp	/^CLCriticalSection::~CLCriticalSection()$/;"	f	class:CLCriticalSection
+CLDataPostResultNotifier	CLDataPostResultNotifier.cpp	/^CLDataPostResultNotifier::CLDataPostResultNotifier(bool isDataDel) : m_bDataDelFlag(isDataDel), m_pMsg(NULL)$/;"	f	class:CLDataPostResultNotifier
+NotifyFailure	CLDataPostResultNotifier.cpp	/^CLStatus CLDataPostResultNotifier::NotifyFailure()$/;"	f	class:CLDataPostResultNotifier
+NotifyResult	CLDataPostResultNotifier.cpp	/^CLStatus CLDataPostResultNotifier::NotifyResult(int result)$/;"	f	class:CLDataPostResultNotifier
+NotifySuccess	CLDataPostResultNotifier.cpp	/^CLStatus CLDataPostResultNotifier::NotifySuccess()$/;"	f	class:CLDataPostResultNotifier
+SetMessage	CLDataPostResultNotifier.cpp	/^CLStatus CLDataPostResultNotifier::SetMessage(CLMessage *pMsg)$/;"	f	class:CLDataPostResultNotifier
+~CLDataPostResultNotifier	CLDataPostResultNotifier.cpp	/^CLDataPostResultNotifier::~CLDataPostResultNotifier()$/;"	f	class:CLDataPostResultNotifier
+CLDataPoster	CLDataPoster.cpp	/^CLDataPoster::CLDataPoster()$/;"	f	class:CLDataPoster
+SetProtocolDataPoster	CLDataPoster.cpp	/^CLStatus CLDataPoster::SetProtocolDataPoster(CLProtocolDataPoster *pProtoDataPoster)$/;"	f	class:CLDataPoster
+~CLDataPoster	CLDataPoster.cpp	/^CLDataPoster::~CLDataPoster()$/;"	f	class:CLDataPoster
+CLDataPosterByNamedPipe	CLDataPosterByNamedPipe.cpp	/^CLDataPosterByNamedPipe::CLDataPosterByNamedPipe(CLNamedPipe *pipe) : m_pNamedPipe(pipe)$/;"	f	class:CLDataPosterByNamedPipe
+PostData	CLDataPosterByNamedPipe.cpp	/^CLStatus CLDataPosterByNamedPipe::PostData(CLIOVector* pDataVec) $/;"	f	class:CLDataPosterByNamedPipe
+~CLDataPosterByNamedPipe	CLDataPosterByNamedPipe.cpp	/^CLDataPosterByNamedPipe::~CLDataPosterByNamedPipe()$/;"	f	class:CLDataPosterByNamedPipe
+CLDataPosterBySTLQueue	CLDataPosterBySTLQueue.cpp	/^CLDataPosterBySTLQueue::CLDataPosterBySTLQueue(CLSTLQueue *pQueue)$/;"	f	class:CLDataPosterBySTLQueue
+PostData	CLDataPosterBySTLQueue.cpp	/^CLStatus CLDataPosterBySTLQueue::PostData(CLIOVector* pDataVec) \/\/do not deal with the free of data vec$/;"	f	class:CLDataPosterBySTLQueue
+~CLDataPosterBySTLQueue	CLDataPosterBySTLQueue.cpp	/^CLDataPosterBySTLQueue::~CLDataPosterBySTLQueue()$/;"	f	class:CLDataPosterBySTLQueue
+CLDataPosterChannelByNamedPipeMaintainer	CLDataPosterChannelByNamedPipeMaintainer.cpp	/^CLDataPosterChannelByNamedPipeMaintainer::CLDataPosterChannelByNamedPipeMaintainer(const char* pStrPipeName, bool isSharedPipe) : m_bIsSharedPipe(isSharedPipe)$/;"	f	class:CLDataPosterChannelByNamedPipeMaintainer
+GetDataPoster	CLDataPosterChannelByNamedPipeMaintainer.cpp	/^CLDataPoster* CLDataPosterChannelByNamedPipeMaintainer::GetDataPoster()$/;"	f	class:CLDataPosterChannelByNamedPipeMaintainer
+Initialize	CLDataPosterChannelByNamedPipeMaintainer.cpp	/^CLStatus CLDataPosterChannelByNamedPipeMaintainer::Initialize(void *pContext)$/;"	f	class:CLDataPosterChannelByNamedPipeMaintainer
+UnInitialize	CLDataPosterChannelByNamedPipeMaintainer.cpp	/^CLStatus CLDataPosterChannelByNamedPipeMaintainer::UnInitialize(void *pContext)$/;"	f	class:CLDataPosterChannelByNamedPipeMaintainer
+~CLDataPosterChannelByNamedPipeMaintainer	CLDataPosterChannelByNamedPipeMaintainer.cpp	/^CLDataPosterChannelByNamedPipeMaintainer::~CLDataPosterChannelByNamedPipeMaintainer()$/;"	f	class:CLDataPosterChannelByNamedPipeMaintainer
+CLDataPosterChannelBySTLQueueMaintainer	CLDataPosterChannelBySTLQueueMaintainer.cpp	/^CLDataPosterChannelBySTLQueueMaintainer::CLDataPosterChannelBySTLQueueMaintainer(CLSTLQueue *pQueue)$/;"	f	class:CLDataPosterChannelBySTLQueueMaintainer
+GetDataPoster	CLDataPosterChannelBySTLQueueMaintainer.cpp	/^CLDataPoster* CLDataPosterChannelBySTLQueueMaintainer::GetDataPoster()$/;"	f	class:CLDataPosterChannelBySTLQueueMaintainer
+Initialize	CLDataPosterChannelBySTLQueueMaintainer.cpp	/^CLStatus CLDataPosterChannelBySTLQueueMaintainer::Initialize(void *pContext)$/;"	f	class:CLDataPosterChannelBySTLQueueMaintainer
+UnInitialize	CLDataPosterChannelBySTLQueueMaintainer.cpp	/^CLStatus CLDataPosterChannelBySTLQueueMaintainer::UnInitialize(void *pContext)$/;"	f	class:CLDataPosterChannelBySTLQueueMaintainer
+~CLDataPosterChannelBySTLQueueMaintainer	CLDataPosterChannelBySTLQueueMaintainer.cpp	/^CLDataPosterChannelBySTLQueueMaintainer::~CLDataPosterChannelBySTLQueueMaintainer()$/;"	f	class:CLDataPosterChannelBySTLQueueMaintainer
+CLDataPosterChannelMaintainer	CLDataPosterChannelMaintainer.cpp	/^CLDataPosterChannelMaintainer::CLDataPosterChannelMaintainer()$/;"	f	class:CLDataPosterChannelMaintainer
+~CLDataPosterChannelMaintainer	CLDataPosterChannelMaintainer.cpp	/^CLDataPosterChannelMaintainer::~CLDataPosterChannelMaintainer()$/;"	f	class:CLDataPosterChannelMaintainer
+CLDataReader	CLDataReader.cpp	/^CLDataReader::CLDataReader(int fd, CLProtoParser *pProtoParser, CLMessageReceiver pMsgReceiver)) : m_fd(fd), m_pProtoParser(pProtoParser)$/;"	f	class:CLDataReader
+ReadContext	CLDataReader.cpp	/^CLStatus CLDataReader::ReadContext(int fd)$/;"	f	class:CLDataReader
+ReadDataAndGetMessage	CLDataReader.cpp	/^CLMessage* CLDataReader::ReadDataAndGetMessage()$/;"	f	class:CLDataReader
+ReadHeader	CLDataReader.cpp	/^CLStatus CLDataReader::ReadHeader(int fd)$/;"	f	class:CLDataReader
+~CLDataReader	CLDataReader.cpp	/^CLDataReader::~CLDataReader()$/;"	f	class:CLDataReader
+CLDataReceiver	CLDataReceiver.cpp	/^CLDataReceiver::CLDataReceiver()$/;"	f	class:CLDataReceiver
+~CLDataReceiver	CLDataReceiver.cpp	/^CLDataReceiver::~CLDataReceiver()$/;"	f	class:CLDataReceiver
+CLDataReceiverByNamedPipe	CLDataReceiverByNamedPipe.cpp	/^CLDataReceiverByNamedPipe::CLDataReceiverByNamedPipe(const char *pStrPipeName, bool isSharedPipe) : m_NamedPipe(pStrPipeName, isSharedPipe, PIPE_FOR_READ)$/;"	f	class:CLDataReceiverByNamedPipe
+GetData	CLDataReceiverByNamedPipe.cpp	/^CLStatus CLDataReceiverByNamedPipe::GetData(CLBuffer *pBuffer)$/;"	f	class:CLDataReceiverByNamedPipe
+GetFd	CLDataReceiverByNamedPipe.cpp	/^const int CLDataReceiverByNamedPipe::GetFd()$/;"	f	class:CLDataReceiverByNamedPipe
+~CLDataReceiverByNamedPipe	CLDataReceiverByNamedPipe.cpp	/^CLDataReceiverByNamedPipe::~CLDataReceiverByNamedPipe()$/;"	f	class:CLDataReceiverByNamedPipe
+CLDataReceiverBySTLQueue	CLDataReceiverBySTLQueue.cpp	/^CLDataReceiverBySTLQueue::CLDataReceiverBySTLQueue(CLSTLQueue* pDataSTLQueue)$/;"	f	class:CLDataReceiverBySTLQueue
+GetData	CLDataReceiverBySTLQueue.cpp	/^CLStatus CLDataReceiverBySTLQueue::GetData(CLBuffer *pBuffer)$/;"	f	class:CLDataReceiverBySTLQueue
+~CLDataReceiverBySTLQueue	CLDataReceiverBySTLQueue.cpp	/^CLDataReceiverBySTLQueue::~CLDataReceiverBySTLQueue()$/;"	f	class:CLDataReceiverBySTLQueue
+CLDataReceiverByTimerFd	CLDataReceiverByTimerFd.cpp	/^CLDataReceiverByTimerFd::CLDataReceiverByTimerFd(int fd, CLTimerApplyMsg *pMsg)$/;"	f	class:CLDataReceiverByTimerFd
+GetData	CLDataReceiverByTimerFd.cpp	/^CLStatus CLDataReceiverByTimerFd::GetData(CLBuffer *pBuffer)$/;"	f	class:CLDataReceiverByTimerFd
+GetFd	CLDataReceiverByTimerFd.cpp	/^const int CLDataReceiverByTimerFd::GetFd()$/;"	f	class:CLDataReceiverByTimerFd
+~CLDataReceiverByTimerFd	CLDataReceiverByTimerFd.cpp	/^CLDataReceiverByTimerFd::~CLDataReceiverByTimerFd()$/;"	f	class:CLDataReceiverByTimerFd
+CLEpoll	CLEpoll.cpp	/^CLEpoll::CLEpoll()$/;"	f	class:CLEpoll
+DEFAULT_EPOLLWAIT_TIME	CLEpoll.cpp	11;"	d	file:
+DoEvent	CLEpoll.cpp	/^CLStatus CLEpoll::DoEvent(CLEpollEvent *pEvent, int fd, int epollOpt, unsigned int epollEvents)$/;"	f	class:CLEpoll
+Initialize	CLEpoll.cpp	/^CLStatus CLEpoll::Initialize(int maxFdSize)$/;"	f	class:CLEpoll
+Run	CLEpoll.cpp	/^CLStatus CLEpoll::Run()$/;"	f	class:CLEpoll
+~CLEpoll	CLEpoll.cpp	/^CLEpoll::~CLEpoll()$/;"	f	class:CLEpoll
+CLEpollEvent	CLEpollEvent.cpp	/^CLEpollEvent::CLEpollEvent(CLEpoll *pEpoll)$/;"	f	class:CLEpollEvent
+CloseREvent	CLEpollEvent.cpp	/^CLStatus CLEpollEvent::CloseREvent()$/;"	f	class:CLEpollEvent
+CloseWEvent	CLEpollEvent.cpp	/^CLStatus CLEpollEvent::CloseWEvent()$/;"	f	class:CLEpollEvent
+EDGEMODE	CLEpollEvent.cpp	13;"	d	file:
+EVENTADD	CLEpollEvent.cpp	9;"	d	file:
+EVENTCHANGE	CLEpollEvent.cpp	11;"	d	file:
+EVENTDEL	CLEpollEvent.cpp	10;"	d	file:
+GetFd	CLEpollEvent.cpp	/^const int CLEpollEvent::GetFd()$/;"	f	class:CLEpollEvent
+GetHandler	CLEpollEvent.cpp	/^void* CLEpollEvent::GetHandler()$/;"	f	class:CLEpollEvent
+LEVELEVENTS	CLEpollEvent.cpp	17;"	d	file:
+LEVELREVENT	CLEpollEvent.cpp	15;"	d	file:
+LEVELWEVENT	CLEpollEvent.cpp	16;"	d	file:
+OpenREvent	CLEpollEvent.cpp	/^CLStatus CLEpollEvent::OpenREvent()$/;"	f	class:CLEpollEvent
+OpenWEvent	CLEpollEvent.cpp	/^CLStatus CLEpollEvent::OpenWEvent()$/;"	f	class:CLEpollEvent
+RegisterREvent	CLEpollEvent.cpp	/^CLStatus CLEpollEvent::RegisterREvent()$/;"	f	class:CLEpollEvent
+RegisterRWEvents	CLEpollEvent.cpp	/^CLStatus CLEpollEvent::RegisterRWEvents()$/;"	f	class:CLEpollEvent
+RegisterWEvent	CLEpollEvent.cpp	/^CLStatus CLEpollEvent::RegisterWEvent()$/;"	f	class:CLEpollEvent
+SetFd	CLEpollEvent.cpp	/^CLStatus CLEpollEvent::SetFd(int fd)$/;"	f	class:CLEpollEvent
+SetHandler	CLEpollEvent.cpp	/^CLStatus CLEpollEvent::SetHandler(void* pHandler)$/;"	f	class:CLEpollEvent
+UnRegisterRWEvents	CLEpollEvent.cpp	/^CLStatus CLEpollEvent::UnRegisterRWEvents()$/;"	f	class:CLEpollEvent
+~CLEpollEvent	CLEpollEvent.cpp	/^CLEpollEvent::~CLEpollEvent()$/;"	f	class:CLEpollEvent
+CLEvent	CLEvent.cpp	/^CLEvent::CLEvent()$/;"	f	class:CLEvent
+CLEvent	CLEvent.cpp	/^CLEvent::CLEvent(bool bSemaphore)$/;"	f	class:CLEvent
+CLEvent	CLEvent.cpp	/^CLEvent::CLEvent(const char *pstrEventName) : m_Mutex(pstrEventName, MUTEX_USE_SHARED_PTHREAD), m_Cond(pstrEventName)$/;"	f	class:CLEvent
+CLEvent	CLEvent.cpp	/^CLEvent::CLEvent(const char *pstrEventName, bool bSemaphore) : m_Mutex(pstrEventName, MUTEX_USE_SHARED_PTHREAD), m_Cond(pstrEventName)$/;"	f	class:CLEvent
+Set	CLEvent.cpp	/^CLStatus CLEvent::Set()$/;"	f	class:CLEvent
+Wait	CLEvent.cpp	/^CLStatus CLEvent::Wait()$/;"	f	class:CLEvent
+~CLEvent	CLEvent.cpp	/^CLEvent::~CLEvent()$/;"	f	class:CLEvent
+CLExecutive	CLExecutive.cpp	/^CLExecutive::CLExecutive(CLExecutiveFunctionProvider *pExecutiveFunctionProvider)$/;"	f	class:CLExecutive
+~CLExecutive	CLExecutive.cpp	/^CLExecutive::~CLExecutive()$/;"	f	class:CLExecutive
+CLExecutiveCommunication	CLExecutiveCommunication.cpp	/^CLExecutiveCommunication::CLExecutiveCommunication()$/;"	f	class:CLExecutiveCommunication
+~CLExecutiveCommunication	CLExecutiveCommunication.cpp	/^CLExecutiveCommunication::~CLExecutiveCommunication()$/;"	f	class:CLExecutiveCommunication
+CLExecutiveCommunicationByNamedPipe	CLExecutiveCommunicationByNamedPipe.cpp	/^CLExecutiveCommunicationByNamedPipe::CLExecutiveCommunicationByNamedPipe(const char *pstrExecutiveName, bool bDeleteMsg) : m_Event(pstrExecutiveName, true)$/;"	f	class:CLExecutiveCommunicationByNamedPipe
+FILE_PATH_FOR_COMMUNICATION_NAMED_PIPE	CLExecutiveCommunicationByNamedPipe.cpp	9;"	d	file:
+PostExecutiveMessage	CLExecutiveCommunicationByNamedPipe.cpp	/^CLStatus CLExecutiveCommunicationByNamedPipe::PostExecutiveMessage(CLMessage *pMessage)$/;"	f	class:CLExecutiveCommunicationByNamedPipe
+~CLExecutiveCommunicationByNamedPipe	CLExecutiveCommunicationByNamedPipe.cpp	/^CLExecutiveCommunicationByNamedPipe::~CLExecutiveCommunicationByNamedPipe()$/;"	f	class:CLExecutiveCommunicationByNamedPipe
+CLExecutiveFunctionForMsgLoop	CLExecutiveFunctionForMsgLoop.cpp	/^CLExecutiveFunctionForMsgLoop::CLExecutiveFunctionForMsgLoop(CLMessageLoopManager *pMsgLoopManager)$/;"	f	class:CLExecutiveFunctionForMsgLoop
+RunExecutiveFunction	CLExecutiveFunctionForMsgLoop.cpp	/^CLStatus CLExecutiveFunctionForMsgLoop::RunExecutiveFunction(void* pContext)$/;"	f	class:CLExecutiveFunctionForMsgLoop
+~CLExecutiveFunctionForMsgLoop	CLExecutiveFunctionForMsgLoop.cpp	/^CLExecutiveFunctionForMsgLoop::~CLExecutiveFunctionForMsgLoop()$/;"	f	class:CLExecutiveFunctionForMsgLoop
+CLExecutiveFunctionProvider	CLExecutiveFunctionProvider.cpp	/^CLExecutiveFunctionProvider::CLExecutiveFunctionProvider()$/;"	f	class:CLExecutiveFunctionProvider
+~CLExecutiveFunctionProvider	CLExecutiveFunctionProvider.cpp	/^CLExecutiveFunctionProvider::~CLExecutiveFunctionProvider()$/;"	f	class:CLExecutiveFunctionProvider
+CLExecutiveInitialFinishedNotifier	CLExecutiveInitialFinishedNotifier.cpp	/^CLExecutiveInitialFinishedNotifier::CLExecutiveInitialFinishedNotifier()$/;"	f	class:CLExecutiveInitialFinishedNotifier
+~CLExecutiveInitialFinishedNotifier	CLExecutiveInitialFinishedNotifier.cpp	/^CLExecutiveInitialFinishedNotifier::~CLExecutiveInitialFinishedNotifier()$/;"	f	class:CLExecutiveInitialFinishedNotifier
+CLExecutiveNameServer	CLExecutiveNameServer.cpp	/^CLExecutiveNameServer::CLExecutiveNameServer()$/;"	f	class:CLExecutiveNameServer
+Create	CLExecutiveNameServer.cpp	/^CLStatus CLExecutiveNameServer::Create()$/;"	f	class:CLExecutiveNameServer
+Destroy	CLExecutiveNameServer.cpp	/^CLStatus CLExecutiveNameServer::Destroy()$/;"	f	class:CLExecutiveNameServer
+GetCommunicationPtr	CLExecutiveNameServer.cpp	/^CLMessagePoster* CLExecutiveNameServer::GetCommunicationPtr(const char* strExecutiveName)$/;"	f	class:CLExecutiveNameServer
+GetInstance	CLExecutiveNameServer.cpp	/^CLExecutiveNameServer* CLExecutiveNameServer::GetInstance()$/;"	f	class:CLExecutiveNameServer
+PostExecutiveMessage	CLExecutiveNameServer.cpp	/^CLStatus CLExecutiveNameServer::PostExecutiveMessage(const char* pstrExecutiveName, CLMessage *pMessage, CLDataPostResultNotifier *pResNotifier)$/;"	f	class:CLExecutiveNameServer
+Register	CLExecutiveNameServer.cpp	/^CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLMessagePoster *pMsgPoster)$/;"	f	class:CLExecutiveNameServer
+ReleaseCommunicationPtr	CLExecutiveNameServer.cpp	/^CLStatus CLExecutiveNameServer::ReleaseCommunicationPtr(const char* strExecutiveName)$/;"	f	class:CLExecutiveNameServer
+m_Mutex	CLExecutiveNameServer.cpp	/^pthread_mutex_t CLExecutiveNameServer::m_Mutex = PTHREAD_MUTEX_INITIALIZER;$/;"	m	class:CLExecutiveNameServer	file:
+m_pNameServer	CLExecutiveNameServer.cpp	/^CLExecutiveNameServer* CLExecutiveNameServer::m_pNameServer = 0;$/;"	m	class:CLExecutiveNameServer	file:
+~CLExecutiveNameServer	CLExecutiveNameServer.cpp	/^CLExecutiveNameServer::~CLExecutiveNameServer()$/;"	f	class:CLExecutiveNameServer
+CLIOVector	CLIOVector.cpp	/^CLIOVector::CLIOVector()$/;"	f	class:CLIOVector
+CLIOVector	CLIOVector.cpp	/^CLIOVector::CLIOVector(const CLIOVector& rhs)$/;"	f	class:CLIOVector
+FreeAndPopAll	CLIOVector.cpp	/^CLStatus CLIOVector::FreeAndPopAll()$/;"	f	class:CLIOVector
+GetBufPtr	CLIOVector.cpp	/^int CLIOVector::GetBufPtr(int index, char** pBuffer)$/;"	f	class:CLIOVector
+GetIOVecStructs	CLIOVector.cpp	/^struct iovec* CLIOVector::GetIOVecStructs() const$/;"	f	class:CLIOVector
+GetIOVecs	CLIOVector.cpp	/^CLStatus CLIOVector::GetIOVecs(int index, int len, CLIOVector& IOVector)$/;"	f	class:CLIOVector
+IOVecNum	CLIOVector.cpp	/^const int CLIOVector::IOVecNum() const$/;"	f	class:CLIOVector
+Length	CLIOVector.cpp	/^const int CLIOVector::Length() const$/;"	f	class:CLIOVector
+PopAll	CLIOVector.cpp	/^CLStatus CLIOVector::PopAll()$/;"	f	class:CLIOVector
+PopBack	CLIOVector.cpp	/^CLStatus CLIOVector::PopBack(char** pBuffer, int* bufLen)$/;"	f	class:CLIOVector
+PopFront	CLIOVector.cpp	/^CLStatus CLIOVector::PopFront(char** pBuffer, int* bufLen)$/;"	f	class:CLIOVector
+PushBack	CLIOVector.cpp	/^CLStatus CLIOVector::PushBack(char* pBuffer, int bufLen)$/;"	f	class:CLIOVector
+PushBackIOVecs	CLIOVector.cpp	/^CLStatus CLIOVector::PushBackIOVecs(CLIOVector& IOVector)$/;"	f	class:CLIOVector
+PushFront	CLIOVector.cpp	/^CLStatus CLIOVector::PushFront(char* pBuffer, int bufLen)$/;"	f	class:CLIOVector
+PushIOVecs	CLIOVector.cpp	/^CLStatus CLIOVector::PushIOVecs(int index, CLIOVector& IOVector) \/\/最好写一个从哪里开始到最后都pop出来的iovec！！！要写一个由index得到该index所在iterator位置的接口！！！$/;"	f	class:CLIOVector
+ReadData	CLIOVector.cpp	/^CLStatus CLIOVector::ReadData(char* pBuffer, const int& index, const int& len)$/;"	f	class:CLIOVector
+WriteData	CLIOVector.cpp	/^CLStatus CLIOVector::WriteData(char* pBuffer, const int& index, const int& len)$/;"	f	class:CLIOVector
+operator =	CLIOVector.cpp	/^CLIOVector& CLIOVector::operator=(const CLIOVector& rhs)$/;"	f	class:CLIOVector
+operator []	CLIOVector.cpp	/^const char& CLIOVector::operator[](const int& index)$/;"	f	class:CLIOVector
+~CLIOVector	CLIOVector.cpp	/^CLIOVector::~CLIOVector()$/;"	f	class:CLIOVector
+Destroy	CLLibExecutiveInitializer.cpp	/^CLStatus CLLibExecutiveInitializer::Destroy()$/;"	f	class:CLLibExecutiveInitializer
+Initialize	CLLibExecutiveInitializer.cpp	/^CLStatus CLLibExecutiveInitializer::Initialize()$/;"	f	class:CLLibExecutiveInitializer
+m_MutexForInitializer	CLLibExecutiveInitializer.cpp	/^pthread_mutex_t CLLibExecutiveInitializer::m_MutexForInitializer = PTHREAD_MUTEX_INITIALIZER;$/;"	m	class:CLLibExecutiveInitializer	file:
+m_bDestroyed	CLLibExecutiveInitializer.cpp	/^bool CLLibExecutiveInitializer::m_bDestroyed = false;$/;"	m	class:CLLibExecutiveInitializer	file:
+m_bInitialized	CLLibExecutiveInitializer.cpp	/^bool CLLibExecutiveInitializer::m_bInitialized = false;$/;"	m	class:CLLibExecutiveInitializer	file:
+CLLogger	CLLogger.cpp	/^CLLogger::CLLogger()$/;"	f	class:CLLogger
+Create	CLLogger.cpp	/^CLStatus CLLogger::Create()$/;"	f	class:CLLogger
+Destroy	CLLogger.cpp	/^CLStatus CLLogger::Destroy()$/;"	f	class:CLLogger
+GetInstance	CLLogger.cpp	/^CLLogger* CLLogger::GetInstance()$/;"	f	class:CLLogger
+LOG_FILE_NAME	CLLogger.cpp	9;"	d	file:
+MAX_SIZE	CLLogger.cpp	10;"	d	file:
+WriteLog	CLLogger.cpp	/^CLStatus CLLogger::WriteLog(const char *pstrMsg, long lErrorCode)$/;"	f	class:CLLogger
+WriteLogMsg	CLLogger.cpp	/^CLStatus CLLogger::WriteLogMsg(const char *pstrMsg, long lErrorCode)$/;"	f	class:CLLogger
+WriteMsgAndErrcodeToFile	CLLogger.cpp	/^CLStatus CLLogger::WriteMsgAndErrcodeToFile(int fd, const char *pstrMsg, const char *pstrErrcode)$/;"	f	class:CLLogger
+m_Mutex	CLLogger.cpp	/^pthread_mutex_t CLLogger::m_Mutex = PTHREAD_MUTEX_INITIALIZER;$/;"	m	class:CLLogger	file:
+m_pLog	CLLogger.cpp	/^CLLogger* CLLogger::m_pLog = 0;$/;"	m	class:CLLogger	file:
+~CLLogger	CLLogger.cpp	/^CLLogger::~CLLogger()$/;"	f	class:CLLogger
+CLMessage	CLMessage.cpp	/^CLMessage::CLMessage(unsigned long lMsgID) : m_clMsgID(m_lMsgID)$/;"	f	class:CLMessage
+~CLMessage	CLMessage.cpp	/^CLMessage::~CLMessage()$/;"	f	class:CLMessage
+CLMessageDeserializer	CLMessageDeserializer.cpp	/^CLMessageDeserializer::CLMessageDeserializer()$/;"	f	class:CLMessageDeserializer
+~CLMessageDeserializer	CLMessageDeserializer.cpp	/^CLMessageDeserializer::~CLMessageDeserializer()$/;"	f	class:CLMessageDeserializer
+CLMessageLoopManager	CLMessageLoopManager.cpp	/^CLMessageLoopManager::CLMessageLoopManager(CLMessageObserver *pMessageObserver)$/;"	f	class:CLMessageLoopManager
+DispatchMessage	CLMessageLoopManager.cpp	/^CLStatus CLMessageLoopManager::DispatchMessage(CLMessage *pMessage)$/;"	f	class:CLMessageLoopManager
+EnterMessageLoop	CLMessageLoopManager.cpp	/^CLStatus CLMessageLoopManager::EnterMessageLoop(void *pContext)$/;"	f	class:CLMessageLoopManager
+Register	CLMessageLoopManager.cpp	/^CLStatus CLMessageLoopManager::Register(unsigned long lMsgID, CallBackForMessageLoop pMsgProcessFunction)$/;"	f	class:CLMessageLoopManager
+~CLMessageLoopManager	CLMessageLoopManager.cpp	/^CLMessageLoopManager::~CLMessageLoopManager()$/;"	f	class:CLMessageLoopManager
+CLMessageObserver	CLMessageObserver.cpp	/^CLMessageObserver::CLMessageObserver()$/;"	f	class:CLMessageObserver
+~CLMessageObserver	CLMessageObserver.cpp	/^CLMessageObserver::~CLMessageObserver()$/;"	f	class:CLMessageObserver
+CLMessagePoster	CLMessagePoster.cpp	/^CLMessagePoster::CLMessagePoster(CLDataPosterChannelMaintainer *pDataPosterChannel, CLMessageSerializer *pMsgSerializer, CLProtocolEncapsulator *pProtoEncapsulator, CLEvent *pEvent)$/;"	f	class:CLMessagePoster
+Initialize	CLMessagePoster.cpp	/^CLStatus CLMessagePoster::Initialize(void *pContext)$/;"	f	class:CLMessagePoster
+PostLeftMessage	CLMessagePoster.cpp	/^CLStatus CLMessagePoster::PostLeftMessage()$/;"	f	class:CLMessagePoster
+PostMessage	CLMessagePoster.cpp	/^CLStatus CLMessagePoster::PostMessage(CLMessage* pMsg, CLDataPostResultNotifier *pResNotifier)$/;"	f	class:CLMessagePoster
+RegisterSerializer	CLMessagePoster.cpp	/^CLStatus CLMessagePoster::RegisterSerializer(unsigned long lMsgID, CLMessageSerializer *pSerializer)$/;"	f	class:CLMessagePoster
+UnInitialize	CLMessagePoster.cpp	/^CLStatus CLMessagePoster::UnInitialize(void *pContext)$/;"	f	class:CLMessagePoster
+~CLMessagePoster	CLMessagePoster.cpp	/^CLMessagePoster::~CLMessagePoster()$/;"	f	class:CLMessagePoster
+CLMessageReceiver	CLMessageReceiver.cpp	/^CLMessageReceiver::CLMessageReceiver()$/;"	f	class:CLMessageReceiver
+CLMessageReceiver	CLMessageReceiver.cpp	/^CLMessageReceiver::CLMessageReceiver(CLDataReceiver *pDataReceiver, CLProtoParser *pProtoParser, CLMessageDeserializer *pMsgDeserializer)$/;"	f	class:CLMessageReceiver
+GetFd	CLMessageReceiver.cpp	/^const int& CLMessageReceiver::GetFd()$/;"	f	class:CLMessageReceiver
+GetMessage	CLMessageReceiver.cpp	/^CLStatus CLMessageReceiver::GetMessage(queue<CLMessage*> &MessageQueue)$/;"	f	class:CLMessageReceiver
+~CLMessageReceiver	CLMessageReceiver.cpp	/^CLMessageReceiver::~CLMessageReceiver()$/;"	f	class:CLMessageReceiver
+CLMessageReceiverByNamedPipe	CLMessageReceiverByNamedPipe.cpp	/^CLMessageReceiverByNamedPipe::CLMessageReceiverByNamedPipe(const char *pstrPipeName) $/;"	f	class:CLMessageReceiverByNamedPipe
+FILE_PATH_FOR_NAMED_PIPE	CLMessageReceiverByNamedPipe.cpp	11;"	d	file:
+GetMessage	CLMessageReceiverByNamedPipe.cpp	/^CLMessage* CLMessageReceiverByNamedPipe::GetMessage()$/;"	f	class:CLMessageReceiverByNamedPipe
+~CLMessageReceiverByNamedPipe	CLMessageReceiverByNamedPipe.cpp	/^CLMessageReceiverByNamedPipe::~CLMessageReceiverByNamedPipe()$/;"	f	class:CLMessageReceiverByNamedPipe
+CLMessageReceiverBySTLqueue	CLMessageReceiverBySTLqueue.cpp	/^CLMessageReceiverBySTLqueue::CLMessageReceiverBySTLqueue() : CLMessageReceiver(NULL)$/;"	f	class:CLMessageReceiverBySTLqueue
+PushMessage	CLMessageReceiverBySTLqueue.cpp	/^CLStatus CLMessageReceiverBySTLqueue::PushMessage(CLMessage * pMessage)$/;"	f	class:CLMessageReceiverBySTLqueue
+ReadDataToMessageQueue	CLMessageReceiverBySTLqueue.cpp	/^CLMessage* CLMessageReceiverBySTLqueue::ReadDataToMessageQueue()$/;"	f	class:CLMessageReceiverBySTLqueue
+~CLMessageReceiverBySTLqueue	CLMessageReceiverBySTLqueue.cpp	/^CLMessageReceiverBySTLqueue::~CLMessageReceiverBySTLqueue()$/;"	f	class:CLMessageReceiverBySTLqueue
+CLMessageReceiverByTimerFd	CLMessageReceiverByTimerFd.cpp	/^CLMessageReceiverByTimerFd::CLMessageReceiverByTimerFd(CLTimerFd *pTimer)$/;"	f	class:CLMessageReceiverByTimerFd
+GetFd	CLMessageReceiverByTimerFd.cpp	/^const int& CLMessageReceiverByTimerFd::GetFd()$/;"	f	class:CLMessageReceiverByTimerFd
+GetMessage	CLMessageReceiverByTimerFd.cpp	/^CLStatus CLMessageReceiverByTimerFd::GetMessage(std::queue<CLMessage*> &MessageQueue)$/;"	f	class:CLMessageReceiverByTimerFd
+~CLMessageReceiverByTimerFd	CLMessageReceiverByTimerFd.cpp	/^CLMessageReceiverByTimerFd::~CLMessageReceiverByTimerFd()$/;"	f	class:CLMessageReceiverByTimerFd
+CLMessageSerializer	CLMessageSerializer.cpp	/^CLMessageSerializer::CLMessageSerializer()$/;"	f	class:CLMessageSerializer
+~CLMessageSerializer	CLMessageSerializer.cpp	/^CLMessageSerializer::~CLMessageSerializer()$/;"	f	class:CLMessageSerializer
+CLMsgLoopManagerForEpoll	CLMsgLoopManagerForEpoll.cpp	/^CLMsgLoopManagerForEpoll::CLMsgLoopManagerForEpoll(CLMessageObserver *pMessageObserver, CLEpoll *pEpoll, CLMultiMsgDeserializer *pMsgDeserializer) : CLMessageLoopManager(pMessageObserver)$/;"	f	class:CLMsgLoopManagerForEpoll
+EnterMessageLoop	CLMsgLoopManagerForEpoll.cpp	/^CLStatus CLMsgLoopManagerForEpoll::EnterMessageLoop(void *pContext)$/;"	f	class:CLMsgLoopManagerForEpoll
+Initialize	CLMsgLoopManagerForEpoll.cpp	/^CLStatus CLMsgLoopManagerForEpoll::Initialize()$/;"	f	class:CLMsgLoopManagerForEpoll
+NotifyReadable	CLMsgLoopManagerForEpoll.cpp	/^CLStatus CLMsgLoopManagerForEpoll::NotifyReadable(int fd)$/;"	f	class:CLMsgLoopManagerForEpoll
+Register	CLMsgLoopManagerForEpoll.cpp	/^CLStatus CLMsgLoopManagerForEpoll::Register(unsigned long lMsgID, CallBackForMessageLoop pMsgProcessFunction)$/;"	f	class:CLMsgLoopManagerForEpoll
+RegisterDeserializer	CLMsgLoopManagerForEpoll.cpp	/^CLStatus CLMsgLoopManagerForEpoll::RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer)$/;"	f	class:CLMsgLoopManagerForEpoll
+RegisterMsgReceiver	CLMsgLoopManagerForEpoll.cpp	/^CLStatus CLMsgLoopManagerForEpoll::RegisterMsgReceiver(CLMessageReceiver *pReceiver)$/;"	f	class:CLMsgLoopManagerForEpoll
+RegisterPipeReceiver	CLMsgLoopManagerForEpoll.cpp	/^CLStatus CLMsgLoopManagerForEpoll::RegisterPipeReceiver(string strPipeName, int pipeType)$/;"	f	class:CLMsgLoopManagerForEpoll
+RegisterTimerReceiver	CLMsgLoopManagerForEpoll.cpp	/^CLStatus CLMsgLoopManagerForEpoll::RegisterTimerReceiver(struct itimerspec& sTimerValue, string pstrRemoteName, const int& ID)$/;"	f	class:CLMsgLoopManagerForEpoll
+UnRegisterMsgReceiver	CLMsgLoopManagerForEpoll.cpp	/^CLStatus CLMsgLoopManagerForEpoll::UnRegisterMsgReceiver(int fd)$/;"	f	class:CLMsgLoopManagerForEpoll
+Uninitialize	CLMsgLoopManagerForEpoll.cpp	/^CLStatus CLMsgLoopManagerForEpoll::Uninitialize()$/;"	f	class:CLMsgLoopManagerForEpoll
+WaitForMessage	CLMsgLoopManagerForEpoll.cpp	/^CLStatus CLMsgLoopManagerForEpoll::WaitForMessage()$/;"	f	class:CLMsgLoopManagerForEpoll
+~CLMsgLoopManagerForEpoll	CLMsgLoopManagerForEpoll.cpp	/^CLMsgLoopManagerForEpoll::~CLMsgLoopManagerForEpoll()$/;"	f	class:CLMsgLoopManagerForEpoll
+CLMsgLoopManagerForIOMultiplex	CLMsgLoopManagerForIOMultiplex.cpp	/^CLMsgLoopManagerForIOMultiplex::CLMsgLoopManagerForIOMultiplex(CLMessageObserver *pMsgObserver, const char* pstrThreadName, int PipeQueueType) : CLMessageLoopManager(pMsgObserver)$/;"	f	class:CLMsgLoopManagerForIOMultiplex
+Initialize	CLMsgLoopManagerForIOMultiplex.cpp	/^CLStatus CLMsgLoopManagerForIOMultiplex::Initialize()$/;"	f	class:CLMsgLoopManagerForIOMultiplex
+InitializeIOMultiplex	CLMsgLoopManagerForIOMultiplex.cpp	/^CLStatus CLMsgLoopManagerForIOMultiplex::InitializeIOMultiplex()$/;"	f	class:CLMsgLoopManagerForIOMultiplex
+RegisterDeserializer	CLMsgLoopManagerForIOMultiplex.cpp	/^CLStatus CLMsgLoopManagerForIOMultiplex::RegisterDeserializer(string strQueueName, unsigned long lMsgID, CLMessageDeserializer *pDeserializer)$/;"	f	class:CLMsgLoopManagerForIOMultiplex
+RegisterMsgQueue	CLMsgLoopManagerForIOMultiplex.cpp	/^CLStatus CLMsgLoopManagerForIOMultiplex::RegisterMsgQueue(string strQueueName, CLMessageQueue *pMsgQueue, bool isShort)$/;"	f	class:CLMsgLoopManagerForIOMultiplex
+SetNonBlocking	CLMsgLoopManagerForIOMultiplex.cpp	/^CLStatus CLMsgLoopManagerForIOMultiplex::SetNonBlocking(int fd)$/;"	f	class:CLMsgLoopManagerForIOMultiplex
+UnRegisterMsgQueue	CLMsgLoopManagerForIOMultiplex.cpp	/^CLStatus CLMsgLoopManagerForIOMultiplex::UnRegisterMsgQueue(string strQueueName)$/;"	f	class:CLMsgLoopManagerForIOMultiplex
+Uninitialize	CLMsgLoopManagerForIOMultiplex.cpp	/^CLStatus CLMsgLoopManagerForIOMultiplex::Uninitialize()$/;"	f	class:CLMsgLoopManagerForIOMultiplex
+WaitForMessage	CLMsgLoopManagerForIOMultiplex.cpp	/^CLMessage* CLMsgLoopManagerForIOMultiplex::WaitForMessage()$/;"	f	class:CLMsgLoopManagerForIOMultiplex
+~CLMsgLoopManagerForIOMultiplex	CLMsgLoopManagerForIOMultiplex.cpp	/^CLMsgLoopManagerForIOMultiplex::~CLMsgLoopManagerForIOMultiplex()$/;"	f	class:CLMsgLoopManagerForIOMultiplex
+CLMsgLoopManagerForPipeQueue	CLMsgLoopManagerForPipeQueue.cpp	/^CLMsgLoopManagerForPipeQueue::CLMsgLoopManagerForPipeQueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName, int PipeQueueType,  CLMessageDeserializer *pMsgDeserializer) : CLMessageLoopManager(pMsgObserver), m_bIsShared(false)$/;"	f	class:CLMsgLoopManagerForPipeQueue
+Initialize	CLMsgLoopManagerForPipeQueue.cpp	/^CLStatus CLMsgLoopManagerForPipeQueue::Initialize()$/;"	f	class:CLMsgLoopManagerForPipeQueue
+RegisterDeserializer	CLMsgLoopManagerForPipeQueue.cpp	/^CLStatus CLMsgLoopManagerForPipeQueue::RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer)$/;"	f	class:CLMsgLoopManagerForPipeQueue
+Uninitialize	CLMsgLoopManagerForPipeQueue.cpp	/^CLStatus CLMsgLoopManagerForPipeQueue::Uninitialize()$/;"	f	class:CLMsgLoopManagerForPipeQueue
+WaitForMessage	CLMsgLoopManagerForPipeQueue.cpp	/^CLStatus CLMsgLoopManagerForPipeQueue::WaitForMessage()$/;"	f	class:CLMsgLoopManagerForPipeQueue
+~CLMsgLoopManagerForPipeQueue	CLMsgLoopManagerForPipeQueue.cpp	/^CLMsgLoopManagerForPipeQueue::~CLMsgLoopManagerForPipeQueue()$/;"	f	class:CLMsgLoopManagerForPipeQueue
+CLMsgLoopManagerForSTLqueue	CLMsgLoopManagerForSTLqueue.cpp	/^CLMsgLoopManagerForSTLqueue::CLMsgLoopManagerForSTLqueue(CLMessageObserver *pMsgObserver, const char* pstrThreadName) : CLMessageLoopManager(pMsgObserver)$/;"	f	class:CLMsgLoopManagerForSTLqueue
+Initialize	CLMsgLoopManagerForSTLqueue.cpp	/^CLStatus CLMsgLoopManagerForSTLqueue::Initialize()$/;"	f	class:CLMsgLoopManagerForSTLqueue
+Uninitialize	CLMsgLoopManagerForSTLqueue.cpp	/^CLStatus CLMsgLoopManagerForSTLqueue::Uninitialize()$/;"	f	class:CLMsgLoopManagerForSTLqueue
+WaitForMessage	CLMsgLoopManagerForSTLqueue.cpp	/^CLStatus CLMsgLoopManagerForSTLqueue::WaitForMessage()$/;"	f	class:CLMsgLoopManagerForSTLqueue
+~CLMsgLoopManagerForSTLqueue	CLMsgLoopManagerForSTLqueue.cpp	/^CLMsgLoopManagerForSTLqueue::~CLMsgLoopManagerForSTLqueue()$/;"	f	class:CLMsgLoopManagerForSTLqueue
+CLMultiMsgDeserializer	CLMultiMsgDeserializer.cpp	/^CLMultiMsgDeserializer::CLMultiMsgDeserializer()$/;"	f	class:CLMultiMsgDeserializer
+Deserialize	CLMultiMsgDeserializer.cpp	/^CLStatus CLMultiMsgDeserializer::Deserialize(CLIOVector &dataVec, CLMessage **pMsg)$/;"	f	class:CLMultiMsgDeserializer
+RegisterDeserializer	CLMultiMsgDeserializer.cpp	/^CLStatus CLMultiMsgDeserializer::RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer)$/;"	f	class:CLMultiMsgDeserializer
+UnRegisterDeserializer	CLMultiMsgDeserializer.cpp	/^CLStatus CLMultiMsgDeserializer::UnRegisterDeserializer(unsigned long lMsgID)$/;"	f	class:CLMultiMsgDeserializer
+~CLMultiMsgDeserializer	CLMultiMsgDeserializer.cpp	/^CLMultiMsgDeserializer::~CLMultiMsgDeserializer()$/;"	f	class:CLMultiMsgDeserializer
+CLMultiMsgSerializer	CLMultiMsgSerializer.cpp	/^CLMultiMsgSerializer::CLMultiMsgSerializer()$/;"	f	class:CLMultiMsgSerializer
+RegisterSerializer	CLMultiMsgSerializer.cpp	/^CLStatus CLMultiMsgSerializer::RegisterSerializer(unsigned long lMsgID, CLMessageSerializer *pSerializer)$/;"	f	class:CLMultiMsgSerializer
+Serialize	CLMultiMsgSerializer.cpp	/^CLStatus CLMultiMsgSerializer::Serialize(CLMessage *pMsg, CLIOVector *pDataVec)$/;"	f	class:CLMultiMsgSerializer
+UnRegisterSerializer	CLMultiMsgSerializer.cpp	/^CLStatus CLMultiMsgSerializer::UnRegisterSerializer(unsigned long lMsgID)$/;"	f	class:CLMultiMsgSerializer
+~CLMultiMsgSerializer	CLMultiMsgSerializer.cpp	/^CLMultiMsgSerializer::~CLMultiMsgSerializer()$/;"	f	class:CLMultiMsgSerializer
+CLMutex	CLMutex.cpp	/^CLMutex::CLMutex()$/;"	f	class:CLMutex
+CLMutex	CLMutex.cpp	/^CLMutex::CLMutex(const char *pstrFileName, int nType)$/;"	f	class:CLMutex
+CLMutex	CLMutex.cpp	/^CLMutex::CLMutex(const char *pstrFileName, pthread_mutex_t *pMutex)$/;"	f	class:CLMutex
+CLMutex	CLMutex.cpp	/^CLMutex::CLMutex(pthread_mutex_t *pMutex)$/;"	f	class:CLMutex
+GetMutexInterface	CLMutex.cpp	/^CLMutexInterface *CLMutex::GetMutexInterface()$/;"	f	class:CLMutex
+Lock	CLMutex.cpp	/^CLStatus CLMutex::Lock()$/;"	f	class:CLMutex
+Unlock	CLMutex.cpp	/^CLStatus CLMutex::Unlock()$/;"	f	class:CLMutex
+~CLMutex	CLMutex.cpp	/^CLMutex::~CLMutex()$/;"	f	class:CLMutex
+CLMutexByPThread	CLMutexByPThread.cpp	/^CLMutexByPThread::CLMutexByPThread()$/;"	f	class:CLMutexByPThread
+CLMutexByPThread	CLMutexByPThread.cpp	/^CLMutexByPThread::CLMutexByPThread(pthread_mutex_t *pMutex)$/;"	f	class:CLMutexByPThread
+GetMutexPointer	CLMutexByPThread.cpp	/^pthread_mutex_t *CLMutexByPThread::GetMutexPointer()$/;"	f	class:CLMutexByPThread
+Initialize	CLMutexByPThread.cpp	/^CLStatus CLMutexByPThread::Initialize()$/;"	f	class:CLMutexByPThread
+Lock	CLMutexByPThread.cpp	/^CLStatus CLMutexByPThread::Lock()$/;"	f	class:CLMutexByPThread
+Uninitialize	CLMutexByPThread.cpp	/^CLStatus CLMutexByPThread::Uninitialize()$/;"	f	class:CLMutexByPThread
+Unlock	CLMutexByPThread.cpp	/^CLStatus CLMutexByPThread::Unlock()$/;"	f	class:CLMutexByPThread
+~CLMutexByPThread	CLMutexByPThread.cpp	/^CLMutexByPThread::~CLMutexByPThread()$/;"	f	class:CLMutexByPThread
+CLMutexByRecordLocking	CLMutexByRecordLocking.cpp	/^CLMutexByRecordLocking::CLMutexByRecordLocking(const char *pstrFileName)$/;"	f	class:CLMutexByRecordLocking
+FILE_PATH_FOR_RECORD_LOCKING	CLMutexByRecordLocking.cpp	11;"	d	file:
+Initialize	CLMutexByRecordLocking.cpp	/^CLStatus CLMutexByRecordLocking::Initialize()$/;"	f	class:CLMutexByRecordLocking
+Lock	CLMutexByRecordLocking.cpp	/^CLStatus CLMutexByRecordLocking::Lock()$/;"	f	class:CLMutexByRecordLocking
+Uninitialize	CLMutexByRecordLocking.cpp	/^CLStatus CLMutexByRecordLocking::Uninitialize()$/;"	f	class:CLMutexByRecordLocking
+Unlock	CLMutexByRecordLocking.cpp	/^CLStatus CLMutexByRecordLocking::Unlock()$/;"	f	class:CLMutexByRecordLocking
+~CLMutexByRecordLocking	CLMutexByRecordLocking.cpp	/^CLMutexByRecordLocking::~CLMutexByRecordLocking()$/;"	f	class:CLMutexByRecordLocking
+CLMutexByRecordLockingAndPThread	CLMutexByRecordLockingAndPThread.cpp	/^CLMutexByRecordLockingAndPThread::CLMutexByRecordLockingAndPThread(const char *pstrFileName) : m_ProcessMutex(pstrFileName, MUTEX_USE_RECORD_LOCK)$/;"	f	class:CLMutexByRecordLockingAndPThread
+CLMutexByRecordLockingAndPThread	CLMutexByRecordLockingAndPThread.cpp	/^CLMutexByRecordLockingAndPThread::CLMutexByRecordLockingAndPThread(const char *pstrFileName, pthread_mutex_t *pMutex) : m_ThreadMutex(pMutex), m_ProcessMutex(pstrFileName, MUTEX_USE_RECORD_LOCK)$/;"	f	class:CLMutexByRecordLockingAndPThread
+Initialize	CLMutexByRecordLockingAndPThread.cpp	/^CLStatus CLMutexByRecordLockingAndPThread::Initialize()$/;"	f	class:CLMutexByRecordLockingAndPThread
+Lock	CLMutexByRecordLockingAndPThread.cpp	/^CLStatus CLMutexByRecordLockingAndPThread::Lock()$/;"	f	class:CLMutexByRecordLockingAndPThread
+Uninitialize	CLMutexByRecordLockingAndPThread.cpp	/^CLStatus CLMutexByRecordLockingAndPThread::Uninitialize()$/;"	f	class:CLMutexByRecordLockingAndPThread
+Unlock	CLMutexByRecordLockingAndPThread.cpp	/^CLStatus CLMutexByRecordLockingAndPThread::Unlock()$/;"	f	class:CLMutexByRecordLockingAndPThread
+~CLMutexByRecordLockingAndPThread	CLMutexByRecordLockingAndPThread.cpp	/^CLMutexByRecordLockingAndPThread::~CLMutexByRecordLockingAndPThread()$/;"	f	class:CLMutexByRecordLockingAndPThread
+CLMutexBySharedPThread	CLMutexBySharedPThread.cpp	/^CLMutexBySharedPThread::CLMutexBySharedPThread(const char *pstrMutexName)$/;"	f	class:CLMutexBySharedPThread
+GetMutexPointer	CLMutexBySharedPThread.cpp	/^pthread_mutex_t *CLMutexBySharedPThread::GetMutexPointer()$/;"	f	class:CLMutexBySharedPThread
+Initialize	CLMutexBySharedPThread.cpp	/^CLStatus CLMutexBySharedPThread::Initialize()$/;"	f	class:CLMutexBySharedPThread
+Lock	CLMutexBySharedPThread.cpp	/^CLStatus CLMutexBySharedPThread::Lock()$/;"	f	class:CLMutexBySharedPThread
+Uninitialize	CLMutexBySharedPThread.cpp	/^CLStatus CLMutexBySharedPThread::Uninitialize()$/;"	f	class:CLMutexBySharedPThread
+Unlock	CLMutexBySharedPThread.cpp	/^CLStatus CLMutexBySharedPThread::Unlock()$/;"	f	class:CLMutexBySharedPThread
+~CLMutexBySharedPThread	CLMutexBySharedPThread.cpp	/^CLMutexBySharedPThread::~CLMutexBySharedPThread()$/;"	f	class:CLMutexBySharedPThread
+CLMutexInterface	CLMutexInterface.cpp	/^CLMutexInterface::CLMutexInterface()$/;"	f	class:CLMutexInterface
+~CLMutexInterface	CLMutexInterface.cpp	/^CLMutexInterface::~CLMutexInterface()$/;"	f	class:CLMutexInterface
+CLNamedPipe	CLNamedPipe.cpp	/^CLNamedPipe::CLNamedPipe(const char* pStrPipeName, bool isShared, int flag)$/;"	f	class:CLNamedPipe
+GetAtomWriteSize	CLNamedPipe.cpp	/^long CLNamedPipe::GetAtomWriteSize()$/;"	f	class:CLNamedPipe
+GetPipeFd	CLNamedPipe.cpp	/^const int CLNamedPipe::GetPipeFd() const$/;"	f	class:CLNamedPipe
+Initialize	CLNamedPipe.cpp	/^CLStatus CLNamedPipe::Initialize(const char* pStrPipeName, int flag)$/;"	f	class:CLNamedPipe
+OpenRead	CLNamedPipe.cpp	/^CLStatus CLNamedPipe::OpenRead()$/;"	f	class:CLNamedPipe
+OpenReadAndWrite	CLNamedPipe.cpp	/^CLStatus CLNamedPipe::OpenReadAndWrite()$/;"	f	class:CLNamedPipe
+OpenWrite	CLNamedPipe.cpp	/^CLStatus CLNamedPipe::OpenWrite()$/;"	f	class:CLNamedPipe
+Read	CLNamedPipe.cpp	/^CLStatus CLNamedPipe::Read(char *pBuf, int length)$/;"	f	class:CLNamedPipe
+ReadVecs	CLNamedPipe.cpp	/^CLStatus CLNamedPipe::ReadVecs(CLIOVector& dataVec)$/;"	f	class:CLNamedPipe
+Write	CLNamedPipe.cpp	/^CLStatus CLNamedPipe::Write(char *pBuf, int length)$/;"	f	class:CLNamedPipe
+WriteVecs	CLNamedPipe.cpp	/^CLStatus CLNamedPipe::WriteVecs(CLIOVector& dataVec)$/;"	f	class:CLNamedPipe
+~CLNamedPipe	CLNamedPipe.cpp	/^CLNamedPipe::~CLNamedPipe()$/;"	f	class:CLNamedPipe
+CLNonThreadForMsgLoop	CLNonThreadForMsgLoop.cpp	/^CLNonThreadForMsgLoop::CLNonThreadForMsgLoop(CLMessageObserver *pMsgObserver, const char *pstrThreadName, int ExecutiveType)$/;"	f	class:CLNonThreadForMsgLoop
+RegisterDeserializer	CLNonThreadForMsgLoop.cpp	/^CLStatus CLNonThreadForMsgLoop::RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer)$/;"	f	class:CLNonThreadForMsgLoop
+Run	CLNonThreadForMsgLoop.cpp	/^CLStatus CLNonThreadForMsgLoop::Run(void *pContext)$/;"	f	class:CLNonThreadForMsgLoop
+~CLNonThreadForMsgLoop	CLNonThreadForMsgLoop.cpp	/^CLNonThreadForMsgLoop::~CLNonThreadForMsgLoop()$/;"	f	class:CLNonThreadForMsgLoop
+CLPointerMsgDeserializer	CLPointerMsgDeserializer.cpp	/^CLPointerMsgDeserializer::CLPointerMsgDeserializer()$/;"	f	class:CLPointerMsgDeserializer
+Deserialize	CLPointerMsgDeserializer.cpp	/^CLStatus CLPointerMsgDeserializer::Deserialize(CLIOVector &dataVec, CLMessage **pMsg)$/;"	f	class:CLPointerMsgDeserializer
+~CLPointerMsgDeserializer	CLPointerMsgDeserializer.cpp	/^CLPointerMsgDeserializer::~CLPointerMsgDeserializer()$/;"	f	class:CLPointerMsgDeserializer
+CLPointerMsgSerializer	CLPointerMsgSerializer.cpp	/^CLPointerMsgSerializer::CLPointerMsgSerializer()$/;"	f	class:CLPointerMsgSerializer
+Serialize	CLPointerMsgSerializer.cpp	/^CLStatus CLPointerMsgSerializer::Serialize(CLMessage *pMsg, CLIOVector *pDataVec)$/;"	f	class:CLPointerMsgSerializer
+~CLPointerMsgSerializer	CLPointerMsgSerializer.cpp	/^CLPointerMsgSerializer::~CLPointerMsgSerializer()$/;"	f	class:CLPointerMsgSerializer
+CLPrivateExecutiveCommunicationByNamedPipe	CLPrivateExecutiveCommunicationByNamedPipe.cpp	/^CLPrivateExecutiveCommunicationByNamedPipe::CLPrivateExecutiveCommunicationByNamedPipe(const char *pstrExecutiveName) : CLExecutiveCommunicationByNamedPipe(pstrExecutiveName, false)$/;"	f	class:CLPrivateExecutiveCommunicationByNamedPipe
+GetMsgBuf	CLPrivateExecutiveCommunicationByNamedPipe.cpp	/^char *CLPrivateExecutiveCommunicationByNamedPipe::GetMsgBuf(CLMessage *pMsg, unsigned int *pLength)$/;"	f	class:CLPrivateExecutiveCommunicationByNamedPipe
+~CLPrivateExecutiveCommunicationByNamedPipe	CLPrivateExecutiveCommunicationByNamedPipe.cpp	/^CLPrivateExecutiveCommunicationByNamedPipe::~CLPrivateExecutiveCommunicationByNamedPipe()$/;"	f	class:CLPrivateExecutiveCommunicationByNamedPipe
+CLPrivateMsgReceiverbyNamedPipe	CLPrivateMsgReceiverbyNamedPipe.cpp	/^CLPrivateMsgReceiverbyNamedPipe::CLPrivateMsgReceiverbyNamedPipe(const char *pstrPipeName) : CLMessageQueueByNamedPipe(pstrPipeName)$/;"	f	class:CLPrivateMsgReceiverbyNamedPipe
+ReadMsgFromPipe	CLPrivateMsgReceiverbyNamedPipe.cpp	/^CLStatus CLPrivateMsgReceiverbyNamedPipe::ReadMsgFromPipe(int fd)$/;"	f	class:CLPrivateMsgReceiverbyNamedPipe
+~CLPrivateMsgReceiverbyNamedPipe	CLPrivateMsgReceiverbyNamedPipe.cpp	/^CLPrivateMsgReceiverbyNamedPipe::~CLPrivateMsgReceiverbyNamedPipe()$/;"	f	class:CLPrivateMsgReceiverbyNamedPipe
+CLProcess	CLProcess.cpp	/^CLProcess::CLProcess(CLExecutiveFunctionProvider *pExecutiveFunctionProvider) : CLExecutive(pExecutiveFunctionProvider)$/;"	f	class:CLProcess
+CLProcess	CLProcess.cpp	/^CLProcess::CLProcess(CLExecutiveFunctionProvider *pExecutiveFunctionProvider, bool bWaitForDeath) : CLExecutive(pExecutiveFunctionProvider)$/;"	f	class:CLProcess
+CloseFileDescriptor	CLProcess.cpp	/^CLStatus CLProcess::CloseFileDescriptor()$/;"	f	class:CLProcess
+LENGTH_OF_PATH	CLProcess.cpp	18;"	d	file:
+LENGTH_OF_PROCESSID	CLProcess.cpp	17;"	d	file:
+Run	CLProcess.cpp	/^CLStatus CLProcess::Run(void *pstrCmdLine)$/;"	f	class:CLProcess
+RunChildFunction	CLProcess.cpp	/^void CLProcess::RunChildFunction(void *pstrCmdLine)$/;"	f	class:CLProcess
+WaitForDeath	CLProcess.cpp	/^CLStatus CLProcess::WaitForDeath()$/;"	f	class:CLProcess
+~CLProcess	CLProcess.cpp	/^CLProcess::~CLProcess()$/;"	f	class:CLProcess
+CLProcessFunctionForExec	CLProcessFunctionForExec.cpp	/^CLProcessFunctionForExec::CLProcessFunctionForExec()$/;"	f	class:CLProcessFunctionForExec
+MAX_LENGTH_OF_PATH	CLProcessFunctionForExec.cpp	11;"	d	file:
+RunExecutiveFunction	CLProcessFunctionForExec.cpp	/^CLStatus CLProcessFunctionForExec::RunExecutiveFunction(void* pCmdLine)$/;"	f	class:CLProcessFunctionForExec
+SetWorkDirectory	CLProcessFunctionForExec.cpp	/^CLStatus CLProcessFunctionForExec::SetWorkDirectory(char *pstrArgv0)$/;"	f	class:CLProcessFunctionForExec
+~CLProcessFunctionForExec	CLProcessFunctionForExec.cpp	/^CLProcessFunctionForExec::~CLProcessFunctionForExec()$/;"	f	class:CLProcessFunctionForExec
+CLProtoEncapForDefaultMsgFormat	CLProtoEncapForDefaultMsgFormat.cpp	/^CLProtoEncapForDefaultMsgFormat::CLProtoEncapForDefaultMsgFormat()$/;"	f	class:CLProtoEncapForDefaultMsgFormat
+Encapsulate	CLProtoEncapForDefaultMsgFormat.cpp	/^CLStatus CLProtoEncapForDefaultMsgFormat::Encapsulate(CLIOVector *pDataVec)$/;"	f	class:CLProtoEncapForDefaultMsgFormat
+~CLProtoEncapForDefaultMsgFormat	CLProtoEncapForDefaultMsgFormat.cpp	/^CLProtoEncapForDefaultMsgFormat::~CLProtoEncapForDefaultMsgFormat()$/;"	f	class:CLProtoEncapForDefaultMsgFormat
+CLProtoParser	CLProtoParser.cpp	/^CLProtoParser::CLProtoParser()$/;"	f	class:CLProtoParser
+Decapsulate	CLProtoParser.cpp	/^CLStatus CLProtoParser::Decapsulate(CLBuffer* pBuffer, vector<CLIOVector *> &vSerializedMsgs)$/;"	f	class:CLProtoParser
+~CLProtoParser	CLProtoParser.cpp	/^CLProtoParser::~CLProtoParser()$/;"	f	class:CLProtoParser
+CLProtoParserForDefaultMsgFormat	CLProtoParserForDefaultMsgFormat.cpp	/^CLProtoParserForDefaultMsgFormat::CLProtoParserForDefaultMsgFormat()$/;"	f	class:CLProtoParserForDefaultMsgFormat
+DecapsulateMsg	CLProtoParserForDefaultMsgFormat.cpp	/^CLStatus CLProtoParserForDefaultMsgFormat::DecapsulateMsg(CLIOVector& dataVec, vector<CLIOVector *> &vSerializedMsgs)$/;"	f	class:CLProtoParserForDefaultMsgFormat
+~CLProtoParserForDefaultMsgFormat	CLProtoParserForDefaultMsgFormat.cpp	/^CLProtoParserForDefaultMsgFormat::~CLProtoParserForDefaultMsgFormat()$/;"	f	class:CLProtoParserForDefaultMsgFormat
+CLProtoParserForPointerMsg	CLProtoParserForPointerMsg.cpp	/^CLProtoParserForPointerMsg::CLProtoParserForPointerMsg()$/;"	f	class:CLProtoParserForPointerMsg
+DecapsulateMsg	CLProtoParserForPointerMsg.cpp	/^CLStatus CLProtoParserForPointerMsg::DecapsulateMsg(CLIOVector& dataVec, vector<CLIOVector *> &vSerializedMsgs)$/;"	f	class:CLProtoParserForPointerMsg
+~CLProtoParserForPointerMsg	CLProtoParserForPointerMsg.cpp	/^CLProtoParserForPointerMsg::~CLProtoParserForPointerMsg()$/;"	f	class:CLProtoParserForPointerMsg
+CLProtocolDataPoster	CLProtocolDataPoster.cpp	/^CLProtocolDataPoster::CLProtocolDataPoster() : m_topMsgBufIndex(0), m_pDataPoster(0), m_bDataLeftFlag(false), m_pEvent(0)$/;"	f	class:CLProtocolDataPoster
+PostData	CLProtocolDataPoster.cpp	/^CLStatus CLProtocolDataPoster::PostData(CLIOVector *pDataVec)$/;"	f	class:CLProtocolDataPoster
+PostLeftProtoData	CLProtocolDataPoster.cpp	/^CLStatus CLProtocolDataPoster::PostLeftProtoData()$/;"	f	class:CLProtocolDataPoster
+PostProtoData	CLProtocolDataPoster.cpp	/^CLStatus CLProtocolDataPoster::PostProtoData(SLDataAndNotifier *pDataAndNotifier)\/\/this dataVec must be one Msg`s buffer$/;"	f	class:CLProtocolDataPoster
+SetParameters	CLProtocolDataPoster.cpp	/^CLStatus CLProtocolDataPoster::SetParameters(CLDataPoster *pDataPoster, CLEvent *pEvent)$/;"	f	class:CLProtocolDataPoster
+~CLProtocolDataPoster	CLProtocolDataPoster.cpp	/^CLProtocolDataPoster::~CLProtocolDataPoster()$/;"	f	class:CLProtocolDataPoster
+CLProtocolEncapsulator	CLProtocolEncapsulator.cpp	/^CLProtocolEncapsulator::CLProtocolEncapsulator()$/;"	f	class:CLProtocolEncapsulator
+~CLProtocolEncapsulator	CLProtocolEncapsulator.cpp	/^CLProtocolEncapsulator::~CLProtocolEncapsulator()$/;"	f	class:CLProtocolEncapsulator
+CLSTLQueue	CLSTLQueue.cpp	/^CLSTLQueue::CLSTLQueue()$/;"	f	class:CLSTLQueue
+PopMessage	CLSTLQueue.cpp	/^CLMessage* CLSTLQueue::PopMessage()$/;"	f	class:CLSTLQueue
+PushMessage	CLSTLQueue.cpp	/^CLStatus CLSTLQueue::PushMessage(CLMessage* pMsg)$/;"	f	class:CLSTLQueue
+~CLSTLQueue	CLSTLQueue.cpp	/^CLSTLQueue::~CLSTLQueue()$/;"	f	class:CLSTLQueue
+CLSharedConditionVariableImpl	CLSharedConditionVariableImpl.cpp	/^CLSharedConditionVariableImpl::CLSharedConditionVariableImpl()$/;"	f	class:CLSharedConditionVariableImpl
+DestroySharedObject	CLSharedConditionVariableImpl.cpp	/^CLStatus CLSharedConditionVariableImpl::DestroySharedObject(SLSharedObjectHead *pObject)$/;"	f	class:CLSharedConditionVariableImpl
+InitializeSharedObject	CLSharedConditionVariableImpl.cpp	/^CLStatus CLSharedConditionVariableImpl::InitializeSharedObject(SLSharedObjectHead *pObject)$/;"	f	class:CLSharedConditionVariableImpl
+SHARED_SPACE_FOR_SHARED_CONDITION_VARIABLE_ALLOCATOR	CLSharedConditionVariableImpl.cpp	4;"	d	file:
+~CLSharedConditionVariableImpl	CLSharedConditionVariableImpl.cpp	/^CLSharedConditionVariableImpl::~CLSharedConditionVariableImpl()$/;"	f	class:CLSharedConditionVariableImpl
+CLSharedEventImpl	CLSharedEventImpl.cpp	/^CLSharedEventImpl::CLSharedEventImpl()$/;"	f	class:CLSharedEventImpl
+DestroySharedObject	CLSharedEventImpl.cpp	/^CLStatus CLSharedEventImpl::DestroySharedObject(SLSharedObjectHead *pObject)$/;"	f	class:CLSharedEventImpl
+InitializeSharedObject	CLSharedEventImpl.cpp	/^CLStatus CLSharedEventImpl::InitializeSharedObject(SLSharedObjectHead *pObject)$/;"	f	class:CLSharedEventImpl
+SHARED_SPACE_FOR_SHARED_EVENT_ALLOCATOR	CLSharedEventImpl.cpp	3;"	d	file:
+~CLSharedEventImpl	CLSharedEventImpl.cpp	/^CLSharedEventImpl::~CLSharedEventImpl()$/;"	f	class:CLSharedEventImpl
+CLSharedExecutiveCommunicationByNamedPipe	CLSharedExecutiveCommunicationByNamedPipe.cpp	/^CLSharedExecutiveCommunicationByNamedPipe::CLSharedExecutiveCommunicationByNamedPipe(const char *pstrExecutiveName) : CLExecutiveCommunicationByNamedPipe(pstrExecutiveName, true)$/;"	f	class:CLSharedExecutiveCommunicationByNamedPipe
+GetMsgBuf	CLSharedExecutiveCommunicationByNamedPipe.cpp	/^char *CLSharedExecutiveCommunicationByNamedPipe::GetMsgBuf(CLMessage *pMsg, unsigned int *pLength)$/;"	f	class:CLSharedExecutiveCommunicationByNamedPipe
+RegisterSerializer	CLSharedExecutiveCommunicationByNamedPipe.cpp	/^CLStatus CLSharedExecutiveCommunicationByNamedPipe::RegisterSerializer(unsigned long lMsgID, CLMessageSerializer *pSerializer)$/;"	f	class:CLSharedExecutiveCommunicationByNamedPipe
+~CLSharedExecutiveCommunicationByNamedPipe	CLSharedExecutiveCommunicationByNamedPipe.cpp	/^CLSharedExecutiveCommunicationByNamedPipe::~CLSharedExecutiveCommunicationByNamedPipe()$/;"	f	class:CLSharedExecutiveCommunicationByNamedPipe
+CLSharedMemory	CLSharedMemory.cpp	/^CLSharedMemory::CLSharedMemory(const char *pstrFileName, size_t nSize) : m_Mutex(pstrFileName, MUTEX_USE_RECORD_LOCK)$/;"	f	class:CLSharedMemory
+DeleteSharedMemory	CLSharedMemory.cpp	/^CLStatus CLSharedMemory::DeleteSharedMemory()$/;"	f	class:CLSharedMemory
+FILE_PATH_FOR_SHARED_MEMORY	CLSharedMemory.cpp	16;"	d	file:
+GetAddress	CLSharedMemory.cpp	/^void *CLSharedMemory::GetAddress()$/;"	f	class:CLSharedMemory
+GetRefCount	CLSharedMemory.cpp	/^int CLSharedMemory::GetRefCount()$/;"	f	class:CLSharedMemory
+ID_FOR_KEY	CLSharedMemory.cpp	14;"	d	file:
+~CLSharedMemory	CLSharedMemory.cpp	/^CLSharedMemory::~CLSharedMemory()$/;"	f	class:CLSharedMemory
+CLSharedMsgReceiverByNamedPipe	CLSharedMsgReceiverByNamedPipe.cpp	/^CLSharedMsgReceiverByNamedPipe::CLSharedMsgReceiverByNamedPipe(const char *pstrPipeName) : CLMessageQueueByNamedPipe(pstrPipeName)$/;"	f	class:CLSharedMsgReceiverByNamedPipe
+ReadMsgFromPipe	CLSharedMsgReceiverByNamedPipe.cpp	/^CLStatus CLSharedMsgReceiverByNamedPipe::ReadMsgFromPipe(int fd)$/;"	f	class:CLSharedMsgReceiverByNamedPipe
+RegisterDeserializer	CLSharedMsgReceiverByNamedPipe.cpp	/^CLStatus CLSharedMsgReceiverByNamedPipe::RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer)$/;"	f	class:CLSharedMsgReceiverByNamedPipe
+~CLSharedMsgReceiverByNamedPipe	CLSharedMsgReceiverByNamedPipe.cpp	/^CLSharedMsgReceiverByNamedPipe::~CLSharedMsgReceiverByNamedPipe()$/;"	f	class:CLSharedMsgReceiverByNamedPipe
+CLSharedMutexImpl	CLSharedMutexImpl.cpp	/^CLSharedMutexImpl::CLSharedMutexImpl()$/;"	f	class:CLSharedMutexImpl
+DestroySharedObject	CLSharedMutexImpl.cpp	/^CLStatus CLSharedMutexImpl::DestroySharedObject(SLSharedObjectHead *pObject)$/;"	f	class:CLSharedMutexImpl
+InitializeSharedObject	CLSharedMutexImpl.cpp	/^CLStatus CLSharedMutexImpl::InitializeSharedObject(SLSharedObjectHead *pObject)$/;"	f	class:CLSharedMutexImpl
+SHARED_SPACE_FOR_SHARED_MUTEX_ALLOCATOR	CLSharedMutexImpl.cpp	4;"	d	file:
+~CLSharedMutexImpl	CLSharedMutexImpl.cpp	/^CLSharedMutexImpl::~CLSharedMutexImpl()$/;"	f	class:CLSharedMutexImpl
+CLSharedObjectsImpl	CLSharedObjectsImpl.cpp	/^CLSharedObjectsImpl::CLSharedObjectsImpl()$/;"	f	class:CLSharedObjectsImpl
+Destroy	CLSharedObjectsImpl.cpp	/^CLStatus CLSharedObjectsImpl::Destroy()$/;"	f	class:CLSharedObjectsImpl
+GetSharedObject	CLSharedObjectsImpl.cpp	/^void *CLSharedObjectsImpl::GetSharedObject(const char *pstrSharedObjectName)$/;"	f	class:CLSharedObjectsImpl
+Initialize	CLSharedObjectsImpl.cpp	/^CLStatus CLSharedObjectsImpl::Initialize()$/;"	f	class:CLSharedObjectsImpl
+ReleaseSharedObject	CLSharedObjectsImpl.cpp	/^CLStatus CLSharedObjectsImpl::ReleaseSharedObject(const char *pstrSharedObjectName)$/;"	f	class:CLSharedObjectsImpl
+~CLSharedObjectsImpl	CLSharedObjectsImpl.cpp	/^CLSharedObjectsImpl::~CLSharedObjectsImpl()$/;"	f	class:CLSharedObjectsImpl
+Accept	CLSocket.cpp	/^CLStatus CLSocket::Accept(CLSocket **ppConnSock)$/;"	f	class:CLSocket
+CLSocket	CLSocket.cpp	/^CLSocket::CLSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool forServer = true, int sockeType = TCP_SOCKET, bool isBlock = true)$/;"	f	class:CLSocket
+CLSocket	CLSocket.cpp	/^CLSocket::CLSocket(int sockFd, bool isBlock = true)$/;"	f	class:CLSocket
+Connect	CLSocket.cpp	/^CLStatus CLSocket::Connect()$/;"	f	class:CLSocket
+Read	CLSocket.cpp	/^CLStatus CLSocket::Read(CLIOVector& IOVec, CLSocketAddress* pAddr = 0)$/;"	f	class:CLSocket
+~CLSocket	CLSocket.cpp	/^CLSocket::~CLSocket()$/;"	f	class:CLSocket
+CLStatus	CLStatus.cpp	/^CLStatus::CLStatus(const CLStatus& status) : m_clReturnCode(m_lReturnCode), m_clErrorCode(m_lErrorCode)$/;"	f	class:CLStatus
+CLStatus	CLStatus.cpp	/^CLStatus::CLStatus(long lReturnCode, long lErrorCode) : m_clReturnCode(m_lReturnCode), m_clErrorCode(m_lErrorCode)$/;"	f	class:CLStatus
+IsSuccess	CLStatus.cpp	/^bool CLStatus::IsSuccess()$/;"	f	class:CLStatus
+operator =	CLStatus.cpp	/^CLStatus& CLStatus::operator= (const CLStatus& status)$/;"	f	class:CLStatus
+~CLStatus	CLStatus.cpp	/^CLStatus::~CLStatus()$/;"	f	class:CLStatus
+CLThread	CLThread.cpp	/^CLThread::CLThread(CLExecutiveFunctionProvider *pExecutiveFunctionProvider) : CLExecutive(pExecutiveFunctionProvider)$/;"	f	class:CLThread
+CLThread	CLThread.cpp	/^CLThread::CLThread(CLExecutiveFunctionProvider *pExecutiveFunctionProvider, bool bWaitForDeath) : CLExecutive(pExecutiveFunctionProvider)$/;"	f	class:CLThread
+Run	CLThread.cpp	/^CLStatus CLThread::Run(void *pContext)$/;"	f	class:CLThread
+StartFunctionOfThread	CLThread.cpp	/^void* CLThread::StartFunctionOfThread(void *pThis)$/;"	f	class:CLThread
+WaitForDeath	CLThread.cpp	/^CLStatus CLThread::WaitForDeath()$/;"	f	class:CLThread
+~CLThread	CLThread.cpp	/^CLThread::~CLThread()$/;"	f	class:CLThread
+CLThreadCommunicationBySTLqueue	CLThreadCommunicationBySTLqueue.cpp	/^CLThreadCommunicationBySTLqueue::CLThreadCommunicationBySTLqueue(CLMessageReceiverBySTLqueue *pMsgReceiver, CLEvent *pEvent)$/;"	f	class:CLThreadCommunicationBySTLqueue
+PostExecutiveMessage	CLThreadCommunicationBySTLqueue.cpp	/^CLStatus CLThreadCommunicationBySTLqueue::PostExecutiveMessage(CLMessage *pMessage)$/;"	f	class:CLThreadCommunicationBySTLqueue
+~CLThreadCommunicationBySTLqueue	CLThreadCommunicationBySTLqueue.cpp	/^CLThreadCommunicationBySTLqueue::~CLThreadCommunicationBySTLqueue()$/;"	f	class:CLThreadCommunicationBySTLqueue
+CLThreadForMsgLoop	CLThreadForMsgLoop.cpp	/^CLThreadForMsgLoop::CLThreadForMsgLoop(CLMessageObserver *pMsgObserver, const char *pstrThreadName, bool bWaitForDeath, int ExecutiveType)$/;"	f	class:CLThreadForMsgLoop
+RegisterDeserializer	CLThreadForMsgLoop.cpp	/^CLStatus CLThreadForMsgLoop::RegisterDeserializer(unsigned long lMsgID, CLMessageDeserializer *pDeserializer)$/;"	f	class:CLThreadForMsgLoop
+Run	CLThreadForMsgLoop.cpp	/^CLStatus CLThreadForMsgLoop::Run(void *pContext)$/;"	f	class:CLThreadForMsgLoop
+~CLThreadForMsgLoop	CLThreadForMsgLoop.cpp	/^CLThreadForMsgLoop::~CLThreadForMsgLoop()$/;"	f	class:CLThreadForMsgLoop
+CLThreadInitialFinishedNotifier	CLThreadInitialFinishedNotifier.cpp	/^CLThreadInitialFinishedNotifier::CLThreadInitialFinishedNotifier(CLEvent *pEvent)$/;"	f	class:CLThreadInitialFinishedNotifier
+IsInitialSuccess	CLThreadInitialFinishedNotifier.cpp	/^bool CLThreadInitialFinishedNotifier::IsInitialSuccess()$/;"	f	class:CLThreadInitialFinishedNotifier
+NotifyInitialFinished	CLThreadInitialFinishedNotifier.cpp	/^CLStatus CLThreadInitialFinishedNotifier::NotifyInitialFinished(bool bInitialSuccess)$/;"	f	class:CLThreadInitialFinishedNotifier
+~CLThreadInitialFinishedNotifier	CLThreadInitialFinishedNotifier.cpp	/^CLThreadInitialFinishedNotifier::~CLThreadInitialFinishedNotifier()$/;"	f	class:CLThreadInitialFinishedNotifier
+CLTimerApplyMsgDeserializer	CLTimerApplyMsgDeserializer.cpp	/^CLTimerApplyMsgDeserializer::CLTimerApplyMsgDeserializer()$/;"	f	class:CLTimerApplyMsgDeserializer
+Deserialize	CLTimerApplyMsgDeserializer.cpp	/^CLStatus CLTimerApplyMsgDeserializer::Deserialize(CLIOVector &dataVec, CLMessage **pMsg)$/;"	f	class:CLTimerApplyMsgDeserializer
+~CLTimerApplyMsgDeserializer	CLTimerApplyMsgDeserializer.cpp	/^CLTimerApplyMsgDeserializer::~CLTimerApplyMsgDeserializer()$/;"	f	class:CLTimerApplyMsgDeserializer
+CLTimerApplyMsgSerializer	CLTimerApplyMsgSerializer.cpp	/^CLTimerApplyMsgSerializer::CLTimerApplyMsgSerializer()$/;"	f	class:CLTimerApplyMsgSerializer
+Serialize	CLTimerApplyMsgSerializer.cpp	/^CLStatus CLTimerApplyMsgSerializer::Serialize(CLMessage *pMsg, CLIOVector *pDataVec)$/;"	f	class:CLTimerApplyMsgSerializer
+~CLTimerApplyMsgSerializer	CLTimerApplyMsgSerializer.cpp	/^CLTimerApplyMsgSerializer::~CLTimerApplyMsgSerializer()$/;"	f	class:CLTimerApplyMsgSerializer
+CLTimerFd	CLTimerFd.cpp	/^CLTimerFd::CLTimerFd(struct itimerspec& sTimerValue, string pstrRemoteName, const int& ID)$/;"	f	class:CLTimerFd
+GetRemoteName	CLTimerFd.cpp	/^const string& CLTimerFd::GetRemoteName()$/;"	f	class:CLTimerFd
+GetTimerFd	CLTimerFd.cpp	/^const int& CLTimerFd::GetTimerFd()$/;"	f	class:CLTimerFd
+GetTimerID	CLTimerFd.cpp	/^const int& CLTimerFd::GetTimerID()$/;"	f	class:CLTimerFd
+IsRepeatTimer	CLTimerFd.cpp	/^const bool& CLTimerFd::IsRepeatTimer()$/;"	f	class:CLTimerFd
+Read	CLTimerFd.cpp	/^CLStatus CLTimerFd::Read()$/;"	f	class:CLTimerFd
+StartClock	CLTimerFd.cpp	/^CLStatus CLTimerFd::StartClock()$/;"	f	class:CLTimerFd
+~CLTimerFd	CLTimerFd.cpp	/^CLTimerFd::~CLTimerFd()$/;"	f	class:CLTimerFd
+CLTimerOutNotifyMsgDeserializer	CLTimerOutNotifyMsgDeserializer.cpp	/^CLTimerOutNotifyMsgDeserializer::CLTimerOutNotifyMsgDeserializer()$/;"	f	class:CLTimerOutNotifyMsgDeserializer
+Deserialize	CLTimerOutNotifyMsgDeserializer.cpp	/^CLStatus CLTimerOutNotifyMsgDeserializer::Deserialize(CLIOVector &dataVec, CLMessage **pMsg)$/;"	f	class:CLTimerOutNotifyMsgDeserializer
+~CLTimerOutNotifyMsgDeserializer	CLTimerOutNotifyMsgDeserializer.cpp	/^CLTimerOutNotifyMsgDeserializer::~CLTimerOutNotifyMsgDeserializer()$/;"	f	class:CLTimerOutNotifyMsgDeserializer
+CLTimerOutNotifyMsgSerializer	CLTimerOutNotifyMsgSerializer.cpp	/^CLTimerOutNotifyMsgSerializer::CLTimerOutNotifyMsgSerializer()$/;"	f	class:CLTimerOutNotifyMsgSerializer
+Serialize	CLTimerOutNotifyMsgSerializer.cpp	/^CLStatus CLTimerOutNotifyMsgSerializer::Serialize(CLMessage *pMsg, CLIOVector *pDataVec)$/;"	f	class:CLTimerOutNotifyMsgSerializer
+~CLTimerOutNotifyMsgSerializer	CLTimerOutNotifyMsgSerializer.cpp	/^CLTimerOutNotifyMsgSerializer::~CLTimerOutNotifyMsgSerializer()$/;"	f	class:CLTimerOutNotifyMsgSerializer
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_PROGRAM_VERSION	5.8	//
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
