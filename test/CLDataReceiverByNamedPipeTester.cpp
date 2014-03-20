@@ -48,3 +48,18 @@ TEST(CLDataReceiverByNamedPipe, GetData2_Features_Test)
 	EXPECT_EQ(s1.m_clErrorCode, RECEIVED_ZERO_BYTE);
 	EXPECT_NE(context, 0);
 }
+
+TEST(CLDataReceiverByNamedPipe, GetUuid)
+{
+	CLDataReceiverByNamedPipe s1("/tmp/CLNamedPipe_GetUuid1_Features_Test");
+	CLDataReceiverByNamedPipe s2("/tmp/CLNamedPipe_GetUuid2_Features_Test");
+
+	CLUuid u1 = s1.GetUuid();
+	CLUuid u2 = s2.GetUuid();
+
+	void *p1 = (char *)&u1 + sizeof(long);
+	void *p2 = (char *)&u2 + sizeof(long);
+
+	int r = uuid_compare((unsigned char *)p1, (unsigned char *)p2);
+	EXPECT_TRUE(r != 0);
+}

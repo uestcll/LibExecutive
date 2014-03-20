@@ -70,3 +70,18 @@ TEST(CLDataReceiverByAccept, GetData_Parameter_Test)
 	EXPECT_TRUE(r1.m_clReturnCode == -1);
 	EXPECT_TRUE(r1.m_clErrorCode == NORMAL_ERROR);
 }
+
+TEST(CLDataReceiverByAccept, GetUuid)
+{
+	CLSocket *ps = new CLSocket("3600");
+	CLDataReceiverByAccept dr(ps);
+
+	CLUuid u1 = ps->GetUuid();
+	CLUuid u2 = dr.GetUuid();
+
+	void *p1 = (char *)&u1 + sizeof(long);
+	void *p2 = (char *)&u2 + sizeof(long);
+
+	int r = uuid_compare((unsigned char *)p1, (unsigned char *)p2);
+	EXPECT_TRUE(r == 0);
+}

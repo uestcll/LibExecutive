@@ -80,3 +80,18 @@ TEST(CLSTLqueue, PopData_Features_Test)
 			EXPECT_EQ((int)buf2[j], 0);
 	}
 }
+
+TEST(CLSTLqueue, GetUuid)
+{
+	CLSTLqueue s1;
+	CLSTLqueue s2;
+
+	CLUuid u1 = s1.GetUuid();
+	CLUuid u2 = s2.GetUuid();
+
+	void *p1 = (char *)&u1 + sizeof(long);
+	void *p2 = (char *)&u2 + sizeof(long);
+
+	int r = uuid_compare((unsigned char *)p1, (unsigned char *)p2);
+	EXPECT_TRUE(r != 0);
+}

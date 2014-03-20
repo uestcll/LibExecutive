@@ -28,19 +28,6 @@ TEST(CLSocket, GetSocket)
 	EXPECT_TRUE(val != -1);
 
 	EXPECT_TRUE(val & O_NONBLOCK);
-
-	uuid_t socket_id;
-	char *pid = (char *)socket_id;
-	char zero[16];
-	for(int i = 0; i < 16; i++)
-	{
-		pid[i] = 0;
-		zero[i] = 0;
-	}
-
-	s.GetUuid(socket_id);
-
-	EXPECT_TRUE(memcmp(socket_id, zero, 16) != 0);
 }
 
 TEST(CLSocket, BlockSocket)
@@ -362,7 +349,7 @@ TEST(CLSocket, UDPServerBlockV4)
 
 	const char *pbuf = "nihaookok";
 	
-	EXPECT_TRUE(strcmp(pbuf, pbuf) == 0);
+	EXPECT_TRUE(strcmp(pbuf, buf) == 0);
 
 	EXPECT_TRUE(event.Wait().IsSuccess());
 }
@@ -398,7 +385,7 @@ TEST(CLSocket, UDPServerNonBlockV4)
 
 	const char *pbuf = "nihaookok";
 
-	EXPECT_TRUE(strcmp(pbuf, pbuf) == 0);
+	EXPECT_TRUE(strcmp(pbuf, buf) == 0);
 
 	EXPECT_TRUE(event.Wait().IsSuccess());
 }
@@ -452,7 +439,7 @@ TEST(CLSocket, UDPServer2BlockV4)
 	EXPECT_TRUE(r.m_clErrorCode == 0);
 
 	const char *pbuf = "nihaookok";
-	EXPECT_TRUE(strcmp(pbuf, pbuf) == 0);
+	EXPECT_TRUE(strcmp(pbuf, buf) == 0);
 
 	CLStatus r1 = s.Write(iov, &addr);
 	EXPECT_TRUE(r1.m_clReturnCode == 10);
@@ -492,4 +479,19 @@ TEST(CLSocket, UDPClientBlockV4)
 	EXPECT_TRUE(strcmp(p, buf) == 0);
 
 	EXPECT_TRUE(event.Wait().IsSuccess());
+}
+
+TEST(CLSocket, GetUuid)
+{
+	CLSocket s1("4000");
+	CLSocket s2("5000");
+
+	CLUuid u1 = s1.GetUuid();
+	CLUuid u2 = s2.GetUuid();
+
+	void *p1 = (char *)&u1 + sizeof(long);
+	void *p2 = (char *)&u2 + sizeof(long);
+
+	int r = uuid_compare((unsigned char *)p1, (unsigned char *)p2);
+	EXPECT_TRUE(r != 0);
 }

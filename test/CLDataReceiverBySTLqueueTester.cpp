@@ -8,6 +8,17 @@ TEST(CLDataReceiverBySTLqueue, GetData_Features_Test)
 	CLSTLqueue qt;
 	CLDataReceiverBySTLqueue q_stl(&qt);
 
+	{
+		CLUuid u1 = qt.GetUuid();
+		CLUuid u2 = q_stl.GetUuid();
+
+		void *p1 = (char *)&u1 + sizeof(long);
+		void *p2 = (char *)&u2 + sizeof(long);
+
+		int r = uuid_compare((unsigned char *)p1, (unsigned char *)p2);
+		EXPECT_TRUE(r == 0);
+	}
+
 	CLIOVectors iov;
 	long context = 1;
 

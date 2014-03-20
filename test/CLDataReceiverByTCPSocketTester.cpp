@@ -31,6 +31,17 @@ TEST(CLDataReceiverByTCPSocket, GetData_Features_Test)
 
 	CLDataReceiverByTCPSocket dt(psocket);
 
+	{
+		CLUuid u1 = psocket->GetUuid();
+		CLUuid u2 = dt.GetUuid();
+
+		void *p1 = (char *)&u1 + sizeof(long);
+		void *p2 = (char *)&u2 + sizeof(long);
+
+		int r = uuid_compare((unsigned char *)p1, (unsigned char *)p2);
+		EXPECT_TRUE(r == 0);
+	}
+
 	context = 0;
 	char pbuf2[10];
 	bzero(pbuf2, 10);
