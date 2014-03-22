@@ -9,6 +9,7 @@
 #include "CLLogger.h"
 #include "ErrorCode.h"
 #include "CLBufferManager.h"
+#include "CLChannelClosedMsg.h"
 
 using namespace std;
 
@@ -82,8 +83,20 @@ CLStatus CLMessageReceiver::GetMessage(std::queue<SLMessageAndSource*>& qMsgCont
 	CLStatus s1 = m_pDataReceiver->GetData(ReceiveIOVec, &Context);
 	if(!s1.IsSuccess())
 	{
-		if(s1.m_clErrorCode != RECEIVED_ZERO_BYTE)
+		if(s1.m_clErrorCode == NORMAL_ERROR)
+		{
 			CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pDataReceiver->GetData error", 0);
+			return CLStatus(-1, NORMAL_ERROR);
+		}
+		else if(s1.m_clErrorCode == RECEIVED_CLOSE)
+		{
+			SLMessageAndSource *pMsgInfo = new SLMessageAndSource;
+			pMsgInfo->pMsg = new CLChannelClosedMsg;
+			pMsgInfo->ChannelUuid = *m_pChannelUuid;
+
+			qMsgContainer.push(pMsgInfo);
+			return CLStatus(0, 0);
+		}
 
 		return s1;
 	}

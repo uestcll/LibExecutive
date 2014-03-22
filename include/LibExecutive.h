@@ -65,5 +65,6 @@
 #include "CLClientArrivedMsg.h"
 #include "CLClientArrivedMsgDeserializer.h"
 #include "CLUuid.h"
+#include "CLChannelClosedMsg.h"
 
 #endif

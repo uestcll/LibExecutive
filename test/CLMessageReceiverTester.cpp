@@ -287,12 +287,14 @@ TEST(CLMessageReceiver, GetMessagePrivateNamedPipe2_Features_Test)
 
 	delete pMsgReceiver;
 }
-/*
+
 TEST(CLMessageReceiver, GetMessagePrivateNamedPipe3_Features_Test)
 {
 	const char *strPath = "/tmp/NamedPipe_For_CLMessageReceiver_Test";
-	queue<CLMessage *> qCon;
-	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(new CLBufferManager(), new CLDataReceiverByNamedPipe(strPath), new CLPointerToMsgDeserializer(), new CLProtocolDecapsulator_For_CLMessageReceiver_Test);
+	queue<SLMessageAndSource *> qCon;
+	CLDataReceiver *pTmpDataReveiver = new CLDataReceiverByNamedPipe(strPath);
+	CLUuid u1 = pTmpDataReveiver->GetUuid();
+	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(&u1, new CLBufferManager(), pTmpDataReveiver, new CLPointerToMsgDeserializer(), new CLProtocolDecapsulator_For_CLMessageReceiver_Test);
 
 	long i = 1;
 	int fd = open(strPath, O_WRONLY);
@@ -424,11 +426,15 @@ public:
 TEST(CLMessageReceiver, GetMessageNamedPipe_Features_Test)
 {
 	const char *strPath = "/tmp/NamedPipe_For_CLMessageReceiver_Test";
-	queue<CLMessage *> qCon;
+	queue<SLMessageAndSource *> qCon;
 	CLMultiMsgDeserializer *pdd = new CLMultiMsgDeserializer();
 	EXPECT_TRUE(pdd->RegisterDeserializer(1, new CLMsg1ForCLMessageReceiverTest_Deserializer).IsSuccess());
 	EXPECT_TRUE(pdd->RegisterDeserializer(2, new CLMsg2ForCLMessageReceiverTest_Deserializer).IsSuccess());
-	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(new CLBufferManager(), new CLDataReceiverByNamedPipe(strPath), pdd, new CLProtocolDecapsulatorByDefaultMsgFormat);
+
+	CLDataReceiver *pTmpDataReveiver = new CLDataReceiverByNamedPipe(strPath);
+	CLUuid u1 = pTmpDataReveiver->GetUuid();
+
+	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(&u1, new CLBufferManager(), pTmpDataReveiver, pdd, new CLProtocolDecapsulatorByDefaultMsgFormat);
 
 	CLStatus s11 = pMsgReceiver->GetMessage(qCon);
 	EXPECT_FALSE(s11.IsSuccess());
@@ -453,23 +459,28 @@ TEST(CLMessageReceiver, GetMessageNamedPipe_Features_Test)
 	i = 1;
 	while(!qCon.empty())
 	{
-		CLMessage *pMsg = qCon.front();
+		SLMessageAndSource *pInfo = qCon.front();
 		qCon.pop();
 
 		if(i % 2 == 0)
 		{
-			CLMsg1ForCLMessageReceiverTest *p = dynamic_cast<CLMsg1ForCLMessageReceiverTest *>(pMsg);
+			CLMsg1ForCLMessageReceiverTest *p = dynamic_cast<CLMsg1ForCLMessageReceiverTest *>(pInfo->pMsg);
 			EXPECT_TRUE(p != 0);
 		}
 		else
 		{
-			CLMsg2ForCLMessageReceiverTest *p = dynamic_cast<CLMsg2ForCLMessageReceiverTest *>(pMsg);
+			CLMsg2ForCLMessageReceiverTest *p = dynamic_cast<CLMsg2ForCLMessageReceiverTest *>(pInfo->pMsg);
 			EXPECT_TRUE(p != 0);
 		}
 
 		i++;
 
-		delete pMsg;
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
+
+		delete pInfo->pMsg;
+
+		delete pInfo;
 	}
 
 	fd = open(strPath, O_WRONLY);
@@ -490,23 +501,28 @@ TEST(CLMessageReceiver, GetMessageNamedPipe_Features_Test)
 		i = 1;
 		while(!qCon.empty())
 		{
-			CLMessage *pMsg = qCon.front();
+			SLMessageAndSource *pInfo = qCon.front();
 			qCon.pop();
 
 			if(i % 2 == 0)
 			{
-				CLMsg1ForCLMessageReceiverTest *p = dynamic_cast<CLMsg1ForCLMessageReceiverTest *>(pMsg);
+				CLMsg1ForCLMessageReceiverTest *p = dynamic_cast<CLMsg1ForCLMessageReceiverTest *>(pInfo->pMsg);
 				EXPECT_TRUE(p != 0);
 			}
 			else
 			{
-				CLMsg2ForCLMessageReceiverTest *p = dynamic_cast<CLMsg2ForCLMessageReceiverTest *>(pMsg);
+				CLMsg2ForCLMessageReceiverTest *p = dynamic_cast<CLMsg2ForCLMessageReceiverTest *>(pInfo->pMsg);
 				EXPECT_TRUE(p != 0);
 			}
 
 			i++;
 
-			delete pMsg;
+			CLUuidComparer compare;
+			EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
+
+			delete pInfo->pMsg;
+
+			delete pInfo;
 		}
 	}
 
@@ -516,23 +532,28 @@ TEST(CLMessageReceiver, GetMessageNamedPipe_Features_Test)
 	i = 1;
 	while(!qCon.empty())
 	{
-		CLMessage *pMsg = qCon.front();
+		SLMessageAndSource *pInfo = qCon.front();
 		qCon.pop();
 
 		if(i % 2 == 0)
 		{
-			CLMsg1ForCLMessageReceiverTest *p = dynamic_cast<CLMsg1ForCLMessageReceiverTest *>(pMsg);
+			CLMsg1ForCLMessageReceiverTest *p = dynamic_cast<CLMsg1ForCLMessageReceiverTest *>(pInfo->pMsg);
 			EXPECT_TRUE(p != 0);
 		}
 		else
 		{
-			CLMsg2ForCLMessageReceiverTest *p = dynamic_cast<CLMsg2ForCLMessageReceiverTest *>(pMsg);
+			CLMsg2ForCLMessageReceiverTest *p = dynamic_cast<CLMsg2ForCLMessageReceiverTest *>(pInfo->pMsg);
 			EXPECT_TRUE(p != 0);
 		}
 
 		i++;
 
-		delete pMsg;
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
+
+		delete pInfo->pMsg;
+
+		delete pInfo;
 	}
 
 	
@@ -542,12 +563,16 @@ TEST(CLMessageReceiver, GetMessageNamedPipe_Features_Test)
 TEST(CLMessageReceiver, GetMessageNamedPipe2_Features_Test)
 {
 	const char *strPath = "/tmp/NamedPipe_For_CLMessageReceiver_Test";
-	queue<CLMessage *> qCon;
+	queue<SLMessageAndSource *> qCon;
 	CLMultiMsgDeserializer *pdd = new CLMultiMsgDeserializer();
 	EXPECT_TRUE(pdd->RegisterDeserializer(1, new CLMsg1ForCLMessageReceiverTest_Deserializer).IsSuccess());
 	EXPECT_TRUE(pdd->RegisterDeserializer(2, new CLMsg2ForCLMessageReceiverTest_Deserializer).IsSuccess());
 	EXPECT_TRUE(pdd->RegisterDeserializer(3, new CLMsg3ForCLMessageReceiverTest_Deserializer).IsSuccess());
-	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(new CLBufferManager(), new CLDataReceiverByNamedPipe(strPath), pdd, new CLProtocolDecapsulatorByDefaultMsgFormat);
+
+	CLDataReceiver *pTmpDataReveiver = new CLDataReceiverByNamedPipe(strPath);
+	CLUuid u1 = pTmpDataReveiver->GetUuid();
+
+	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(&u1, new CLBufferManager(), pTmpDataReveiver, pdd, new CLProtocolDecapsulatorByDefaultMsgFormat);
 
 	int buf1[5] = {16, 1, 0, 2, 3};
 	int buf2[3] = {8, 2, 0};
@@ -572,23 +597,27 @@ TEST(CLMessageReceiver, GetMessageNamedPipe2_Features_Test)
 	i = 1;
 	while(!qCon.empty())
 	{
-		CLMessage *pMsg = qCon.front();
+		SLMessageAndSource *pInfo = qCon.front();
 		qCon.pop();
 
 		if(i % 2 == 0)
 		{
-			CLMsg1ForCLMessageReceiverTest *p = dynamic_cast<CLMsg1ForCLMessageReceiverTest *>(pMsg);
+			CLMsg1ForCLMessageReceiverTest *p = dynamic_cast<CLMsg1ForCLMessageReceiverTest *>(pInfo->pMsg);
 			EXPECT_TRUE(p != 0);
 		}
 		else
 		{
-			CLMsg2ForCLMessageReceiverTest *p = dynamic_cast<CLMsg2ForCLMessageReceiverTest *>(pMsg);
+			CLMsg2ForCLMessageReceiverTest *p = dynamic_cast<CLMsg2ForCLMessageReceiverTest *>(pInfo->pMsg);
 			EXPECT_TRUE(p != 0);
 		}
 
 		i++;
 
-		delete pMsg;
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
+
+		delete pInfo->pMsg;
+		delete pInfo;
 	}
 
 	delete pMsgReceiver;
@@ -597,12 +626,16 @@ TEST(CLMessageReceiver, GetMessageNamedPipe2_Features_Test)
 TEST(CLMessageReceiver, GetMessageNamedPipe3_Features_Test)
 {
 	const char *strPath = "/tmp/NamedPipe_For_CLMessageReceiver_Test";
-	queue<CLMessage *> qCon;
+	queue<SLMessageAndSource *> qCon;
 	CLMultiMsgDeserializer *pdd = new CLMultiMsgDeserializer();
 	EXPECT_TRUE(pdd->RegisterDeserializer(1, new CLMsg1ForCLMessageReceiverTest_Deserializer).IsSuccess());
 	EXPECT_TRUE(pdd->RegisterDeserializer(2, new CLMsg2ForCLMessageReceiverTest_Deserializer).IsSuccess());
 	EXPECT_TRUE(pdd->RegisterDeserializer(3, new CLMsg3ForCLMessageReceiverTest_Deserializer).IsSuccess());
-	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(new CLBufferManager(), new CLDataReceiverByNamedPipe(strPath), pdd);
+
+	CLDataReceiver *pTmpDataReveiver = new CLDataReceiverByNamedPipe(strPath);
+	CLUuid u1 = pTmpDataReveiver->GetUuid();
+
+	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(&u1, new CLBufferManager(), pTmpDataReveiver, pdd);
 
 	int buf1[5] = {16, 1, 0, 2, 3};
 	int fd = open(strPath, O_WRONLY);
@@ -613,11 +646,17 @@ TEST(CLMessageReceiver, GetMessageNamedPipe3_Features_Test)
 	EXPECT_TRUE(s1.IsSuccess());
 	EXPECT_TRUE(qCon.size() == 1);
 
-	CLMessage *pMsg = qCon.front();
+	SLMessageAndSource *pInfo = qCon.front();
 	qCon.pop();
-	CLMsg1ForCLMessageReceiverTest *p = dynamic_cast<CLMsg1ForCLMessageReceiverTest *>(pMsg);
+
+	CLMsg1ForCLMessageReceiverTest *p = dynamic_cast<CLMsg1ForCLMessageReceiverTest *>(pInfo->pMsg);
 	EXPECT_TRUE(p != 0);
-	delete pMsg;
+
+	CLUuidComparer compare;
+	EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
+
+	delete pInfo->pMsg;
+	delete pInfo;
 	
 	delete pMsgReceiver;
 }
@@ -679,11 +718,15 @@ public:
 TEST(CLMessageReceiver, GetMessageNamedPipe4_Features_Test)
 {
 	const char *strPath = "/tmp/NamedPipe_For_CLMessageReceiver_Test";
-	queue<CLMessage *> qCon;
+	queue<SLMessageAndSource *> qCon;
 	CLMultiMsgDeserializer *pdd = new CLMultiMsgDeserializer();
 	EXPECT_TRUE(pdd->RegisterDeserializer(1, new CLMsg1ForCLMessageReceiverTest_Deserializer).IsSuccess());
 	EXPECT_TRUE(pdd->RegisterDeserializer(4, new CLMsg4ForCLMessageReceiverTest_Deserializer).IsSuccess());
-	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(new CLBufferManager(), new CLDataReceiverByNamedPipe(strPath), pdd, new CLProtocolDecapsulatorByDefaultMsgFormat);
+
+	CLDataReceiver *pTmpDataReveiver = new CLDataReceiverByNamedPipe(strPath);
+	CLUuid u1 = pTmpDataReveiver->GetUuid();
+
+	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(&u1, new CLBufferManager(), pTmpDataReveiver, pdd, new CLProtocolDecapsulatorByDefaultMsgFormat);
 
 	int buf[6] = {20, 4, 0, 2, 3, 4};
 	int i;
@@ -699,13 +742,17 @@ TEST(CLMessageReceiver, GetMessageNamedPipe4_Features_Test)
 		EXPECT_TRUE(qCon.size() == 170);
 		while(!qCon.empty())
 		{
-			CLMessage *pMsg = qCon.front();
+			SLMessageAndSource *pInfo = qCon.front();
 			qCon.pop();
 
-			CLMsg4ForCLMessageReceiverTest *p = dynamic_cast<CLMsg4ForCLMessageReceiverTest *>(pMsg);
+			CLMsg4ForCLMessageReceiverTest *p = dynamic_cast<CLMsg4ForCLMessageReceiverTest *>(pInfo->pMsg);
 			EXPECT_TRUE(p != 0);
 
-			delete pMsg;
+			CLUuidComparer compare;
+			EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
+
+			delete pInfo->pMsg;
+			delete pInfo;
 		}
 	}
 
@@ -714,13 +761,17 @@ TEST(CLMessageReceiver, GetMessageNamedPipe4_Features_Test)
 	EXPECT_TRUE(qCon.size() == 150);
 	while(!qCon.empty())
 	{
-		CLMessage *pMsg = qCon.front();
+		SLMessageAndSource *pInfo = qCon.front();
 		qCon.pop();
 
-		CLMsg4ForCLMessageReceiverTest *p = dynamic_cast<CLMsg4ForCLMessageReceiverTest *>(pMsg);
+		CLMsg4ForCLMessageReceiverTest *p = dynamic_cast<CLMsg4ForCLMessageReceiverTest *>(pInfo->pMsg);
 		EXPECT_TRUE(p != 0);
 
-		delete pMsg;
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
+
+		delete pInfo->pMsg;
+		delete pInfo;
 	}
 
 	delete pMsgReceiver;
@@ -779,11 +830,15 @@ public:
 TEST(CLMessageReceiver, GetMessageNamedPipe5_Features_Test)
 {
 	const char *strPath = "/tmp/NamedPipe_For_CLMessageReceiver_Test";
-	queue<CLMessage *> qCon;
+	queue<SLMessageAndSource *> qCon;
 	CLMultiMsgDeserializer *pdd = new CLMultiMsgDeserializer();
 	EXPECT_TRUE(pdd->RegisterDeserializer(1, new CLMsg1ForCLMessageReceiverTest_Deserializer).IsSuccess());
 	EXPECT_TRUE(pdd->RegisterDeserializer(5, new CLMsg5ForCLMessageReceiverTest_Deserializer).IsSuccess());
-	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(new CLBufferManager(), new CLDataReceiverByNamedPipe(strPath), pdd, new CLProtocolDecapsulatorByDefaultMsgFormat);
+
+	CLDataReceiver *pTmpDataReveiver = new CLDataReceiverByNamedPipe(strPath);
+	CLUuid u1 = pTmpDataReveiver->GetUuid();
+
+	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(&u1, new CLBufferManager(), pTmpDataReveiver, pdd, new CLProtocolDecapsulatorByDefaultMsgFormat);
 
 	int buf[9] = {29, 5, 0, 0, 0, 0, 0, 0, 0};
 	int i;
@@ -851,13 +906,17 @@ TEST(CLMessageReceiver, GetMessageNamedPipe5_Features_Test)
 	i = 0;
 	while(!qCon.empty())
 	{
-		CLMessage *pMsg = qCon.front();
+		SLMessageAndSource *pInfo = qCon.front();
 		qCon.pop();
 
-		CLMsg5ForCLMessageReceiverTest *p = dynamic_cast<CLMsg5ForCLMessageReceiverTest *>(pMsg);
+		CLMsg5ForCLMessageReceiverTest *p = dynamic_cast<CLMsg5ForCLMessageReceiverTest *>(pInfo->pMsg);
 		EXPECT_TRUE(p != 0);
 
-		delete pMsg;
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
+
+		delete pInfo->pMsg;
+		delete pInfo;
 
 		i++;
 	}
@@ -868,14 +927,18 @@ TEST(CLMessageReceiver, GetMessageNamedPipe5_Features_Test)
 	EXPECT_EQ(qCon.size(), 1000-893);
 	while(!qCon.empty())
 	{
-		CLMessage *pMsg = qCon.front();
+		SLMessageAndSource *pInfo = qCon.front();
 		qCon.pop();
 
-		CLMsg5ForCLMessageReceiverTest *p = dynamic_cast<CLMsg5ForCLMessageReceiverTest *>(pMsg);
+		CLMsg5ForCLMessageReceiverTest *p = dynamic_cast<CLMsg5ForCLMessageReceiverTest *>(pInfo->pMsg);
 		EXPECT_TRUE(p != 0);
 
-		delete pMsg;
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
+
+		delete pInfo->pMsg;
+		delete pInfo;
 	}
 
 	delete pMsgReceiver;
-}*/
+}
