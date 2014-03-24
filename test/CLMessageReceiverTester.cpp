@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <queue>
 #include <fcntl.h>
+#include <unistd.h>
 #include "LibExecutive.h"
 
 using namespace std;
@@ -940,5 +941,406 @@ TEST(CLMessageReceiver, GetMessageNamedPipe5_Features_Test)
 		delete pInfo;
 	}
 
+	delete pMsgReceiver;
+}
+
+TEST(CLMessageReceiver, GetMessageTCPSocket_Features_Test)
+{
+	queue<SLMessageAndSource *> qCon;
+
+	CLSocket *pSocket = new CLSocket("3600");
+	CLUuid u1 = pSocket->GetUuid();
+
+	CLDataReceiver *pTmpDataReveiver = new CLDataReceiverByAccept(pSocket);
+
+	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(&u1, new CLBufferManager(), pTmpDataReveiver, new CLClientArrivedMsgDeserializer);
+
+	CLStatus s11 = pMsgReceiver->GetMessage(qCon);
+	EXPECT_FALSE(s11.IsSuccess());
+	EXPECT_TRUE(s11.m_clErrorCode == MSG_RECEIVED_ZERO);
+	
+	CLSocket *pClientSocket = new CLSocket("127.0.0.1", "3600", SOCKET_TYPE_TCP, true);
+	EXPECT_TRUE(pClientSocket->Connect().IsSuccess());
+
+	CLStatus s12 = pMsgReceiver->GetMessage(qCon);
+	EXPECT_TRUE(s12.IsSuccess());
+	EXPECT_TRUE(qCon.size() == 1);
+
+	CLSocket *pConnSocket;
+
+	{
+		SLMessageAndSource *pInfo = qCon.front();
+		qCon.pop();
+
+		CLClientArrivedMsg *pMsg = dynamic_cast<CLClientArrivedMsg *>(pInfo->pMsg);
+		EXPECT_TRUE(pMsg != 0);
+
+		pConnSocket = pMsg->GetSocket();
+
+		EXPECT_TRUE(pConnSocket != 0);
+
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
+
+		delete pInfo->pMsg;
+
+		delete pInfo;
+	}
+
+	CLMultiMsgDeserializer *pdd = new CLMultiMsgDeserializer();
+	EXPECT_TRUE(pdd->RegisterDeserializer(1, new CLMsg1ForCLMessageReceiverTest_Deserializer).IsSuccess());
+	EXPECT_TRUE(pdd->RegisterDeserializer(2, new CLMsg2ForCLMessageReceiverTest_Deserializer).IsSuccess());
+
+	CLDataReceiver *pTmpDataReveiver1 = new CLDataReceiverByTCPSocket(pConnSocket);
+	CLUuid u2 = pTmpDataReveiver1->GetUuid();
+	
+	CLMessageReceiver *pMsgReceiver1 = new CLMessageReceiver(&u2, new CLBufferManager(), pTmpDataReveiver1, pdd, new CLProtocolDecapsulatorByDefaultMsgFormat);
+
+	{
+		CLStatus s1 = pMsgReceiver1->GetMessage(qCon);
+		EXPECT_FALSE(s1.IsSuccess());
+		EXPECT_TRUE(s1.m_clErrorCode == MSG_RECEIVED_ZERO);
+	}
+
+	int buf1[5] = {16, 1, 0, 2, 3};
+	int buf2[3] = {8, 2, 0};
+	CLIOVectors iov1, iov2;
+	EXPECT_TRUE(iov1.PushBack((char*)buf1, 20).IsSuccess());
+	EXPECT_TRUE(iov2.PushBack((char*)buf2, 12).IsSuccess());
+	int i;
+	for(i = 1; i < 1001; i++)
+	{
+		if(i % 2 == 0)
+		{
+			CLStatus s13 = pClientSocket->Write(iov1);
+			EXPECT_EQ(s13.m_clReturnCode, 20);
+		}
+		else
+		{
+			CLStatus s13 = pClientSocket->Write(iov2);
+			EXPECT_EQ(s13.m_clReturnCode, 12);
+		}
+	}
+
+	while(true)
+	{
+		CLStatus s1 = pMsgReceiver1->GetMessage(qCon);
+		EXPECT_TRUE(s1.IsSuccess());
+		if(qCon.size() == 1000)
+			break;
+	}
+
+	i = 1;
+	while(!qCon.empty())
+	{
+		SLMessageAndSource *pInfo = qCon.front();
+		qCon.pop();
+
+		if(i % 2 == 0)
+		{
+			CLMsg1ForCLMessageReceiverTest *p = dynamic_cast<CLMsg1ForCLMessageReceiverTest *>(pInfo->pMsg);
+			EXPECT_TRUE(p != 0);
+		}
+		else
+		{
+			CLMsg2ForCLMessageReceiverTest *p = dynamic_cast<CLMsg2ForCLMessageReceiverTest *>(pInfo->pMsg);
+			EXPECT_TRUE(p != 0);
+		}
+
+		i++;
+
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(pInfo->ChannelUuid, u2) == 0);
+
+		delete pInfo->pMsg;
+
+		delete pInfo;
+	}
+	
+	delete pClientSocket;
+
+	sleep(2);
+
+	CLStatus s17 = pMsgReceiver1->GetMessage(qCon);
+	EXPECT_TRUE(s17.IsSuccess());
+	EXPECT_TRUE(qCon.size() == 1);
+	
+	{
+		SLMessageAndSource *pInfo = qCon.front();
+		qCon.pop();
+
+		CLChannelClosedMsg *pMsg = dynamic_cast<CLChannelClosedMsg *>(pInfo->pMsg);
+		EXPECT_TRUE(pMsg != 0);
+
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(pInfo->ChannelUuid, u2) == 0);
+
+		delete pInfo->pMsg;
+
+		delete pInfo;
+	}
+
+	delete pMsgReceiver1;
+	delete pMsgReceiver;
+}
+
+TEST(CLMessageReceiver, GetMessageTCPSocket_Partial_Features_Test)
+{
+	queue<SLMessageAndSource *> qCon;
+
+	CLSocket *pSocket = new CLSocket("3600");
+	CLUuid u1 = pSocket->GetUuid();
+
+	CLDataReceiver *pTmpDataReveiver = new CLDataReceiverByAccept(pSocket);
+
+	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(&u1, new CLBufferManager(), pTmpDataReveiver, new CLClientArrivedMsgDeserializer);
+
+	CLSocket *pClientSocket = new CLSocket("127.0.0.1", "3600", SOCKET_TYPE_TCP, true);
+	EXPECT_TRUE(pClientSocket->Connect().IsSuccess());
+
+	CLStatus s12 = pMsgReceiver->GetMessage(qCon);
+	EXPECT_TRUE(s12.IsSuccess());
+	EXPECT_TRUE(qCon.size() == 1);
+
+	CLSocket *pConnSocket;
+
+	{
+		SLMessageAndSource *pInfo = qCon.front();
+		qCon.pop();
+
+		CLClientArrivedMsg *pMsg = dynamic_cast<CLClientArrivedMsg *>(pInfo->pMsg);
+		EXPECT_TRUE(pMsg != 0);
+
+		pConnSocket = pMsg->GetSocket();
+
+		EXPECT_TRUE(pConnSocket != 0);
+
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
+
+		delete pInfo->pMsg;
+
+		delete pInfo;
+	}
+
+	CLMultiMsgDeserializer *pdd = new CLMultiMsgDeserializer();
+	EXPECT_TRUE(pdd->RegisterDeserializer(1, new CLMsg1ForCLMessageReceiverTest_Deserializer).IsSuccess());
+	EXPECT_TRUE(pdd->RegisterDeserializer(2, new CLMsg2ForCLMessageReceiverTest_Deserializer).IsSuccess());
+
+	CLDataReceiver *pTmpDataReveiver1 = new CLDataReceiverByTCPSocket(pConnSocket);
+	CLUuid u2 = pTmpDataReveiver1->GetUuid();
+
+	CLMessageReceiver *pMsgReceiver1 = new CLMessageReceiver(&u2, new CLBufferManager(), pTmpDataReveiver1, pdd, new CLProtocolDecapsulatorByDefaultMsgFormat);
+
+	int buf1[5] = {16, 1, 0, 2, 3};
+	int buf2[3] = {8, 2, 0};
+	
+	CLIOVectors iov1, iov2;
+	EXPECT_TRUE(iov1.PushBack((char*)buf1, 20).IsSuccess());
+	EXPECT_TRUE(iov2.PushBack((char*)buf2, 12).IsSuccess());
+	int i;
+	for(i = 1; i < 1001; i++)
+	{
+		if(i % 2 == 0)
+		{
+			CLStatus s13 = pClientSocket->Write(iov1);
+			EXPECT_EQ(s13.m_clReturnCode, 20);
+		}
+		else
+		{
+			CLStatus s13 = pClientSocket->Write(iov2);
+			EXPECT_EQ(s13.m_clReturnCode, 12);
+		}
+	}
+	
+	CLIOVectors iov3;
+	EXPECT_TRUE(iov3.PushBack((char*)buf1, 1).IsSuccess());
+	{
+		CLStatus s13 = pClientSocket->Write(iov3);
+		EXPECT_EQ(s13.m_clReturnCode, 1);
+	}
+
+	while(true)
+	{
+		CLStatus s1 = pMsgReceiver1->GetMessage(qCon);
+		EXPECT_TRUE(s1.IsSuccess());
+		if(qCon.size() == 1000)
+			break;
+	}
+
+	i = 1;
+	while(!qCon.empty())
+	{
+		SLMessageAndSource *pInfo = qCon.front();
+		qCon.pop();
+
+		if(i % 2 == 0)
+		{
+			CLMsg1ForCLMessageReceiverTest *p = dynamic_cast<CLMsg1ForCLMessageReceiverTest *>(pInfo->pMsg);
+			EXPECT_TRUE(p != 0);
+		}
+		else
+		{
+			CLMsg2ForCLMessageReceiverTest *p = dynamic_cast<CLMsg2ForCLMessageReceiverTest *>(pInfo->pMsg);
+			EXPECT_TRUE(p != 0);
+		}
+
+		i++;
+
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(pInfo->ChannelUuid, u2) == 0);
+
+		delete pInfo->pMsg;
+
+		delete pInfo;
+	}
+
+	CLIOVectors iov4;
+	char *buf11 = (char *)buf1 + 1;
+	EXPECT_TRUE(iov4.PushBack(buf11, 19).IsSuccess());
+	{
+		CLStatus s13 = pClientSocket->Write(iov4);
+		EXPECT_EQ(s13.m_clReturnCode, 19);
+	}
+
+	sleep(2);
+
+	{
+		CLStatus s1 = pMsgReceiver1->GetMessage(qCon);
+		EXPECT_TRUE(s1.IsSuccess());
+		EXPECT_TRUE(qCon.size() == 1);
+		
+		SLMessageAndSource *pInfo = qCon.front();
+		qCon.pop();
+
+		CLMsg1ForCLMessageReceiverTest *p = dynamic_cast<CLMsg1ForCLMessageReceiverTest *>(pInfo->pMsg);
+		EXPECT_TRUE(p != 0);
+
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(pInfo->ChannelUuid, u2) == 0);
+
+		delete pInfo->pMsg;
+
+		delete pInfo;
+	}
+
+	delete pClientSocket;
+	delete pMsgReceiver1;
+	delete pMsgReceiver;
+}
+
+TEST(CLMessageReceiver, GetMessageTCPSocket_DeserialError_Test)
+{
+	queue<SLMessageAndSource *> qCon;
+
+	CLSocket *pSocket = new CLSocket("3600");
+	CLUuid u1 = pSocket->GetUuid();
+
+	CLDataReceiver *pTmpDataReveiver = new CLDataReceiverByAccept(pSocket);
+
+	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(&u1, new CLBufferManager(), pTmpDataReveiver, new CLClientArrivedMsgDeserializer);
+
+	CLSocket *pClientSocket = new CLSocket("127.0.0.1", "3600", SOCKET_TYPE_TCP, true);
+	EXPECT_TRUE(pClientSocket->Connect().IsSuccess());
+
+	CLStatus s12 = pMsgReceiver->GetMessage(qCon);
+	EXPECT_TRUE(s12.IsSuccess());
+	EXPECT_TRUE(qCon.size() == 1);
+
+	CLSocket *pConnSocket;
+
+	{
+		SLMessageAndSource *pInfo = qCon.front();
+		qCon.pop();
+
+		CLClientArrivedMsg *pMsg = dynamic_cast<CLClientArrivedMsg *>(pInfo->pMsg);
+		EXPECT_TRUE(pMsg != 0);
+
+		pConnSocket = pMsg->GetSocket();
+
+		EXPECT_TRUE(pConnSocket != 0);
+
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
+
+		delete pInfo->pMsg;
+
+		delete pInfo;
+	}
+
+	CLMultiMsgDeserializer *pdd = new CLMultiMsgDeserializer();
+	EXPECT_TRUE(pdd->RegisterDeserializer(1, new CLMsg1ForCLMessageReceiverTest_Deserializer).IsSuccess());
+	EXPECT_TRUE(pdd->RegisterDeserializer(2, new CLMsg2ForCLMessageReceiverTest_Deserializer).IsSuccess());
+	EXPECT_TRUE(pdd->RegisterDeserializer(3, new CLMsg3ForCLMessageReceiverTest_Deserializer).IsSuccess());
+
+	CLDataReceiver *pTmpDataReveiver1 = new CLDataReceiverByTCPSocket(pConnSocket);
+	CLUuid u2 = pTmpDataReveiver1->GetUuid();
+
+	CLMessageReceiver *pMsgReceiver1 = new CLMessageReceiver(&u2, new CLBufferManager(), pTmpDataReveiver1, pdd, new CLProtocolDecapsulatorByDefaultMsgFormat);
+
+
+	int buf1[5] = {16, 1, 0, 2, 3};
+	int buf2[3] = {8, 2, 0};
+	int buf3[3] = {8, 3, 0};
+
+	CLIOVectors iov1, iov2, iov3;
+	EXPECT_TRUE(iov1.PushBack((char*)buf1, 20).IsSuccess());
+	EXPECT_TRUE(iov2.PushBack((char*)buf2, 12).IsSuccess());
+	EXPECT_TRUE(iov3.PushBack((char*)buf3, 12).IsSuccess());
+
+	int i;
+	for(i = 1; i < 101; i++)
+	{
+		if(i == 10)
+		{
+			CLStatus s13 = pClientSocket->Write(iov3);
+			EXPECT_EQ(s13.m_clReturnCode, 12);
+		}
+		if(i % 2 == 0)
+		{
+			CLStatus s13 = pClientSocket->Write(iov1);
+			EXPECT_EQ(s13.m_clReturnCode, 20);
+		}
+		else
+		{
+			CLStatus s13 = pClientSocket->Write(iov2);
+			EXPECT_EQ(s13.m_clReturnCode, 12);
+		}
+	}
+
+	sleep(2);
+
+	CLLogger::WriteLogMsg("2 The Following bug is produced on purpose 2", 0);
+	CLStatus s1 = pMsgReceiver->GetMessage(qCon);
+	EXPECT_FALSE(s1.IsSuccess());
+	EXPECT_TRUE(qCon.size() == 9);
+	i = 1;
+	while(!qCon.empty())
+	{
+		SLMessageAndSource *pInfo = qCon.front();
+		qCon.pop();
+
+		if(i % 2 == 0)
+		{
+			CLMsg1ForCLMessageReceiverTest *p = dynamic_cast<CLMsg1ForCLMessageReceiverTest *>(pInfo->pMsg);
+			EXPECT_TRUE(p != 0);
+		}
+		else
+		{
+			CLMsg2ForCLMessageReceiverTest *p = dynamic_cast<CLMsg2ForCLMessageReceiverTest *>(pInfo->pMsg);
+			EXPECT_TRUE(p != 0);
+		}
+
+		i++;
+
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
+
+		delete pInfo->pMsg;
+		delete pInfo;
+	}
+
+	delete pClientSocket;
+	delete pMsgReceiver1;
 	delete pMsgReceiver;
 }

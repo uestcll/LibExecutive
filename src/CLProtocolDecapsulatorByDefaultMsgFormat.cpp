@@ -56,7 +56,7 @@ CLStatus CLProtocolDecapsulatorByDefaultMsgFormat::Decapsulate(CLIOVectors& IOVe
 
 		if(r == -1)
 		{
-			CLStatus s = IOVectorsForData.PushBackRangeToAIOVector(IOVectorsForPartialData, iter, IOVectorsForData.Size());
+			CLStatus s = IOVectorsForData.PushBackRangeToAIOVector(IOVectorsForPartialData, iter, LeftLength);
 			if(!s.IsSuccess())
 			{
 				CLLogger::WriteLogMsg("In CLProtocolDecapsulatorByDefaultMsgFormat::Decapsulate(), IOVectorsForData.PushBackRangeToAIOVector error", 0);
