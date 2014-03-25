@@ -45,5 +45,55 @@ CLstatus CLMsgLoopManagerForLibevent::Initialize()
             CLLogger::WriteLogMsg("In CLMsgLoopManagerForLibevent::Initialize(), CLExecutiveNameServer::GetInstance error", 0);
             throw CLStatus(-1, 0);
         }
+        pMsgObserver = new CLMessagePoster(new CLMsgToPointerSerializer, 0, new CLDataPostChannelByLibeventMaintainer(), m_pEvent);
+
+        CLStatus s2 = pMsgObserver->Initialize(new CLInitialDataPostChannelNotifier(), 0);
+        if(!s2.IsSuccess() && (s2.clErrorCode == DATA_POSTER_INITIALIZE_ERROR))
+        {
+            CLLogger::WriteLogMsg("In CLMsgLoopManagerForLibevent::Initialize(), pMsgPoster->Initialize error", 0);
+            throw CLStatus(-1, 0);
+        }
+
+        CLStatus s = pNameServer->Register(m_strThreadName.c_str(), pMsgPoster, m_pMsgReceiver);
+
+        if(!s.IsSuccess())
+        {
+            CLLogger::WriteLogMsg("In CLMsgLoopManagerForLibevent::Initialize(), pNameServer->Register error", 0);
+
+            m_pMsgReceiver = 0;
+            return CLStatus(-1, 0);
+        }
+
+        return CLStatus(0, 0);
     }
+    catch(CLStatus& s1)
+    {
+        if(m_pMsgReceiver)
+        {
+            delete m_pMsgReceiver;
+            m_pMsgReceiver = 0;
+        }
+
+        if(pMsgPoster)
+            delete pMsgPoster;
+        else
+        {
+            delete m_pEvent;
+        }
+
+        return s1;
+    }
+}
+
+CLStatus CLMsgLoopManagerForLibevent::Uninitialize()
+{
+    m_pMsgReceiver = 0;
+    CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
+    if(pNameServer == 0)
+    {
+        CLLogger::WriteLogMsg("In CLMsgLoopManagerForLibevent::Uninitialize(), CLExecutiveNameServer::GetInstance error", 0);
+        return CLstatus(-1, 0);
+    }
+
+    return pNameServer->ReleaseCommunicationPtr(m_strThreadName.c_str());
 }
