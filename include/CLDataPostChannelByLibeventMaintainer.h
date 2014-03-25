@@ -1,0 +1,9 @@
+#ifndef CLDATAPOSTCHANNELBYLIBEVENTMAINTAINER_H
+#define CLDATAPOSTCHANNELBYLIBEVENTMAINTAINER_H
+
+class CLDataPostChannelByLibeventMaintainer 
+{
+
+};
+
+#endif

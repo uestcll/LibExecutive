@@ -29,7 +29,7 @@ class CLMsgLoopManagerForLibevent : public CLMessageLoopManager
     private:
     std::string m_strThreadName;
     CLMessageReceiver *m_pMsgReceiver;
-    //CLEvent *m_pEvent;
+    CLEvent *m_pEvent;
     
 };
 
