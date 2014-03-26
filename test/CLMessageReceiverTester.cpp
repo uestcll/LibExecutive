@@ -1311,7 +1311,7 @@ TEST(CLMessageReceiver, GetMessageTCPSocket_DeserialError_Test)
 	sleep(2);
 
 	CLLogger::WriteLogMsg("2 The Following bug is produced on purpose 2", 0);
-	CLStatus s1 = pMsgReceiver->GetMessage(qCon);
+	CLStatus s1 = pMsgReceiver1->GetMessage(qCon);
 	EXPECT_FALSE(s1.IsSuccess());
 	EXPECT_TRUE(qCon.size() == 9);
 	i = 1;
@@ -1334,11 +1334,322 @@ TEST(CLMessageReceiver, GetMessageTCPSocket_DeserialError_Test)
 		i++;
 
 		CLUuidComparer compare;
-		EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
+		EXPECT_TRUE(compare(pInfo->ChannelUuid, u2) == 0);
 
 		delete pInfo->pMsg;
 		delete pInfo;
 	}
+
+	delete pClientSocket;
+	delete pMsgReceiver1;
+	delete pMsgReceiver;
+}
+
+TEST(CLMessageReceiver, GetMessageTCPSocket_SendPointer_Test)
+{
+	queue<SLMessageAndSource *> qCon;
+
+	CLSocket *pSocket = new CLSocket("3600");
+	CLUuid u1 = pSocket->GetUuid();
+
+	CLDataReceiver *pTmpDataReveiver = new CLDataReceiverByAccept(pSocket);
+
+	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(&u1, new CLBufferManager(), pTmpDataReveiver, new CLClientArrivedMsgDeserializer);
+
+	CLSocket *pClientSocket = new CLSocket("127.0.0.1", "3600", SOCKET_TYPE_TCP, true);
+	EXPECT_TRUE(pClientSocket->Connect().IsSuccess());
+
+	CLStatus s12 = pMsgReceiver->GetMessage(qCon);
+	EXPECT_TRUE(s12.IsSuccess());
+	EXPECT_TRUE(qCon.size() == 1);
+
+	CLSocket *pConnSocket;
+
+	{
+		SLMessageAndSource *pInfo = qCon.front();
+		qCon.pop();
+
+		CLClientArrivedMsg *pMsg = dynamic_cast<CLClientArrivedMsg *>(pInfo->pMsg);
+		EXPECT_TRUE(pMsg != 0);
+
+		pConnSocket = pMsg->GetSocket();
+
+		EXPECT_TRUE(pConnSocket != 0);
+
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
+
+		delete pInfo->pMsg;
+
+		delete pInfo;
+	}
+
+	CLDataReceiver *pTmpDataReveiver1 = new CLDataReceiverByTCPSocket(pConnSocket);
+	CLUuid u2 = pTmpDataReveiver1->GetUuid();
+
+	CLMessageReceiver *pMsgReceiver1 = new CLMessageReceiver(&u2, new CLBufferManager(), pTmpDataReveiver1, new CLPointerToMsgDeserializer(), new CLProtocolDecapsulatorBySplitPointer());
+
+	long i = 0;
+	CLIOVectors iov;
+	EXPECT_TRUE(iov.PushBack((char *)(&i), 8).IsSuccess());
+	for(; i < 100; i++)
+	{
+		long j = i;
+		i++;
+		CLStatus s13 = pClientSocket->Write(iov);
+		EXPECT_EQ(s13.m_clReturnCode, 8);
+		i = j;
+	}
+
+	sleep(2);
+
+	while(true)
+	{
+		CLStatus s1 = pMsgReceiver1->GetMessage(qCon);
+		EXPECT_TRUE(s1.IsSuccess());
+
+		if(qCon.size() == 100)
+			break;
+	}
+	
+	i = 0;
+	while(!qCon.empty())
+	{
+		SLMessageAndSource *pInfo = qCon.front();
+		qCon.pop();
+
+		EXPECT_TRUE(pInfo->pMsg == (CLMessage *)(i + 1));
+		i++;
+
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(u2, pInfo->ChannelUuid) == 0);
+
+		delete pInfo;
+	}
+
+	i = 0;
+	for(; i < 100; i++)
+	{
+		if(i == 50)
+		{
+			long j = i;
+			i = 0;
+			CLStatus s13 = pClientSocket->Write(iov);
+			EXPECT_EQ(s13.m_clReturnCode, 8);
+			i = j;
+			continue;
+		}
+
+		{
+			long j = i;
+			i++;
+			CLStatus s13 = pClientSocket->Write(iov);
+			EXPECT_EQ(s13.m_clReturnCode, 8);
+			i = j;
+		}
+	}
+
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
+
+	sleep(2);
+
+	CLStatus s2 = pMsgReceiver1->GetMessage(qCon);
+	EXPECT_FALSE(s2.IsSuccess());
+	EXPECT_TRUE(qCon.size() == 50);
+
+	i = 0;
+	while(!qCon.empty())
+	{
+		SLMessageAndSource *pInfo = qCon.front();
+		qCon.pop();
+
+		EXPECT_TRUE(pInfo->pMsg == (CLMessage *)(i + 1));
+		i++;
+
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(pInfo->ChannelUuid, u2) == 0);
+
+		delete pInfo;
+	}
+
+	for(i = 0; i < 1000; i++)
+	{
+		long j = i;
+		i++;
+		CLStatus s13 = pClientSocket->Write(iov);
+		EXPECT_EQ(s13.m_clReturnCode, 8);
+		i = j;
+	}
+
+	sleep(2);
+
+	CLStatus s3 = pMsgReceiver1->GetMessage(qCon);
+	EXPECT_TRUE(s3.IsSuccess());
+	EXPECT_TRUE(qCon.size() == 512);
+
+	i = 0;
+	while(!qCon.empty())
+	{
+		SLMessageAndSource *pInfo = qCon.front();
+		qCon.pop();
+
+		EXPECT_TRUE(pInfo->pMsg == (CLMessage *)(i + 1));
+		i++;
+
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(pInfo->ChannelUuid, u2) == 0);
+
+		delete pInfo;
+	}
+
+	delete pClientSocket;
+	delete pMsgReceiver1;
+	delete pMsgReceiver;
+}
+
+TEST(CLMessageReceiver, GetMessageTCPSocket_NONProtocl_Test)
+{
+	queue<SLMessageAndSource *> qCon;
+
+	CLSocket *pSocket = new CLSocket("3600");
+	CLUuid u1 = pSocket->GetUuid();
+
+	CLDataReceiver *pTmpDataReveiver = new CLDataReceiverByAccept(pSocket);
+
+	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(&u1, new CLBufferManager(), pTmpDataReveiver, new CLClientArrivedMsgDeserializer);
+
+	CLStatus s11 = pMsgReceiver->GetMessage(qCon);
+	EXPECT_FALSE(s11.IsSuccess());
+	EXPECT_TRUE(s11.m_clErrorCode == MSG_RECEIVED_ZERO);
+
+	CLSocket *pClientSocket = new CLSocket("127.0.0.1", "3600", SOCKET_TYPE_TCP, true);
+	EXPECT_TRUE(pClientSocket->Connect().IsSuccess());
+
+	CLStatus s12 = pMsgReceiver->GetMessage(qCon);
+	EXPECT_TRUE(s12.IsSuccess());
+	EXPECT_TRUE(qCon.size() == 1);
+
+	CLSocket *pConnSocket;
+
+	{
+		SLMessageAndSource *pInfo = qCon.front();
+		qCon.pop();
+
+		CLClientArrivedMsg *pMsg = dynamic_cast<CLClientArrivedMsg *>(pInfo->pMsg);
+		EXPECT_TRUE(pMsg != 0);
+
+		pConnSocket = pMsg->GetSocket();
+
+		EXPECT_TRUE(pConnSocket != 0);
+
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
+
+		delete pInfo->pMsg;
+
+		delete pInfo;
+	}
+
+	CLDataReceiver *pTmpDataReveiver1 = new CLDataReceiverByTCPSocket(pConnSocket);
+	CLUuid u2 = pTmpDataReveiver1->GetUuid();
+
+	CLMessageReceiver *pMsgReceiver1 = new CLMessageReceiver(&u2, new CLBufferManager(), pTmpDataReveiver1, new CLMsg1ForCLMessageReceiverTest_Deserializer);
+
+	int buf1[5] = {16, 1, 0, 2, 3};
+	CLIOVectors iov;
+	EXPECT_TRUE(iov.PushBack((char*)buf1, 20).IsSuccess());
+	
+	{
+		CLStatus s13 = pClientSocket->Write(iov);
+		EXPECT_EQ(s13.m_clReturnCode, 20);
+	}
+
+	sleep(2);
+
+	{
+		CLStatus s1 = pMsgReceiver1->GetMessage(qCon);
+		EXPECT_TRUE(s1.IsSuccess());
+		EXPECT_EQ(qCon.size(), 1);
+	}
+
+	{
+		SLMessageAndSource *pInfo = qCon.front();
+		qCon.pop();
+
+		CLMsg1ForCLMessageReceiverTest *p = dynamic_cast<CLMsg1ForCLMessageReceiverTest *>(pInfo->pMsg);
+		EXPECT_TRUE(p != 0);
+		
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(pInfo->ChannelUuid, u2) == 0);
+
+		delete pInfo->pMsg;
+
+		delete pInfo;
+	}
+
+	delete pClientSocket;
+	delete pMsgReceiver1;
+	delete pMsgReceiver;
+}
+
+TEST(CLMessageReceiver, GetMessageTCPSocket_ProtocolError_Test)
+{
+	queue<SLMessageAndSource *> qCon;
+
+	CLSocket *pSocket = new CLSocket("3600");
+	CLUuid u1 = pSocket->GetUuid();
+
+	CLDataReceiver *pTmpDataReveiver = new CLDataReceiverByAccept(pSocket);
+
+	CLMessageReceiver *pMsgReceiver = new CLMessageReceiver(&u1, new CLBufferManager(), pTmpDataReveiver, new CLClientArrivedMsgDeserializer);
+
+	CLStatus s11 = pMsgReceiver->GetMessage(qCon);
+	EXPECT_FALSE(s11.IsSuccess());
+	EXPECT_TRUE(s11.m_clErrorCode == MSG_RECEIVED_ZERO);
+
+	CLSocket *pClientSocket = new CLSocket("127.0.0.1", "3600", SOCKET_TYPE_TCP, true);
+	EXPECT_TRUE(pClientSocket->Connect().IsSuccess());
+
+	CLStatus s12 = pMsgReceiver->GetMessage(qCon);
+	EXPECT_TRUE(s12.IsSuccess());
+	EXPECT_TRUE(qCon.size() == 1);
+
+	CLSocket *pConnSocket;
+
+	{
+		SLMessageAndSource *pInfo = qCon.front();
+		qCon.pop();
+
+		CLClientArrivedMsg *pMsg = dynamic_cast<CLClientArrivedMsg *>(pInfo->pMsg);
+		EXPECT_TRUE(pMsg != 0);
+
+		pConnSocket = pMsg->GetSocket();
+
+		EXPECT_TRUE(pConnSocket != 0);
+
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
+
+		delete pInfo->pMsg;
+
+		delete pInfo;
+	}
+
+	CLDataReceiver *pTmpDataReveiver1 = new CLDataReceiverByTCPSocket(pConnSocket);
+	CLUuid u2 = pTmpDataReveiver1->GetUuid();
+
+	CLMessageReceiver *pMsgReceiver1 = new CLMessageReceiver(&u2, new CLBufferManager(), pTmpDataReveiver1, new CLPointerToMsgDeserializer(), new CLProtocolDecapsulator_For_CLMessageReceiver_Test());
+
+	long i = 1;
+	CLIOVectors iov;
+	EXPECT_TRUE(iov.PushBack((char *)(&i), 8).IsSuccess());
+	CLStatus s13 = pClientSocket->Write(iov);
+	EXPECT_EQ(s13.m_clReturnCode, 8);
+
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
+	CLStatus s1 = pMsgReceiver1->GetMessage(qCon);
+	EXPECT_FALSE(s1.IsSuccess());
+	EXPECT_TRUE(s1.m_clErrorCode == NORMAL_ERROR);
 
 	delete pClientSocket;
 	delete pMsgReceiver1;
