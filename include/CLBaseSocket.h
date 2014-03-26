@@ -9,7 +9,7 @@
 class CLBaseSocket
 {
 public:
-	CLBaseSocket();
+	CLBaseSocket(bool isBlock);
 	CLBaseSocket(int fd, bool isBlock);
 	virtual ~CLBaseSocket();
 

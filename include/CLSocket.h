@@ -9,6 +9,7 @@ class CLSocketAddress;
 
 #define TCP_SOCKET 1
 #define UDP_SOCKET 2
+#define MAX_LISTEN_NUM 1024
 
 class CLSocket
 {

@@ -52,7 +52,7 @@ CLTCPListenSocket::CLTCPListenSocket(const char *pHostNameOrIp, const char *pSer
 				CLLogger::WriteLogMsg("In CLTCPListenSocket::CLTCPListenSocket(), listen error", 0)
 				throw CLStatus(-1, 0);
 			}
-
+			break;
 		}
 
 		m_SocketFd = sockFd;

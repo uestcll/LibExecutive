@@ -1,3 +1,10 @@
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <errno.h>
+#include <strings.h>
+#include <unistd.h>
+
 #include "CLTCPClientSocket.h"
 #include "CLLogger.h"
 
@@ -63,6 +70,7 @@ CLStatus CLTCPClientSocket::Connect()
 
 			return CLStatus(-1, CONNECT_PENDING);
 		}
+		break;
 	}
 
 	freeaddrinfo(results);

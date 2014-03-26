@@ -9,7 +9,7 @@ class CLSocket;
 class CLTCPClientSocket : public CLBaseSocket
 {
 public:
-	CLTCPListenSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock);
+	CLTCPClientSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock);
 	virtual ~CLTCPClientSocket();
 
 	CLStatus Connect();
