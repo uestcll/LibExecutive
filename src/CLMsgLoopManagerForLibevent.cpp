@@ -1,14 +1,16 @@
 #include <string.h>
 #include "CLMsgLoopManagerForLibevent.h"
 #include "CLMessageReceiver.h"
-#include "CLPointToMsgDeserializer.h"
+#include "CLPointerToMsgDeserializer.h"
 #include "CLExecutiveNameServer.h"
+#include "CLDataReceiverByLibevent.h"
 #include "CLLogger.h"
 #include "CLEvent.h"
 #include "ErrorCode.h"
 #include "CLBufferManager.h"
 #include "CLMessagePoster.h"
 #include "CLMsgToPointerSerializer.h"
+#include "CLDataPostChannelByLibeventMaintainer.h"
 #include "CLProtocolDecapsulatorBySplitPointer.h"
 #include "CLInitialDataPostChannelNotifier.h"
 
@@ -45,9 +47,9 @@ CLstatus CLMsgLoopManagerForLibevent::Initialize()
             CLLogger::WriteLogMsg("In CLMsgLoopManagerForLibevent::Initialize(), CLExecutiveNameServer::GetInstance error", 0);
             throw CLStatus(-1, 0);
         }
-        pMsgObserver = new CLMessagePoster(new CLMsgToPointerSerializer, 0, new CLDataPostChannelByLibeventMaintainer(), m_pEvent);
+        pMsgPoster = new CLMessagePoster(new CLMsgToPointerSerializer, 0, new CLDataPostChannelByLibeventMaintainer(), m_pEvent);
 
-        CLStatus s2 = pMsgObserver->Initialize(new CLInitialDataPostChannelNotifier(), 0);
+        CLStatus s2 = pMsgPoster->Initialize(new CLInitialDataPostChannelNotifier(), 0);
         if(!s2.IsSuccess() && (s2.clErrorCode == DATA_POSTER_INITIALIZE_ERROR))
         {
             CLLogger::WriteLogMsg("In CLMsgLoopManagerForLibevent::Initialize(), pMsgPoster->Initialize error", 0);
@@ -87,7 +89,9 @@ CLstatus CLMsgLoopManagerForLibevent::Initialize()
 
 CLStatus CLMsgLoopManagerForLibevent::Uninitialize()
 {
+    delete m_pMsgReceiver;
     m_pMsgReceiver = 0;
+
     CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
     if(pNameServer == 0)
     {
@@ -96,4 +100,30 @@ CLStatus CLMsgLoopManagerForLibevent::Uninitialize()
     }
 
     return pNameServer->ReleaseCommunicationPtr(m_strThreadName.c_str());
+}
+
+CLstatus CLMsgLoopManagerForLibevent::WaitForMessage()
+{
+    CLStatus s = m_pEvent->Wait();
+    if(!s.IsSuccess())
+    {
+        CLLogger::WriteLogMsg("In CLMsgLoopManagerForLibevent::WaitForMessage(), m_Event.Wait error", 0);
+        return CLstatus(-1, 0);
+    }
+
+    long old_size = m_MessageContainer.size();
+
+    CLStatus s1 = m_pMsgReceiver->GetMessage(m_MessageContainer);
+    
+    long new_size = m_MessageContainer.size();
+
+    if(new_size > old_size)
+    {
+        if(!(m_pEvent->ReleaseSemaphore(new_size - old_size - 1).IsSuccess()))
+        {
+            CLLogger::WriteLogMsg("In CLMsgLoopManagerForLibevent::WaitForMessage(), m_pEvent->ReleaseSemaphore error; but may be made by the sequence of sendmsg.set(wait)sendmsg(compute new_size).set", 0);
+        }
+    }
+
+    return s1;
 }

@@ -3,12 +3,8 @@
 
 #include "CLMessageLoopManager.h"
 
+class CLEvent;
 class CLMessageReceiver;
-class CLBufferManager;
-class CLProtocolEncapsulator;
-class CLProtocolDecapsulator;
-class CLMessageDeserializer;
-class CLMessageSerializer;
 
 class CLMsgLoopManagerForLibevent : public CLMessageLoopManager
 {
