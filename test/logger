@@ -1,0 +1,125 @@
+CLLibExecutiveInitializer Test	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 0
+In CLLibExecutiveInitializer::Initialize(), CLSharedMutexAllocator::Create error	Error code: 0
+CLBufferManager Test	Error code: 0
+CLConditionVariable Test	Error code: 0
+In CLSharedMemory::CLSharedMemory(), shmat error	Error code: 13
+In CLSharedMemory::~CLSharedMemory(), shmctl IPC_STAT error	Error code: 13
