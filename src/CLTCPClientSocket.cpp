@@ -2,9 +2,9 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <errno.h>
-#include <strings.h>
+#include <string.h>
 #include <unistd.h>
-
+#include "errCode.h"
 #include "CLTCPClientSocket.h"
 #include "CLLogger.h"
 
@@ -27,12 +27,12 @@ CLStatus CLTCPClientSocket::Connect()
 
 	int sockFd;
 
-	bzero(&hints, sizoef(struct addrinfo));
+	bzero(&hints, sizeof(struct addrinfo));
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;
 
-	int ret = getaddrinfo(pHostNameOrIp, pServiceNameOrPort, &hints, &results);
+	int ret = getaddrinfo(m_pHostOrIP.c_str(), m_pServiceOrPort.c_str(), &hints, &results);
 	if(ret != 0)
 	{
 		CLLogger::WriteLogMsg("In CLTCPClientSocket::CLTCPClientSocket(), getaddrinfo() error", 0);
@@ -45,9 +45,9 @@ CLStatus CLTCPClientSocket::Connect()
 		if(sockFd < 0)
 			continue;
 
-		if(!InitSocketFd(sockFd, isBlock).IsSuccess())
+		if(!InitSocketFd(sockFd, m_bBlock).IsSuccess())
 		{
-			CLLogger::WriteLogMsg("In CLTCPClientSocket::CLTCPClientSocket(), InitSocketFd() error");
+			CLLogger::WriteLogMsg("In CLTCPClientSocket::CLTCPClientSocket(), InitSocketFd() error", 0);
 			return  CLStatus(-1, 0);
 		}
 

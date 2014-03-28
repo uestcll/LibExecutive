@@ -2,12 +2,13 @@
 #include "CLIOVector.h"
 #include "CLBaseSocket.h"
 #include "CLTCPListenSocket.h"
-#include "CLUDPListenSocket.h"
+#include "CLUDPServerSocket.h"
 #include "CLTCPClientSocket.h"
 #include "CLUDPClientSocket.h"
 #include "CLLogger.h"
+#include "CLSocketAddress.h"
 
-CLSocket::CLSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool forServer, int sockeType, bool isBlock, int listenNUm)
+CLSocket::CLSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool forServer, int sockeType, bool isBlock, int listenNum)
 {
 	if(!pHostNameOrIp || !pServiceNameOrPort)
 		throw "In CLSocket::CLSocket(): service or host name error";
@@ -22,7 +23,7 @@ CLSocket::CLSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bo
 	else if(sockeType == UDP_SOCKET)
 	{
 		if(forServer)
-			m_pSocket = new CLUDPListenSocket(pHostNameOrIp, pServiceNameOrPort, isBlock);
+			m_pSocket = new CLUDPServerSocket(pHostNameOrIp, pServiceNameOrPort, isBlock);
 		else
 			m_pSocket = new CLUDPClientSocket(pHostNameOrIp, pServiceNameOrPort, isBlock);
 	}
@@ -47,7 +48,7 @@ CLSocket::~CLSocket()
 		delete m_pSocket;
 }
 
-CLStatus CLSocket::Accept(CLSocket **ppConnSock)
+CLStatus CLSocket::Accept(CLSocket **ppConnSock, CLSocketAddress **pOppoAddress)
 {
 	if(!ppConnSock || !m_pSocket)
 	{
@@ -56,7 +57,7 @@ CLStatus CLSocket::Accept(CLSocket **ppConnSock)
 
 	CLTCPListenSocket *pTmpSocket = (CLTCPListenSocket *)dynamic_cast<CLTCPListenSocket *> (m_pSocket);
 	if(pTmpSocket)
-		return pTmpSocket->Accept(ppConnSock);
+		return pTmpSocket->Accept(ppConnSock, pOppoAddress);
 	else
 	{
 		CLLogger::WriteLogMsg("In CLSocket::Accept(), dynamic_cast error", 0);

@@ -74,5 +74,14 @@
 #include "CLTimerOutNotifyMsgSerializer.h"
 #include "MessageID.h"
 #include "CLMessageReceiverByTimerFd.h"
+#include "CLSocket.h"
+#include "CLBaseSocket.h"
+#include "CLTCPListenSocket.h"
+#include "CLTCPClientSocket.h"
+#include "CLUDPServerSocket.h"
+#include "CLUDPClientSocket.h"
+#include "CLSocketAddress.h"
+#include "definition.h"
+#include "errCode.h"
 
 #endif

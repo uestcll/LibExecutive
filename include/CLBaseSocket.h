@@ -3,8 +3,8 @@
 
 #include "CLStatus.h"
 
-#define IO_PAUSE 2
-#define IO_PENDING 3
+class CLIOVector;
+class CLSocketAddress;
 
 class CLBaseSocket
 {

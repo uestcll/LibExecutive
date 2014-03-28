@@ -1,0 +1,4 @@
+MessageObserver Initialize error is a test	Error code: 0
+In CLMessageLoopManager::EnterMessageLoop(), m_pMessageObserver->Initialize error	Error code: 0
+MessageObserver Initialize error is a test	Error code: 0
+In CLMessageLoopManager::EnterMessageLoop(), m_pMessageObserver->Initialize error	Error code: 0

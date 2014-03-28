@@ -2,23 +2,20 @@
 #define CLSOCKET_H
 
 #include "CLStatus.h"
+#include "definition.h"
 
 class CLBaseSocket;
 class CLIOVector;
 class CLSocketAddress;
 
-#define TCP_SOCKET 1
-#define UDP_SOCKET 2
-#define MAX_LISTEN_NUM 1024
-
 class CLSocket
 {
 public:
-	CLSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool forServer = true, int sockeType = TCP_SOCKET, bool isBlock = true, int listenNum = MAX_LISTEN_NUM);
+	CLSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool forServer = true, int sockeType = TCP_SOCKET, bool isBlock = false, int listenNum = MAX_LISTEN_NUM);
 	CLSocket(int sockFd, bool isBlock);
 	virtual ~CLSocket();
 
-	CLStatus Accept(CLSocket **ppConnSock);
+	CLStatus Accept(CLSocket **ppConnSock, CLSocketAddress **pOppoAddress);
 	CLStatus Connect();
 
 	CLStatus Read(CLIOVector& IOVec, CLSocketAddress* pAddr = 0);

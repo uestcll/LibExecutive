@@ -39,7 +39,7 @@ CLMutex::CLMutex(const char *pstrFileName, int nType)
 	}
 	else if(nType == MUTEX_USE_SHARED_PTHREAD)
 	{
-		m_pMutex = new (pstrFileName);
+		m_pMutex = new CLMutexBySharedPThread(pstrFileName);
 	}
 	else
 		throw "In CLMutex::CLMutex(), nType error";

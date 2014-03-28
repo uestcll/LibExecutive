@@ -1,3 +1,11 @@
+CLBaseSocket	CLBaseSocket.cpp	/^CLBaseSocket::CLBaseSocket(bool isBlock) : m_SocketFd(-1), m_bBlock(isBlock)$/;"	f	class:CLBaseSocket
+CLBaseSocket	CLBaseSocket.cpp	/^CLBaseSocket::CLBaseSocket(int fd, bool isBlock)$/;"	f	class:CLBaseSocket
+GetSocketFd	CLBaseSocket.cpp	/^const int CLBaseSocket::GetSocketFd() const$/;"	f	class:CLBaseSocket
+InitSocketFd	CLBaseSocket.cpp	/^CLStatus CLBaseSocket::InitSocketFd(int fd, bool isBlock)$/;"	f	class:CLBaseSocket
+Read	CLBaseSocket.cpp	/^CLStatus CLBaseSocket::Read(CLIOVector& IOVec, CLSocketAddress *pAddr)$/;"	f	class:CLBaseSocket
+ReadOrWrite	CLBaseSocket.cpp	/^CLStatus CLBaseSocket::ReadOrWrite(CLIOVector& IOVec, CLSocketAddress *pAddr, bool bWrite)$/;"	f	class:CLBaseSocket
+Write	CLBaseSocket.cpp	/^CLStatus CLBaseSocket::Write(CLIOVector& IOVec, CLSocketAddress *pAddr)$/;"	f	class:CLBaseSocket
+~CLBaseSocket	CLBaseSocket.cpp	/^CLBaseSocket::~CLBaseSocket()$/;"	f	class:CLBaseSocket
 AddDataStartIndex	CLBuffer.cpp	/^CLStatus CLBuffer::AddDataStartIndex(const int& addDataLen)$/;"	f	class:CLBuffer
 AddUsedBufferLen	CLBuffer.cpp	/^CLStatus CLBuffer::AddUsedBufferLen(const int& addUsedLen)$/;"	f	class:CLBuffer
 CLBuffer	CLBuffer.cpp	/^CLBuffer::CLBuffer(int itemSize) : m_iItemSize(itemSize), m_ciDataStartIndex(m_iDataStartIndex), m_ciUsedBufferLen(m_iUsedBufferLen)$/;"	f	class:CLBuffer
@@ -388,16 +396,30 @@ Initialize	CLSharedObjectsImpl.cpp	/^CLStatus CLSharedObjectsImpl::Initialize()$
 ReleaseSharedObject	CLSharedObjectsImpl.cpp	/^CLStatus CLSharedObjectsImpl::ReleaseSharedObject(const char *pstrSharedObjectName)$/;"	f	class:CLSharedObjectsImpl
 ~CLSharedObjectsImpl	CLSharedObjectsImpl.cpp	/^CLSharedObjectsImpl::~CLSharedObjectsImpl()$/;"	f	class:CLSharedObjectsImpl
 Accept	CLSocket.cpp	/^CLStatus CLSocket::Accept(CLSocket **ppConnSock)$/;"	f	class:CLSocket
-CLSocket	CLSocket.cpp	/^CLSocket::CLSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool forServer = true, int sockeType = TCP_SOCKET, bool isBlock = true)$/;"	f	class:CLSocket
+CLSocket	CLSocket.cpp	/^CLSocket::CLSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool forServer, int sockeType, bool isBlock, int listenNum)$/;"	f	class:CLSocket
 CLSocket	CLSocket.cpp	/^CLSocket::CLSocket(int sockFd, bool isBlock = true)$/;"	f	class:CLSocket
 Connect	CLSocket.cpp	/^CLStatus CLSocket::Connect()$/;"	f	class:CLSocket
-Read	CLSocket.cpp	/^CLStatus CLSocket::Read(CLIOVector& IOVec, CLSocketAddress* pAddr = 0)$/;"	f	class:CLSocket
+GetSocket	CLSocket.cpp	/^const int CLSocket::GetSocket() const$/;"	f	class:CLSocket
+NotifyConnectResult	CLSocket.cpp	/^void  CLSocket::NotifyConnectResult(bool bResult)$/;"	f	class:CLSocket
+Read	CLSocket.cpp	/^CLStatus CLSocket::Read(CLIOVector& IOVec, CLSocketAddress* pAddr)$/;"	f	class:CLSocket
+Write	CLSocket.cpp	/^CLStatus CLSocket::Write(CLIOVector& IOVec, CLSocketAddress* pAddr)$/;"	f	class:CLSocket
 ~CLSocket	CLSocket.cpp	/^CLSocket::~CLSocket()$/;"	f	class:CLSocket
+CLSocketAddress	CLSocketAddress.cpp	/^CLSocketAddress::CLSocketAddress()$/;"	f	class:CLSocketAddress
+GetAddress	CLSocketAddress.cpp	/^struct sockaddr* CLSocketAddress::GetAddress()$/;"	f	class:CLSocketAddress
+GetAddressLength	CLSocketAddress.cpp	/^socklen_t CLSocketAddress::GetAddressLength()$/;"	f	class:CLSocketAddress
+~CLSocketAddress	CLSocketAddress.cpp	/^CLSocketAddress::~CLSocketAddress()$/;"	f	class:CLSocketAddress
 CLStatus	CLStatus.cpp	/^CLStatus::CLStatus(const CLStatus& status) : m_clReturnCode(m_lReturnCode), m_clErrorCode(m_lErrorCode)$/;"	f	class:CLStatus
 CLStatus	CLStatus.cpp	/^CLStatus::CLStatus(long lReturnCode, long lErrorCode) : m_clReturnCode(m_lReturnCode), m_clErrorCode(m_lErrorCode)$/;"	f	class:CLStatus
 IsSuccess	CLStatus.cpp	/^bool CLStatus::IsSuccess()$/;"	f	class:CLStatus
 operator =	CLStatus.cpp	/^CLStatus& CLStatus::operator= (const CLStatus& status)$/;"	f	class:CLStatus
 ~CLStatus	CLStatus.cpp	/^CLStatus::~CLStatus()$/;"	f	class:CLStatus
+CLTCPClientSocket	CLTCPClientSocket.cpp	/^CLTCPClientSocket::CLTCPClientSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock) : CLBaseSocket(isBlock)$/;"	f	class:CLTCPClientSocket
+Connect	CLTCPClientSocket.cpp	/^CLStatus CLTCPClientSocket::Connect()$/;"	f	class:CLTCPClientSocket
+NotifyConnectResult	CLTCPClientSocket.cpp	/^void  CLTCPClientSocket::NotifyConnectResult(bool bResult)$/;"	f	class:CLTCPClientSocket
+~CLTCPClientSocket	CLTCPClientSocket.cpp	/^CLTCPClientSocket::~CLTCPClientSocket()$/;"	f	class:CLTCPClientSocket
+Accept	CLTCPListenSocket.cpp	/^CLStatus CLTCPListenSocket::Accept(CLSocket **ppConnSock, CLSocketAddress **ppOppoAddr)$/;"	f	class:CLTCPListenSocket
+CLTCPListenSocket	CLTCPListenSocket.cpp	/^CLTCPListenSocket::CLTCPListenSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock, int listenNum) : CLBaseSocket(isBlock)$/;"	f	class:CLTCPListenSocket
+~CLTCPListenSocket	CLTCPListenSocket.cpp	/^CLTCPListenSocket::~CLTCPListenSocket()$/;"	f	class:CLTCPListenSocket
 CLThread	CLThread.cpp	/^CLThread::CLThread(CLExecutiveFunctionProvider *pExecutiveFunctionProvider) : CLExecutive(pExecutiveFunctionProvider)$/;"	f	class:CLThread
 CLThread	CLThread.cpp	/^CLThread::CLThread(CLExecutiveFunctionProvider *pExecutiveFunctionProvider, bool bWaitForDeath) : CLExecutive(pExecutiveFunctionProvider)$/;"	f	class:CLThread
 Run	CLThread.cpp	/^CLStatus CLThread::Run(void *pContext)$/;"	f	class:CLThread
@@ -435,6 +457,10 @@ Deserialize	CLTimerOutNotifyMsgDeserializer.cpp	/^CLStatus CLTimerOutNotifyMsgDe
 CLTimerOutNotifyMsgSerializer	CLTimerOutNotifyMsgSerializer.cpp	/^CLTimerOutNotifyMsgSerializer::CLTimerOutNotifyMsgSerializer()$/;"	f	class:CLTimerOutNotifyMsgSerializer
 Serialize	CLTimerOutNotifyMsgSerializer.cpp	/^CLStatus CLTimerOutNotifyMsgSerializer::Serialize(CLMessage *pMsg, CLIOVector *pDataVec)$/;"	f	class:CLTimerOutNotifyMsgSerializer
 ~CLTimerOutNotifyMsgSerializer	CLTimerOutNotifyMsgSerializer.cpp	/^CLTimerOutNotifyMsgSerializer::~CLTimerOutNotifyMsgSerializer()$/;"	f	class:CLTimerOutNotifyMsgSerializer
+CLUDPClientSocket	CLUDPClientSocket.cpp	/^CLUDPClientSocket::CLUDPClientSocket()$/;"	f	class:CLUDPClientSocket
+~CLUDPClientSocket	CLUDPClientSocket.cpp	/^CLUDPClientSocket::~CLUDPClientSocket()$/;"	f	class:CLUDPClientSocket
+CLUDPServerSocket	CLUDPServerSocket.cpp	/^CLUDPServerSocket::CLUDPServerSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock) : CLBaseSocket(isBlock)$/;"	f	class:CLUDPServerSocket
+~CLUDPServerSocket	CLUDPServerSocket.cpp	/^CLUDPServerSocket::~CLUDPServerSocket()$/;"	f	class:CLUDPServerSocket
 !_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
 !_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
 !_TAG_PROGRAM_VERSION	5.8	//

@@ -1,20 +1,20 @@
-#ifndef CLUCPCLIENTSOCKET_H
-#define CLUCPCLIENTSOCKET_H
+#ifndef CLUDPCLIENTSOCKET_H
+#define CLUDPCLIENTSOCKET_H
 
 #include "CLStatus.h"
 #include "CLBaseSocket.h"
 
 class CLSocket;
 
-class CLUCPClientSocket : public CLBaseSocket
+class CLUDPClientSocket : public CLBaseSocket
 {
 public:
-	CLUCPClientSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock);
-	virtual ~CLUCPClientSocket();
+	CLUDPClientSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock);
+	virtual ~CLUDPClientSocket();
 
 private:
-	CLUCPClientSocket(const CLUCPClientSocket&);
-	CLUCPClientSocket& operator=(const CLUCPClientSocket&);
+	CLUDPClientSocket(const CLUDPClientSocket&);
+	CLUDPClientSocket& operator=(const CLUDPClientSocket&);
 };
 
 #endif

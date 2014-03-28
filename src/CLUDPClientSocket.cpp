@@ -8,13 +8,13 @@
 #include "CLUDPClientSocket.h"
 #include "CLLogger.h"
 
-CLUDPClientSocket::CLUDPClientSocket()
+CLUDPClientSocket::CLUDPClientSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock) : CLBaseSocket(isBlock)
 {
 	struct addrinfo hints, *results;
 
 	int sockFd;
 
-	bzero(&hints, sizoef(struct addrinfo));
+	bzero(&hints, sizeof(struct addrinfo));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_DGRAM;
 	hints.ai_protocol = IPPROTO_UDP;
@@ -36,13 +36,13 @@ CLUDPClientSocket::CLUDPClientSocket()
 		{
 			if(!InitSocketFd(sockFd, isBlock).IsSuccess())
 			{
-				CLLogger::WriteLogMsg("In CLUDPClientSocket::CLUDPClientSocket(), InitSocketFd() error");
+				CLLogger::WriteLogMsg("In CLUDPClientSocket::CLUDPClientSocket(), InitSocketFd() error", 0);
 				throw  CLStatus(-1, 0);
 			}
 
 			if(-1 == bind(sockFd, addr->ai_addr, addr->ai_addrlen))
 			{
-				CLLogger::WriteLogMsg("In CLUDPClientSocket::CLUDPClientSocket(), bind error", 0)
+				CLLogger::WriteLogMsg("In CLUDPClientSocket::CLUDPClientSocket(), bind error", 0);
 				throw CLStatus(-1, 0);
 			}
 
@@ -62,7 +62,7 @@ CLUDPClientSocket::CLUDPClientSocket()
 	if(m_SocketFd < 0)
 	{
 		CLLogger::WriteLogMsg("In CLUDPClientSocket::CLUDPClientSocket(), sockfd < 0", 0);
-		throw "In CLUDPServerSocket::CLUDPServerSocket(),m_SocketFd < 0"
+		throw "In CLUDPServerSocket::CLUDPServerSocket(),m_SocketFd < 0";
 	}
 }
 

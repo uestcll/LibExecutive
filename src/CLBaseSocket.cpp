@@ -4,8 +4,12 @@
 #include <netdb.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <string.h>
 #include "CLBaseSocket.h"
 #include "CLLogger.h"
+#include "CLIOVector.h"
+#include "CLSocketAddress.h"
+#include "errCode.h"
 
 CLBaseSocket::CLBaseSocket(bool isBlock) : m_SocketFd(-1), m_bBlock(isBlock)
 {
@@ -62,7 +66,7 @@ CLStatus CLBaseSocket::Read(CLIOVector& IOVec, CLSocketAddress *pAddr)
 
 CLStatus CLBaseSocket::Write(CLIOVector& IOVec, CLSocketAddress *pAddr)
 {
-	return ReadOrWrite(IOV>, pAddr, true);
+	return ReadOrWrite(IOVec, pAddr, true);
 }
 
 CLStatus CLBaseSocket::ReadOrWrite(CLIOVector& IOVec, CLSocketAddress *pAddr, bool bWrite)
@@ -77,15 +81,15 @@ CLStatus CLBaseSocket::ReadOrWrite(CLIOVector& IOVec, CLSocketAddress *pAddr, bo
 		msg.msg_namelen = pAddr->GetAddressLength();
 	}
 
-	struct iovec *iov = IOVec->GetIOVecStructs();
+	struct iovec *iov = IOVec.GetIOVecStructs();
 	if(iov == NULL)
 	{
 		CLLogger::WriteLogMsg("In CLBaseSocket::ReadOrWrite(), iov is NULL", 0);
-		return CLSocketAddress(-1, 0);
+		return CLStatus(-1, 0);
 	}
 
 	msg.msg_iov = iov; 
-	msg.msg_iovlen = IOVec->IOVecNum();
+	msg.msg_iovlen = IOVec.IOVecNum();
 
 	ssize_t length;
 

@@ -4,7 +4,7 @@
 #include <errno.h>
 #include <strings.h>
 #include <unistd.h>
-
+#include "CLLogger.h"
 #include "CLUDPServerSocket.h"
 
 CLUDPServerSocket::CLUDPServerSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock) : CLBaseSocket(isBlock)
@@ -13,7 +13,7 @@ CLUDPServerSocket::CLUDPServerSocket(const char *pHostNameOrIp, const char *pSer
 
 	int sockFd;
 
-	bzero(&hints, sizoef(struct addrinfo));
+	bzero(&hints, sizeof(struct addrinfo));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_DGRAM;
 	hints.ai_protocol = IPPROTO_UDP;
@@ -35,13 +35,13 @@ CLUDPServerSocket::CLUDPServerSocket(const char *pHostNameOrIp, const char *pSer
 		{
 			if(!InitSocketFd(sockFd, isBlock).IsSuccess())
 			{
-				CLLogger::WriteLogMsg("In CLTCPClientSocket::CLTCPClientSocket(), InitSocketFd() error");
+				CLLogger::WriteLogMsg("In CLTCPClientSocket::CLTCPClientSocket(), InitSocketFd() error", 0);
 				throw  CLStatus(-1, 0);
 			}
 
 			if(-1 == bind(sockFd, addr->ai_addr, addr->ai_addrlen))
 			{
-				CLLogger::WriteLogMsg("In CLTCPClientSocket::CLTCPClientSocket(), bind error", 0)
+				CLLogger::WriteLogMsg("In CLTCPClientSocket::CLTCPClientSocket(), bind error", 0);
 				throw CLStatus(-1, 0);
 			}
 
@@ -61,7 +61,7 @@ CLUDPServerSocket::CLUDPServerSocket(const char *pHostNameOrIp, const char *pSer
 	if(m_SocketFd < 0)
 	{
 		CLLogger::WriteLogMsg("In CLTCPClientSocket::CLTCPClientSocket(), sockfd < 0", 0);
-		throw "In CLUDPServerSocket::CLUDPServerSocket(),m_SocketFd < 0"
+		throw "In CLUDPServerSocket::CLUDPServerSocket(),m_SocketFd < 0";
 	}
 }
 

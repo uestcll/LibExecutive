@@ -12,7 +12,7 @@ public:
 	CLTCPListenSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock, int listenNum);
 	virtual ~CLTCPListenSocket();
 
-	CLStatus Accept(CLSocket **ppConnSock);
+	CLStatus Accept(CLSocket **ppConnSock, CLSocketAddress **ppOppoAddr);
 
 private:
 	CLTCPListenSocket(const CLTCPListenSocket&);

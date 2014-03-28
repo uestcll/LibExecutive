@@ -5,8 +5,11 @@
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
 Accept	.\CLSocket.cpp	/^CLStatus CLSocket::Accept(CLSocket **ppConnSock)$/;"	f	class:CLSocket
+Accept	.\CLTCPListenSocket.cpp	/^CLStatus CLTCPListenSocket::Accept(CLSocket **ppConnSock, CLSocketAddress **ppOppoAddr)$/;"	f	class:CLTCPListenSocket
 AddDataStartIndex	.\CLBuffer.cpp	/^CLStatus CLBuffer::AddDataStartIndex(const int& addDataLen)$/;"	f	class:CLBuffer
 AddUsedBufferLen	.\CLBuffer.cpp	/^CLStatus CLBuffer::AddUsedBufferLen(const int& addUsedLen)$/;"	f	class:CLBuffer
+CLBaseSocket	.\CLBaseSocket.cpp	/^CLBaseSocket::CLBaseSocket(bool isBlock) : m_SocketFd(-1), m_bBlock(isBlock)$/;"	f	class:CLBaseSocket
+CLBaseSocket	.\CLBaseSocket.cpp	/^CLBaseSocket::CLBaseSocket(int fd, bool isBlock)$/;"	f	class:CLBaseSocket
 CLBuffer	.\CLBuffer.cpp	/^CLBuffer::CLBuffer(int itemSize) : m_iItemSize(itemSize), m_ciDataStartIndex(m_iDataStartIndex), m_ciUsedBufferLen(m_iUsedBufferLen)$/;"	f	class:CLBuffer
 CLConditionVariable	.\CLConditionVariable.cpp	/^CLConditionVariable::CLConditionVariable()$/;"	f	class:CLConditionVariable
 CLConditionVariable	.\CLConditionVariable.cpp	/^CLConditionVariable::CLConditionVariable(const char* pstrCondName)$/;"	f	class:CLConditionVariable
@@ -91,10 +94,13 @@ CLSharedMemory	.\CLSharedMemory.cpp	/^CLSharedMemory::CLSharedMemory(const char 
 CLSharedMsgReceiverByNamedPipe	.\CLSharedMsgReceiverByNamedPipe.cpp	/^CLSharedMsgReceiverByNamedPipe::CLSharedMsgReceiverByNamedPipe(const char *pstrPipeName) : CLMessageQueueByNamedPipe(pstrPipeName)$/;"	f	class:CLSharedMsgReceiverByNamedPipe
 CLSharedMutexImpl	.\CLSharedMutexImpl.cpp	/^CLSharedMutexImpl::CLSharedMutexImpl()$/;"	f	class:CLSharedMutexImpl
 CLSharedObjectsImpl	.\CLSharedObjectsImpl.cpp	/^CLSharedObjectsImpl::CLSharedObjectsImpl()$/;"	f	class:CLSharedObjectsImpl
-CLSocket	.\CLSocket.cpp	/^CLSocket::CLSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool forServer = true, int sockeType = TCP_SOCKET, bool isBlock = true)$/;"	f	class:CLSocket
+CLSocket	.\CLSocket.cpp	/^CLSocket::CLSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool forServer, int sockeType, bool isBlock, int listenNum)$/;"	f	class:CLSocket
 CLSocket	.\CLSocket.cpp	/^CLSocket::CLSocket(int sockFd, bool isBlock = true)$/;"	f	class:CLSocket
+CLSocketAddress	.\CLSocketAddress.cpp	/^CLSocketAddress::CLSocketAddress()$/;"	f	class:CLSocketAddress
 CLStatus	.\CLStatus.cpp	/^CLStatus::CLStatus(const CLStatus& status) : m_clReturnCode(m_lReturnCode), m_clErrorCode(m_lErrorCode)$/;"	f	class:CLStatus
 CLStatus	.\CLStatus.cpp	/^CLStatus::CLStatus(long lReturnCode, long lErrorCode) : m_clReturnCode(m_lReturnCode), m_clErrorCode(m_lErrorCode)$/;"	f	class:CLStatus
+CLTCPClientSocket	.\CLTCPClientSocket.cpp	/^CLTCPClientSocket::CLTCPClientSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock) : CLBaseSocket(isBlock)$/;"	f	class:CLTCPClientSocket
+CLTCPListenSocket	.\CLTCPListenSocket.cpp	/^CLTCPListenSocket::CLTCPListenSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock, int listenNum) : CLBaseSocket(isBlock)$/;"	f	class:CLTCPListenSocket
 CLThread	.\CLThread.cpp	/^CLThread::CLThread(CLExecutiveFunctionProvider *pExecutiveFunctionProvider) : CLExecutive(pExecutiveFunctionProvider)$/;"	f	class:CLThread
 CLThread	.\CLThread.cpp	/^CLThread::CLThread(CLExecutiveFunctionProvider *pExecutiveFunctionProvider, bool bWaitForDeath) : CLExecutive(pExecutiveFunctionProvider)$/;"	f	class:CLThread
 CLThreadCommunicationBySTLqueue	.\CLThreadCommunicationBySTLqueue.cpp	/^CLThreadCommunicationBySTLqueue::CLThreadCommunicationBySTLqueue(CLMessageReceiverBySTLqueue *pMsgReceiver, CLEvent *pEvent)$/;"	f	class:CLThreadCommunicationBySTLqueue
@@ -105,11 +111,14 @@ CLTimerApplyMsgSerializer	.\CLTimerApplyMsgSerializer.cpp	/^CLTimerApplyMsgSeria
 CLTimerFd	.\CLTimerFd.cpp	/^CLTimerFd::CLTimerFd(struct itimerspec& sTimerValue, string pstrRemoteName, const int& ID)$/;"	f	class:CLTimerFd
 CLTimerOutNotifyMsgDeserializer	.\CLTimerOutNotifyMsgDeserializer.cpp	/^CLTimerOutNotifyMsgDeserializer::CLTimerOutNotifyMsgDeserializer()$/;"	f	class:CLTimerOutNotifyMsgDeserializer
 CLTimerOutNotifyMsgSerializer	.\CLTimerOutNotifyMsgSerializer.cpp	/^CLTimerOutNotifyMsgSerializer::CLTimerOutNotifyMsgSerializer()$/;"	f	class:CLTimerOutNotifyMsgSerializer
+CLUDPClientSocket	.\CLUDPClientSocket.cpp	/^CLUDPClientSocket::CLUDPClientSocket()$/;"	f	class:CLUDPClientSocket
+CLUDPServerSocket	.\CLUDPServerSocket.cpp	/^CLUDPServerSocket::CLUDPServerSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock) : CLBaseSocket(isBlock)$/;"	f	class:CLUDPServerSocket
 CheckForRestBuffer	.\CLBuffer.cpp	/^CLStatus CLBuffer::CheckForRestBuffer()$/;"	f	class:CLBuffer
 CloseFileDescriptor	.\CLProcess.cpp	/^CLStatus CLProcess::CloseFileDescriptor()$/;"	f	class:CLProcess
 CloseREvent	.\CLEpollEvent.cpp	/^CLStatus CLEpollEvent::CloseREvent()$/;"	f	class:CLEpollEvent
 CloseWEvent	.\CLEpollEvent.cpp	/^CLStatus CLEpollEvent::CloseWEvent()$/;"	f	class:CLEpollEvent
 Connect	.\CLSocket.cpp	/^CLStatus CLSocket::Connect()$/;"	f	class:CLSocket
+Connect	.\CLTCPClientSocket.cpp	/^CLStatus CLTCPClientSocket::Connect()$/;"	f	class:CLTCPClientSocket
 Create	.\CLExecutiveNameServer.cpp	/^CLStatus CLExecutiveNameServer::Create()$/;"	f	class:CLExecutiveNameServer
 Create	.\CLLogger.cpp	/^CLStatus CLLogger::Create()$/;"	f	class:CLLogger
 DEFAULT_EPOLLWAIT_TIME	.\CLEpoll.cpp	11;"	d	file:
@@ -145,6 +154,8 @@ FILE_PATH_FOR_RECORD_LOCKING	.\CLMutexByRecordLocking.cpp	11;"	d	file:
 FILE_PATH_FOR_SHARED_MEMORY	.\CLSharedMemory.cpp	16;"	d	file:
 FreeAndPopAll	.\CLIOVector.cpp	/^CLStatus CLIOVector::FreeAndPopAll()$/;"	f	class:CLIOVector
 GetAddress	.\CLSharedMemory.cpp	/^void *CLSharedMemory::GetAddress()$/;"	f	class:CLSharedMemory
+GetAddress	.\CLSocketAddress.cpp	/^struct sockaddr* CLSocketAddress::GetAddress()$/;"	f	class:CLSocketAddress
+GetAddressLength	.\CLSocketAddress.cpp	/^socklen_t CLSocketAddress::GetAddressLength()$/;"	f	class:CLSocketAddress
 GetAtomWriteSize	.\CLNamedPipe.cpp	/^long CLNamedPipe::GetAtomWriteSize()$/;"	f	class:CLNamedPipe
 GetBufPtr	.\CLIOVector.cpp	/^int CLIOVector::GetBufPtr(int index, char** pBuffer)$/;"	f	class:CLIOVector
 GetCommunicationPtr	.\CLExecutiveNameServer.cpp	/^CLMessagePoster* CLExecutiveNameServer::GetCommunicationPtr(const char* strExecutiveName)$/;"	f	class:CLExecutiveNameServer
@@ -179,10 +190,13 @@ GetRemoteName	.\CLTimerFd.cpp	/^const string& CLTimerFd::GetRemoteName()$/;"	f	c
 GetRestBufPtr	.\CLBuffer.cpp	/^CLStatus CLBuffer::GetRestBufPtr(char** pBuf, int &restLen)$/;"	f	class:CLBuffer
 GetRestIOVecs	.\CLBuffer.cpp	/^CLStatus CLBuffer::GetRestIOVecs(CLIOVector& IOVector)$/;"	f	class:CLBuffer
 GetSharedObject	.\CLSharedObjectsImpl.cpp	/^void *CLSharedObjectsImpl::GetSharedObject(const char *pstrSharedObjectName)$/;"	f	class:CLSharedObjectsImpl
+GetSocket	.\CLSocket.cpp	/^const int CLSocket::GetSocket() const$/;"	f	class:CLSocket
+GetSocketFd	.\CLBaseSocket.cpp	/^const int CLBaseSocket::GetSocketFd() const$/;"	f	class:CLBaseSocket
 GetTimerFd	.\CLTimerFd.cpp	/^const int& CLTimerFd::GetTimerFd()$/;"	f	class:CLTimerFd
 GetTimerID	.\CLTimerFd.cpp	/^const int& CLTimerFd::GetTimerID()$/;"	f	class:CLTimerFd
 ID_FOR_KEY	.\CLSharedMemory.cpp	14;"	d	file:
 IOVecNum	.\CLIOVector.cpp	/^const int CLIOVector::IOVecNum() const$/;"	f	class:CLIOVector
+InitSocketFd	.\CLBaseSocket.cpp	/^CLStatus CLBaseSocket::InitSocketFd(int fd, bool isBlock)$/;"	f	class:CLBaseSocket
 Initialize	.\CLDataPosterChannelByNamedPipeMaintainer.cpp	/^CLStatus CLDataPosterChannelByNamedPipeMaintainer::Initialize(void *pContext)$/;"	f	class:CLDataPosterChannelByNamedPipeMaintainer
 Initialize	.\CLDataPosterChannelBySTLQueueMaintainer.cpp	/^CLStatus CLDataPosterChannelBySTLQueueMaintainer::Initialize(void *pContext)$/;"	f	class:CLDataPosterChannelBySTLQueueMaintainer
 Initialize	.\CLEpoll.cpp	/^CLStatus CLEpoll::Initialize(int maxFdSize)$/;"	f	class:CLEpoll
@@ -220,6 +234,8 @@ Lock	.\CLMutexBySharedPThread.cpp	/^CLStatus CLMutexBySharedPThread::Lock()$/;"	
 MAX_LENGTH_OF_PATH	.\CLProcessFunctionForExec.cpp	11;"	d	file:
 MAX_SIZE	.\CLLogger.cpp	10;"	d	file:
 NewBuffer	.\CLBuffer.cpp	/^CLStatus CLBuffer::NewBuffer(int size)$/;"	f	class:CLBuffer
+NotifyConnectResult	.\CLSocket.cpp	/^void  CLSocket::NotifyConnectResult(bool bResult)$/;"	f	class:CLSocket
+NotifyConnectResult	.\CLTCPClientSocket.cpp	/^void  CLTCPClientSocket::NotifyConnectResult(bool bResult)$/;"	f	class:CLTCPClientSocket
 NotifyFailure	.\CLDataPostResultNotifier.cpp	/^CLStatus CLDataPostResultNotifier::NotifyFailure()$/;"	f	class:CLDataPostResultNotifier
 NotifyInitialFinished	.\CLThreadInitialFinishedNotifier.cpp	/^CLStatus CLThreadInitialFinishedNotifier::NotifyInitialFinished(bool bInitialSuccess)$/;"	f	class:CLThreadInitialFinishedNotifier
 NotifyReadable	.\CLMsgLoopManagerForEpoll.cpp	/^CLStatus CLMsgLoopManagerForEpoll::NotifyReadable(int fd)$/;"	f	class:CLMsgLoopManagerForEpoll
@@ -251,8 +267,9 @@ PushFront	.\CLIOVector.cpp	/^CLStatus CLIOVector::PushFront(char* pBuffer, int b
 PushIOVecs	.\CLIOVector.cpp	/^CLStatus CLIOVector::PushIOVecs(int index, CLIOVector& IOVector) \/\/最好写一个从哪里开始到最后都pop出来的iovec！！！要写一个由index得到该index所在iterator位置的接口！！！$/;"	f	class:CLIOVector
 PushMessage	.\CLMessageReceiverBySTLqueue.cpp	/^CLStatus CLMessageReceiverBySTLqueue::PushMessage(CLMessage * pMessage)$/;"	f	class:CLMessageReceiverBySTLqueue
 PushMessage	.\CLSTLQueue.cpp	/^CLStatus CLSTLQueue::PushMessage(CLMessage* pMsg)$/;"	f	class:CLSTLQueue
+Read	.\CLBaseSocket.cpp	/^CLStatus CLBaseSocket::Read(CLIOVector& IOVec, CLSocketAddress *pAddr)$/;"	f	class:CLBaseSocket
 Read	.\CLNamedPipe.cpp	/^CLStatus CLNamedPipe::Read(char *pBuf, int length)$/;"	f	class:CLNamedPipe
-Read	.\CLSocket.cpp	/^CLStatus CLSocket::Read(CLIOVector& IOVec, CLSocketAddress* pAddr = 0)$/;"	f	class:CLSocket
+Read	.\CLSocket.cpp	/^CLStatus CLSocket::Read(CLIOVector& IOVec, CLSocketAddress* pAddr)$/;"	f	class:CLSocket
 Read	.\CLTimerFd.cpp	/^CLStatus CLTimerFd::Read()$/;"	f	class:CLTimerFd
 ReadContext	.\CLDataReader.cpp	/^CLStatus CLDataReader::ReadContext(int fd)$/;"	f	class:CLDataReader
 ReadData	.\CLBuffer.cpp	/^CLStatus CLBuffer::ReadData(char* pBuffer, const int& index, const int& len)$/;"	f	class:CLBuffer
@@ -262,6 +279,7 @@ ReadDataToMessageQueue	.\CLMessageReceiverBySTLqueue.cpp	/^CLMessage* CLMessageR
 ReadHeader	.\CLDataReader.cpp	/^CLStatus CLDataReader::ReadHeader(int fd)$/;"	f	class:CLDataReader
 ReadMsgFromPipe	.\CLPrivateMsgReceiverbyNamedPipe.cpp	/^CLStatus CLPrivateMsgReceiverbyNamedPipe::ReadMsgFromPipe(int fd)$/;"	f	class:CLPrivateMsgReceiverbyNamedPipe
 ReadMsgFromPipe	.\CLSharedMsgReceiverByNamedPipe.cpp	/^CLStatus CLSharedMsgReceiverByNamedPipe::ReadMsgFromPipe(int fd)$/;"	f	class:CLSharedMsgReceiverByNamedPipe
+ReadOrWrite	.\CLBaseSocket.cpp	/^CLStatus CLBaseSocket::ReadOrWrite(CLIOVector& IOVec, CLSocketAddress *pAddr, bool bWrite)$/;"	f	class:CLBaseSocket
 ReadVecs	.\CLNamedPipe.cpp	/^CLStatus CLNamedPipe::ReadVecs(CLIOVector& dataVec)$/;"	f	class:CLNamedPipe
 Register	.\CLExecutiveNameServer.cpp	/^CLStatus CLExecutiveNameServer::Register(const char* strExecutiveName, CLMessagePoster *pMsgPoster)$/;"	f	class:CLExecutiveNameServer
 Register	.\CLMessageLoopManager.cpp	/^CLStatus CLMessageLoopManager::Register(unsigned long lMsgID, CallBackForMessageLoop pMsgProcessFunction)$/;"	f	class:CLMessageLoopManager
@@ -342,7 +360,9 @@ WaitForMessage	.\CLMsgLoopManagerForPipeQueue.cpp	/^CLStatus CLMsgLoopManagerFor
 WaitForMessage	.\CLMsgLoopManagerForSTLqueue.cpp	/^CLStatus CLMsgLoopManagerForSTLqueue::WaitForMessage()$/;"	f	class:CLMsgLoopManagerForSTLqueue
 Wakeup	.\CLConditionVariable.cpp	/^CLStatus CLConditionVariable::Wakeup()$/;"	f	class:CLConditionVariable
 WakeupAll	.\CLConditionVariable.cpp	/^CLStatus CLConditionVariable::WakeupAll()$/;"	f	class:CLConditionVariable
+Write	.\CLBaseSocket.cpp	/^CLStatus CLBaseSocket::Write(CLIOVector& IOVec, CLSocketAddress *pAddr)$/;"	f	class:CLBaseSocket
 Write	.\CLNamedPipe.cpp	/^CLStatus CLNamedPipe::Write(char *pBuf, int length)$/;"	f	class:CLNamedPipe
+Write	.\CLSocket.cpp	/^CLStatus CLSocket::Write(CLIOVector& IOVec, CLSocketAddress* pAddr)$/;"	f	class:CLSocket
 WriteData	.\CLBuffer.cpp	/^CLStatus CLBuffer::WriteData(char* pBuffer, const int& len)$/;"	f	class:CLBuffer
 WriteData	.\CLIOVector.cpp	/^CLStatus CLIOVector::WriteData(char* pBuffer, const int& index, const int& len)$/;"	f	class:CLIOVector
 WriteLog	.\CLLogger.cpp	/^CLStatus CLLogger::WriteLog(const char *pstrMsg, long lErrorCode)$/;"	f	class:CLLogger
@@ -359,6 +379,7 @@ m_pNameServer	.\CLExecutiveNameServer.cpp	/^CLExecutiveNameServer* CLExecutiveNa
 operator =	.\CLIOVector.cpp	/^CLIOVector& CLIOVector::operator=(const CLIOVector& rhs)$/;"	f	class:CLIOVector
 operator =	.\CLStatus.cpp	/^CLStatus& CLStatus::operator= (const CLStatus& status)$/;"	f	class:CLStatus
 operator []	.\CLIOVector.cpp	/^const char& CLIOVector::operator[](const int& index)$/;"	f	class:CLIOVector
+~CLBaseSocket	.\CLBaseSocket.cpp	/^CLBaseSocket::~CLBaseSocket()$/;"	f	class:CLBaseSocket
 ~CLBuffer	.\CLBuffer.cpp	/^CLBuffer::~CLBuffer()$/;"	f	class:CLBuffer
 ~CLConditionVariable	.\CLConditionVariable.cpp	/^CLConditionVariable::~CLConditionVariable()$/;"	f	class:CLConditionVariable
 ~CLCriticalSection	.\CLCriticalSection.cpp	/^CLCriticalSection::~CLCriticalSection()$/;"	f	class:CLCriticalSection
@@ -431,7 +452,10 @@ operator []	.\CLIOVector.cpp	/^const char& CLIOVector::operator[](const int& ind
 ~CLSharedMutexImpl	.\CLSharedMutexImpl.cpp	/^CLSharedMutexImpl::~CLSharedMutexImpl()$/;"	f	class:CLSharedMutexImpl
 ~CLSharedObjectsImpl	.\CLSharedObjectsImpl.cpp	/^CLSharedObjectsImpl::~CLSharedObjectsImpl()$/;"	f	class:CLSharedObjectsImpl
 ~CLSocket	.\CLSocket.cpp	/^CLSocket::~CLSocket()$/;"	f	class:CLSocket
+~CLSocketAddress	.\CLSocketAddress.cpp	/^CLSocketAddress::~CLSocketAddress()$/;"	f	class:CLSocketAddress
 ~CLStatus	.\CLStatus.cpp	/^CLStatus::~CLStatus()$/;"	f	class:CLStatus
+~CLTCPClientSocket	.\CLTCPClientSocket.cpp	/^CLTCPClientSocket::~CLTCPClientSocket()$/;"	f	class:CLTCPClientSocket
+~CLTCPListenSocket	.\CLTCPListenSocket.cpp	/^CLTCPListenSocket::~CLTCPListenSocket()$/;"	f	class:CLTCPListenSocket
 ~CLThread	.\CLThread.cpp	/^CLThread::~CLThread()$/;"	f	class:CLThread
 ~CLThreadCommunicationBySTLqueue	.\CLThreadCommunicationBySTLqueue.cpp	/^CLThreadCommunicationBySTLqueue::~CLThreadCommunicationBySTLqueue()$/;"	f	class:CLThreadCommunicationBySTLqueue
 ~CLThreadForMsgLoop	.\CLThreadForMsgLoop.cpp	/^CLThreadForMsgLoop::~CLThreadForMsgLoop()$/;"	f	class:CLThreadForMsgLoop
@@ -441,3 +465,5 @@ operator []	.\CLIOVector.cpp	/^const char& CLIOVector::operator[](const int& ind
 ~CLTimerFd	.\CLTimerFd.cpp	/^CLTimerFd::~CLTimerFd()$/;"	f	class:CLTimerFd
 ~CLTimerOutNotifyMsgDeserializer	.\CLTimerOutNotifyMsgDeserializer.cpp	/^CLTimerOutNotifyMsgDeserializer::~CLTimerOutNotifyMsgDeserializer()$/;"	f	class:CLTimerOutNotifyMsgDeserializer
 ~CLTimerOutNotifyMsgSerializer	.\CLTimerOutNotifyMsgSerializer.cpp	/^CLTimerOutNotifyMsgSerializer::~CLTimerOutNotifyMsgSerializer()$/;"	f	class:CLTimerOutNotifyMsgSerializer
+~CLUDPClientSocket	.\CLUDPClientSocket.cpp	/^CLUDPClientSocket::~CLUDPClientSocket()$/;"	f	class:CLUDPClientSocket
+~CLUDPServerSocket	.\CLUDPServerSocket.cpp	/^CLUDPServerSocket::~CLUDPServerSocket()$/;"	f	class:CLUDPServerSocket

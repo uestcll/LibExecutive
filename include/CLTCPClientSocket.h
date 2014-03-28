@@ -1,6 +1,7 @@
 #ifndef CLTCPCLIENTSOCKET_H
 #define CLTCPCLIENTSOCKET_H
 
+#include <string>
 #include "CLStatus.h"
 #include "CLBaseSocket.h"
 
@@ -13,12 +14,12 @@ public:
 	virtual ~CLTCPClientSocket();
 
 	CLStatus Connect();
-	void  NotifyConnectResult(bool bResult)
+	void  NotifyConnectResult(bool bResult);
 
 
 private:
-	char* m_pHostOrIP;
-	char* m_pServiceOrPort;
+	std::string m_pHostOrIP;
+	std::string m_pServiceOrPort;
 
 	struct addrinfo *m_pAddressInfo;
 
