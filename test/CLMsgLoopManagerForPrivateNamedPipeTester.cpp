@@ -23,21 +23,21 @@ public:
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_1(CLMessage *pm)
+	CLStatus On_1(CLMessage *pm, CLUuid u1)
 	{
 		EXPECT_EQ(pm->m_clMsgID, 1);
 		g1 = true;
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_2(CLMessage *pm)
+	CLStatus On_2(CLMessage *pm, CLUuid u1)
 	{
 		EXPECT_EQ(pm->m_clMsgID, 2);
 		g2 = true;
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_3(CLMessage *pm)
+	CLStatus On_3(CLMessage *pm, CLUuid u1)
 	{
 		EXPECT_EQ(pm->m_clMsgID, 3);
 		g3 = true;
@@ -104,21 +104,21 @@ public:
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_1(CLMessage *pm)
+	CLStatus On_1(CLMessage *pm, CLUuid u1)
 	{
 		EXPECT_EQ(pm->m_clMsgID, 1);
 		g1 = true;
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_2(CLMessage *pm)
+	CLStatus On_2(CLMessage *pm, CLUuid u1)
 	{
 		EXPECT_EQ(pm->m_clMsgID, 2);
 		g2 = true;
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_3(CLMessage *pm)
+	CLStatus On_3(CLMessage *pm, CLUuid u1)
 	{
 		EXPECT_EQ(pm->m_clMsgID, 3);
 		g3 = true;

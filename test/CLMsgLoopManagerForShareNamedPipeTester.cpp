@@ -178,14 +178,14 @@ public:
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_1(CLMessage *pm)
+	CLStatus On_1(CLMessage *pm, CLUuid u1)
 	{
 		EXPECT_EQ(pm->m_clMsgID, 1);
 		g1++;
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_2(CLMessage *pm)
+	CLStatus On_2(CLMessage *pm, CLUuid u1)
 	{
 		EXPECT_EQ(pm->m_clMsgID, 2);
 		g2++;
@@ -272,13 +272,13 @@ public:
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_1(CLMessage *pm)
+	CLStatus On_1(CLMessage *pm, CLUuid u1)
 	{
 		EXPECT_EQ(pm->m_clMsgID, 1);
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_2(CLMessage *pm)
+	CLStatus On_2(CLMessage *pm, CLUuid u1)
 	{
 		EXPECT_EQ(pm->m_clMsgID, 2);
 		return CLStatus(QUIT_MESSAGE_LOOP, 0);
