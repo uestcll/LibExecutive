@@ -172,7 +172,7 @@ public:
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_1(CLMessage *pm)
+	CLStatus On_1(CLMessage *pm, CLUuid u1)
 	{
 		CLMsg1ForCLThreadForMsgLoopTest *p = dynamic_cast<CLMsg1ForCLThreadForMsgLoopTest*>(pm);
 		EXPECT_TRUE(p != 0);
@@ -182,7 +182,7 @@ public:
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_2(CLMessage *pm)
+	CLStatus On_2(CLMessage *pm, CLUuid u1)
 	{
 		CLMsg2ForCLThreadForMsgLoopTest *p = dynamic_cast<CLMsg2ForCLThreadForMsgLoopTest*>(pm);
 		EXPECT_TRUE(p != 0);
@@ -236,7 +236,7 @@ public:
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_1(CLMessage *pm)
+	CLStatus On_1(CLMessage *pm, CLUuid u1)
 	{
 		CLMsg1ForCLThreadForMsgLoopTest *p = dynamic_cast<CLMsg1ForCLThreadForMsgLoopTest*>(pm);
 		EXPECT_TRUE(p != 0);
@@ -246,7 +246,7 @@ public:
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_2(CLMessage *pm)
+	CLStatus On_2(CLMessage *pm, CLUuid u1)
 	{
 		CLMsg2ForCLThreadForMsgLoopTest *p = dynamic_cast<CLMsg2ForCLThreadForMsgLoopTest*>(pm);
 		EXPECT_TRUE(p != 0);

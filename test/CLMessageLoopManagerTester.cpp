@@ -20,6 +20,8 @@ public:
 	int m_j;
 };
 
+static CLUuid g_u1_for_CLMessageLoopManagerTest;
+
 class TestObserverForCLMessageLoopManager : public CLMessageObserver
 {
 public:
@@ -46,6 +48,9 @@ public:
 
 	CLStatus On_Add(CLMessage* pMsg, CLUuid u1)
 	{
+		CLUuidComparer compare;
+		EXPECT_TRUE(compare(u1, g_u1_for_CLMessageLoopManagerTest) == 0);
+
 		static int i = 0;
 
 		CLTestAddMsgForCLMessageLoopManager *p = dynamic_cast<CLTestAddMsgForCLMessageLoopManager *>(pMsg);
@@ -103,7 +108,7 @@ public:
 		for(int k = 0; k < 10; k++)
 		{
 			SLMessageAndSource *pInfo = new SLMessageAndSource;
-			pInfo->ChannelUuid = CLUuid();
+			pInfo->ChannelUuid = g_u1_for_CLMessageLoopManagerTest;
 			pInfo->pMsg = new CLTestAddMsgForCLMessageLoopManager(2, 5);
 			m_MessageContainer.push(pInfo);
 		}
@@ -135,7 +140,7 @@ TEST(CLMessageLoopManager, EnterMessageLoop_Features_Test)
 
 	delete p;
 }
-/*
+
 TEST(CLMessageLoopManager, EnterMessageLoop_Failure_Test)
 {
 	SLExecutiveInitialParameter i;
@@ -174,4 +179,4 @@ TEST(CLMessageLoopManager, EnterMessageLoop_WaitForMessageError_Test)
 	EXPECT_TRUE(p->EnterMessageLoop(&i).IsSuccess());
 
 	delete p;
-}*/
+}

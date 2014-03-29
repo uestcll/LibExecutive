@@ -174,7 +174,7 @@ public:
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_1(CLMessage *pm)
+	CLStatus On_1(CLMessage *pm, CLUuid u1)
 	{
 		CLMsg1ForCLNonThreadForMsgLoopTest *p = dynamic_cast<CLMsg1ForCLNonThreadForMsgLoopTest*>(pm);
 		EXPECT_TRUE(p != 0);
@@ -215,7 +215,7 @@ public:
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_2(CLMessage *pm)
+	CLStatus On_2(CLMessage *pm, CLUuid u1)
 	{
 		CLMsg2ForCLNonThreadForMsgLoopTest *p = dynamic_cast<CLMsg2ForCLNonThreadForMsgLoopTest*>(pm);
 		EXPECT_TRUE(p != 0);
@@ -242,7 +242,7 @@ public:
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_1(CLMessage *pm)
+	CLStatus On_1(CLMessage *pm, CLUuid u1)
 	{
 		CLMsg1ForCLNonThreadForMsgLoopTest *p = dynamic_cast<CLMsg1ForCLNonThreadForMsgLoopTest*>(pm);
 		EXPECT_TRUE(p != 0);
@@ -254,7 +254,7 @@ public:
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_2(CLMessage *pm)
+	CLStatus On_2(CLMessage *pm, CLUuid u1)
 	{
 		CLMsg2ForCLNonThreadForMsgLoopTest *p = dynamic_cast<CLMsg2ForCLNonThreadForMsgLoopTest*>(pm);
 		EXPECT_TRUE(p != 0);
@@ -336,7 +336,7 @@ public:
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_1(CLMessage *pm)
+	CLStatus On_1(CLMessage *pm, CLUuid u1)
 	{
 		CLMsg1ForCLNonThreadForMsgLoopTest *p = dynamic_cast<CLMsg1ForCLNonThreadForMsgLoopTest*>(pm);
 		EXPECT_TRUE(p != 0);
@@ -354,14 +354,15 @@ public:
 		CLMessagePoster *pMsgPoster = new CLMessagePoster(m_pMsgSerializer, 0, new CLDataPostChannelByNamedPipeMaintainer(test1_pipe_namepath), m_pEvent);
 		EXPECT_TRUE(pMsgPoster->Initialize(new CLInitialDataPostChannelNotifier(), 0).IsSuccess());
 
-		EXPECT_TRUE(pNameServer->Register(test1_pipe_name, pMsgPoster).IsSuccess());
+		CLUuid u2;
+		EXPECT_TRUE(pNameServer->Register(test1_pipe_name, u2, pMsgPoster).IsSuccess());
 
 		EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test1_pipe_name, new CLMsg1ForCLNonThreadForMsgLoopTest, true).IsSuccess());
 
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_2(CLMessage *pm)
+	CLStatus On_2(CLMessage *pm, CLUuid u1)
 	{
 		CLMsg2ForCLNonThreadForMsgLoopTest *p = dynamic_cast<CLMsg2ForCLNonThreadForMsgLoopTest*>(pm);
 		EXPECT_TRUE(p != 0);

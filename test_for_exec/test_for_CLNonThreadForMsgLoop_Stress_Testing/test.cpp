@@ -162,7 +162,7 @@ public:
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_1(CLMessage *pm)
+	CLStatus On_1(CLMessage *pm, CLUuid u1)
 	{
 		CLMsg1ForCLNonThreadForMsgLoopTest *p = dynamic_cast<CLMsg1ForCLNonThreadForMsgLoopTest*>(pm);
 		CLMessagePoster *poster = CLExecutiveNameServer::GetInstance()->GetCommunicationPtr(test_pipe_name);
@@ -196,7 +196,7 @@ public:
 		return CLStatus(0, 0);
 	}
 
-	CLStatus On_2(CLMessage *pm)
+	CLStatus On_2(CLMessage *pm, CLUuid u1)
 	{
 		CLMsg2ForCLNonThreadForMsgLoopTest *p = dynamic_cast<CLMsg2ForCLNonThreadForMsgLoopTest*>(pm);
 
@@ -245,7 +245,9 @@ int main(int argc, char* argv[])
 			throw CLStatus(-1, 0);
 		}
 
-		if(pNameServer->Register(test_pipe_name, pMsgPoster).IsSuccess() == false)
+		CLUuid u1;
+
+		if(pNameServer->Register(test_pipe_name, u1, pMsgPoster).IsSuccess() == false)
 		{
 			cout << "name server Register error" << endl;
 			throw CLStatus(-1, 0);
