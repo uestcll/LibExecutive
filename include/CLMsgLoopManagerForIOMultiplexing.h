@@ -23,7 +23,7 @@ public:
 	CLStatus RegisterReadEvent(int fd, CLMessageReceiver *pMsgReceiver);
 	CLStatus UnRegisterReadEvent(int fd);
 
-	CLStatus RegisterWriteEvent(int, CLProtocolDataPoster *pDataPoster);
+	CLStatus RegisterWriteEvent(int fd, CLProtocolDataPoster *pDataPoster);
 
 protected:
 	virtual CLStatus Initialize();

@@ -18,6 +18,9 @@ CLMsgLoopManagerForIOMultiplexing::CLMsgLoopManagerForIOMultiplexing(CLMessageOb
 
 	m_pReadSet = new fd_set;
 	m_pWriteSet = new fd_set;
+
+	FD_ZERO(m_pReadSet);
+	FD_ZERO(m_pWriteSet);
 }
 
 CLMsgLoopManagerForIOMultiplexing::~CLMsgLoopManagerForIOMultiplexing()
@@ -43,6 +46,8 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::RegisterReadEvent(int fd, CLMessageR
 		}
 
 		m_ReadSetMap[fd] = pMsgReceiver;
+
+		FD_SET(fd, m_pReadSet);
 
 		return CLStatus(0, 0);
 	}
@@ -72,9 +77,24 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::UnRegisterReadEvent(int fd)
 	return CLStatus(-1, NORMAL_ERROR);
 }
 
-CLStatus CLMsgLoopManagerForIOMultiplexing::RegisterWriteEvent(int, CLProtocolDataPoster *pDataPoster)
+CLStatus CLMsgLoopManagerForIOMultiplexing::RegisterWriteEvent(int fd, CLProtocolDataPoster *pDataPoster)
 {
-	return CLStatus(-1, NORMAL_ERROR);
+	CLCriticalSection cs(&m_MutexForWriteMap);
+
+	map<int, list<CLProtocolDataPoster*>*>::iterator it = m_WriteSetMap.find(fd);
+	if(it == m_WriteSetMap.end())
+	{
+		list<CLProtocolDataPoster*>* plist = new list<CLProtocolDataPoster*>;
+		plist->push_back(pDataPoster);
+
+		m_WriteSetMap[fd] = plist;
+	}
+	else
+	{
+		it->second->push_back(pDataPoster);
+	}
+
+	return CLStatus(0, 0);
 }
 
 void CLMsgLoopManagerForIOMultiplexing::ClearDeletedSet()
@@ -93,6 +113,9 @@ void CLMsgLoopManagerForIOMultiplexing::ClearDeletedSet()
 			if(it != m_ReadSetMap.end())
 			{
 				vpMsgReceiver.push_back(it->second);
+
+				FD_CLR(it->first, m_pReadSet);
+
 				m_ReadSetMap.erase(it);
 			}
 			else
@@ -123,8 +146,8 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::WaitForMessage()
 {
 	ClearDeletedSet();
 
-	FD_ZERO(m_pReadSet);
-	FD_ZERO(m_pWriteSet);
+	fd_set *pReadSet = new fd_set;
+	fd_set *pWriteSet = new fd_set;
 
 	int maxrfd = 0;
 	int maxwfd = 0;
@@ -134,11 +157,7 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::WaitForMessage()
 
 		maxrfd = m_ReadSetMap.rbegin()->first;
 
-		map<int, CLMessageReceiver*>::iterator it = m_ReadSetMap.begin();
-		for(; it != m_ReadSetMap.end(); ++it)
-		{
-			FD_SET(it->first, m_pReadSet);
-		}
+		memcpy(pReadSet, m_pReadSet, sizeof(fd_set));
 	}
 
 	{
@@ -146,11 +165,7 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::WaitForMessage()
 
 		maxwfd = m_WriteSetMap.rbegin()->first;
 		
-		map<int, std::list<CLProtocolDataPoster*>*>::iterator it = m_WriteSetMap.begin();
-		for(; it != m_WriteSetMap.end(); ++it)
-		{
-			FD_SET(it->first, m_pWriteSet);
-		}
+		memcpy(pWriteSet, m_pWriteSet, sizeof(fd_set));
 	}
 
 	int maxfdp1 = 0;
@@ -159,7 +174,7 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::WaitForMessage()
 	else
 		maxfdp1 = maxwfd + 1;
 
-	int ready_fd = select(maxfdp1, m_pReadSet, m_pWriteSet, 0, 0);
+	int ready_fd = select(maxfdp1, pReadSet, pWriteSet, 0, 0);
 
 	vector<CLMessageReceiver *> vpMsgReceiver;
 	
@@ -169,14 +184,36 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::WaitForMessage()
 		map<int, CLMessageReceiver*>::iterator it = m_ReadSetMap.begin();
 		for(; it != m_ReadSetMap.end(); ++it)
 		{
-			if(FD_ISSET(it->first, m_pReadSet))
+			if(FD_ISSET(it->first, pReadSet))
 			{
 				vpMsgReceiver.push_back(it->second);
 			}
 		}
 	}
 
-	//.....................
+	vector<CLMessageReceiver *>::iterator iter_read = vpMsgReceiver.begin();
+	for(; iter_read != vpMsgReceiver.end(); ++iter_read)
+	{
+		//bug iff getmessage return error how to notify user
+		(*iter_read)->GetMessage(m_MessageContainer);
+	}
+
+	{
+		CLCriticalSection cs(&m_MutexForWriteMap);
+
+		map<int, list<CLProtocolDataPoster*>*>::iterator it = m_WriteSetMap.begin();
+		for(; it != m_WriteSetMap.end(); ++it)
+		{
+			if(FD_ISSET(it->first, pWriteSet))
+			{
+				//.......................
+			}
+		}
+	}
+
+	delete pReadSet;
+
+	delete pWriteSet;
 
 	return CLStatus(0, 0);
 }
