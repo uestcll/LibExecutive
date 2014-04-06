@@ -1,6 +1,8 @@
 #ifndef CLMSGLOOPMANAGERFORLIBEVENT_H
 #define CLMSGLOOPMANAGERFORLIBEVENT_H
 
+#include <event2/event.h>
+#include <event2/bufferevent.h>
 #include <string>
 #include <map>
 #include <set>
@@ -20,13 +22,36 @@ class CLMsgLoopManagerForLibevent : public CLMessageLoopManager
     CLMsgLoopManagerForLibevent(CLMesssageObserver *pMsgObserver, const char *pstrThreadName);
     virtual ~CLMsgLoopManagerForLibevent();
 
-    CLStatus RegisterReadEvent();
-    CLstatus UnRegisterReadEvent();
+    CLStatus RegisterReadEvent(struct event ev, CLMessageReceiver *pMsgReceiver);
+    CLstatus UnRegisterReadEvent(struct event ev);
 
-    CLStatus RegisterWriteEvent();
-    CLStatus UnRegisterWriteEvent();
+    CLStatus RegisterWriteEvent(struct event ev, CLMessagePoster *pMsgPoster);
+    CLStatus UnRegisterWriteEvent(struct event ev);
 
     protected:
-    
-}
+    virtual CLStatus Initialize();
+    virtual CLStatus Uninitialize();
+
+    virtual CLStatus WaitForMessage();
+
+    private:
+    void ClearDeletedSet();
+
+    private:
+    CLMsgLoopManagerForLibevent(const CLMsgLoopManagerForLibevent&);
+    CLMsgLoopManagerForLibevent& operator=(const CLMsgLoopManagerForLibevent&);
+
+    private:
+    std::string m_strThreadName;
+
+    std::map<struct event, CLMessageReceiver*> m_ReadSetMap;
+    std::map<struct event, std::list<CLMessagePoster*>*> m_WriteSetMap;
+
+    std::set<struct event> m_DeletedSet;
+
+    CLMutex m_MutexForReadMap;
+    CLMutex m_MutexForWriteMap;
+    CLMutex m_MutexForDeletedSet;  
+};
+
 #endif
