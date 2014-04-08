@@ -5,6 +5,7 @@
 #include "CLCriticalSection.h"
 #include "ErrorCode.h"
 #include "CLMessageReceiver.h"
+#include "CLMessagePoster.h"
 #include "CLLogger.h"
 
 using namespace std;
@@ -25,7 +26,11 @@ CLMsgLoopManagerForIOMultiplexing::CLMsgLoopManagerForIOMultiplexing(CLMessageOb
 
 CLMsgLoopManagerForIOMultiplexing::~CLMsgLoopManagerForIOMultiplexing()
 {
-	ClearDeletedSet();
+	map<int, CLMessageReceiver*>::iterator it = m_ReadSetMap.begin();
+	for(; it != m_ReadSetMap.end(); ++it)
+	{
+		delete it->second;
+	}
 
 	delete m_pReadSet;
 
@@ -36,6 +41,9 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::RegisterReadEvent(int fd, CLMessageR
 {
 	try
 	{
+		if(fd < 0)
+			throw CLStatus(-1, NORMAL_ERROR);
+
 		CLCriticalSection cs(&m_MutexForReadMap);
 
 		map<int, CLMessageReceiver*>::iterator it = m_ReadSetMap.find(fd);
@@ -62,6 +70,9 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::RegisterReadEvent(int fd, CLMessageR
 
 CLStatus CLMsgLoopManagerForIOMultiplexing::UnRegisterReadEvent(int fd)
 {
+	if(fd < 0)
+		return CLStatus(-1, NORMAL_ERROR);
+
 	CLCriticalSection cs(&m_MutexForDeletedSet);
 
 	set<int>::iterator it = m_DeletedSet.find(fd);
@@ -77,30 +88,10 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::UnRegisterReadEvent(int fd)
 	return CLStatus(-1, NORMAL_ERROR);
 }
 
-CLStatus CLMsgLoopManagerForIOMultiplexing::RegisterWriteEvent(int fd, CLProtocolDataPoster *pDataPoster)
-{
-	CLCriticalSection cs(&m_MutexForWriteMap);
-
-	map<int, list<CLProtocolDataPoster*>*>::iterator it = m_WriteSetMap.find(fd);
-	if(it == m_WriteSetMap.end())
-	{
-		list<CLProtocolDataPoster*>* plist = new list<CLProtocolDataPoster*>;
-		plist->push_back(pDataPoster);
-
-		m_WriteSetMap[fd] = plist;
-	}
-	else
-	{
-		it->second->push_back(pDataPoster);
-	}
-
-	return CLStatus(0, 0);
-}
-
 void CLMsgLoopManagerForIOMultiplexing::ClearDeletedSet()
 {
 	vector<CLMessageReceiver *> vpMsgReceiver;
-	
+
 	{
 		CLCriticalSection cs(&m_MutexForDeletedSet);
 
@@ -130,6 +121,24 @@ void CLMsgLoopManagerForIOMultiplexing::ClearDeletedSet()
 	{
 		delete (*it);
 	}
+}
+
+CLStatus CLMsgLoopManagerForIOMultiplexing::RegisterWriteEvent(int fd, CLMessagePoster *pMsgPoster)
+{
+	if(fd < 0)
+		return CLStatus(-1, NORMAL_ERROR);
+
+	CLCriticalSection cs(&m_MutexForWriteMap);
+
+	map<int, CLMessagePoster*>::iterator it = m_WriteSetMap.find(fd);
+	if(it != m_WriteSetMap.end())
+		return CLStatus(0, 0);
+
+	m_WriteSetMap[fd] = pMsgPoster;
+
+	FD_SET(fd, m_pWriteSet);
+
+	return CLStatus(0, 0);
 }
 
 CLStatus CLMsgLoopManagerForIOMultiplexing::Initialize()
