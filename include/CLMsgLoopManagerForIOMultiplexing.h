@@ -18,7 +18,7 @@ class CLDataPostChannelMaintainer;
 class CLMsgLoopManagerForIOMultiplexing : public CLMessageLoopManager
 {
 public:
-	CLMsgLoopManagerForIOMultiplexing(CLMessageObserver *pMsgObserver, const char* pstrThreadName);
+	CLMsgLoopManagerForIOMultiplexing(CLMessageObserver *pMsgObserver, const char* pstrThreadName, bool bMultipleThread);
 	virtual ~CLMsgLoopManagerForIOMultiplexing();
 
 	CLStatus RegisterReadEvent(int fd, CLMessageReceiver *pMsgReceiver);
@@ -36,6 +36,17 @@ protected:
 
 private:
 	void ClearDeletedSet();
+
+	CLStatus Internal_RegisterReadEvent(int fd, CLMessageReceiver *pMsgReceiver);
+	CLStatus Internal_UnRegisterReadEvent(int fd);
+
+	CLStatus Internal_RegisterWriteEvent(int fd, CLMessagePoster *pMsgPoster);
+
+	CLStatus Internal_RegisterConnectEvent(int fd, CLDataPostChannelMaintainer *pChannel);
+
+	CLStatus GetSeletcParameters(fd_set *pReadSet, fd_set *pWriteSet, int& maxfdp1);
+
+	CLStatus GetInfoFromSet(bool bReadSet, fd_set *pSet, int& maxfd);
 
 private:
 	CLMsgLoopManagerForIOMultiplexing(const CLMsgLoopManagerForIOMultiplexing&);
@@ -56,6 +67,8 @@ private:
 	CLMutex m_MutexForWriteMap;
 	CLMutex m_MutexForDeletedSet;
 	CLMutex m_MutexForChannelMap;
+
+	bool m_bMultipleThread;
 };
 
 #endif

@@ -10,7 +10,7 @@
 
 using namespace std;
 
-CLMsgLoopManagerForIOMultiplexing::CLMsgLoopManagerForIOMultiplexing(CLMessageObserver *pMsgObserver, const char* pstrThreadName) : CLMessageLoopManager(pMsgObserver)
+CLMsgLoopManagerForIOMultiplexing::CLMsgLoopManagerForIOMultiplexing(CLMessageObserver *pMsgObserver, const char* pstrThreadName, bool bMultipleThread) : CLMessageLoopManager(pMsgObserver)
 {
 	if((pstrThreadName == 0) || (strlen(pstrThreadName) == 0))
 		throw "In CLMsgLoopManagerForIOMultiplexing::CLMsgLoopManagerForIOMultiplexing(), pstrThreadName error";
@@ -22,6 +22,8 @@ CLMsgLoopManagerForIOMultiplexing::CLMsgLoopManagerForIOMultiplexing(CLMessageOb
 
 	FD_ZERO(m_pReadSet);
 	FD_ZERO(m_pWriteSet);
+
+	m_bMultipleThread = bMultipleThread;
 }
 
 CLMsgLoopManagerForIOMultiplexing::~CLMsgLoopManagerForIOMultiplexing()
@@ -37,35 +39,48 @@ CLMsgLoopManagerForIOMultiplexing::~CLMsgLoopManagerForIOMultiplexing()
 	delete m_pWriteSet;
 }
 
+CLStatus CLMsgLoopManagerForIOMultiplexing::Internal_RegisterReadEvent(int fd, CLMessageReceiver *pMsgReceiver)
+{
+	map<int, CLMessageReceiver*>::iterator it = m_ReadSetMap.find(fd);
+	if(it != m_ReadSetMap.end())
+		return CLStatus(-1, NORMAL_ERROR);
+
+	m_ReadSetMap[fd] = pMsgReceiver;
+
+	FD_SET(fd, m_pReadSet);
+
+	return CLStatus(0, 0);
+}
+
 CLStatus CLMsgLoopManagerForIOMultiplexing::RegisterReadEvent(int fd, CLMessageReceiver *pMsgReceiver)
 {
-	try
-	{
-		if(fd < 0)
-			throw CLStatus(-1, NORMAL_ERROR);
+	if(pMsgReceiver == 0)
+		return CLStatus(-1, NORMAL_ERROR);
 
+	if(fd < 0)
+	{
+		delete pMsgReceiver;
+		return CLStatus(-1, NORMAL_ERROR);
+	}
+
+	if(m_bMultipleThread)
+	{
 		CLCriticalSection cs(&m_MutexForReadMap);
 
-		map<int, CLMessageReceiver*>::iterator it = m_ReadSetMap.find(fd);
-		if(it != m_ReadSetMap.end())
-		{
-			CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::RegisterReadEvent(), m_ReadSetMap.find error", 0);
-			throw CLStatus(-1, NORMAL_ERROR);
-		}
-
-		m_ReadSetMap[fd] = pMsgReceiver;
-
-		FD_SET(fd, m_pReadSet);
-
-		return CLStatus(0, 0);
+		if(Internal_RegisterReadEvent(fd, pMsgReceiver).IsSuccess())
+			return CLStatus(0, 0);
 	}
-	catch(CLStatus& s)
+	else
 	{
-		if(pMsgReceiver)
-			delete pMsgReceiver;
-
-		return s;
+		if(Internal_RegisterReadEvent(fd, pMsgReceiver).IsSuccess())
+			return CLStatus(0, 0);
 	}
+
+	CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::RegisterReadEvent(), Internal_RegisterReadEvent error", fd);
+
+	delete pMsgReceiver;
+
+	return CLStatus(-1, NORMAL_ERROR);
 }
 
 CLStatus CLMsgLoopManagerForIOMultiplexing::UnRegisterReadEvent(int fd)
@@ -73,19 +88,55 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::UnRegisterReadEvent(int fd)
 	if(fd < 0)
 		return CLStatus(-1, NORMAL_ERROR);
 
-	CLCriticalSection cs(&m_MutexForDeletedSet);
+	if(m_bMultipleThread)
+	{
+		{
+			CLCriticalSection cs(&m_MutexForDeletedSet);
 
-	set<int>::iterator it = m_DeletedSet.find(fd);
-	if(it != m_DeletedSet.end())
-		return CLStatus(0, 0);
+			set<int>::iterator it = m_DeletedSet.find(fd);
+			if(it != m_DeletedSet.end())
+				return CLStatus(0, 0);
 
-	pair<set<int>::iterator, bool> r = m_DeletedSet.insert(fd);
-	if(r.second)
-		return CLStatus(0, 0);
-	
-	CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::UnRegisterReadEvent(), m_DeletedSet.insert error", 0);
-	
-	return CLStatus(-1, NORMAL_ERROR);
+			pair<set<int>::iterator, bool> r = m_DeletedSet.insert(fd);
+			if(r.second)
+				return CLStatus(0, 0);
+		}
+
+		CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::UnRegisterReadEvent(), m_DeletedSet.insert error", fd);
+
+		return CLStatus(-1, NORMAL_ERROR);
+	}
+	else
+	{
+		CLStatus s = Internal_UnRegisterReadEvent(fd);
+		if(!s.IsSuccess())
+		{
+			CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::UnRegisterReadEvent(), Internal_UnRegisterReadEvent error", fd);
+			return s;
+		}
+
+		CLMessageReceiver *pTmp = (CLMessageReceiver *)s.m_clErrorCode;
+
+		if(pTmp)
+			delete pTmp;
+
+		return s;
+	}
+}
+
+CLStatus CLMsgLoopManagerForIOMultiplexing::Internal_UnRegisterReadEvent(int fd)
+{
+	map<int, CLMessageReceiver*>::iterator it = m_ReadSetMap.find(fd);
+	if(it == m_ReadSetMap.end())
+		return CLStatus(-1, NORMAL_ERROR);
+
+	CLMessageReceiver *pTmp = it->second;
+
+	FD_CLR(it->first, m_pReadSet);
+
+	m_ReadSetMap.erase(it);
+
+	return CLStatus(0, (long)pTmp);
 }
 
 void CLMsgLoopManagerForIOMultiplexing::ClearDeletedSet()
@@ -98,19 +149,26 @@ void CLMsgLoopManagerForIOMultiplexing::ClearDeletedSet()
 		set<int>::iterator iter = m_DeletedSet.begin();
 		for(; iter != m_DeletedSet.end(); ++iter)
 		{
-			CLCriticalSection cs1(&m_MutexForReadMap);
+			long r, e;
 
-			map<int, CLMessageReceiver*>::iterator it = m_ReadSetMap.find(*iter);
-			if(it != m_ReadSetMap.end())
 			{
-				vpMsgReceiver.push_back(it->second);
+				CLCriticalSection cs1(&m_MutexForReadMap);
 
-				FD_CLR(it->first, m_pReadSet);
-
-				m_ReadSetMap.erase(it);
+				CLStatus s = Internal_UnRegisterReadEvent(*iter);
+				r = s.m_clReturnCode;
+				e = s.m_clErrorCode;
 			}
-			else
-				CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::ClearDeletedSet(), m_ReadSetMap.find error", 0);
+
+			CLStatus s1(r, e);
+			if(!s1.IsSuccess())
+			{
+				CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::ClearDeletedSet(), Internal_UnRegisterReadEvent error", *iter);
+				continue;
+			}
+
+			CLMessageReceiver *pTmp = (CLMessageReceiver *)s1.m_clErrorCode;
+			if(pTmp)
+				vpMsgReceiver.push_back(pTmp);
 		}
 
 		m_DeletedSet.clear();
@@ -128,8 +186,20 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::RegisterWriteEvent(int fd, CLMessage
 	if(fd < 0)
 		return CLStatus(-1, NORMAL_ERROR);
 
-	CLCriticalSection cs(&m_MutexForWriteMap);
+	if(m_bMultipleThread)
+	{
+		CLCriticalSection cs(&m_MutexForWriteMap);
 
+		return Internal_RegisterWriteEvent(fd, pMsgPoster);
+	}
+	else
+	{
+		return Internal_RegisterWriteEvent(fd, pMsgPoster);
+	}
+}
+
+CLStatus CLMsgLoopManagerForIOMultiplexing::Internal_RegisterWriteEvent(int fd, CLMessagePoster *pMsgPoster)
+{
 	map<int, CLMessagePoster*>::iterator it = m_WriteSetMap.find(fd);
 	if(it != m_WriteSetMap.end())
 		return CLStatus(0, 0);
@@ -139,6 +209,46 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::RegisterWriteEvent(int fd, CLMessage
 	FD_SET(fd, m_pWriteSet);
 
 	return CLStatus(0, 0);
+}
+
+CLStatus CLMsgLoopManagerForIOMultiplexing::Internal_RegisterConnectEvent(int fd, CLDataPostChannelMaintainer *pChannel)
+{
+	map<int, CLDataPostChannelMaintainer*>::iterator it = m_ChannelMap.find(fd);
+	if(it != m_ChannelMap.end())
+		return CLStatus(0, 0);
+
+	m_ChannelMap[fd] = pChannel;
+
+	Internal_RegisterReadEvent(fd, 0);
+
+	Internal_RegisterWriteEvent(fd, 0);
+
+	return CLStatus(0, 0);
+}
+
+CLStatus CLMsgLoopManagerForIOMultiplexing::RegisterConnectEvent(int fd, CLDataPostChannelMaintainer *pChannel)
+{
+	if((fd < 0) || (pChannel == 0))
+		return CLStatus(-1, NORMAL_ERROR);
+
+	if(m_bMultipleThread)
+	{
+		CLCriticalSection cs(&m_MutexForChannelMap);
+
+		{
+			CLCriticalSection cs1(&m_MutexForReadMap);
+
+			{
+				CLCriticalSection cs2(&m_MutexForWriteMap);
+
+				return Internal_RegisterConnectEvent(fd, pChannel);
+			}
+		}
+	}
+	else
+	{
+		return Internal_RegisterConnectEvent(fd, pChannel);
+	}
 }
 
 CLStatus CLMsgLoopManagerForIOMultiplexing::Initialize()
@@ -151,37 +261,72 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::Uninitialize()
 	return CLStatus(0, 0);
 }
 
-CLStatus CLMsgLoopManagerForIOMultiplexing::WaitForMessage()
+CLStatus CLMsgLoopManagerForIOMultiplexing::GetInfoFromSet(bool bReadSet, fd_set *pSet, int& maxfd)
 {
-	ClearDeletedSet();
+	if(bReadSet)
+	{
+		map<int, CLMessageReceiver*>::iterator it = m_ReadSetMap.rbegin();
+		if(it != m_ReadSetMap.end())
+		{
+			maxfd = it->first;
+			memcpy(pSet, m_pReadSet, sizeof(fd_set));
+			return CLStatus(0, 0);
+		}
+		//................................
+	}
+}
 
-	fd_set *pReadSet = new fd_set;
-	fd_set *pWriteSet = new fd_set;
-
+CLStatus CLMsgLoopManagerForIOMultiplexing::GetSeletcParameters(fd_set *pReadSet, fd_set *pWriteSet, int& maxfdp1)
+{
 	int maxrfd = 0;
 	int maxwfd = 0;
 
+	if(m_bMultipleThread)
 	{
 		CLCriticalSection cs(&m_MutexForReadMap);
 
 		maxrfd = m_ReadSetMap.rbegin()->first;
-
+		memcpy(pReadSet, m_pReadSet, sizeof(fd_set));
+	}
+	else
+	{
+		maxrfd = m_ReadSetMap.rbegin()->first;
 		memcpy(pReadSet, m_pReadSet, sizeof(fd_set));
 	}
 
+	if(m_bMultipleThread)
 	{
 		CLCriticalSection cs(&m_MutexForWriteMap);
 
 		maxwfd = m_WriteSetMap.rbegin()->first;
-		
+		memcpy(pWriteSet, m_pWriteSet, sizeof(fd_set));
+	}
+	else
+	{
+		maxwfd = m_WriteSetMap.rbegin()->first;
 		memcpy(pWriteSet, m_pWriteSet, sizeof(fd_set));
 	}
 
-	int maxfdp1 = 0;
 	if(maxrfd > maxwfd)
 		maxfdp1 = maxrfd + 1;
 	else
 		maxfdp1 = maxwfd + 1;
+
+	return CLStatus(0, 0);
+}
+
+CLStatus CLMsgLoopManagerForIOMultiplexing::WaitForMessage()
+{
+	if(m_bMultipleThread)
+		ClearDeletedSet();
+
+	fd_set *pReadSet = new fd_set;
+	fd_set *pWriteSet = new fd_set;
+	FD_ZERO(pReadSet);
+	FD_ZERO(pWriteSet);
+	int maxfdp1 = -1;
+
+	GetSeletcParameters(pReadSet, pWriteSet, maxfdp1);
 
 	int ready_fd = select(maxfdp1, pReadSet, pWriteSet, 0, 0);
 
