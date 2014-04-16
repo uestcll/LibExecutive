@@ -4,7 +4,8 @@
 //for quit
 #define QUIT_MESSAGE_LOOP 1
 
-
+//for tcp client arrived
+#define TCP_CLIENT_ARRIVED_MSG_ID 5
 
 //for timer
 

@@ -4,14 +4,6 @@
 #include <queue>
 #include <CLMutex.h>
 
-// typedef struct _serialized_msg
-// {
-// 	unsigned long m_lMsgID;
-// 	int m_iStartIndex;
-// 	int m_iLength;
-	
-// }SLSerializedMsgScope;
-
 
 class CLMessage;
 class CLProtoParser;

@@ -21,7 +21,7 @@ public:
 	CLStatus Read(CLIOVector& IOVec, CLSocketAddress* pAddr = 0);
 	CLStatus Write(CLIOVector& IOVec, CLSocketAddress *pAddr = 0);
 
-	const int GetSocket() const ;
+	const int GetSocketFd() const ;
 
 	void  NotifyConnectResult(bool bResult);
 

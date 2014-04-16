@@ -94,6 +94,20 @@ CLStatus CLEpoll::Run()
              //   	{
              //   		CLLogger::WriteLogMsg("In CLEpoll::Run(), pDataPoster->SendData() error", 0);
              //   	}
+            	CLMessagePoster *pMsgPoster = (CLMessagePoster *)(pEvent->GetHandler());
+            	if(pMsgPoster)
+            	{
+            		CLStatus s = pMsgPoster->NotifyWritable();
+            		if(!s.IsSuccess())
+            		{
+            			//pMsgPoster->UnRegister();
+            			CLLogger::WriteLogMsg("In CLEpoll::Run(), pMsgPoster->NotifyWritable() error", 0);
+            		}
+            	}
+            	else
+            	{
+            		CLLogger::WriteLogMsg("In CLEpoll::Run(), pMsgPoster is NULL", 0);
+            	}            	
 
                	continue;
             }
@@ -102,10 +116,10 @@ CLStatus CLEpoll::Run()
             	CLMsgLoopManagerForEpoll *pMsgLoopManager = (CLMsgLoopManagerForEpoll *)(pEvent->GetHandler());
             	if(pMsgLoopManager)
             	{
-            		int fd = pEvent->GetFd();
-            		CLStatus s = pMsgLoopManager->NotifyReadable(fd);
+            		CLStatus s = pMsgLoopManager->NotifyReadable(pEvent->GetFd());
             		if(!s.IsSuccess())
             		{
+            			//pMsgLoopManager->RecycleReceiver();
             			CLLogger::WriteLogMsg("In CLEpoll::Run(), pMsgLoopManager->NotifyReadable() error", 0);
             		}
             	}
@@ -122,7 +136,6 @@ CLStatus CLEpoll::Run()
             }
 		}
 	}
-
 
 	return CLStatus(0, 0);
 }

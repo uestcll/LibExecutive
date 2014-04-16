@@ -98,7 +98,7 @@ CLStatus CLSocket::Write(CLIOVector& IOVec, CLSocketAddress* pAddr)
 	return m_pSocket->Write(IOVec, pAddr);
 }
 
-const int CLSocket::GetSocket() const
+const int CLSocket::GetSocketFd() const
 {
 	return m_pSocket->GetSocketFd();
 }
