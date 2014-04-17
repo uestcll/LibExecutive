@@ -4,9 +4,9 @@
 #include <string.h>
 #include "CLEpoll.h"
 #include "CLLogger.h"
-// #include "CLDelayedDataPoster.h"
 #include "CLMsgLoopManagerForEpoll.h"
 #include "CLEpollEvent.h"
+#include "CLMessagePoster.h"
 
 #define DEFAULT_EPOLLWAIT_TIME 5
 
@@ -94,7 +94,7 @@ CLStatus CLEpoll::Run()
              //   	{
              //   		CLLogger::WriteLogMsg("In CLEpoll::Run(), pDataPoster->SendData() error", 0);
              //   	}
-            	CLMessagePoster *pMsgPoster = (CLMessagePoster *)(pEvent->GetHandler());
+            	/*CLMessagePoster *pMsgPoster = (CLMessagePoster *)(pEvent->GetHandler());
             	if(pMsgPoster)
             	{
             		CLStatus s = pMsgPoster->NotifyWritable();
@@ -107,7 +107,7 @@ CLStatus CLEpoll::Run()
             	else
             	{
             		CLLogger::WriteLogMsg("In CLEpoll::Run(), pMsgPoster is NULL", 0);
-            	}            	
+            	} */           	
 
                	continue;
             }

@@ -1,0 +1,490 @@
+CLBASESOCKET_H	CLBaseSocket.h	2;"	d
+CLBaseSocket	CLBaseSocket.h	/^class CLBaseSocket$/;"	c
+m_SocketFd	CLBaseSocket.h	/^	int m_SocketFd;$/;"	m	class:CLBaseSocket
+m_bBlock	CLBaseSocket.h	/^	bool m_bBlock;$/;"	m	class:CLBaseSocket
+CLBUFFER_H	CLBuffer.h	2;"	d
+CLBuffer	CLBuffer.h	/^class CLBuffer$/;"	c
+DEAFULT_BUFFER_LENGTH	CLBuffer.h	5;"	d
+MINIMUN_BUFFER_LENGTH	CLBuffer.h	6;"	d
+m_ciDataStartIndex	CLBuffer.h	/^	const int& m_ciDataStartIndex;$/;"	m	class:CLBuffer
+m_ciUsedBufferLen	CLBuffer.h	/^	const int& m_ciUsedBufferLen;$/;"	m	class:CLBuffer
+m_iDataStartIndex	CLBuffer.h	/^	int m_iDataStartIndex;$/;"	m	class:CLBuffer
+m_iItemSize	CLBuffer.h	/^	int m_iItemSize;$/;"	m	class:CLBuffer
+m_iSumBufferLen	CLBuffer.h	/^	int m_iSumBufferLen;$/;"	m	class:CLBuffer
+m_iUsedBufferLen	CLBuffer.h	/^	int m_iUsedBufferLen;$/;"	m	class:CLBuffer
+m_pIOBufferVec	CLBuffer.h	/^	CLIOVector *m_pIOBufferVec;$/;"	m	class:CLBuffer
+CLConditionVariable	CLConditionVariable.h	/^class CLConditionVariable$/;"	c
+CLConditionVariable_H	CLConditionVariable.h	2;"	d
+m_bNeededDestroy	CLConditionVariable.h	/^	bool m_bNeededDestroy;$/;"	m	class:CLConditionVariable
+m_pConditionVariable	CLConditionVariable.h	/^	pthread_cond_t *m_pConditionVariable;$/;"	m	class:CLConditionVariable
+m_strCondName	CLConditionVariable.h	/^	string m_strCondName;$/;"	m	class:CLConditionVariable
+CLCriticalSection	CLCriticalSection.h	/^class CLCriticalSection$/;"	c
+CLCriticalSection_H	CLCriticalSection.h	2;"	d
+m_pMutex	CLCriticalSection.h	/^	CLMutex *m_pMutex;$/;"	m	class:CLCriticalSection
+CLDATAPOSTRESULTNOTIFIER_H	CLDataPostResultNotifier.h	2;"	d
+CLDataPostResultNotifier	CLDataPostResultNotifier.h	/^class CLDataPostResultNotifier$/;"	c
+POST_MSG_ERROR	CLDataPostResultNotifier.h	6;"	d
+POST_MSG_PARTION	CLDataPostResultNotifier.h	7;"	d
+POST_MSG_SUCCESS	CLDataPostResultNotifier.h	8;"	d
+m_bDataDelFlag	CLDataPostResultNotifier.h	/^	bool m_bDataDelFlag;$/;"	m	class:CLDataPostResultNotifier
+m_pMsg	CLDataPostResultNotifier.h	/^	CLMessage *m_pMsg;$/;"	m	class:CLDataPostResultNotifier
+CLDATAPOSTER_H	CLDataPoster.h	2;"	d
+CLDataPoster	CLDataPoster.h	/^class CLDataPoster$/;"	c
+m_pProtoDataPoster	CLDataPoster.h	/^	CLProtocolDataPoster *m_pProtoDataPoster;$/;"	m	class:CLDataPoster
+CLDATAPOSTERBYNAMEDPIPE_H	CLDataPosterByNamedPipe.h	2;"	d
+CLDataPosterByNamedPipe	CLDataPosterByNamedPipe.h	/^class CLDataPosterByNamedPipe : public CLDataPoster$/;"	c
+m_pNamedPipe	CLDataPosterByNamedPipe.h	/^	CLNamedPipe *m_pNamedPipe;$/;"	m	class:CLDataPosterByNamedPipe
+CLDATAPOSTERBYSTLQUEUE_H	CLDataPosterBySTLQueue.h	2;"	d
+CLDataPosterBySTLQueue	CLDataPosterBySTLQueue.h	/^class CLDataPosterBySTLQueue : public CLDataPoster$/;"	c
+m_pQueue	CLDataPosterBySTLQueue.h	/^	CLSTLQueue *m_pQueue;$/;"	m	class:CLDataPosterBySTLQueue
+CLDATAPOSTERCHANNELBYNAMEDPIPEMAINTAINER_H	CLDataPosterChannelByNamedPipeMaintainer.h	2;"	d
+CLDataPosterChannelByNamedPipeMaintainer	CLDataPosterChannelByNamedPipeMaintainer.h	/^class CLDataPosterChannelByNamedPipeMaintainer : public CLDataPosterChannelMaintainer$/;"	c
+m_bIsSharedPipe	CLDataPosterChannelByNamedPipeMaintainer.h	/^	bool m_bIsSharedPipe;$/;"	m	class:CLDataPosterChannelByNamedPipeMaintainer
+m_pNamedPipe	CLDataPosterChannelByNamedPipeMaintainer.h	/^	CLNamedPipe *m_pNamedPipe;$/;"	m	class:CLDataPosterChannelByNamedPipeMaintainer
+CLDATAPOSTERCHANNELBYSTLQUEUEMAINTAINER_H	CLDataPosterChannelBySTLQueueMaintainer.h	2;"	d
+CLDataPosterChannelBySTLQueueMaintainer	CLDataPosterChannelBySTLQueueMaintainer.h	/^class CLDataPosterChannelBySTLQueueMaintainer : public CLDataPosterChannelMaintainer$/;"	c
+m_pQueue	CLDataPosterChannelBySTLQueueMaintainer.h	/^	CLSTLQueue *m_pQueue;$/;"	m	class:CLDataPosterChannelBySTLQueueMaintainer
+CLDATAPOSTERCHANNELMAINTAINER_H	CLDataPosterChannelMaintainer.h	2;"	d
+CLDataPosterChannelMaintainer	CLDataPosterChannelMaintainer.h	/^class CLDataPosterChannelMaintainer$/;"	c
+CLDataReader	CLDataReader.h	/^class CLDataReader$/;"	c
+CLDataReader_H	CLDataReader.h	2;"	d
+READ_END	CLDataReader.h	4;"	d
+READ_ERROR	CLDataReader.h	5;"	d
+m_bNewData	CLDataReader.h	/^	bool m_bNewData;$/;"	m	class:CLDataReader
+m_bReadHead	CLDataReader.h	/^	bool m_bReadHead;$/;"	m	class:CLDataReader
+m_fd	CLDataReader.h	/^	int m_fd;$/;"	m	class:CLDataReader
+m_iCtxLength	CLDataReader.h	/^	int  m_iCtxLength;$/;"	m	class:CLDataReader
+m_iHeadLength	CLDataReader.h	/^	int  m_iHeadLength;$/;"	m	class:CLDataReader
+m_iReadOffset	CLDataReader.h	/^	int  m_iReadOffset;$/;"	m	class:CLDataReader
+m_pCtxBuffer	CLDataReader.h	/^	char* m_pCtxBuffer;$/;"	m	class:CLDataReader
+m_pHeaderBuffer	CLDataReader.h	/^	char* m_pHeaderBuffer;$/;"	m	class:CLDataReader
+m_pProtoParser	CLDataReader.h	/^	CLProtoParser *m_pProtoParser;$/;"	m	class:CLDataReader
+pMsg	CLDataReader.h	/^	CLMessage *pMsg;$/;"	m	class:CLDataReader
+CLDATARECEIVER_H	CLDataReceiver.h	2;"	d
+CLDataReceiver	CLDataReceiver.h	/^class CLDataReceiver$/;"	c
+GetFd	CLDataReceiver.h	/^	virtual const int GetFd(){return -1;}$/;"	f	class:CLDataReceiver
+CLDATARECEIVERBYNAMEDPIPE_H	CLDataReceiverByNamedPipe.h	2;"	d
+CLDataReceiverByNamedPipe	CLDataReceiverByNamedPipe.h	/^class CLDataReceiverByNamedPipe : public CLDataReceiver$/;"	c
+m_NamedPipe	CLDataReceiverByNamedPipe.h	/^	CLNamedPipe m_NamedPipe;$/;"	m	class:CLDataReceiverByNamedPipe
+m_lMaxSizeForPipe	CLDataReceiverByNamedPipe.h	/^	long m_lMaxSizeForPipe;$/;"	m	class:CLDataReceiverByNamedPipe
+CLDATARECEIVERBYSTLQUEUE_H	CLDataReceiverBySTLQueue.h	2;"	d
+CLDataReceiverBySTLQueue	CLDataReceiverBySTLQueue.h	/^class CLDataReceiverBySTLQueue : public CLDataReceiver$/;"	c
+m_pDataSTLQueue	CLDataReceiverBySTLQueue.h	/^	CLSTLQueue* m_pDataSTLQueue;$/;"	m	class:CLDataReceiverBySTLQueue
+CLDATARECEIVERBYTCPACCEPT_H	CLDataReceiverByTCPAccept.h	2;"	d
+CLDataReceiverByTCPAccept	CLDataReceiverByTCPAccept.h	/^class CLDataReceiverByTCPAccept : public CLDataReceiver$/;"	c
+m_pListenSocket	CLDataReceiverByTCPAccept.h	/^	CLSocket *m_pListenSocket;$/;"	m	class:CLDataReceiverByTCPAccept
+CLDATARECEIVERBYTIMERFD_H	CLDataReceiverByTimerFd.h	2;"	d
+CLDataReceiverByTimerFd	CLDataReceiverByTimerFd.h	/^class CLDataReceiverByTimerFd : CLDataReceiver$/;"	c
+m_Fd	CLDataReceiverByTimerFd.h	/^	int m_Fd;$/;"	m	class:CLDataReceiverByTimerFd
+m_iEchoID	CLDataReceiverByTimerFd.h	/^	int m_iEchoID;$/;"	m	class:CLDataReceiverByTimerFd
+m_strRemoteName	CLDataReceiverByTimerFd.h	/^	std::string m_strRemoteName;$/;"	m	class:CLDataReceiverByTimerFd
+CLEPOLL_H	CLEpoll.h	2;"	d
+CLEpoll	CLEpoll.h	/^class CLEpoll$/;"	c
+EPOLL_MAX_FD_SIZE	CLEpoll.h	7;"	d
+m_iEpollFd	CLEpoll.h	/^	int 				m_iEpollFd;$/;"	m	class:CLEpoll
+m_iMaxEventSize	CLEpoll.h	/^	int 				m_iMaxEventSize;$/;"	m	class:CLEpoll
+m_pEpollEvents	CLEpoll.h	/^	struct epoll_event *m_pEpollEvents;$/;"	m	class:CLEpoll	typeref:struct:CLEpoll::epoll_event
+CLEPOLLEVENT_H	CLEpollEvent.h	2;"	d
+CLEpollEvent	CLEpollEvent.h	/^class CLEpollEvent$/;"	c
+m_Event	CLEpollEvent.h	/^	unsigned int m_Event;$/;"	m	class:CLEpollEvent
+m_Fd	CLEpollEvent.h	/^	int m_Fd;$/;"	m	class:CLEpollEvent
+m_bReadFlag	CLEpollEvent.h	/^	bool m_bReadFlag;$/;"	m	class:CLEpollEvent
+m_bWriteFlag	CLEpollEvent.h	/^	bool m_bWriteFlag;$/;"	m	class:CLEpollEvent
+m_pEpoll	CLEpollEvent.h	/^	CLEpoll *m_pEpoll;$/;"	m	class:CLEpollEvent
+m_pHandle	CLEpollEvent.h	/^	void *m_pHandle;$/;"	m	class:CLEpollEvent
+CLEVENT_H	CLEvent.h	2;"	d
+CLEvent	CLEvent.h	/^class CLEvent$/;"	c
+m_Cond	CLEvent.h	/^	CLConditionVariable m_Cond;$/;"	m	class:CLEvent
+m_Mutex	CLEvent.h	/^	CLMutex m_Mutex;$/;"	m	class:CLEvent
+m_bNeededDestroy	CLEvent.h	/^	bool m_bNeededDestroy;$/;"	m	class:CLEvent
+m_pEventInfo	CLEvent.h	/^	SLEventInfo *m_pEventInfo;$/;"	m	class:CLEvent
+m_strEventName	CLEvent.h	/^	string m_strEventName;$/;"	m	class:CLEvent
+CLEXECUTIVE_H	CLExecutive.h	2;"	d
+CLExecutive	CLExecutive.h	/^class CLExecutive$/;"	c
+m_pExecutiveFunctionProvider	CLExecutive.h	/^	CLExecutiveFunctionProvider *m_pExecutiveFunctionProvider;$/;"	m	class:CLExecutive
+CLExecutiveCommunication	CLExecutiveCommunication.h	/^class CLExecutiveCommunication$/;"	c
+CLExecutiveCommunication_H	CLExecutiveCommunication.h	2;"	d
+CLExecutiveCommunicationByNamedPipe	CLExecutiveCommunicationByNamedPipe.h	/^class CLExecutiveCommunicationByNamedPipe : public CLExecutiveCommunication$/;"	c
+CLExecutiveCommunicationByNamedPipe_H	CLExecutiveCommunicationByNamedPipe.h	2;"	d
+m_Event	CLExecutiveCommunicationByNamedPipe.h	/^	CLEvent m_Event;$/;"	m	class:CLExecutiveCommunicationByNamedPipe
+m_Fd	CLExecutiveCommunicationByNamedPipe.h	/^	int m_Fd;$/;"	m	class:CLExecutiveCommunicationByNamedPipe
+m_bDeleteMsg	CLExecutiveCommunicationByNamedPipe.h	/^	bool m_bDeleteMsg;$/;"	m	class:CLExecutiveCommunicationByNamedPipe
+m_lPipeBufSize	CLExecutiveCommunicationByNamedPipe.h	/^	long m_lPipeBufSize;$/;"	m	class:CLExecutiveCommunicationByNamedPipe
+m_strExecutiveName	CLExecutiveCommunicationByNamedPipe.h	/^	string m_strExecutiveName;$/;"	m	class:CLExecutiveCommunicationByNamedPipe
+CLEXECUTIVEFUNCTIONFORMSGLOOP_H	CLExecutiveFunctionForMsgLoop.h	2;"	d
+CLExecutiveFunctionForMsgLoop	CLExecutiveFunctionForMsgLoop.h	/^class CLExecutiveFunctionForMsgLoop : public CLExecutiveFunctionProvider$/;"	c
+m_pMsgLoopManager	CLExecutiveFunctionForMsgLoop.h	/^	CLMessageLoopManager *m_pMsgLoopManager;$/;"	m	class:CLExecutiveFunctionForMsgLoop
+CLEXECUTIVEFUNCTIONPROVIDER_H	CLExecutiveFunctionProvider.h	2;"	d
+CLExecutiveFunctionProvider	CLExecutiveFunctionProvider.h	/^class CLExecutiveFunctionProvider$/;"	c
+CLExecutiveInitialFinishedNotifier	CLExecutiveInitialFinishedNotifier.h	/^class CLExecutiveInitialFinishedNotifier$/;"	c
+CLExecutiveInitialFinishedNotifier_H	CLExecutiveInitialFinishedNotifier.h	2;"	d
+CLExecutiveNameServer	CLExecutiveNameServer.h	/^class CLExecutiveNameServer$/;"	c
+CLExecutiveNameServer_H	CLExecutiveNameServer.h	2;"	d
+SLMessagePosterPtrCount	CLExecutiveNameServer.h	/^struct SLMessagePosterPtrCount$/;"	s
+m_Mutex	CLExecutiveNameServer.h	/^	static pthread_mutex_t m_Mutex;$/;"	m	class:CLExecutiveNameServer
+m_NameTable	CLExecutiveNameServer.h	/^	std::map<std::string, SLMessagePosterPtrCount*> m_NameTable;$/;"	m	class:CLExecutiveNameServer
+m_pNameServer	CLExecutiveNameServer.h	/^	static CLExecutiveNameServer *m_pNameServer;$/;"	m	class:CLExecutiveNameServer
+nCount	CLExecutiveNameServer.h	/^	unsigned int nCount;$/;"	m	struct:SLMessagePosterPtrCount
+pMsgPoster	CLExecutiveNameServer.h	/^	CLMessagePoster *pMsgPoster;$/;"	m	struct:SLMessagePosterPtrCount
+CLIOVECTOR_H	CLIOVector.h	2;"	d
+CLIOVector	CLIOVector.h	/^class CLIOVector$/;"	c
+m_iDataLength	CLIOVector.h	/^	int m_iDataLength;$/;"	m	class:CLIOVector
+m_ioVecQueue	CLIOVector.h	/^	std::deque<struct iovec> m_ioVecQueue;$/;"	m	class:CLIOVector
+CLLibExecutiveInitializer	CLLibExecutiveInitializer.h	/^class CLLibExecutiveInitializer$/;"	c
+CLLibExecutiveInitializer_H	CLLibExecutiveInitializer.h	2;"	d
+m_MutexForInitializer	CLLibExecutiveInitializer.h	/^	static pthread_mutex_t m_MutexForInitializer;$/;"	m	class:CLLibExecutiveInitializer
+m_bDestroyed	CLLibExecutiveInitializer.h	/^	static bool m_bDestroyed;$/;"	m	class:CLLibExecutiveInitializer
+m_bInitialized	CLLibExecutiveInitializer.h	/^	static bool m_bInitialized;$/;"	m	class:CLLibExecutiveInitializer
+CLLogger	CLLogger.h	/^class CLLogger$/;"	c
+CLLogger_H	CLLogger.h	2;"	d
+m_Fd	CLLogger.h	/^	int m_Fd;$/;"	m	class:CLLogger
+m_Mutex	CLLogger.h	/^	static pthread_mutex_t m_Mutex;$/;"	m	class:CLLogger
+m_pLog	CLLogger.h	/^	static CLLogger *m_pLog;$/;"	m	class:CLLogger
+CLMessage	CLMessage.h	/^class CLMessage$/;"	c
+CLMessage_H	CLMessage.h	2;"	d
+m_clMsgID	CLMessage.h	/^	const unsigned long& m_clMsgID;$/;"	m	class:CLMessage
+m_lMsgID	CLMessage.h	/^	unsigned long m_lMsgID;$/;"	m	class:CLMessage
+CLMessageDeserializer	CLMessageDeserializer.h	/^class CLMessageDeserializer$/;"	c
+CLMessageDeserializer_H	CLMessageDeserializer.h	2;"	d
+CLMessageLoopManager	CLMessageLoopManager.h	/^class CLMessageLoopManager$/;"	c
+CLMessageLoopManager_H	CLMessageLoopManager.h	2;"	d
+CallBackForMessageLoop	CLMessageLoopManager.h	/^typedef CLStatus (CLMessageObserver::*CallBackForMessageLoop)(CLMessage *);$/;"	t
+SLExecutiveInitialParameter	CLMessageLoopManager.h	/^struct SLExecutiveInitialParameter$/;"	s
+m_MessageQueue	CLMessageLoopManager.h	/^	std::queue<CLMessage*> m_MessageQueue;$/;"	m	class:CLMessageLoopManager
+m_MsgMappingTable	CLMessageLoopManager.h	/^	std::map<unsigned long, CallBackForMessageLoop> m_MsgMappingTable;$/;"	m	class:CLMessageLoopManager
+m_pMessageObserver	CLMessageLoopManager.h	/^	CLMessageObserver *m_pMessageObserver;$/;"	m	class:CLMessageLoopManager
+pContext	CLMessageLoopManager.h	/^	void *pContext;$/;"	m	struct:SLExecutiveInitialParameter
+pNotifier	CLMessageLoopManager.h	/^	CLExecutiveInitialFinishedNotifier *pNotifier;$/;"	m	struct:SLExecutiveInitialParameter
+CLMESSAGEOBSERVER_H	CLMessageObserver.h	2;"	d
+CLMessageObserver	CLMessageObserver.h	/^class CLMessageObserver$/;"	c
+CLMESSAGEPOSTER_H	CLMessagePoster.h	2;"	d
+CLMessagePoster	CLMessagePoster.h	/^class CLMessagePoster$/;"	c
+m_pDataPosterChannel	CLMessagePoster.h	/^	CLDataPosterChannelMaintainer *m_pDataPosterChannel;$/;"	m	class:CLMessagePoster
+m_pEvent	CLMessagePoster.h	/^	CLEvent	*m_pEvent;$/;"	m	class:CLMessagePoster
+m_pMsgSerializer	CLMessagePoster.h	/^	CLMessageSerializer *m_pMsgSerializer;$/;"	m	class:CLMessagePoster
+m_pProtoDataPoster	CLMessagePoster.h	/^	CLProtocolDataPoster *m_pProtoDataPoster;$/;"	m	class:CLMessagePoster
+m_pProtoEncapsulator	CLMessagePoster.h	/^	CLProtocolEncapsulator *m_pProtoEncapsulator;$/;"	m	class:CLMessagePoster
+CLMESSAGERECEIVER_H	CLMessageReceiver.h	2;"	d
+CLMessageReceiver	CLMessageReceiver.h	/^class CLMessageReceiver$/;"	c
+m_pDataBuffer	CLMessageReceiver.h	/^	CLBuffer *m_pDataBuffer;$/;"	m	class:CLMessageReceiver
+m_pDataReceiver	CLMessageReceiver.h	/^	CLDataReceiver *m_pDataReceiver;$/;"	m	class:CLMessageReceiver
+m_pMsgDeserializer	CLMessageReceiver.h	/^	CLMessageDeserializer *m_pMsgDeserializer;$/;"	m	class:CLMessageReceiver
+m_pProtoParser	CLMessageReceiver.h	/^	CLProtoParser *m_pProtoParser;$/;"	m	class:CLMessageReceiver
+CLMessageReceiverByNamedPipe	CLMessageReceiverByNamedPipe.h	/^class CLMessageReceiverByNamedPipe : public CLMessageReceiver$/;"	c
+CLMessageReceiverByNamedPipe_H	CLMessageReceiverByNamedPipe.h	2;"	d
+m_MessageQueue	CLMessageReceiverByNamedPipe.h	/^	std::queue<CLMessage*> m_MessageQueue;$/;"	m	class:CLMessageReceiverByNamedPipe
+CLMessageReceiverBySTLqueue	CLMessageReceiverBySTLqueue.h	/^class CLMessageReceiverBySTLqueue : public CLMessageReceiver$/;"	c
+CLMessageReceiverBySTLqueue_H	CLMessageReceiverBySTLqueue.h	2;"	d
+CLMESSAGERECEIVERBYTCPLISTENER_H	CLMessageReceiverByTCPListener.h	2;"	d
+CLMessageReceiverByTCPListener	CLMessageReceiverByTCPListener.h	/^class CLMessageReceiverByTCPListener : public CLMessageReceiver$/;"	c
+CLMESSAGERECEIVERBYTIMERFD_H	CLMessageReceiverByTimerFd.h	2;"	d
+CLMessageReceiverByTimerFd	CLMessageReceiverByTimerFd.h	/^class CLMessageReceiverByTimerFd : public CLMessageReceiver$/;"	c
+m_pTimer	CLMessageReceiverByTimerFd.h	/^	CLTimerFd *m_pTimer;$/;"	m	class:CLMessageReceiverByTimerFd
+CLMessageSerializer	CLMessageSerializer.h	/^class CLMessageSerializer$/;"	c
+CLMessageSerializer_H	CLMessageSerializer.h	2;"	d
+CLMSGLOOPMANAGERFOREPOLL_H	CLMsgLoopManagerForEpoll.h	2;"	d
+CLMsgLoopManagerForEpoll	CLMsgLoopManagerForEpoll.h	/^class CLMsgLoopManagerForEpoll : public CLMessageLoopManager$/;"	c
+m_EpollEventMap	CLMsgLoopManagerForEpoll.h	/^	map<int, CLEpollEvent*> m_EpollEventMap;$/;"	m	class:CLMsgLoopManagerForEpoll
+m_MsgReceiverMap	CLMsgLoopManagerForEpoll.h	/^	map<int, CLMessageReceiver*> m_MsgReceiverMap;\/\/!!!!$/;"	m	class:CLMsgLoopManagerForEpoll
+m_pEpoll	CLMsgLoopManagerForEpoll.h	/^	CLEpoll *m_pEpoll;$/;"	m	class:CLMsgLoopManagerForEpoll
+m_pMsgReceiver	CLMsgLoopManagerForEpoll.h	/^	CLMessageReceiver* m_pMsgReceiver;$/;"	m	class:CLMsgLoopManagerForEpoll
+m_pMultiMsgDeserializer	CLMsgLoopManagerForEpoll.h	/^	CLMultiMsgDeserializer *m_pMultiMsgDeserializer;$/;"	m	class:CLMsgLoopManagerForEpoll
+m_pPointerMsgDeserializer	CLMsgLoopManagerForEpoll.h	/^	CLPointerMsgDeserializer *m_pPointerMsgDeserializer;$/;"	m	class:CLMsgLoopManagerForEpoll
+CLMsgLoopManagerForIOMultiplex	CLMsgLoopManagerForIOMultiplex.h	/^class CLMsgLoopManagerForIOMultiplex : public CLMessageLoopManager$/;"	c
+CLMsgLoopManagerForIOMultiplex_H	CLMsgLoopManagerForIOMultiplex.h	2;"	d
+MAX_EVENT_SIZE	CLMsgLoopManagerForIOMultiplex.h	17;"	d
+MAX_FD_SIZE	CLMsgLoopManagerForIOMultiplex.h	18;"	d
+PIPE_QUEUE_BETWEEN_PROCESS	CLMsgLoopManagerForIOMultiplex.h	15;"	d
+PIPE_QUEUE_IN_PROCESS	CLMsgLoopManagerForIOMultiplex.h	16;"	d
+m_MsgQueueTable	CLMsgLoopManagerForIOMultiplex.h	/^	map<string, CLMessageQueue*> m_MsgQueueTable;$/;"	m	class:CLMsgLoopManagerForIOMultiplex
+m_epEvent	CLMsgLoopManagerForIOMultiplex.h	/^	struct epoll_event m_epEvent;$/;"	m	class:CLMsgLoopManagerForIOMultiplex	typeref:struct:CLMsgLoopManagerForIOMultiplex::epoll_event
+m_epEvents	CLMsgLoopManagerForIOMultiplex.h	/^   	struct epoll_event m_epEvents[MAX_EVENT_SIZE]; $/;"	m	class:CLMsgLoopManagerForIOMultiplex	typeref:struct:CLMsgLoopManagerForIOMultiplex::epoll_event
+m_iEpollFd	CLMsgLoopManagerForIOMultiplex.h	/^	int    m_iEpollFd;$/;"	m	class:CLMsgLoopManagerForIOMultiplex
+m_pMsgQueue	CLMsgLoopManagerForIOMultiplex.h	/^	CLMessageQueueByNamedPipe *m_pMsgQueue;$/;"	m	class:CLMsgLoopManagerForIOMultiplex
+m_strThreadName	CLMsgLoopManagerForIOMultiplex.h	/^	string m_strThreadName;$/;"	m	class:CLMsgLoopManagerForIOMultiplex
+CLMsgLoopManagerForPipeQueue	CLMsgLoopManagerForPipeQueue.h	/^class CLMsgLoopManagerForPipeQueue : public CLMessageLoopManager$/;"	c
+CLMsgLoopManagerForPipeQueue_H	CLMsgLoopManagerForPipeQueue.h	2;"	d
+PIPE_QUEUE_BETWEEN_PROCESS	CLMsgLoopManagerForPipeQueue.h	16;"	d
+PIPE_QUEUE_IN_PROCESS	CLMsgLoopManagerForPipeQueue.h	17;"	d
+m_bIsShared	CLMsgLoopManagerForPipeQueue.h	/^	bool m_bIsShared;$/;"	m	class:CLMsgLoopManagerForPipeQueue
+m_pEvent	CLMsgLoopManagerForPipeQueue.h	/^	CLEvent *m_pEvent;$/;"	m	class:CLMsgLoopManagerForPipeQueue
+m_pMsgDeserializer	CLMsgLoopManagerForPipeQueue.h	/^	CLMessageDeserializer *m_pMsgDeserializer;	$/;"	m	class:CLMsgLoopManagerForPipeQueue
+m_pMsgReceiver	CLMsgLoopManagerForPipeQueue.h	/^	CLMessageReceiver *m_pMsgReceiver;$/;"	m	class:CLMsgLoopManagerForPipeQueue
+m_strThreadName	CLMsgLoopManagerForPipeQueue.h	/^	string m_strThreadName;$/;"	m	class:CLMsgLoopManagerForPipeQueue
+CLMsgLoopManagerForSTLqueue	CLMsgLoopManagerForSTLqueue.h	/^class CLMsgLoopManagerForSTLqueue : public CLMessageLoopManager$/;"	c
+CLMsgLoopManagerForSTLqueue_H	CLMsgLoopManagerForSTLqueue.h	2;"	d
+m_pEvent	CLMsgLoopManagerForSTLqueue.h	/^	CLEvent     *m_pEvent;$/;"	m	class:CLMsgLoopManagerForSTLqueue
+m_pMsgDeserializer	CLMsgLoopManagerForSTLqueue.h	/^	CLPointerMsgDeserializer *m_pMsgDeserializer;$/;"	m	class:CLMsgLoopManagerForSTLqueue
+m_pMsgReceiver	CLMsgLoopManagerForSTLqueue.h	/^	CLMessageReceiver *m_pMsgReceiver;$/;"	m	class:CLMsgLoopManagerForSTLqueue
+m_pStlQueue	CLMsgLoopManagerForSTLqueue.h	/^	CLSTLQueue *m_pStlQueue;$/;"	m	class:CLMsgLoopManagerForSTLqueue
+m_strThreadName	CLMsgLoopManagerForSTLqueue.h	/^	std::string m_strThreadName;$/;"	m	class:CLMsgLoopManagerForSTLqueue
+CLMULTIMSGDESERIALIZER_H	CLMultiMsgDeserializer.h	2;"	d
+CLMultiMsgDeserializer	CLMultiMsgDeserializer.h	/^class CLMultiMsgDeserializer : public CLMessageDeserializer$/;"	c
+m_DeserializerTable	CLMultiMsgDeserializer.h	/^	map<unsigned long, CLMessageDeserializer*> m_DeserializerTable;$/;"	m	class:CLMultiMsgDeserializer
+CLMULTIMSGSERIALIZER_H	CLMultiMsgSerializer.h	2;"	d
+CLMultiMsgSerializer	CLMultiMsgSerializer.h	/^class CLMultiMsgSerializer : public CLMessageSerializer$/;"	c
+m_SerializerTable	CLMultiMsgSerializer.h	/^	std::map<unsigned long, CLMessageSerializer*> m_SerializerTable;		$/;"	m	class:CLMultiMsgSerializer
+CLMutex	CLMutex.h	/^class CLMutex$/;"	c
+CLMutex_H	CLMutex.h	2;"	d
+MUTEX_USE_RECORD_LOCK	CLMutex.h	8;"	d
+MUTEX_USE_RECORD_LOCK_AND_PTHREAD	CLMutex.h	9;"	d
+MUTEX_USE_SHARED_PTHREAD	CLMutex.h	10;"	d
+m_pMutex	CLMutex.h	/^	CLMutexInterface *m_pMutex;$/;"	m	class:CLMutex
+CLMutexByPThread	CLMutexByPThread.h	/^class CLMutexByPThread : public CLMutexInterface$/;"	c
+CLMutexByPThread_H	CLMutexByPThread.h	2;"	d
+m_bNeededDestroy	CLMutexByPThread.h	/^	bool m_bNeededDestroy;$/;"	m	class:CLMutexByPThread
+m_pMutex	CLMutexByPThread.h	/^	pthread_mutex_t *m_pMutex;$/;"	m	class:CLMutexByPThread
+CLMutexByRecordLocking	CLMutexByRecordLocking.h	/^class CLMutexByRecordLocking : public CLMutexInterface$/;"	c
+CLMutexByRecordLocking_H	CLMutexByRecordLocking.h	2;"	d
+m_Fd	CLMutexByRecordLocking.h	/^	int m_Fd;$/;"	m	class:CLMutexByRecordLocking
+m_strFileName	CLMutexByRecordLocking.h	/^	string m_strFileName;$/;"	m	class:CLMutexByRecordLocking
+CLMutexByRecordLockingAndPThread	CLMutexByRecordLockingAndPThread.h	/^class CLMutexByRecordLockingAndPThread : public CLMutexInterface$/;"	c
+CLMutexByRecordLockingAndPThread_H	CLMutexByRecordLockingAndPThread.h	2;"	d
+m_ProcessMutex	CLMutexByRecordLockingAndPThread.h	/^	CLMutex m_ProcessMutex;$/;"	m	class:CLMutexByRecordLockingAndPThread
+m_ThreadMutex	CLMutexByRecordLockingAndPThread.h	/^	CLMutex m_ThreadMutex;$/;"	m	class:CLMutexByRecordLockingAndPThread
+CLMutexBySharedPThread	CLMutexBySharedPThread.h	/^class CLMutexBySharedPThread : public CLMutexInterface$/;"	c
+CLMutexBySharedPThread_H	CLMutexBySharedPThread.h	2;"	d
+m_pMutex	CLMutexBySharedPThread.h	/^	pthread_mutex_t *m_pMutex;$/;"	m	class:CLMutexBySharedPThread
+m_strMutexName	CLMutexBySharedPThread.h	/^	string m_strMutexName;$/;"	m	class:CLMutexBySharedPThread
+CLMutexInterface	CLMutexInterface.h	/^class CLMutexInterface$/;"	c
+CLMutexInterface_H	CLMutexInterface.h	2;"	d
+CLNAMEDPIPE_H	CLNamedPipe.h	2;"	d
+CLNamedPipe	CLNamedPipe.h	/^class CLNamedPipe$/;"	c
+FILE_PATH_FOR_NAMED_PIPE	CLNamedPipe.h	10;"	d
+PIPE_FOR_READ	CLNamedPipe.h	8;"	d
+PIPE_FOR_WRITE	CLNamedPipe.h	9;"	d
+m_Fd	CLNamedPipe.h	/^	int m_Fd;$/;"	m	class:CLNamedPipe
+m_lAtomWriteSize	CLNamedPipe.h	/^	long m_lAtomWriteSize;$/;"	m	class:CLNamedPipe
+m_pMutexForNamedPipe	CLNamedPipe.h	/^	CLMutex *m_pMutexForNamedPipe;$/;"	m	class:CLNamedPipe
+m_strPipeName	CLNamedPipe.h	/^	string m_strPipeName;$/;"	m	class:CLNamedPipe
+CLNonThreadForMsgLoop	CLNonThreadForMsgLoop.h	/^class CLNonThreadForMsgLoop$/;"	c
+CLNonThreadForMsgLoop_H	CLNonThreadForMsgLoop.h	2;"	d
+EXECUTIVE_BETWEEN_PROCESS_USE_PIPE_QUEUE	CLNonThreadForMsgLoop.h	13;"	d
+EXECUTIVE_IN_PROCESS_USE_PIPE_QUEUE	CLNonThreadForMsgLoop.h	12;"	d
+EXECUTIVE_IN_PROCESS_USE_STL_QUEUE	CLNonThreadForMsgLoop.h	11;"	d
+m_pFunctionProvider	CLNonThreadForMsgLoop.h	/^	CLExecutiveFunctionProvider *m_pFunctionProvider;$/;"	m	class:CLNonThreadForMsgLoop
+m_pPipeMsgQueue	CLNonThreadForMsgLoop.h	/^	CLMsgLoopManagerForPipeQueue *m_pPipeMsgQueue;$/;"	m	class:CLNonThreadForMsgLoop
+CLPOINTERMSGDESERIALIZER_H	CLPointerMsgDeserializer.h	2;"	d
+CLPointerMsgDeserializer	CLPointerMsgDeserializer.h	/^class CLPointerMsgDeserializer : public CLMessageDeserializer$/;"	c
+CLPOINTERMSGSERIALIZER_H	CLPointerMsgSerializer.h	2;"	d
+CLPointerMsgSerializer	CLPointerMsgSerializer.h	/^class CLPointerMsgSerializer : public CLMessageSerializer$/;"	c
+CLPrivateExecutiveCommunicationByNamedPipe	CLPrivateExecutiveCommunicationByNamedPipe.h	/^class CLPrivateExecutiveCommunicationByNamedPipe : public CLExecutiveCommunicationByNamedPipe$/;"	c
+CLPrivateExecutiveCommunicationByNamedPipe_H	CLPrivateExecutiveCommunicationByNamedPipe.h	2;"	d
+CLPrivateMsgReceiverbyNamedPipe	CLPrivateMsgReceiverByNamedPipe.h	/^class CLPrivateMsgReceiverbyNamedPipe : public CLMessageQueueByNamedPipe$/;"	c
+CLPrivateMsgReceiverbyNamedPipe_H	CLPrivateMsgReceiverByNamedPipe.h	2;"	d
+CLProcess	CLProcess.h	/^class CLProcess : public CLExecutive$/;"	c
+CLProcess_H	CLProcess.h	2;"	d
+m_ProcessID	CLProcess.h	/^	pid_t m_ProcessID;$/;"	m	class:CLProcess
+m_bExecSuccess	CLProcess.h	/^	bool m_bExecSuccess;$/;"	m	class:CLProcess
+m_bProcessCreated	CLProcess.h	/^	bool m_bProcessCreated;$/;"	m	class:CLProcess
+m_bWaitForDeath	CLProcess.h	/^	bool m_bWaitForDeath;$/;"	m	class:CLProcess
+CLProcessFunctionForExec	CLProcessFunctionForExec.h	/^class CLProcessFunctionForExec : public CLExecutiveFunctionProvider$/;"	c
+CLProcessFunctionForExec_H	CLProcessFunctionForExec.h	2;"	d
+CLPROTOENCAPFORDEFAULTMSGFORMAT_H	CLProtoEncapForDefaultMsgFormat.h	2;"	d
+CLProtoEncapForDefaultMsgFormat	CLProtoEncapForDefaultMsgFormat.h	/^class CLProtoEncapForDefaultMsgFormat : public CLProtocolEncapsulator$/;"	c
+CLPROTOPARSER_H	CLProtoParser.h	3;"	d
+CLProtoParser	CLProtoParser.h	/^class CLProtoParser$/;"	c
+CLPROTOPARSERFORDEFAULTMSGFORMAT_H	CLProtoParserForDefaultMsgFormat.h	2;"	d
+CLProtoParserForDefaultMsgFormat	CLProtoParserForDefaultMsgFormat.h	/^class CLProtoParserForDefaultMsgFormat : public CLProtoParser$/;"	c
+CLPROTOPARSERFORPOINTERMSG_H	CLProtoParserForPointerMsg.h	2;"	d
+CLProtoParserForPointerMsg	CLProtoParserForPointerMsg.h	/^class CLProtoParserForPointerMsg : public CLProtoParser$/;"	c
+CLPROTOCOLDATAPOSTER_H	CLProtocolDataPoster.h	2;"	d
+CLProtocolDataPoster	CLProtocolDataPoster.h	/^class CLProtocolDataPoster \/\/deal with the msgDataVec buffer free and delete$/;"	c
+POST_DATA_COMPLETE	CLProtocolDataPoster.h	7;"	d
+POST_DATA_ERROR	CLProtocolDataPoster.h	9;"	d
+POST_DATA_PARTION	CLProtocolDataPoster.h	8;"	d
+SLDataAndNotifier	CLProtocolDataPoster.h	/^}SLDataAndNotifier;$/;"	t	typeref:struct:_proto_data
+_proto_data	CLProtocolDataPoster.h	/^typedef struct _proto_data$/;"	s
+m_MsgBufVecList	CLProtocolDataPoster.h	/^	std::list<SLDataAndNotifier *> m_MsgBufVecList;$/;"	m	class:CLProtocolDataPoster
+m_bDataLeftFlag	CLProtocolDataPoster.h	/^	bool m_bDataLeftFlag;$/;"	m	class:CLProtocolDataPoster
+m_pData	CLProtocolDataPoster.h	/^	CLIOVector *m_pData;$/;"	m	struct:_proto_data
+m_pDataPoster	CLProtocolDataPoster.h	/^	CLDataPoster *m_pDataPoster;$/;"	m	class:CLProtocolDataPoster
+m_pEvent	CLProtocolDataPoster.h	/^	CLEvent *m_pEvent; \/\/delete is in the msgposter$/;"	m	class:CLProtocolDataPoster
+m_pResNotifier	CLProtocolDataPoster.h	/^	CLDataPostResultNotifier *m_pResNotifier;$/;"	m	struct:_proto_data
+m_topMsgBufIndex	CLProtocolDataPoster.h	/^	int m_topMsgBufIndex;$/;"	m	class:CLProtocolDataPoster
+CLProtocolEncapsulator	CLProtocolEncapsulator.h	/^class CLProtocolEncapsulator$/;"	c
+CLProtocolEncapsulator_H	CLProtocolEncapsulator.h	2;"	d
+CLSTLQUEUE_H	CLSTLQueue.h	2;"	d
+CLSTLQueue	CLSTLQueue.h	/^class CLSTLQueue$/;"	c
+m_MsgQueue	CLSTLQueue.h	/^	queue<CLMessage*> m_MsgQueue; $/;"	m	class:CLSTLQueue
+m_MutexForQueue	CLSTLQueue.h	/^    CLMutex m_MutexForQueue;$/;"	m	class:CLSTLQueue
+CLSharedConditionVariableImpl	CLSharedConditionVariableImpl.h	/^class CLSharedConditionVariableImpl : public CLSharedObjectsImpl$/;"	c
+CLSharedConditionVariableImpl_H	CLSharedConditionVariableImpl.h	2;"	d
+SLSharedConditionVariableItem	CLSharedConditionVariableImpl.h	/^struct SLSharedConditionVariableItem$/;"	s
+cond	CLSharedConditionVariableImpl.h	/^	pthread_cond_t cond;$/;"	m	struct:SLSharedConditionVariableItem
+head	CLSharedConditionVariableImpl.h	/^	SLSharedObjectHead head;$/;"	m	struct:SLSharedConditionVariableItem
+CLSharedEventImpl	CLSharedEventImpl.h	/^class CLSharedEventImpl : public CLSharedObjectsImpl$/;"	c
+CLSharedEventImpl_H	CLSharedEventImpl.h	2;"	d
+Context	CLSharedEventImpl.h	/^	long Context;$/;"	m	struct:SLEventInfo
+EventInfo	CLSharedEventImpl.h	/^	SLEventInfo EventInfo;$/;"	m	struct:SLSharedEventItem
+Flag	CLSharedEventImpl.h	/^	long Flag;$/;"	m	struct:SLEventInfo
+SLEventInfo	CLSharedEventImpl.h	/^struct SLEventInfo$/;"	s
+SLSharedEventItem	CLSharedEventImpl.h	/^struct SLSharedEventItem$/;"	s
+bSemaphore	CLSharedEventImpl.h	/^	long bSemaphore;$/;"	m	struct:SLEventInfo
+head	CLSharedEventImpl.h	/^	SLSharedObjectHead head;$/;"	m	struct:SLSharedEventItem
+CLSharedExecutiveCommunicationByNamedPipe	CLSharedExecutiveCommunicationByNamedPipe.h	/^class CLSharedExecutiveCommunicationByNamedPipe : public CLExecutiveCommunicationByNamedPipe$/;"	c
+CLSharedExecutiveCommunicationByNamedPipe_H	CLSharedExecutiveCommunicationByNamedPipe.h	2;"	d
+m_SerializerTable	CLSharedExecutiveCommunicationByNamedPipe.h	/^	map<unsigned long, CLMessageSerializer*> m_SerializerTable;$/;"	m	class:CLSharedExecutiveCommunicationByNamedPipe
+CLSharedMemory	CLSharedMemory.h	/^class CLSharedMemory$/;"	c
+CLSharedMemory_H	CLSharedMemory.h	2;"	d
+m_Mutex	CLSharedMemory.h	/^	CLMutex m_Mutex;$/;"	m	class:CLSharedMemory
+m_SharedMemoryID	CLSharedMemory.h	/^	int m_SharedMemoryID;$/;"	m	class:CLSharedMemory
+m_pSharedMemory	CLSharedMemory.h	/^	void *m_pSharedMemory;$/;"	m	class:CLSharedMemory
+CLSharedMsgReceiverByNamedPipe	CLSharedMsgReceiverByNamedPipe.h	/^class CLSharedMsgReceiverByNamedPipe : public CLMessageReceiverByNamedPipe$/;"	c
+CLSharedMsgReceiverByNamedPipe_H	CLSharedMsgReceiverByNamedPipe.h	2;"	d
+m_DeserializerTable	CLSharedMsgReceiverByNamedPipe.h	/^	map<unsigned long, CLMessageDeserializer*> m_DeserializerTable;$/;"	m	class:CLSharedMsgReceiverByNamedPipe
+m_bNewMsg	CLSharedMsgReceiverByNamedPipe.h	/^	bool m_bNewMsg;$/;"	m	class:CLSharedMsgReceiverByNamedPipe
+m_bReadHead	CLSharedMsgReceiverByNamedPipe.h	/^	bool m_bReadHead;$/;"	m	class:CLSharedMsgReceiverByNamedPipe
+m_iHeadLength	CLSharedMsgReceiverByNamedPipe.h	/^	int  m_iHeadLength;$/;"	m	class:CLSharedMsgReceiverByNamedPipe
+m_iMsgLength	CLSharedMsgReceiverByNamedPipe.h	/^	int  m_iMsgLength;$/;"	m	class:CLSharedMsgReceiverByNamedPipe
+m_iReadLength	CLSharedMsgReceiverByNamedPipe.h	/^	int  m_iReadLength;$/;"	m	class:CLSharedMsgReceiverByNamedPipe
+m_pMsgBuffer	CLSharedMsgReceiverByNamedPipe.h	/^	char* m_pMsgBuffer;$/;"	m	class:CLSharedMsgReceiverByNamedPipe
+CLSharedMutexImpl	CLSharedMutexImpl.h	/^class CLSharedMutexImpl : public CLSharedObjectsImpl$/;"	c
+CLSharedMutexImpl_H	CLSharedMutexImpl.h	2;"	d
+SLSharedMutexItem	CLSharedMutexImpl.h	/^struct SLSharedMutexItem$/;"	s
+head	CLSharedMutexImpl.h	/^	SLSharedObjectHead head;$/;"	m	struct:SLSharedMutexItem
+mutex	CLSharedMutexImpl.h	/^	pthread_mutex_t mutex;$/;"	m	struct:SLSharedMutexItem
+CLSharedObjectAllocator	CLSharedObjectAllocator.h	/^CLSharedObjectAllocator<TSharedObjectPool, TSharedObject>::CLSharedObjectAllocator()$/;"	f	class:CLSharedObjectAllocator
+CLSharedObjectAllocator	CLSharedObjectAllocator.h	/^class CLSharedObjectAllocator$/;"	c
+CLSharedObjectAllocator_H	CLSharedObjectAllocator.h	2;"	d
+Create	CLSharedObjectAllocator.h	/^CLStatus CLSharedObjectAllocator<TSharedObjectPool, TSharedObject>::Create()$/;"	f	class:CLSharedObjectAllocator
+Destroy	CLSharedObjectAllocator.h	/^CLStatus CLSharedObjectAllocator<TSharedObjectPool, TSharedObject>::Destroy()$/;"	f	class:CLSharedObjectAllocator
+Get	CLSharedObjectAllocator.h	/^TSharedObject* CLSharedObjectAllocator<TSharedObjectPool, TSharedObject>::Get(const char *pstrEventName)$/;"	f	class:CLSharedObjectAllocator
+GetInstance	CLSharedObjectAllocator.h	/^CLSharedObjectAllocator<TSharedObjectPool, TSharedObject>* CLSharedObjectAllocator<TSharedObjectPool,TSharedObject>::GetInstance()$/;"	f	class:CLSharedObjectAllocator
+GetMutex	CLSharedObjectAllocator.h	/^inline CLMutex* CLSharedObjectAllocator<CLSharedConditionVariableImpl, pthread_cond_t>::GetMutex()$/;"	f	class:CLSharedObjectAllocator
+GetMutex	CLSharedObjectAllocator.h	/^inline CLMutex* CLSharedObjectAllocator<CLSharedEventImpl, SLEventInfo>::GetMutex()$/;"	f	class:CLSharedObjectAllocator
+GetMutex	CLSharedObjectAllocator.h	/^inline CLMutex* CLSharedObjectAllocator<CLSharedMutexImpl, pthread_mutex_t>::GetMutex()$/;"	f	class:CLSharedObjectAllocator
+GetSharedObject	CLSharedObjectAllocator.h	/^TSharedObject *CLSharedObjectAllocator<TSharedObjectPool, TSharedObject>::GetSharedObject(const char *pstrObjectName)$/;"	f	class:CLSharedObjectAllocator
+MUTEX_FOR_SHARED_CONDITION_VARIABLE_ALLOCATOR	CLSharedObjectAllocator.h	14;"	d
+MUTEX_FOR_SHARED_EVENT_ALLOCATOR	CLSharedObjectAllocator.h	16;"	d
+MUTEX_FOR_SHARED_MUTEX_ALLOCATOR	CLSharedObjectAllocator.h	15;"	d
+Release	CLSharedObjectAllocator.h	/^CLStatus CLSharedObjectAllocator<TSharedObjectPool, TSharedObject>::Release(const char *pstrEventName)$/;"	f	class:CLSharedObjectAllocator
+ReleaseSharedObject	CLSharedObjectAllocator.h	/^CLStatus CLSharedObjectAllocator<TSharedObjectPool, TSharedObject>::ReleaseSharedObject(const char *pstrObjectName)$/;"	f	class:CLSharedObjectAllocator
+m_MutexForSharedMutex	CLSharedObjectAllocator.h	/^	static pthread_mutex_t m_MutexForSharedMutex;$/;"	m	class:CLSharedObjectAllocator
+m_MutexForSharedMutex	CLSharedObjectAllocator.h	/^pthread_mutex_t CLSharedObjectAllocator<TSharedObjectPool, TSharedObject>::m_MutexForSharedMutex = PTHREAD_MUTEX_INITIALIZER;$/;"	m	class:CLSharedObjectAllocator
+m_pAllocator	CLSharedObjectAllocator.h	/^	static CLSharedObjectAllocator *m_pAllocator;$/;"	m	class:CLSharedObjectAllocator
+m_pAllocator	CLSharedObjectAllocator.h	/^CLSharedObjectAllocator<TSharedObjectPool, TSharedObject>* CLSharedObjectAllocator<TSharedObjectPool,TSharedObject>::m_pAllocator = 0;$/;"	m	class:CLSharedObjectAllocator
+m_pImpl	CLSharedObjectAllocator.h	/^	TSharedObjectPool *m_pImpl;$/;"	m	class:CLSharedObjectAllocator
+~CLSharedObjectAllocator	CLSharedObjectAllocator.h	/^CLSharedObjectAllocator<TSharedObjectPool, TSharedObject>::~CLSharedObjectAllocator()$/;"	f	class:CLSharedObjectAllocator
+ALLOCATED_SHARED_OBJECT	CLSharedObjectsImpl.h	13;"	d
+CLSharedObjectsImpl	CLSharedObjectsImpl.h	/^class CLSharedObjectsImpl$/;"	c
+CLSharedObjectsImpl_H	CLSharedObjectsImpl.h	2;"	d
+INITIALIZED_SHARED_OBJECT	CLSharedObjectsImpl.h	12;"	d
+LENGTH_OF_SHARED_OBJECT_NAME	CLSharedObjectsImpl.h	9;"	d
+MAGIC_NUMBER_FOR_SHARED_OBJECT	CLSharedObjectsImpl.h	16;"	d
+NUMBER_OF_SHARED_OBJECT	CLSharedObjectsImpl.h	15;"	d
+RefCount	CLSharedObjectsImpl.h	/^	int RefCount;$/;"	m	struct:SLSharedObjectHead
+SLSharedObjectHead	CLSharedObjectsImpl.h	/^struct SLSharedObjectHead$/;"	s
+Status	CLSharedObjectsImpl.h	/^	int Status;$/;"	m	struct:SLSharedObjectHead
+UNINITIALIZED_SHARED_OBJECT	CLSharedObjectsImpl.h	11;"	d
+m_nItemSize	CLSharedObjectsImpl.h	/^	unsigned int m_nItemSize;$/;"	m	class:CLSharedObjectsImpl
+m_pSharedMemory	CLSharedObjectsImpl.h	/^	CLSharedMemory *m_pSharedMemory;$/;"	m	class:CLSharedObjectsImpl
+m_pSharedObjects	CLSharedObjectsImpl.h	/^	SLSharedObjectHead *m_pSharedObjects;$/;"	m	class:CLSharedObjectsImpl
+m_strSharedSpaceName	CLSharedObjectsImpl.h	/^	string m_strSharedSpaceName;$/;"	m	class:CLSharedObjectsImpl
+strSharedObjectName	CLSharedObjectsImpl.h	/^	char strSharedObjectName[LENGTH_OF_SHARED_OBJECT_NAME];$/;"	m	struct:SLSharedObjectHead
+CLSOCKET_H	CLSocket.h	2;"	d
+CLSocket	CLSocket.h	/^class CLSocket$/;"	c
+m_pSocket	CLSocket.h	/^	CLBaseSocket *m_pSocket;$/;"	m	class:CLSocket
+CLSOCKETADDRESS_H	CLSocketAddress.h	2;"	d
+CLSocketAddress	CLSocketAddress.h	/^class CLSocketAddress$/;"	c
+m_addr	CLSocketAddress.h	/^	struct sockaddr  m_addr;$/;"	m	class:CLSocketAddress	typeref:struct:CLSocketAddress::sockaddr
+CLSTATUS_H	CLStatus.h	2;"	d
+CLStatus	CLStatus.h	/^class CLStatus$/;"	c
+m_clErrorCode	CLStatus.h	/^	const long& m_clErrorCode;$/;"	m	class:CLStatus
+m_clReturnCode	CLStatus.h	/^	const long& m_clReturnCode;$/;"	m	class:CLStatus
+m_lErrorCode	CLStatus.h	/^	long m_lErrorCode;$/;"	m	class:CLStatus
+m_lReturnCode	CLStatus.h	/^	long m_lReturnCode;$/;"	m	class:CLStatus
+CLTCPClientArrivedMessage	CLTCPClientArrivedMessage.h	/^	CLTCPClientArrivedMessage() : CLMessage(TCP_CLIENT_ARRIVED_MSG_ID)$/;"	f	class:CLTCPClientArrivedMessage
+CLTCPClientArrivedMessage	CLTCPClientArrivedMessage.h	/^class CLTCPClientArrivedMessage : public CLMessage$/;"	c
+CLTCPClientArrivedMessage_h	CLTCPClientArrivedMessage.h	2;"	d
+m_pClientAddr	CLTCPClientArrivedMessage.h	/^	CLSocketAddress *m_pClientAddr;$/;"	m	class:CLTCPClientArrivedMessage
+m_pClientSocket	CLTCPClientArrivedMessage.h	/^	CLSocket *m_pClientSocket;$/;"	m	class:CLTCPClientArrivedMessage
+~CLTCPClientArrivedMessage	CLTCPClientArrivedMessage.h	/^	virtual ~CLTCPClientArrivedMessage()$/;"	f	class:CLTCPClientArrivedMessage
+CLTCPCLIENTSOCKET_H	CLTCPClientSocket.h	2;"	d
+CLTCPClientSocket	CLTCPClientSocket.h	/^class CLTCPClientSocket : public CLBaseSocket$/;"	c
+m_pAddressInfo	CLTCPClientSocket.h	/^	struct addrinfo *m_pAddressInfo;$/;"	m	class:CLTCPClientSocket	typeref:struct:CLTCPClientSocket::addrinfo
+m_pHostOrIP	CLTCPClientSocket.h	/^	std::string m_pHostOrIP;$/;"	m	class:CLTCPClientSocket
+m_pServiceOrPort	CLTCPClientSocket.h	/^	std::string m_pServiceOrPort;$/;"	m	class:CLTCPClientSocket
+CLTCPLISTENSOCKET_H	CLTCPListenSocket.h	2;"	d
+CLTCPListenSocket	CLTCPListenSocket.h	/^class CLTCPListenSocket : public CLBaseSocket$/;"	c
+CLTHREAD_H	CLThread.h	2;"	d
+CLThread	CLThread.h	/^class CLThread : public CLExecutive$/;"	c
+m_EventForWaitingForNewThread	CLThread.h	/^	CLEvent m_EventForWaitingForNewThread;$/;"	m	class:CLThread
+m_EventForWaitingForOldThread	CLThread.h	/^	CLEvent m_EventForWaitingForOldThread;$/;"	m	class:CLThread
+m_ThreadID	CLThread.h	/^	pthread_t m_ThreadID; $/;"	m	class:CLThread
+m_bThreadCreated	CLThread.h	/^	bool m_bThreadCreated;$/;"	m	class:CLThread
+m_bWaitForDeath	CLThread.h	/^	bool m_bWaitForDeath;$/;"	m	class:CLThread
+m_pContext	CLThread.h	/^	void *m_pContext;$/;"	m	class:CLThread
+CLThreadCommunicationBySTLqueue	CLThreadCommunicationBySTLqueue.h	/^class CLThreadCommunicationBySTLqueue : public CLExecutiveCommunication$/;"	c
+CLThreadCommunicationBySTLqueue_H	CLThreadCommunicationBySTLqueue.h	2;"	d
+m_pEvent	CLThreadCommunicationBySTLqueue.h	/^	CLEvent *m_pEvent;$/;"	m	class:CLThreadCommunicationBySTLqueue
+m_pMsgReceiver	CLThreadCommunicationBySTLqueue.h	/^	CLMessageReceiverBySTLqueue *m_pMsgReceiver;$/;"	m	class:CLThreadCommunicationBySTLqueue
+CLThreadForMsgLoop	CLThreadForMsgLoop.h	/^class CLThreadForMsgLoop$/;"	c
+CLThreadForMsgLoop_H	CLThreadForMsgLoop.h	2;"	d
+m_bWaitForDeath	CLThreadForMsgLoop.h	/^	bool m_bWaitForDeath;$/;"	m	class:CLThreadForMsgLoop
+m_pPipeQueue	CLThreadForMsgLoop.h	/^	CLMsgLoopManagerForPipeQueue *m_pPipeQueue;$/;"	m	class:CLThreadForMsgLoop
+m_pThread	CLThreadForMsgLoop.h	/^	CLThread *m_pThread;$/;"	m	class:CLThreadForMsgLoop
+CLThreadInitialFinishedNotifier	CLThreadInitialFinishedNotifier.h	/^class CLThreadInitialFinishedNotifier : public CLExecutiveInitialFinishedNotifier$/;"	c
+CLThreadInitialFinishedNotifier_H	CLThreadInitialFinishedNotifier.h	2;"	d
+m_bSuccess	CLThreadInitialFinishedNotifier.h	/^	bool m_bSuccess;$/;"	m	class:CLThreadInitialFinishedNotifier
+m_pEvent	CLThreadInitialFinishedNotifier.h	/^	CLEvent *m_pEvent;$/;"	m	class:CLThreadInitialFinishedNotifier
+CLTIMERAPPLYMSG_H	CLTimerApplyMsg.h	2;"	d
+CLTimerApplyMsg	CLTimerApplyMsg.h	/^	CLTimerApplyMsg()	 : CLMessage(TIMER_APPLY_MSG_ID)$/;"	f	class:CLTimerApplyMsg
+CLTimerApplyMsg	CLTimerApplyMsg.h	/^class CLTimerApplyMsg : public CLMessage$/;"	c
+m_iEchoID	CLTimerApplyMsg.h	/^	int m_iEchoID;$/;"	m	class:CLTimerApplyMsg
+m_sTimeValue	CLTimerApplyMsg.h	/^	struct itimerspec m_sTimeValue;\/\/ user abslute time$/;"	m	class:CLTimerApplyMsg	typeref:struct:CLTimerApplyMsg::itimerspec
+m_strRemoteName	CLTimerApplyMsg.h	/^	std::string m_strRemoteName;$/;"	m	class:CLTimerApplyMsg
+CLTIMERAPPLYMSGDESERIALIZER_H	CLTimerApplyMsgDeserializer.h	2;"	d
+CLTimerApplyMsgDeserializer	CLTimerApplyMsgDeserializer.h	/^class CLTimerApplyMsgDeserializer : public CLMessageDeserializer$/;"	c
+CLTIMERAPPLYMSGSERIALIZER_H	CLTimerApplyMsgSerializer.h	2;"	d
+CLTimerApplyMsgSerializer	CLTimerApplyMsgSerializer.h	/^class CLTimerApplyMsgSerializer : public CLMessageSerializer$/;"	c
+CLTIMERFD_H	CLTimerFd.h	2;"	d
+CLTimerFd	CLTimerFd.h	/^class CLTimerFd$/;"	c
+m_Fd	CLTimerFd.h	/^	int m_Fd;$/;"	m	class:CLTimerFd
+m_ID	CLTimerFd.h	/^	int m_ID;$/;"	m	class:CLTimerFd
+m_bIsRepeat	CLTimerFd.h	/^	bool m_bIsRepeat;$/;"	m	class:CLTimerFd
+m_sTimerValue	CLTimerFd.h	/^	struct itimerspec m_sTimerValue;$/;"	m	class:CLTimerFd	typeref:struct:CLTimerFd::itimerspec
+m_strRemoteName	CLTimerFd.h	/^	string m_strRemoteName;$/;"	m	class:CLTimerFd
+CLTIMEROUTMSG_H	CLTimerOutMsg.h	2;"	d
+CLTimerOutMsg	CLTimerOutMsg.h	/^	CLTimerOutMsg() : CLMessage(TIMER_OUT_MSG_ID)$/;"	f	class:CLTimerOutMsg
+CLTimerOutMsg	CLTimerOutMsg.h	/^class CLTimerOutMsg : public CLMessage$/;"	c
+m_bRepeat	CLTimerOutMsg.h	/^	bool m_bRepeat;$/;"	m	class:CLTimerOutMsg
+m_iEchoID	CLTimerOutMsg.h	/^	int m_iEchoID; $/;"	m	class:CLTimerOutMsg
+m_iTimerFd	CLTimerOutMsg.h	/^	int m_iTimerFd;$/;"	m	class:CLTimerOutMsg
+m_strRemoteName	CLTimerOutMsg.h	/^	std::string m_strRemoteName;$/;"	m	class:CLTimerOutMsg
+CLTIMEROUTNOTIFYMSG_H	CLTimerOutNotifyMsg.h	2;"	d
+CLTimerOutNotifyMsg	CLTimerOutNotifyMsg.h	/^	CLTimerOutNotifyMsg() : CLMessage(TIMER_OUT_NOTIFY_MSG_ID)$/;"	f	class:CLTimerOutNotifyMsg
+CLTimerOutNotifyMsg	CLTimerOutNotifyMsg.h	/^	explicit CLTimerOutNotifyMsg(const int& echoID) : CLMessage(TIMER_OUT_NOTIFY_MSG_ID)$/;"	f	class:CLTimerOutNotifyMsg
+CLTimerOutNotifyMsg	CLTimerOutNotifyMsg.h	/^class CLTimerOutNotifyMsg : public CLMessage$/;"	c
+m_iEchoID	CLTimerOutNotifyMsg.h	/^	int m_iEchoID; $/;"	m	class:CLTimerOutNotifyMsg
+CLTIMTEROUTNOTIFYMSGDESERIALIZER_H	CLTimerOutNotifyMsgDeserializer.h	2;"	d
+CLTimerOutNotifyMsgDeserializer	CLTimerOutNotifyMsgDeserializer.h	/^class CLTimerOutNotifyMsgDeserializer : public CLMessageDeserializer$/;"	c
+CLTIMEROUTNOTIFYMSGSERIALIZER_H	CLTimerOutNotifyMsgSerializer.h	2;"	d
+CLTimerOutNotifyMsgSerializer	CLTimerOutNotifyMsgSerializer.h	/^class CLTimerOutNotifyMsgSerializer : public CLMessageSerializer$/;"	c
+CLUDPCLIENTSOCKET_H	CLUDPClientSocket.h	2;"	d
+CLUDPClientSocket	CLUDPClientSocket.h	/^class CLUDPClientSocket : public CLBaseSocket$/;"	c
+CLUDPServerSOCKET_H	CLUDPServerSocket.h	2;"	d
+CLUDPServerSocket	CLUDPServerSocket.h	/^class CLUDPServerSocket : public CLBaseSocket$/;"	c
+LIBEXECUTIVE_H	LibExecutive.h	2;"	d
+MESSAGEID_H	MessageID.h	2;"	d
+QUIT_MESSAGE_LOOP	MessageID.h	5;"	d
+TCP_CLIENT_ARRIVED_MSG_ID	MessageID.h	8;"	d
+TIMER_APPLY_MSG_ID	MessageID.h	12;"	d
+TIMER_OUT_MSG_ID	MessageID.h	13;"	d
+TIMER_OUT_NOTIFY_MSG_ID	MessageID.h	14;"	d
+DEFINITION_H	definition.h	2;"	d
+MAX_LISTEN_NUM	definition.h	/^const int MAX_LISTEN_NUM = 1024;$/;"	v
+TCP_SOCKET	definition.h	/^const int TCP_SOCKET = 1;$/;"	v
+UDP_SOCKET	definition.h	/^const int UDP_SOCKET = 2;$/;"	v
+ACCEPT_PENDING	errCode.h	/^const int ACCEPT_PENDING = BASE_CODE + 40;$/;"	v
+BASE_CODE	errCode.h	/^const int BASE_CODE = 100;$/;"	v
+CONNECT_PENDING	errCode.h	/^const int CONNECT_PENDING = BASE_CODE + 41;$/;"	v
+ERRCODE_H	errCode.h	2;"	d
+IO_PAUSE	errCode.h	/^const int IO_PAUSE = BASE_CODE + 42;$/;"	v
+IO_PENDING	errCode.h	/^const int IO_PENDING = BASE_CODE + 43;$/;"	v
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_PROGRAM_VERSION	5.8	//
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/

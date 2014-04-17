@@ -72,6 +72,10 @@ GetFd	CLDataReceiverByNamedPipe.cpp	/^const int CLDataReceiverByNamedPipe::GetFd
 CLDataReceiverBySTLQueue	CLDataReceiverBySTLQueue.cpp	/^CLDataReceiverBySTLQueue::CLDataReceiverBySTLQueue(CLSTLQueue* pDataSTLQueue)$/;"	f	class:CLDataReceiverBySTLQueue
 GetData	CLDataReceiverBySTLQueue.cpp	/^CLStatus CLDataReceiverBySTLQueue::GetData(CLBuffer *pBuffer)$/;"	f	class:CLDataReceiverBySTLQueue
 ~CLDataReceiverBySTLQueue	CLDataReceiverBySTLQueue.cpp	/^CLDataReceiverBySTLQueue::~CLDataReceiverBySTLQueue()$/;"	f	class:CLDataReceiverBySTLQueue
+CLDataReceiverByTCPAccept	CLDataReceiverByTCPAccept.cpp	/^CLDataReceiverByTCPAccept::CLDataReceiverByTCPAccept(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock, int listenNum)$/;"	f	class:CLDataReceiverByTCPAccept
+GetData	CLDataReceiverByTCPAccept.cpp	/^CLStatus CLDataReceiverByTCPAccept::GetData(CLBuffer *pBuffer)$/;"	f	class:CLDataReceiverByTCPAccept
+GetFd	CLDataReceiverByTCPAccept.cpp	/^const int CLDataReceiverByTCPAccept::GetFd()$/;"	f	class:CLDataReceiverByTCPAccept
+~CLDataReceiverByTCPAccept	CLDataReceiverByTCPAccept.cpp	/^CLDataReceiverByTCPAccept::~CLDataReceiverByTCPAccept()$/;"	f	class:CLDataReceiverByTCPAccept
 CLDataReceiverByTimerFd	CLDataReceiverByTimerFd.cpp	/^CLDataReceiverByTimerFd::CLDataReceiverByTimerFd(int fd, CLTimerApplyMsg *pMsg)$/;"	f	class:CLDataReceiverByTimerFd
 GetData	CLDataReceiverByTimerFd.cpp	/^CLStatus CLDataReceiverByTimerFd::GetData(CLBuffer *pBuffer)$/;"	f	class:CLDataReceiverByTimerFd
 GetFd	CLDataReceiverByTimerFd.cpp	/^const int CLDataReceiverByTimerFd::GetFd()$/;"	f	class:CLDataReceiverByTimerFd
@@ -204,6 +208,7 @@ CLMessageReceiverBySTLqueue	CLMessageReceiverBySTLqueue.cpp	/^CLMessageReceiverB
 PushMessage	CLMessageReceiverBySTLqueue.cpp	/^CLStatus CLMessageReceiverBySTLqueue::PushMessage(CLMessage * pMessage)$/;"	f	class:CLMessageReceiverBySTLqueue
 ReadDataToMessageQueue	CLMessageReceiverBySTLqueue.cpp	/^CLMessage* CLMessageReceiverBySTLqueue::ReadDataToMessageQueue()$/;"	f	class:CLMessageReceiverBySTLqueue
 ~CLMessageReceiverBySTLqueue	CLMessageReceiverBySTLqueue.cpp	/^CLMessageReceiverBySTLqueue::~CLMessageReceiverBySTLqueue()$/;"	f	class:CLMessageReceiverBySTLqueue
+CLMessageReceiverByTCPListener	CLMessageReceiverByTCPListener.cpp	/^CLMessageReceiverByTCPListener::CLMessageReceiverByTCPListener($/;"	f	class:CLMessageReceiverByTCPListener
 CLMessageReceiverByTimerFd	CLMessageReceiverByTimerFd.cpp	/^CLMessageReceiverByTimerFd::CLMessageReceiverByTimerFd(CLTimerFd *pTimer)$/;"	f	class:CLMessageReceiverByTimerFd
 GetFd	CLMessageReceiverByTimerFd.cpp	/^const int& CLMessageReceiverByTimerFd::GetFd()$/;"	f	class:CLMessageReceiverByTimerFd
 GetMessage	CLMessageReceiverByTimerFd.cpp	/^CLStatus CLMessageReceiverByTimerFd::GetMessage(std::queue<CLMessage*> &MessageQueue)$/;"	f	class:CLMessageReceiverByTimerFd
@@ -395,16 +400,17 @@ GetSharedObject	CLSharedObjectsImpl.cpp	/^void *CLSharedObjectsImpl::GetSharedOb
 Initialize	CLSharedObjectsImpl.cpp	/^CLStatus CLSharedObjectsImpl::Initialize()$/;"	f	class:CLSharedObjectsImpl
 ReleaseSharedObject	CLSharedObjectsImpl.cpp	/^CLStatus CLSharedObjectsImpl::ReleaseSharedObject(const char *pstrSharedObjectName)$/;"	f	class:CLSharedObjectsImpl
 ~CLSharedObjectsImpl	CLSharedObjectsImpl.cpp	/^CLSharedObjectsImpl::~CLSharedObjectsImpl()$/;"	f	class:CLSharedObjectsImpl
-Accept	CLSocket.cpp	/^CLStatus CLSocket::Accept(CLSocket **ppConnSock)$/;"	f	class:CLSocket
+Accept	CLSocket.cpp	/^CLStatus CLSocket::Accept(CLSocket **ppConnSock, CLSocketAddress **pOppoAddress)$/;"	f	class:CLSocket
 CLSocket	CLSocket.cpp	/^CLSocket::CLSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool forServer, int sockeType, bool isBlock, int listenNum)$/;"	f	class:CLSocket
 CLSocket	CLSocket.cpp	/^CLSocket::CLSocket(int sockFd, bool isBlock = true)$/;"	f	class:CLSocket
 Connect	CLSocket.cpp	/^CLStatus CLSocket::Connect()$/;"	f	class:CLSocket
-GetSocket	CLSocket.cpp	/^const int CLSocket::GetSocket() const$/;"	f	class:CLSocket
+GetSocketFd	CLSocket.cpp	/^const int CLSocket::GetSocketFd() const$/;"	f	class:CLSocket
 NotifyConnectResult	CLSocket.cpp	/^void  CLSocket::NotifyConnectResult(bool bResult)$/;"	f	class:CLSocket
 Read	CLSocket.cpp	/^CLStatus CLSocket::Read(CLIOVector& IOVec, CLSocketAddress* pAddr)$/;"	f	class:CLSocket
 Write	CLSocket.cpp	/^CLStatus CLSocket::Write(CLIOVector& IOVec, CLSocketAddress* pAddr)$/;"	f	class:CLSocket
 ~CLSocket	CLSocket.cpp	/^CLSocket::~CLSocket()$/;"	f	class:CLSocket
 CLSocketAddress	CLSocketAddress.cpp	/^CLSocketAddress::CLSocketAddress()$/;"	f	class:CLSocketAddress
+CLSocketAddress	CLSocketAddress.cpp	/^CLSocketAddress::CLSocketAddress(struct sockaddr& addr)$/;"	f	class:CLSocketAddress
 GetAddress	CLSocketAddress.cpp	/^struct sockaddr* CLSocketAddress::GetAddress()$/;"	f	class:CLSocketAddress
 GetAddressLength	CLSocketAddress.cpp	/^socklen_t CLSocketAddress::GetAddressLength()$/;"	f	class:CLSocketAddress
 ~CLSocketAddress	CLSocketAddress.cpp	/^CLSocketAddress::~CLSocketAddress()$/;"	f	class:CLSocketAddress
@@ -457,7 +463,7 @@ Deserialize	CLTimerOutNotifyMsgDeserializer.cpp	/^CLStatus CLTimerOutNotifyMsgDe
 CLTimerOutNotifyMsgSerializer	CLTimerOutNotifyMsgSerializer.cpp	/^CLTimerOutNotifyMsgSerializer::CLTimerOutNotifyMsgSerializer()$/;"	f	class:CLTimerOutNotifyMsgSerializer
 Serialize	CLTimerOutNotifyMsgSerializer.cpp	/^CLStatus CLTimerOutNotifyMsgSerializer::Serialize(CLMessage *pMsg, CLIOVector *pDataVec)$/;"	f	class:CLTimerOutNotifyMsgSerializer
 ~CLTimerOutNotifyMsgSerializer	CLTimerOutNotifyMsgSerializer.cpp	/^CLTimerOutNotifyMsgSerializer::~CLTimerOutNotifyMsgSerializer()$/;"	f	class:CLTimerOutNotifyMsgSerializer
-CLUDPClientSocket	CLUDPClientSocket.cpp	/^CLUDPClientSocket::CLUDPClientSocket()$/;"	f	class:CLUDPClientSocket
+CLUDPClientSocket	CLUDPClientSocket.cpp	/^CLUDPClientSocket::CLUDPClientSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock) : CLBaseSocket(isBlock)$/;"	f	class:CLUDPClientSocket
 ~CLUDPClientSocket	CLUDPClientSocket.cpp	/^CLUDPClientSocket::~CLUDPClientSocket()$/;"	f	class:CLUDPClientSocket
 CLUDPServerSocket	CLUDPServerSocket.cpp	/^CLUDPServerSocket::CLUDPServerSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock) : CLBaseSocket(isBlock)$/;"	f	class:CLUDPServerSocket
 ~CLUDPServerSocket	CLUDPServerSocket.cpp	/^CLUDPServerSocket::~CLUDPServerSocket()$/;"	f	class:CLUDPServerSocket

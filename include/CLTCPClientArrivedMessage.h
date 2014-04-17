@@ -13,7 +13,14 @@ class CLTCPClientArrivedMessage : public CLMessage
 public:
 	CLTCPClientArrivedMessage() : CLMessage(TCP_CLIENT_ARRIVED_MSG_ID)
 	{
+		m_pClientSocket = NULL;
+		m_pClientAddr = NULL;
+	}
 
+	CLTCPClientArrivedMessage(CLSocket *pSock, CLSocketAddress *pAddr) : CLMessage(TCP_CLIENT_ARRIVED_MSG_ID)
+	{
+		m_pClientSocket = pSock;
+		m_pClientAddr = pAddr;
 	}
 
 	virtual ~CLTCPClientArrivedMessage()

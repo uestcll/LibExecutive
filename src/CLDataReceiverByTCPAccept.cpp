@@ -6,6 +6,7 @@
 #include "CLSocket.h"
 #include "CLSocketAddress.h"
 #include "CLTCPClientArrivedMessage.h"
+#include "errCode.h"
 
 CLDataReceiverByTCPAccept::CLDataReceiverByTCPAccept(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock, int listenNum)
 {
@@ -13,7 +14,7 @@ CLDataReceiverByTCPAccept::CLDataReceiverByTCPAccept(const char *pHostNameOrIp, 
 	{
 		m_pListenSocket = new CLSocket(pHostNameOrIp, pServiceNameOrPort, true, TCP_SOCKET, isBlock, listenNum);
 	}
-	catch(const string& str)
+	catch(const char *str)
 	{
 		throw "In CLDataReceiverByTCPAccept::CLDataReceiverByTCPAccept() ERROR!";
 	}
@@ -63,7 +64,7 @@ CLStatus CLDataReceiverByTCPAccept::GetData(CLBuffer *pBuffer)
 
 	CLTCPClientArrivedMessage *pClientArrivedMsg = new CLTCPClientArrivedMessage(pTmpConnSock, pTmpOppoAddr);
 
-	CLStatus s3 = IOVec.WriteData((char *)(&pClientArrivedMsg), sizeof(CLTCPClientArrivedMessage *));
+	CLStatus s3 = IOVec.WriteData((char *)(&pClientArrivedMsg), 0, sizeof(CLTCPClientArrivedMessage *));
 	if(!s3.IsSuccess())
 	{
 		CLLogger::WriteLogMsg("In CLDataReceiverByTCPAccept::GetData(), IOVec.WriteData() error", 0);

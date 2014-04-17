@@ -4,7 +4,7 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
-Accept	.\CLSocket.cpp	/^CLStatus CLSocket::Accept(CLSocket **ppConnSock)$/;"	f	class:CLSocket
+Accept	.\CLSocket.cpp	/^CLStatus CLSocket::Accept(CLSocket **ppConnSock, CLSocketAddress **pOppoAddress)$/;"	f	class:CLSocket
 Accept	.\CLTCPListenSocket.cpp	/^CLStatus CLTCPListenSocket::Accept(CLSocket **ppConnSock, CLSocketAddress **ppOppoAddr)$/;"	f	class:CLTCPListenSocket
 AddDataStartIndex	.\CLBuffer.cpp	/^CLStatus CLBuffer::AddDataStartIndex(const int& addDataLen)$/;"	f	class:CLBuffer
 AddUsedBufferLen	.\CLBuffer.cpp	/^CLStatus CLBuffer::AddUsedBufferLen(const int& addUsedLen)$/;"	f	class:CLBuffer
@@ -26,6 +26,7 @@ CLDataReader	.\CLDataReader.cpp	/^CLDataReader::CLDataReader(int fd, CLProtoPars
 CLDataReceiver	.\CLDataReceiver.cpp	/^CLDataReceiver::CLDataReceiver()$/;"	f	class:CLDataReceiver
 CLDataReceiverByNamedPipe	.\CLDataReceiverByNamedPipe.cpp	/^CLDataReceiverByNamedPipe::CLDataReceiverByNamedPipe(const char *pStrPipeName, bool isSharedPipe) : m_NamedPipe(pStrPipeName, isSharedPipe, PIPE_FOR_READ)$/;"	f	class:CLDataReceiverByNamedPipe
 CLDataReceiverBySTLQueue	.\CLDataReceiverBySTLQueue.cpp	/^CLDataReceiverBySTLQueue::CLDataReceiverBySTLQueue(CLSTLQueue* pDataSTLQueue)$/;"	f	class:CLDataReceiverBySTLQueue
+CLDataReceiverByTCPAccept	.\CLDataReceiverByTCPAccept.cpp	/^CLDataReceiverByTCPAccept::CLDataReceiverByTCPAccept(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock, int listenNum)$/;"	f	class:CLDataReceiverByTCPAccept
 CLDataReceiverByTimerFd	.\CLDataReceiverByTimerFd.cpp	/^CLDataReceiverByTimerFd::CLDataReceiverByTimerFd(int fd, CLTimerApplyMsg *pMsg)$/;"	f	class:CLDataReceiverByTimerFd
 CLEpoll	.\CLEpoll.cpp	/^CLEpoll::CLEpoll()$/;"	f	class:CLEpoll
 CLEpollEvent	.\CLEpollEvent.cpp	/^CLEpollEvent::CLEpollEvent(CLEpoll *pEpoll)$/;"	f	class:CLEpollEvent
@@ -52,6 +53,7 @@ CLMessageReceiver	.\CLMessageReceiver.cpp	/^CLMessageReceiver::CLMessageReceiver
 CLMessageReceiver	.\CLMessageReceiver.cpp	/^CLMessageReceiver::CLMessageReceiver(CLDataReceiver *pDataReceiver, CLProtoParser *pProtoParser, CLMessageDeserializer *pMsgDeserializer)$/;"	f	class:CLMessageReceiver
 CLMessageReceiverByNamedPipe	.\CLMessageReceiverByNamedPipe.cpp	/^CLMessageReceiverByNamedPipe::CLMessageReceiverByNamedPipe(const char *pstrPipeName) $/;"	f	class:CLMessageReceiverByNamedPipe
 CLMessageReceiverBySTLqueue	.\CLMessageReceiverBySTLqueue.cpp	/^CLMessageReceiverBySTLqueue::CLMessageReceiverBySTLqueue() : CLMessageReceiver(NULL)$/;"	f	class:CLMessageReceiverBySTLqueue
+CLMessageReceiverByTCPListener	.\CLMessageReceiverByTCPListener.cpp	/^CLMessageReceiverByTCPListener::CLMessageReceiverByTCPListener($/;"	f	class:CLMessageReceiverByTCPListener
 CLMessageReceiverByTimerFd	.\CLMessageReceiverByTimerFd.cpp	/^CLMessageReceiverByTimerFd::CLMessageReceiverByTimerFd(CLTimerFd *pTimer)$/;"	f	class:CLMessageReceiverByTimerFd
 CLMessageSerializer	.\CLMessageSerializer.cpp	/^CLMessageSerializer::CLMessageSerializer()$/;"	f	class:CLMessageSerializer
 CLMsgLoopManagerForEpoll	.\CLMsgLoopManagerForEpoll.cpp	/^CLMsgLoopManagerForEpoll::CLMsgLoopManagerForEpoll(CLMessageObserver *pMessageObserver, CLEpoll *pEpoll, CLMultiMsgDeserializer *pMsgDeserializer) : CLMessageLoopManager(pMessageObserver)$/;"	f	class:CLMsgLoopManagerForEpoll
@@ -97,6 +99,7 @@ CLSharedObjectsImpl	.\CLSharedObjectsImpl.cpp	/^CLSharedObjectsImpl::CLSharedObj
 CLSocket	.\CLSocket.cpp	/^CLSocket::CLSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool forServer, int sockeType, bool isBlock, int listenNum)$/;"	f	class:CLSocket
 CLSocket	.\CLSocket.cpp	/^CLSocket::CLSocket(int sockFd, bool isBlock = true)$/;"	f	class:CLSocket
 CLSocketAddress	.\CLSocketAddress.cpp	/^CLSocketAddress::CLSocketAddress()$/;"	f	class:CLSocketAddress
+CLSocketAddress	.\CLSocketAddress.cpp	/^CLSocketAddress::CLSocketAddress(struct sockaddr& addr)$/;"	f	class:CLSocketAddress
 CLStatus	.\CLStatus.cpp	/^CLStatus::CLStatus(const CLStatus& status) : m_clReturnCode(m_lReturnCode), m_clErrorCode(m_lErrorCode)$/;"	f	class:CLStatus
 CLStatus	.\CLStatus.cpp	/^CLStatus::CLStatus(long lReturnCode, long lErrorCode) : m_clReturnCode(m_lReturnCode), m_clErrorCode(m_lErrorCode)$/;"	f	class:CLStatus
 CLTCPClientSocket	.\CLTCPClientSocket.cpp	/^CLTCPClientSocket::CLTCPClientSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock) : CLBaseSocket(isBlock)$/;"	f	class:CLTCPClientSocket
@@ -111,7 +114,7 @@ CLTimerApplyMsgSerializer	.\CLTimerApplyMsgSerializer.cpp	/^CLTimerApplyMsgSeria
 CLTimerFd	.\CLTimerFd.cpp	/^CLTimerFd::CLTimerFd(struct itimerspec& sTimerValue, string pstrRemoteName, const int& ID)$/;"	f	class:CLTimerFd
 CLTimerOutNotifyMsgDeserializer	.\CLTimerOutNotifyMsgDeserializer.cpp	/^CLTimerOutNotifyMsgDeserializer::CLTimerOutNotifyMsgDeserializer()$/;"	f	class:CLTimerOutNotifyMsgDeserializer
 CLTimerOutNotifyMsgSerializer	.\CLTimerOutNotifyMsgSerializer.cpp	/^CLTimerOutNotifyMsgSerializer::CLTimerOutNotifyMsgSerializer()$/;"	f	class:CLTimerOutNotifyMsgSerializer
-CLUDPClientSocket	.\CLUDPClientSocket.cpp	/^CLUDPClientSocket::CLUDPClientSocket()$/;"	f	class:CLUDPClientSocket
+CLUDPClientSocket	.\CLUDPClientSocket.cpp	/^CLUDPClientSocket::CLUDPClientSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock) : CLBaseSocket(isBlock)$/;"	f	class:CLUDPClientSocket
 CLUDPServerSocket	.\CLUDPServerSocket.cpp	/^CLUDPServerSocket::CLUDPServerSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock) : CLBaseSocket(isBlock)$/;"	f	class:CLUDPServerSocket
 CheckForRestBuffer	.\CLBuffer.cpp	/^CLStatus CLBuffer::CheckForRestBuffer()$/;"	f	class:CLBuffer
 CloseFileDescriptor	.\CLProcess.cpp	/^CLStatus CLProcess::CloseFileDescriptor()$/;"	f	class:CLProcess
@@ -161,11 +164,13 @@ GetBufPtr	.\CLIOVector.cpp	/^int CLIOVector::GetBufPtr(int index, char** pBuffer
 GetCommunicationPtr	.\CLExecutiveNameServer.cpp	/^CLMessagePoster* CLExecutiveNameServer::GetCommunicationPtr(const char* strExecutiveName)$/;"	f	class:CLExecutiveNameServer
 GetData	.\CLDataReceiverByNamedPipe.cpp	/^CLStatus CLDataReceiverByNamedPipe::GetData(CLBuffer *pBuffer)$/;"	f	class:CLDataReceiverByNamedPipe
 GetData	.\CLDataReceiverBySTLQueue.cpp	/^CLStatus CLDataReceiverBySTLQueue::GetData(CLBuffer *pBuffer)$/;"	f	class:CLDataReceiverBySTLQueue
+GetData	.\CLDataReceiverByTCPAccept.cpp	/^CLStatus CLDataReceiverByTCPAccept::GetData(CLBuffer *pBuffer)$/;"	f	class:CLDataReceiverByTCPAccept
 GetData	.\CLDataReceiverByTimerFd.cpp	/^CLStatus CLDataReceiverByTimerFd::GetData(CLBuffer *pBuffer)$/;"	f	class:CLDataReceiverByTimerFd
 GetDataIOVecs	.\CLBuffer.cpp	/^CLStatus CLBuffer::GetDataIOVecs(CLIOVector& IOVector)$/;"	f	class:CLBuffer
 GetDataPoster	.\CLDataPosterChannelByNamedPipeMaintainer.cpp	/^CLDataPoster* CLDataPosterChannelByNamedPipeMaintainer::GetDataPoster()$/;"	f	class:CLDataPosterChannelByNamedPipeMaintainer
 GetDataPoster	.\CLDataPosterChannelBySTLQueueMaintainer.cpp	/^CLDataPoster* CLDataPosterChannelBySTLQueueMaintainer::GetDataPoster()$/;"	f	class:CLDataPosterChannelBySTLQueueMaintainer
 GetFd	.\CLDataReceiverByNamedPipe.cpp	/^const int CLDataReceiverByNamedPipe::GetFd()$/;"	f	class:CLDataReceiverByNamedPipe
+GetFd	.\CLDataReceiverByTCPAccept.cpp	/^const int CLDataReceiverByTCPAccept::GetFd()$/;"	f	class:CLDataReceiverByTCPAccept
 GetFd	.\CLDataReceiverByTimerFd.cpp	/^const int CLDataReceiverByTimerFd::GetFd()$/;"	f	class:CLDataReceiverByTimerFd
 GetFd	.\CLEpollEvent.cpp	/^const int CLEpollEvent::GetFd()$/;"	f	class:CLEpollEvent
 GetFd	.\CLMessageReceiver.cpp	/^const int& CLMessageReceiver::GetFd()$/;"	f	class:CLMessageReceiver
@@ -190,8 +195,8 @@ GetRemoteName	.\CLTimerFd.cpp	/^const string& CLTimerFd::GetRemoteName()$/;"	f	c
 GetRestBufPtr	.\CLBuffer.cpp	/^CLStatus CLBuffer::GetRestBufPtr(char** pBuf, int &restLen)$/;"	f	class:CLBuffer
 GetRestIOVecs	.\CLBuffer.cpp	/^CLStatus CLBuffer::GetRestIOVecs(CLIOVector& IOVector)$/;"	f	class:CLBuffer
 GetSharedObject	.\CLSharedObjectsImpl.cpp	/^void *CLSharedObjectsImpl::GetSharedObject(const char *pstrSharedObjectName)$/;"	f	class:CLSharedObjectsImpl
-GetSocket	.\CLSocket.cpp	/^const int CLSocket::GetSocket() const$/;"	f	class:CLSocket
 GetSocketFd	.\CLBaseSocket.cpp	/^const int CLBaseSocket::GetSocketFd() const$/;"	f	class:CLBaseSocket
+GetSocketFd	.\CLSocket.cpp	/^const int CLSocket::GetSocketFd() const$/;"	f	class:CLSocket
 GetTimerFd	.\CLTimerFd.cpp	/^const int& CLTimerFd::GetTimerFd()$/;"	f	class:CLTimerFd
 GetTimerID	.\CLTimerFd.cpp	/^const int& CLTimerFd::GetTimerID()$/;"	f	class:CLTimerFd
 ID_FOR_KEY	.\CLSharedMemory.cpp	14;"	d	file:
@@ -394,6 +399,7 @@ operator []	.\CLIOVector.cpp	/^const char& CLIOVector::operator[](const int& ind
 ~CLDataReceiver	.\CLDataReceiver.cpp	/^CLDataReceiver::~CLDataReceiver()$/;"	f	class:CLDataReceiver
 ~CLDataReceiverByNamedPipe	.\CLDataReceiverByNamedPipe.cpp	/^CLDataReceiverByNamedPipe::~CLDataReceiverByNamedPipe()$/;"	f	class:CLDataReceiverByNamedPipe
 ~CLDataReceiverBySTLQueue	.\CLDataReceiverBySTLQueue.cpp	/^CLDataReceiverBySTLQueue::~CLDataReceiverBySTLQueue()$/;"	f	class:CLDataReceiverBySTLQueue
+~CLDataReceiverByTCPAccept	.\CLDataReceiverByTCPAccept.cpp	/^CLDataReceiverByTCPAccept::~CLDataReceiverByTCPAccept()$/;"	f	class:CLDataReceiverByTCPAccept
 ~CLDataReceiverByTimerFd	.\CLDataReceiverByTimerFd.cpp	/^CLDataReceiverByTimerFd::~CLDataReceiverByTimerFd()$/;"	f	class:CLDataReceiverByTimerFd
 ~CLEpoll	.\CLEpoll.cpp	/^CLEpoll::~CLEpoll()$/;"	f	class:CLEpoll
 ~CLEpollEvent	.\CLEpollEvent.cpp	/^CLEpollEvent::~CLEpollEvent()$/;"	f	class:CLEpollEvent

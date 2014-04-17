@@ -1,6 +1,10 @@
 #ifndef CLDATARECEIVERBYTCPACCEPT_H
 #define CLDATARECEIVERBYTCPACCEPT_H
 
+#include "CLStatus.h"
+#include "definition.h"
+#include "CLDataReceiver.h"
+
 class CLSocket;
 
 class CLDataReceiverByTCPAccept : public CLDataReceiver
