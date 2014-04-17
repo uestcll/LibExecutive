@@ -55,6 +55,13 @@ CLUDPClientSocket.o : ./src/CLUDPClientSocket.cpp
 
 CLSocketAddress.o : ./src/CLSocketAddress.cpp
 	g++ -o CLSocketAddress.o -c ./src/CLSocketAddress.cpp -I./include -g
+
+CLDataReceiverByTCPAccept.o : ./src/CLDataReceiverByTCPAccept.cpp
+	g++ -o CLDataReceiverByTCPAccept.o -c ./src/CLDataReceiverByTCPAccept.cpp -I./include -g
+
+CLMessageReceiverByTCPListener.o : ./src/CLMessageReceiverByTCPListener.cpp
+	g++ -o CLMessageReceiverByTCPListener.o -c ./src/CLMessageReceiverByTCPListener.cpp -I./include -g
+
 #for socket end
 
 CLDataPostResultNotifier.o : ./src/CLDataPostResultNotifier.cpp
