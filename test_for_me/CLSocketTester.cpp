@@ -6,10 +6,10 @@
 TEST(CLSocket, CLSocket)
 {
 	CLSocket *pSocket = new CLSocket("localhost", "2323");
-	EXPECT_TRUE(pSocket->GetSocket());
+	EXPECT_TRUE(pSocket->GetSocketFd());
 	CLSocket *pClientSocket = new CLSocket("localhost", "2323", false);
 	//EXPECT_TRUE((pClientSocket->Connect()).IsSuccess());
-	EXPECT_TRUE(pSocket->GetSocket());
+	EXPECT_TRUE(pSocket->GetSocketFd());
 	CLSocket *pConnSocket;
 	CLSocketAddress *pConnAddr;
 
