@@ -395,6 +395,7 @@ m_clReturnCode	CLStatus.h	/^	const long& m_clReturnCode;$/;"	m	class:CLStatus
 m_lErrorCode	CLStatus.h	/^	long m_lErrorCode;$/;"	m	class:CLStatus
 m_lReturnCode	CLStatus.h	/^	long m_lReturnCode;$/;"	m	class:CLStatus
 CLTCPClientArrivedMessage	CLTCPClientArrivedMessage.h	/^	CLTCPClientArrivedMessage() : CLMessage(TCP_CLIENT_ARRIVED_MSG_ID)$/;"	f	class:CLTCPClientArrivedMessage
+CLTCPClientArrivedMessage	CLTCPClientArrivedMessage.h	/^	CLTCPClientArrivedMessage(CLSocket *pSock, CLSocketAddress *pAddr) : CLMessage(TCP_CLIENT_ARRIVED_MSG_ID)$/;"	f	class:CLTCPClientArrivedMessage
 CLTCPClientArrivedMessage	CLTCPClientArrivedMessage.h	/^class CLTCPClientArrivedMessage : public CLMessage$/;"	c
 CLTCPClientArrivedMessage_h	CLTCPClientArrivedMessage.h	2;"	d
 m_pClientAddr	CLTCPClientArrivedMessage.h	/^	CLSocketAddress *m_pClientAddr;$/;"	m	class:CLTCPClientArrivedMessage

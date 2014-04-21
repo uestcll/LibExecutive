@@ -168,6 +168,7 @@ CLSocketAddress	.\CLSocketAddress.h	/^class CLSocketAddress$/;"	c
 CLStatus	.\CLStatus.h	/^class CLStatus$/;"	c
 CLTCPCLIENTSOCKET_H	.\CLTCPClientSocket.h	2;"	d
 CLTCPClientArrivedMessage	.\CLTCPClientArrivedMessage.h	/^	CLTCPClientArrivedMessage() : CLMessage(TCP_CLIENT_ARRIVED_MSG_ID)$/;"	f	class:CLTCPClientArrivedMessage
+CLTCPClientArrivedMessage	.\CLTCPClientArrivedMessage.h	/^	CLTCPClientArrivedMessage(CLSocket *pSock, CLSocketAddress *pAddr) : CLMessage(TCP_CLIENT_ARRIVED_MSG_ID)$/;"	f	class:CLTCPClientArrivedMessage
 CLTCPClientArrivedMessage	.\CLTCPClientArrivedMessage.h	/^class CLTCPClientArrivedMessage : public CLMessage$/;"	c
 CLTCPClientArrivedMessage_h	.\CLTCPClientArrivedMessage.h	2;"	d
 CLTCPClientSocket	.\CLTCPClientSocket.h	/^class CLTCPClientSocket : public CLBaseSocket$/;"	c

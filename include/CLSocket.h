@@ -11,7 +11,7 @@ class CLSocketAddress;
 class CLSocket
 {
 public:
-	CLSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool forServer = true, int sockeType = TCP_SOCKET, bool isBlock = false, int listenNum = MAX_LISTEN_NUM);
+	CLSocket(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool forServer = true, int sockeType = TCP_SOCKET, bool isBlock = true, int listenNum = MAX_LISTEN_NUM);
 	CLSocket(int sockFd, bool isBlock);
 	virtual ~CLSocket();
 

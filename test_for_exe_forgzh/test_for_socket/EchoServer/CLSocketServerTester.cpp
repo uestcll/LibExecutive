@@ -12,8 +12,10 @@ TEST(CLSocket, TCPServer)
 
 	int listenFd = pServer->GetFd();
 
-	cout<<"The Listen Fd is: "<<listenFd<<endl;
 	EXPECT_TRUE(listenFd);
+
+	cout<<"The Listen Fd is: "<<listenFd<<endl;
+	
 
 	queue<CLMessage*> MessageQueue;
 
@@ -33,7 +35,7 @@ TEST(CLSocket, TCPServer)
 
 		while(!MessageQueue.empty())
 		{
-			CLMessage* pMsg = m_MessageQueue.front();
+			CLMessage* pMsg = MessageQueue.front();
 			MessageQueue.pop();
 
 			if(pMsg != 0)
@@ -59,24 +61,24 @@ TEST(CLSocket, TCPServer)
 						if(s2.m_clErrorCode == IO_PAUSE)
 						{
 							cout<<"The connect closed by client!"<<endl;
-							iovec->FreeAndPopAll();
+							iovec.FreeAndPopAll();
 
-							break;
+							return;
 						}
 
 						char *data;
 
 						EXPECT_EQ(iovec.GetBufPtr(0, &data), 100);
-						EXPECT_EQ(s2.m_lReturnCode, 15);
+						EXPECT_EQ(s2.m_clReturnCode, 15);
 
-						cout<<"The data is: "<<data;
+						cout<<"The data is: "<<data<<endl;
 
-						iovec->FreeAndPopAll();
+						iovec.FreeAndPopAll();
 					}
 
 					if(!s2.IsSuccess() && s2.m_clErrorCode != IO_PENDING)
 					{
-						iovec->FreeAndPopAll();
+						iovec.FreeAndPopAll();
 
 						break;
 					}
@@ -86,4 +88,6 @@ TEST(CLSocket, TCPServer)
 			}
 		}	
 	}
+
+	delete pServer;
 }
