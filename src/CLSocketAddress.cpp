@@ -18,9 +18,9 @@ CLSocketAddress::~CLSocketAddress()
 
 }
 
-struct sockaddr* CLSocketAddress::GetAddress()
+struct sockaddr_in* CLSocketAddress::GetAddress()
 {
-	return (struct sockaddr*)(&m_addr);
+	return (struct sockaddr_in*)(&m_addr);
 }
 
 socklen_t CLSocketAddress::GetAddressLength()

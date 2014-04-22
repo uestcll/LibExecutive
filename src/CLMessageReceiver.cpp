@@ -99,7 +99,17 @@ CLStatus CLMessageReceiver::GetMessage(queue<CLMessage*> &MessageQueue)
 {
 	//CLIOVector revDataBufVec;
 	// CLStatus s1 = m_pDataReceiver->GetData(revDataBufVec);
-	CLStatus s1 = m_pDataReceiver->GetData(m_pDataBuffer); //deal with the usedlen in getdata()
+
+	CLIOVector IOVec;
+
+	CLStatus s = m_pDataBuffer->GetRestIOVecs(IOVec);
+	if(!s.IsSuccess())
+	{
+		CLLogger::WriteLogMsg("In CLMessageReceiver::GetMessage(), m_pDataBuffer->GetRestIOVecs error", 0);
+		return s;
+	}
+
+	CLStatus s1 = m_pDataReceiver->GetData(IOVec); //deal with the usedlen in getdata()
 	// get data by iovec, push into databuffer!!!
 	//!!此处需要判断独到的内容 可能是连接断了，可能是读不到内容了，出错了，就要关闭连接 就要回收m_pDataReceiver了
 	if(!s1.IsSuccess())

@@ -14,19 +14,19 @@ CLDataReceiverByNamedPipe::~CLDataReceiverByNamedPipe()
 
 }
 // no break!!!
-CLStatus CLDataReceiverByNamedPipe::GetData(CLBuffer *pBuffer)
+CLStatus CLDataReceiverByNamedPipe::GetData(CLIOVector &IOVec)
 {
 	
 	long readLen = 0;
 
-	CLIOVector IOVec;
+	// CLIOVector IOVec;
 
-	CLStatus s1 = pBuffer->GetRestIOVecs(IOVec);
-	if(!s1.IsSuccess())
-	{
-		CLLogger::WriteLogMsg("In CLDataReceiverByNamedPipe::GetData(), pBuffer->GetRestIOVecs error", 0);
-		return s1;
-	}
+	// CLStatus s1 = pBuffer->GetRestIOVecs(IOVec);
+	// if(!s1.IsSuccess())
+	// {
+	// 	CLLogger::WriteLogMsg("In CLDataReceiverByNamedPipe::GetData(), pBuffer->GetRestIOVecs error", 0);
+	// 	return s1;
+	// }
 
 	CLStatus s2 = m_NamedPipe.ReadVecs(IOVec);
 	if(!s2.IsSuccess())

@@ -11,7 +11,7 @@ public:
 	CLDataReceiverByTimerFd(int fd, const char* pstrWaitingObjName); //等待超时的对象的名字（通过该名字，向其发送超时消息，该名字可能代表的是pipe也可能是网络）
 	virtual CLDataReceiverByTimerFd();
 
-	virtual CLStatus GetData(CLBuffer *pBuffer);
+	virtual CLStatus GetData(CLIOVector &IOVec);
 	virtual const int GetFd();
 
 private:

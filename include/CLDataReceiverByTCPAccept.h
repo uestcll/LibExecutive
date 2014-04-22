@@ -13,7 +13,7 @@ public:
 	CLDataReceiverByTCPAccept(const char *pHostNameOrIp, const char *pServiceNameOrPort, bool isBlock = true, int listenNum = MAX_LISTEN_NUM);
 	virtual ~CLDataReceiverByTCPAccept();
 
-	virtual CLStatus GetData(CLBuffer *pBuffer);
+	virtual CLStatus GetData(CLIOVector &IOVec);
 
 	virtual const int GetFd();
 

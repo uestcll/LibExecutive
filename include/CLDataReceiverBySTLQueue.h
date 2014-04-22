@@ -4,7 +4,7 @@
 #include "CLDataReceiver.h"
 
 class CLSTLQueue;
-class CLBuffer;
+class CLIOVector;
 
 class CLDataReceiverBySTLQueue : public CLDataReceiver
 {
@@ -12,7 +12,7 @@ public:
 	CLDataReceiverBySTLQueue(CLSTLQueue* pDataSTLQueue);
 	virtual ~CLDataReceiverBySTLQueue();
 
-	virtual CLStatus GetData(CLBuffer *pBuffer);
+	virtual CLStatus GetData(CLIOVector &IOVec);
 
 private:
 	CLDataReceiverBySTLQueue(const CLDataReceiverBySTLQueue&);

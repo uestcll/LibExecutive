@@ -11,7 +11,7 @@ public:
 	explicit CLSocketAddress(struct sockaddr& addr);
 	virtual ~CLSocketAddress();
 
-	struct sockaddr* GetAddress();
+	struct sockaddr_in* GetAddress();
 	socklen_t GetAddressLength();
 
 private:

@@ -1,6 +1,6 @@
 #include "CLDataReceiverByTimerFd.h"
 #include "CLStatus.h"
-#include "CLBuffer.h"
+#include "CLIOVector.h"
 
 using namespace std;
 
@@ -17,7 +17,7 @@ CLDataReceiverByTimerFd::~CLDataReceiverByTimerFd()
 
 }
 
-CLStatus CLDataReceiverByTimerFd::GetData(CLBuffer *pBuffer)
+CLStatus CLDataReceiverByTimerFd::GetData(CLIOVector &IOVec)
 {
 	
 

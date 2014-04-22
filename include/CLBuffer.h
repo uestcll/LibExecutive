@@ -2,8 +2,7 @@
 #define CLBUFFER_H
 
 #include "CLStatus.h"
-#define DEAFULT_BUFFER_LENGTH 4096
-#define MINIMUN_BUFFER_LENGTH 512
+#include "definition.h"
 
 class CLIOVector;
 //提供接口 得到从哪里开始 多长的字符串。如果是连续的，就返回指针。不是就拷贝一份成为连续的。

@@ -29,7 +29,7 @@ CLDataReceiverByTCPAccept::~CLDataReceiverByTCPAccept()
 	}
 }
 // no break!!!
-CLStatus CLDataReceiverByTCPAccept::GetData(CLBuffer *pBuffer)
+CLStatus CLDataReceiverByTCPAccept::GetData(CLIOVector &IOVec)
 {
 	// CLStatus s2 = m_NamedPipe.ReadVecs(IOVec);
 	// if(!s2.IsSuccess())
@@ -53,14 +53,14 @@ CLStatus CLDataReceiverByTCPAccept::GetData(CLBuffer *pBuffer)
 
 	long readLen = 0;
 
-	CLIOVector IOVec;
+	// CLIOVector IOVec;
 
-	CLStatus s2 = pBuffer->GetRestIOVecs(IOVec);
-	if(!s2.IsSuccess())
-	{
-		CLLogger::WriteLogMsg("In CLDataReceiverByTCPAccept::GetData(), pBuffer->GetRestIOVecs error", 0);
-		return s2;
-	}
+	// CLStatus s2 = pBuffer->GetRestIOVecs(IOVec);
+	// if(!s2.IsSuccess())
+	// {
+	// 	CLLogger::WriteLogMsg("In CLDataReceiverByTCPAccept::GetData(), pBuffer->GetRestIOVecs error", 0);
+	// 	return s2;
+	// }
 
 	CLTCPClientArrivedMessage *pClientArrivedMsg = new CLTCPClientArrivedMessage(pTmpConnSock, pTmpOppoAddr);
 

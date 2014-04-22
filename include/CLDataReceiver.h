@@ -3,7 +3,7 @@
 
 #include "CLStatus.h"
 
-class CLBuffer;
+class CLIOVector;
 
 class CLDataReceiver
 {
@@ -11,7 +11,7 @@ public:
 	CLDataReceiver();
 	virtual ~CLDataReceiver();
 
-	virtual CLStatus GetData(CLBuffer *pBuffer) = 0;//m_clReturnCode is the data read length , <0 is error and not success
+	virtual CLStatus GetData(CLIOVector &IOVec) = 0;//m_clReturnCode is the data read length , <0 is error and not success
 
 	virtual const int GetFd(){return -1;}
 private:

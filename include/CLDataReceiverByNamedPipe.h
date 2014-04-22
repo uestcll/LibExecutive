@@ -12,7 +12,7 @@ public:
 	CLDataReceiverByNamedPipe(const char *pStrPipeName, bool isSharedPipe = false);
 	virtual ~CLDataReceiverByNamedPipe();
 
-	virtual CLStatus GetData(CLBuffer *pBuffer);
+	virtual CLStatus GetData(CLIOVector &IOVec);
 	virtual const int GetFd();
 
 private:

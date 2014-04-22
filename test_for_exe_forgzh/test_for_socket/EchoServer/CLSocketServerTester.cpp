@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <queue>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include "CLSocket.h"
 #include "LibExecutive.h"
 
@@ -46,6 +50,10 @@ TEST(CLSocket, TCPServer)
 				EXPECT_TRUE(pClientSocketMsg);
 
 				CLSocket *pClient = pClientSocketMsg->m_pClientSocket;
+				CLSocketAddress *pAddr = pClientSocketMsg->m_pClientAddr;
+
+				cout<<"The client addr is: "<<inet_ntoa((pAddr->GetAddress())->sin_addr)<<endl;
+
 				CLIOVector iovec;
 
 				while(1)
