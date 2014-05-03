@@ -9,43 +9,40 @@
 
 using namespace std;
 
-CLMsgLoopManagerForLibevent::CLMsgLoopManagerForLibevent(CLMessageObserver *pMsgObserver, const char* pstrThreadName) : CLMessageLoopManager(pMsgObserver)
+CLMsgLoopManagerForLibevent::CLMsgLoopManagerForLibevent(CLMessageObserver *pMsgObserver, const char* pstrThreadName, bool bMultipleThread) : CLMessageLoopManager(pMsgObserver)
 {
 	if((pstrThreadName == 0) || (strlen(pstrThreadName) == 0))
 		throw "In CLMsgLoopManagerForIOMultiplexing::CLMsgLoopManagerForIOMultiplexing(), pstrThreadName error";
 
 	m_strThreadName = pstrThreadName;
+
+    m_bMultipleThread = bMultipleThread;
 }
 
 CLMsgLoopManagerForLibevent::~CLMsgLoopManagerForLibevent()
 {
-	ClearDeletedSet();
+	map<struct event, CLMessageReceiver*>::iterator it = m_ReadSetMap.begin();
+    for(; it != m_ReadSetMap.end(); ++it)
+    {
+        delete it->second;
+    }
 }
 
+CLStatus CLMsgLoopManagerForLibevent::Internal_RegisterReadEvent(struct event ev, CLMessageReceiver *pMsgReceiver)
+{
+    map<struct event, CLMessageReceiver*>::iterator it = m_ReadSetMap.find(ev);
+    if(it != m_ReadSetMap.end())
+        return CLStatus(-1, NORMAL_ERROR);
+
+    m_ReadSetMap[ev] = pMsgReceiver;
+
+    return CLStatus(0, 0);
+}
 CLStatus CLMsgLoopManagerForLibevent::RegisterReadEvent(struct event ev, CLMessageReceiver *pMsgReceiver)
 {
-	try
-	{
-		CLCriticalSection cs(&m_MutexForReadMap);
+    if(pMsgReceiver == 0)
+        return CLStatus(-1, NORMAL_ERROR);
 
-		map<struct event, CLMessageReceiver*>::iterator it = m_ReadSetMap.find(ev);
-		if(it != m_ReadSetMap.end())
-		{
-			CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::RegisterReadEvent(), m_ReadSetMap.find error", 0);
-			throw CLStatus(-1, NORMAL_ERROR);
-		}
-
-		m_ReadSetMap[ev] = pMsgReceiver;
-
-		return CLStatus(0, 0);
-	}
-	catch(CLStatus& s)
-	{
-		if(pMsgReceiver)
-			delete pMsgReceiver;
-
-		return s;
-	}
 }
 
 CLStatus CLMsgLoopManagerForLibevent::UnRegisterReadEvent(struct event ev)
