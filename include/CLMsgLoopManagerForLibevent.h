@@ -14,12 +14,13 @@
 #include "CLMutex.h"
 
 class CLMessageReceiver;
-class CLProtocolDataPoster;
+class CLMessagePoster;
+class CLDataPostChannelMaintainer;
 
 class CLMsgLoopManagerForLibevent : public CLMessageLoopManager
 {
     public:
-    CLMsgLoopManagerForLibevent(CLMesssageObserver *pMsgObserver, const char *pstrThreadName);
+    CLMsgLoopManagerForLibevent(CLMesssageObserver *pMsgObserver, const char *pstrThreadName, bool bMultipleThread);
     virtual ~CLMsgLoopManagerForLibevent();
 
     CLStatus RegisterReadEvent(struct event ev, CLMessageReceiver *pMsgReceiver);
@@ -37,6 +38,13 @@ class CLMsgLoopManagerForLibevent : public CLMessageLoopManager
     private:
     void ClearDeletedSet();
 
+    CLStatus Internal_RegisterReadEvent(struct event ev, CLMessageReceiver *pMsgReceiver);
+    CLStatus Internal_UnRegisterReadEvent(struct event ev);
+
+    CLStatus Internal_RegisterWriteEvent(struct event ev, CLMessagePoster *pMsgPoster);
+
+    CLStatus Internal_RegisterConnectEvent(struct event ev, CLDataPostChannelMainter *pChannel);
+
     private:
     CLMsgLoopManagerForLibevent(const CLMsgLoopManagerForLibevent&);
     CLMsgLoopManagerForLibevent& operator=(const CLMsgLoopManagerForLibevent&);
@@ -45,13 +53,16 @@ class CLMsgLoopManagerForLibevent : public CLMessageLoopManager
     std::string m_strThreadName;
 
     std::map<struct event, CLMessageReceiver*> m_ReadSetMap;
-    std::map<struct event, std::list<CLMessagePoster*>*> m_WriteSetMap;
-
+    std::map<struct event, CLMessagePoster*> m_WriteSetMap;
+    std::map<struct event, CLDataPostChannelMaintainer*> m_ChannelMap;
     std::set<struct event> m_DeletedSet;
 
     CLMutex m_MutexForReadMap;
     CLMutex m_MutexForWriteMap;
     CLMutex m_MutexForDeletedSet;  
+    CLMutex m_MutexForChannelMap;
+
+    bool m_bMultipleThread;
 };
 
 #endif
