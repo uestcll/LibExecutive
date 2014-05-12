@@ -183,7 +183,7 @@ void CLMsgLoopManagerForIOMultiplexing::ClearDeletedSet()
 
 CLStatus CLMsgLoopManagerForIOMultiplexing::RegisterWriteEvent(int fd, CLMessagePoster *pMsgPoster)
 {
-	if(fd < 0)
+	if((fd < 0) || (pMsgPoster == 0))
 		return CLStatus(-1, NORMAL_ERROR);
 
 	if(m_bMultipleThread)
@@ -261,7 +261,7 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::Uninitialize()
 	return CLStatus(0, 0);
 }
 
-CLStatus CLMsgLoopManagerForIOMultiplexing::GetInfoFromSet(bool bReadSet, fd_set *pSet, int& maxfd)
+CLStatus CLMsgLoopManagerForIOMultiplexing::GetInfoFromSet(bool bReadSet, fd_set **ppSet, int& maxfd)
 {
 	if(bReadSet)
 	{
@@ -269,43 +269,66 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::GetInfoFromSet(bool bReadSet, fd_set
 		if(it != m_ReadSetMap.end())
 		{
 			maxfd = it->first;
-			memcpy(pSet, m_pReadSet, sizeof(fd_set));
+
+			*ppSet = new fd_set;
+			FD_ZERO(*ppSet);
+
+			memcpy(*ppSet, m_pReadSet, sizeof(fd_set));
 			return CLStatus(0, 0);
 		}
-		//................................
 	}
+	else
+	{
+		map<int, CLMessagePoster*>::iterator it = m_WriteSetMap.rbegin();
+		if(it != m_WriteSetMap.end())
+		{
+			maxfd = it->first;
+
+			*ppSet = new fd_set;
+			FD_ZERO(*ppSet);
+
+			memcpy(*ppSet, m_pWriteSet, sizeof(fd_set));
+			return CLStatus(0, 0);
+		}
+	}
+
+	*ppSet = 0;
+	return CLStatus(-1, NORMAL_ERROR);
 }
 
-CLStatus CLMsgLoopManagerForIOMultiplexing::GetSeletcParameters(fd_set *pReadSet, fd_set *pWriteSet, int& maxfdp1)
+CLStatus CLMsgLoopManagerForIOMultiplexing::GetSelectParameters(fd_set **ppReadSet, fd_set **ppWriteSet, int& maxfdp1)
 {
-	int maxrfd = 0;
-	int maxwfd = 0;
+	int maxrfd = -1;
+	int maxwfd = -1;
 
 	if(m_bMultipleThread)
 	{
 		CLCriticalSection cs(&m_MutexForReadMap);
 
-		maxrfd = m_ReadSetMap.rbegin()->first;
-		memcpy(pReadSet, m_pReadSet, sizeof(fd_set));
+		GetInfoFromSet(true, ppReadSet, maxrfd);
 	}
 	else
 	{
-		maxrfd = m_ReadSetMap.rbegin()->first;
-		memcpy(pReadSet, m_pReadSet, sizeof(fd_set));
+		GetInfoFromSet(true, ppReadSet, maxrfd);
 	}
 
 	if(m_bMultipleThread)
 	{
 		CLCriticalSection cs(&m_MutexForWriteMap);
 
-		maxwfd = m_WriteSetMap.rbegin()->first;
-		memcpy(pWriteSet, m_pWriteSet, sizeof(fd_set));
+		GetInfoFromSet(false, ppWriteSet, maxwfd);
 	}
 	else
 	{
-		maxwfd = m_WriteSetMap.rbegin()->first;
-		memcpy(pWriteSet, m_pWriteSet, sizeof(fd_set));
+		GetInfoFromSet(false, ppWriteSet, maxwfd);
 	}
+
+	if((maxrfd == -1) && (maxwfd == -1))
+	{
+		maxfdp1 = -1;
+		return CLStatus(0, 0);
+	}
+		
 
 	if(maxrfd > maxwfd)
 		maxfdp1 = maxrfd + 1;
@@ -315,20 +338,38 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::GetSeletcParameters(fd_set *pReadSet
 	return CLStatus(0, 0);
 }
 
+CLStatus CLMsgLoopManagerForIOMultiplexing::ProcessConnectEvent(fd_set *pReadSet, fd_set *pWriteSet)
+{
+	if(m_bMultipleThread)
+	{
+		CLCriticalSection cs(&m_MutexForChannelMap);
+
+		map<int, CLDataPostChannelMaintainer*>::iterator it = m_ChannelMap.begin();
+		//................................
+	}
+}
+
 CLStatus CLMsgLoopManagerForIOMultiplexing::WaitForMessage()
 {
 	if(m_bMultipleThread)
 		ClearDeletedSet();
 
-	fd_set *pReadSet = new fd_set;
-	fd_set *pWriteSet = new fd_set;
-	FD_ZERO(pReadSet);
-	FD_ZERO(pWriteSet);
+	fd_set *pReadSet = 0;
+	fd_set *pWriteSet = 0;
 	int maxfdp1 = -1;
 
-	GetSeletcParameters(pReadSet, pWriteSet, maxfdp1);
+	GetSelectParameters(&pReadSet, &pWriteSet, maxfdp1);
+
+	if(maxfdp1 == -1)
+		return CLStatus(0, 0);
 
 	int ready_fd = select(maxfdp1, pReadSet, pWriteSet, 0, 0);
+
+	ProcessConnectEvent(pReadSet, pWriteSet);
+
+
+
+	
 
 	vector<CLMessageReceiver *> vpMsgReceiver;
 	
@@ -365,9 +406,11 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::WaitForMessage()
 		}
 	}
 
-	delete pReadSet;
+	if(pReadSet)
+		delete pReadSet;
 
-	delete pWriteSet;
+	if(pWriteSet)
+		delete pWriteSet;
 
 	return CLStatus(0, 0);
 }

@@ -44,9 +44,11 @@ private:
 
 	CLStatus Internal_RegisterConnectEvent(int fd, CLDataPostChannelMaintainer *pChannel);
 
-	CLStatus GetSeletcParameters(fd_set *pReadSet, fd_set *pWriteSet, int& maxfdp1);
+	CLStatus GetSelectParameters(fd_set **ppReadSet, fd_set **ppWriteSet, int& maxfdp1);
 
-	CLStatus GetInfoFromSet(bool bReadSet, fd_set *pSet, int& maxfd);
+	CLStatus GetInfoFromSet(bool bReadSet, fd_set **ppSet, int& maxfd);
+
+	CLStatus ProcessConnectEvent(fd_set *pReadSet, fd_set *pWriteSet);
 
 private:
 	CLMsgLoopManagerForIOMultiplexing(const CLMsgLoopManagerForIOMultiplexing&);
