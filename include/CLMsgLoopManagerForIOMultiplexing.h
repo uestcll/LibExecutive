@@ -4,7 +4,7 @@
 #include <string>
 #include <map>
 #include <set>
-#include <list>
+#include <utility>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -41,6 +41,7 @@ private:
 	CLStatus Internal_UnRegisterReadEvent(int fd);
 
 	CLStatus Internal_RegisterWriteEvent(int fd, CLMessagePoster *pMsgPoster);
+	CLStatus Internal_UnRegisterWriteEvent(int fd);
 
 	CLStatus Internal_RegisterConnectEvent(int fd, CLDataPostChannelMaintainer *pChannel);
 
@@ -49,6 +50,9 @@ private:
 	CLStatus GetInfoFromSet(bool bReadSet, fd_set **ppSet, int& maxfd);
 
 	CLStatus ProcessConnectEvent(fd_set *pReadSet, fd_set *pWriteSet);
+
+	//using boost tuple........................adding 
+	CLStatus Internal_ProcessConnectEvent(vector<pair<int, CLDataPostChannelMaintainer *> >& vSuccessChannel);
 
 private:
 	CLMsgLoopManagerForIOMultiplexing(const CLMsgLoopManagerForIOMultiplexing&);
