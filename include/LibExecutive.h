@@ -58,5 +58,6 @@
 #include "CLProtocolEncapsulator.h"
 #include "CLMsgLoopManagerForPrivateNamedPipe.h"
 #include "CLMsgLoopManagerForShareNamedPipe.h"
+#include "CLMsgLoopManagerForLibevent.h"
 
 #endif
