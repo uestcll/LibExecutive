@@ -1,7 +1,6 @@
-#include "CLMsgLoopManagerForLibevent.h"
+#include "LibExecutive.h"
 
-int main()
+int main(int argc, char *argv[])
 {
-    CLMessageObserver *pObserver = NULL;
-    return 0;
+
 }

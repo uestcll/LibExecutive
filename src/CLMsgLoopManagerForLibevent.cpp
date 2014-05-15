@@ -21,16 +21,16 @@ CLMsgLoopManagerForLibevent::CLMsgLoopManagerForLibevent(CLMessageObserver *pMsg
 
 CLMsgLoopManagerForLibevent::~CLMsgLoopManagerForLibevent()
 {
-	map<CLLibEvent, CLMessageReceiver*>::iterator it = m_ReadSetMap.begin();
+	map<struct event*, CLMessageReceiver*>::iterator it = m_ReadSetMap.begin();
     for(; it != m_ReadSetMap.end(); ++it)
     {
         delete it->second;
     }
 }
 
-CLStatus CLMsgLoopManagerForLibevent::Internal_RegisterReadEvent(CLLibEvent ev, CLMessageReceiver *pMsgReceiver)
+CLStatus CLMsgLoopManagerForLibevent::Internal_RegisterReadEvent(struct event* ev, CLMessageReceiver *pMsgReceiver)
 {
-    map<CLLibEvent, CLMessageReceiver*>::iterator it = m_ReadSetMap.find(ev);
+    map<struct event*, CLMessageReceiver*>::iterator it = m_ReadSetMap.find(ev);
     if(it != m_ReadSetMap.end())
         return CLStatus(-1, NORMAL_ERROR);
 
@@ -38,7 +38,7 @@ CLStatus CLMsgLoopManagerForLibevent::Internal_RegisterReadEvent(CLLibEvent ev, 
 
     return CLStatus(0, 0);
 }
-CLStatus CLMsgLoopManagerForLibevent::RegisterReadEvent(CLLibEvent ev, CLMessageReceiver *pMsgReceiver)
+CLStatus CLMsgLoopManagerForLibevent::RegisterReadEvent(struct event* ev, CLMessageReceiver *pMsgReceiver)
 {
     if(pMsgReceiver == 0)
         return CLStatus(-1, NORMAL_ERROR);
@@ -63,18 +63,18 @@ CLStatus CLMsgLoopManagerForLibevent::RegisterReadEvent(CLLibEvent ev, CLMessage
     return CLStatus(-1, NORMAL_ERROR);
 }
 
-CLStatus CLMsgLoopManagerForLibevent::UnRegisterReadEvent(CLLibEvent ev)
+CLStatus CLMsgLoopManagerForLibevent::UnRegisterReadEvent(struct event* ev)
 {
     if(m_bMultipleThread)
     {
         {
             CLCriticalSection cs(&m_MutexForDeletedSet);
 
-            set<CLLibEvent>::iterator it = m_DeletedSet.find(ev);
+            set<struct event*>::iterator it = m_DeletedSet.find(ev);
             if(it != m_DeletedSet.end())
                 return CLStatus(0, 0);
 
-            pair<set<CLLibEvent>::iterator, bool> r = m_DeletedSet.insert(ev);
+            pair<set<struct event*>::iterator, bool> r = m_DeletedSet.insert(ev);
 
             if(r.second)
                 return CLStatus(0, 0);
@@ -102,9 +102,9 @@ CLStatus CLMsgLoopManagerForLibevent::UnRegisterReadEvent(CLLibEvent ev)
     }
 }
 
-CLStatus CLMsgLoopManagerForLibevent::Internal_UnRegisterReadEvent(CLLibEvent ev)
+CLStatus CLMsgLoopManagerForLibevent::Internal_UnRegisterReadEvent(struct event* ev)
 {
-    map<CLLibEvent, CLMessageReceiver*>::iterator it = m_ReadSetMap.find(ev);
+    map<struct event*, CLMessageReceiver*>::iterator it = m_ReadSetMap.find(ev);
     if(it == m_ReadSetMap.end())
         return CLStatus(-1, NORMAL_ERROR);
 
@@ -122,7 +122,7 @@ void CLMsgLoopManagerForLibevent::ClearDeletedSet()
 	{
 		CLCriticalSection cs(&m_MutexForDeletedSet);
 
-		set<CLLibEvent>::iterator iter = m_DeletedSet.begin();
+		set<struct event*>::iterator iter = m_DeletedSet.begin();
         for(; iter != m_DeletedSet.end(); ++iter)
         {
             long r, e;
@@ -157,7 +157,7 @@ void CLMsgLoopManagerForLibevent::ClearDeletedSet()
     }
 }
 
-CLStatus CLMsgLoopManagerForLibevent::RegisterWriteEvent(CLLibEvent ev, CLMessagePoster *pMsgPoster)
+CLStatus CLMsgLoopManagerForLibevent::RegisterWriteEvent(struct event* ev, CLMessagePoster *pMsgPoster)
 {
     if(m_bMultipleThread)
     {
@@ -171,9 +171,9 @@ CLStatus CLMsgLoopManagerForLibevent::RegisterWriteEvent(CLLibEvent ev, CLMessag
     }
 }
 
-CLStatus CLMsgLoopManagerForLibevent::Internal_RegisterWriteEvent(CLLibEvent ev, CLMessagePoster *pMsgPoster)
+CLStatus CLMsgLoopManagerForLibevent::Internal_RegisterWriteEvent(struct event* ev, CLMessagePoster *pMsgPoster)
 {
-    map<CLLibEvent, CLMessagePoster*>::iterator it = m_WriteSetMap.find(ev);
+    map<struct event*, CLMessagePoster*>::iterator it = m_WriteSetMap.find(ev);
     if(it != m_WriteSetMap.end())
         return CLStatus(0, 0);
 
@@ -183,9 +183,9 @@ CLStatus CLMsgLoopManagerForLibevent::Internal_RegisterWriteEvent(CLLibEvent ev,
     return CLStatus(0, 0);
 }
 
-CLStatus CLMsgLoopManagerForLibevent::Internal_RegisterConnectEvent(CLLibEvent ev, CLDataPostChannelMainter *pChannel)
+CLStatus CLMsgLoopManagerForLibevent::Internal_RegisterConnectEvent(struct event* ev, CLDataPostChannelMainter *pChannel)
 {
-    map<CLLibEvent, CLDataPostChannelMainter*>::iterator it = m_ChannelMap.find(ev);
+    map<struct event*, CLDataPostChannelMainter*>::iterator it = m_ChannelMap.find(ev);
     if(it != m_ChannelMap.end())
         return CLStatus(0, 0);
 
@@ -198,7 +198,7 @@ CLStatus CLMsgLoopManagerForLibevent::Internal_RegisterConnectEvent(CLLibEvent e
     return CLStatus(0, 0);
 }
 
-CLStatus CLMsgLoopManagerForLibevent::RegisterConnectEvent(CLLibEvent ev, CLDataPostChannelMainter *pChannel)
+CLStatus CLMsgLoopManagerForLibevent::RegisterConnectEvent(struct event* ev, CLDataPostChannelMainter *pChannel)
 {
     if(pChannel == 0)
         return CLStatus(-1, NORMAL_ERROR);
