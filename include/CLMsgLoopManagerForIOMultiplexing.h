@@ -45,14 +45,16 @@ private:
 
 	CLStatus Internal_RegisterConnectEvent(int fd, CLDataPostChannelMaintainer *pChannel);
 
-	CLStatus GetSelectParameters(fd_set **ppReadSet, fd_set **ppWriteSet, int& maxfdp1);
+	void GetSelectParameters(fd_set **ppReadSet, fd_set **ppWriteSet, int& maxfdp1);
 
 	CLStatus GetInfoFromSet(bool bReadSet, fd_set **ppSet, int& maxfd);
 
 	CLStatus ProcessConnectEvent(fd_set *pReadSet, fd_set *pWriteSet);
 
-	//using boost tuple........................adding 
-	CLStatus Internal_ProcessConnectEvent(vector<pair<int, CLDataPostChannelMaintainer *> >& vSuccessChannel);
+	void Internal_ProcessConnectEvent(vector<pair<int, CLDataPostChannelMaintainer *> >& vSuccessChannel, vector<pair<int, CLDataPostChannelMaintainer *> >& vFailureChannel, fd_set *pReadSet, fd_set *pWriteSet);
+	void Internal_ProcessConnectChannelEvent(vector<pair<int, CLDataPostChannelMaintainer *> >& vSuccessChannel, vector<pair<int, CLDataPostChannelMaintainer *> >& vFailureChannel, fd_set *pReadSet, fd_set *pWriteSet);
+	void Internal_ProcessConnectReadEvent(vector<pair<int, CLDataPostChannelMaintainer *> >& vSuccessChannel, vector<pair<int, CLDataPostChannelMaintainer *> >& vFailureChannel);
+	void Internal_ProcessConnectWriteEvent(vector<pair<int, CLDataPostChannelMaintainer *> >& vSuccessChannel, vector<pair<int, CLDataPostChannelMaintainer *> >& vFailureChannel);
 
 private:
 	CLMsgLoopManagerForIOMultiplexing(const CLMsgLoopManagerForIOMultiplexing&);

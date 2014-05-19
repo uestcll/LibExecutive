@@ -1,3 +1,4 @@
+#include <sys/socket.h>
 #include <string.h>
 #include <utility>
 #include <vector>
@@ -309,7 +310,7 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::GetInfoFromSet(bool bReadSet, fd_set
 	return CLStatus(-1, NORMAL_ERROR);
 }
 
-CLStatus CLMsgLoopManagerForIOMultiplexing::GetSelectParameters(fd_set **ppReadSet, fd_set **ppWriteSet, int& maxfdp1)
+void CLMsgLoopManagerForIOMultiplexing::GetSelectParameters(fd_set **ppReadSet, fd_set **ppWriteSet, int& maxfdp1)
 {
 	int maxrfd = -1;
 	int maxwfd = -1;
@@ -339,7 +340,7 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::GetSelectParameters(fd_set **ppReadS
 	if((maxrfd == -1) && (maxwfd == -1))
 	{
 		maxfdp1 = -1;
-		return CLStatus(0, 0);
+		return;
 	}
 		
 
@@ -348,44 +349,131 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::GetSelectParameters(fd_set **ppReadS
 	else
 		maxfdp1 = maxwfd + 1;
 
-	return CLStatus(0, 0);
+	return;
 }
 
-//now reconstructing this functions.
+void CLMsgLoopManagerForIOMultiplexing::Internal_ProcessConnectEvent(vector<pair<int, CLDataPostChannelMaintainer *> >& vSuccessChannel, vector<pair<int, CLDataPostChannelMaintainer *> >& vFailureChannel, fd_set *pReadSet, fd_set *pWriteSet)
+{
+	map<int, CLDataPostChannelMaintainer*>::iterator it = m_ChannelMap.begin();
+	for(; it != m_ChannelMap.end(); ++it)
+	{
+		int fd = it->first;
+
+		if(FD_ISSET(fd, pWriteSet))
+		{
+			if((pReadSet != 0) && (FD_ISSET(fd, pReadSet)))
+			{
+				long err = 0;
+				socklen_t len = sizeof(long);
+				if((getsockopt(fd, SOL_SOCKET, SO_ERROR, &err, &len) < 0) || (err != 0))
+				{
+					pair<int, CLDataPostChannelMaintainer*> p(fd, it->second);
+					vFailureChannel.push_back(p);
+
+					continue;
+				}
+			}
+
+			pair<int, CLDataPostChannelMaintainer*> p(fd, it->second);
+			vSuccessChannel.push_back(p);
+
+			continue;
+		}
+	}
+}
+
+void CLMsgLoopManagerForIOMultiplexing::Internal_ProcessConnectWriteEvent(vector<pair<int, CLDataPostChannelMaintainer *> >& vSuccessChannel, vector<pair<int, CLDataPostChannelMaintainer *> >& vFailureChannel)
+{
+	vector<pair<int, CLDataPostChannelMaintainer *> >::iterator it = vSuccessChannel.begin();
+	for(; it != vSuccessChannel.end(); ++it)
+	{
+		Internal_UnRegisterWriteEvent(it->first);
+	}
+
+	vector<pair<int, CLDataPostChannelMaintainer *> >::iterator it1 = vFailureChannel.begin();
+	for(; it1 != vFailureChannel.end(); ++it1)
+	{
+		Internal_UnRegisterWriteEvent(it1->first);
+	}
+}
+
+void CLMsgLoopManagerForIOMultiplexing::Internal_ProcessConnectReadEvent(vector<pair<int, CLDataPostChannelMaintainer *> >& vSuccessChannel, vector<pair<int, CLDataPostChannelMaintainer *> >& vFailureChannel)
+{
+	vector<pair<int, CLDataPostChannelMaintainer *> >::iterator it = vSuccessChannel.begin();
+	for(; it != vSuccessChannel.end(); ++it)
+	{
+		Internal_UnRegisterReadEvent(it->first);
+	}
+
+	vector<pair<int, CLDataPostChannelMaintainer *> >::iterator it1 = vFailureChannel.begin();
+	for(; it1 != vFailureChannel.end(); ++it1)
+	{
+		Internal_UnRegisterReadEvent(it1->first);
+	}
+}
+
+void CLMsgLoopManagerForIOMultiplexing::Internal_ProcessConnectChannelEvent(vector<pair<int, CLDataPostChannelMaintainer *> >& vSuccessChannel, vector<pair<int, CLDataPostChannelMaintainer *> >& vFailureChannel, fd_set *pReadSet, fd_set *pWriteSet)
+{
+	Internal_ProcessConnectEvent(vSuccessChannel, vFailureChannel, pReadSet, pWriteSet);
+
+	vector<pair<int, CLDataPostChannelMaintainer *> >::iterator it = vSuccessChannel.begin();
+	for(; it != vSuccessChannel.end(); ++it)
+	{
+		m_ChannelMap.erase(it->first);
+	}
+
+	vector<pair<int, CLDataPostChannelMaintainer *> >::iterator it1 = vFailureChannel.begin();
+	for(; it1 != vFailureChannel.end(); ++it1)
+	{
+		m_ChannelMap.erase(it1->first);
+	}
+}
+
 CLStatus CLMsgLoopManagerForIOMultiplexing::ProcessConnectEvent(fd_set *pReadSet, fd_set *pWriteSet)
 {
-	vector<CLDataPostChannelMaintainer *> vChannel;
-	vector<CLDataPostChannelMaintainer *> vFailureChannel;
+	if(pWriteSet == 0)
+		return CLStatus(0, 0);
+
+	vector<pair<int, CLDataPostChannelMaintainer *> > vSuccessChannel;
+	vector<pair<int, CLDataPostChannelMaintainer *> > vFailureChannel;
 
 	if(m_bMultipleThread)
 	{
 		CLCriticalSection cs(&m_MutexForChannelMap);
 
-		map<int, CLDataPostChannelMaintainer*>::iterator it = m_ChannelMap.begin();
-		for(; it != m_ChannelMap.end(); ++it)
-		{
-			int fd = it->first;
+		Internal_ProcessConnectChannelEvent(vSuccessChannel, vFailureChannel, pReadSet, pWriteSet);
 
-			if(FD_ISSET(fd, pWriteSet))
-			{
-				if(FD_ISSET(fd, pReadSet))
-				{
-					long err = 0;
-					socklen_t len = sizeof(long);
-					if((getsockopt(fd, SOL_SOCKET, SO_ERROR, &err, &len) < 0) || (err != 0))
-					{
-						vFailureChannel.push_back(it->second);
-						continue;
-					}
-				}
-
-				vChannel.push_back(it->second);
-				continue;
-			}
-		}
+	}
+	else
+	{
+		Internal_ProcessConnectChannelEvent(vSuccessChannel, vFailureChannel, pReadSet, pWriteSet);
 	}
 
-	//.........................
+	if(m_bMultipleThread)
+	{
+		CLCriticalSection cs(&m_MutexForReadMap);
+
+		Internal_ProcessConnectReadEvent(vSuccessChannel, vFailureChannel);
+	}
+	else
+	{
+		Internal_ProcessConnectReadEvent(vSuccessChannel, vFailureChannel);
+	}
+
+	if(m_bMultipleThread)
+	{
+		CLCriticalSection cs(&m_MutexForWriteMap);
+
+		Internal_ProcessConnectWriteEvent(vSuccessChannel, vFailureChannel);
+	}
+	else
+	{
+		Internal_ProcessConnectWriteEvent(vSuccessChannel, vFailureChannel);
+	}
+
+	//add notify code and check ruturn CLStatus...............
+
+	return CLStatus(0, 0);
 }
 
 CLStatus CLMsgLoopManagerForIOMultiplexing::WaitForMessage()
@@ -405,8 +493,6 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::WaitForMessage()
 	int ready_fd = select(maxfdp1, pReadSet, pWriteSet, 0, 0);
 
 	ProcessConnectEvent(pReadSet, pWriteSet);
-
-
 
 	
 
