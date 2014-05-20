@@ -429,10 +429,10 @@ void CLMsgLoopManagerForIOMultiplexing::Internal_ProcessConnectChannelEvent(vect
 	}
 }
 
-CLStatus CLMsgLoopManagerForIOMultiplexing::ProcessConnectEvent(fd_set *pReadSet, fd_set *pWriteSet)
+void CLMsgLoopManagerForIOMultiplexing::ProcessConnectEvent(fd_set *pReadSet, fd_set *pWriteSet)
 {
 	if(pWriteSet == 0)
-		return CLStatus(0, 0);
+		return;
 
 	vector<pair<int, CLDataPostChannelMaintainer *> > vSuccessChannel;
 	vector<pair<int, CLDataPostChannelMaintainer *> > vFailureChannel;
@@ -471,9 +471,33 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::ProcessConnectEvent(fd_set *pReadSet
 		Internal_ProcessConnectWriteEvent(vSuccessChannel, vFailureChannel);
 	}
 
-	//add notify code and check ruturn CLStatus...............
+	vector<pair<int, CLDataPostChannelMaintainer *> >::iterator it = vSuccessChannel.begin();
+	for(; it != vSuccessChannel.end(); ++it)
+	{
+		it->second->NotifyConnectionResult(true);
+	}
 
-	return CLStatus(0, 0);
+	vector<pair<int, CLDataPostChannelMaintainer *> >::iterator it1 = vFailureChannel.begin();
+	for(; it1 != vFailureChannel.end(); ++it1)
+	{
+		it1->second->NotifyConnectionResult(false);
+	}
+
+	return;
+}
+
+void CLMsgLoopManagerForIOMultiplexing::ProcessWriteEvent(fd_set *pWriteSet)
+{
+	if(pWriteSet == 0)
+		return;
+
+	vector<pair<int, CLMessagePoster *>>//.....................
+
+	map<int, CLMessagePoster*>::iterator it = m_WriteSetMap.begin();
+	for(; it != m_WriteSetMap.end(); ++it)
+	{
+
+	}
 }
 
 CLStatus CLMsgLoopManagerForIOMultiplexing::WaitForMessage()

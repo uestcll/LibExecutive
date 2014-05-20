@@ -17,6 +17,8 @@ public:
 
 	virtual CLDataPoster* GetDataPoster() = 0;
 
+	virtual void NotifyConnectionResult(bool bSuccess);
+
 private:
 	CLDataPostChannelMaintainer(const CLDataPostChannelMaintainer&);
 	CLDataPostChannelMaintainer& operator=(const CLDataPostChannelMaintainer&);
