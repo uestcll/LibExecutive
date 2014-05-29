@@ -17,6 +17,8 @@ CLMsgLoopManagerForLibevent::CLMsgLoopManagerForLibevent(CLMessageObserver *pMsg
 	m_strThreadName = pstrThreadName;
 
     m_bMultipleThread = bMultipleThread;
+
+    m_base = event_base_new();
 }
 
 CLMsgLoopManagerForLibevent::~CLMsgLoopManagerForLibevent()
@@ -26,6 +28,8 @@ CLMsgLoopManagerForLibevent::~CLMsgLoopManagerForLibevent()
     {
         delete it->second;
     }
+
+    event_base_dispatch(base);
 }
 
 CLStatus CLMsgLoopManagerForLibevent::Internal_RegisterReadEvent(struct event* ev, CLMessageReceiver *pMsgReceiver)
@@ -35,6 +39,8 @@ CLStatus CLMsgLoopManagerForLibevent::Internal_RegisterReadEvent(struct event* e
         return CLStatus(-1, NORMAL_ERROR);
 
     m_ReadSetMap[ev] = pMsgReceiver;
+
+    event_add(ev, NULL);
 
     return CLStatus(0, 0);
 }
@@ -178,7 +184,7 @@ CLStatus CLMsgLoopManagerForLibevent::Internal_RegisterWriteEvent(struct event* 
         return CLStatus(0, 0);
 
     m_WriteSetMap[ev] = pMsgPoster;
-
+    event_add(ev, NULL);
 
     return CLStatus(0, 0);
 }
@@ -194,6 +200,8 @@ CLStatus CLMsgLoopManagerForLibevent::Internal_RegisterConnectEvent(struct event
     Internal_RegisterReadEvent(ev, 0);
 
     Internal_RegisterWriteEvent(ev, 0);
+
+    event_add(ev, NULL);
 
     return CLStatus(0, 0);
 }
@@ -235,6 +243,5 @@ CLStatus CLMsgLoopManagerForLibevent::Uninitialize()
 
 CLStatus CLMsgLoopManagerForLibevent::WaitForMessage()
 {
-    if(m_bMultipleThread)
-        ClearDeletedSet();
+    event_base_dispatch(base);
 }

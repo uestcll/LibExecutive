@@ -2,7 +2,7 @@
 #include "CLMessageSerializer.h"
 #include "CLProtocolEncapsulator.h"
 #include "CLDataPoster.h"
-#include "CLEvent.h"
+#include "CLNotify.h"
 #include "CLLogger.h"
 #include "CLProtocolDataPoster.h"
 #include "CLMessage.h"
@@ -12,7 +12,7 @@
 #include "ErrorCode.h"
 #include "CLIOVectors.h"
 
-CLMessagePoster::CLMessagePoster(CLMessageSerializer *pMsgSerializer, CLProtocolEncapsulator *pProtocolEncapsulator, CLDataPostChannelMaintainer *pChannelMaintainer, CLEvent *pEvent)
+CLMessagePoster::CLMessagePoster(CLMessageSerializer *pMsgSerializer, CLProtocolEncapsulator *pProtocolEncapsulator, CLDataPostChannelMaintainer *pChannelMaintainer, CLNotify *pEvent)
 {
 	try
 	{

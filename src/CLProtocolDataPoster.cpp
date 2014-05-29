@@ -1,5 +1,5 @@
 #include "CLProtocolDataPoster.h"
-#include "CLEvent.h"
+#include "CLNotify.h"
 #include "CLDataPostResultNotifier.h"
 #include "CLDataPoster.h"
 #include "CLLogger.h"
@@ -35,7 +35,7 @@ CLProtocolDataPoster::~CLProtocolDataPoster()
 		delete m_pResultNotifer;
 }
 
-CLStatus CLProtocolDataPoster::SetParameters(CLDataPoster *pDataPoster, CLDataPostResultNotifier *pResultNotifier, CLEvent *pEvent)
+CLStatus CLProtocolDataPoster::SetParameters(CLDataPoster *pDataPoster, CLDataPostResultNotifier *pResultNotifier, CLNotify *pEvent)
 {
 	if((pDataPoster == 0) || (pResultNotifier == 0) || m_bSetParameters)
 	{

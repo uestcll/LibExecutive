@@ -5,7 +5,7 @@
 #include "CLPointerToMsgDeserializer.h"
 #include "CLExecutiveNameServer.h"
 #include "CLLogger.h"
-#include "CLEvent.h"
+#include "CLNotify.h"
 #include "ErrorCode.h"
 #include "CLBufferManager.h"
 #include "CLSTLqueue.h"
@@ -21,7 +21,8 @@ CLMsgLoopManagerForSTLqueue::CLMsgLoopManagerForSTLqueue(CLMessageObserver *pMsg
 		throw "In CLMsgLoopManagerForSTLqueue::CLMsgLoopManagerForSTLqueue(), pstrThreadName error";
 		
 	m_strThreadName = pstrThreadName;
-	m_pEvent = new CLEvent(true);
+	//m_pEvent = new CLEvent(true);
+    m_pEvent = new CLNotify();
 	m_pSTLqueue = new CLSTLqueue();
 
 	m_pMsgReceiver = new CLMessageReceiver(new CLBufferManager(), new CLDataReceiverBySTLqueue(m_pSTLqueue), new CLPointerToMsgDeserializer(), new CLProtocolDecapsulatorBySplitPointer());

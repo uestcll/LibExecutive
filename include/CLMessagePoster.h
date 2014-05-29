@@ -8,7 +8,7 @@
 class CLMessageSerializer;
 class CLProtocolEncapsulator;
 class CLDataPoster;
-class CLEvent;
+class CLNotify;
 class CLDataPostResultNotifier;
 class CLInitialDataPostChannelNotifier;
 class CLDataPostChannelMaintainer;
@@ -18,7 +18,7 @@ class CLProtocolDataPoster;
 class CLMessagePoster
 {
 public:
-	CLMessagePoster(CLMessageSerializer *pMsgSerializer, CLProtocolEncapsulator *pProtocolEncapsulator, CLDataPostChannelMaintainer *pChannelMaintainer, CLEvent *pEvent);
+	CLMessagePoster(CLMessageSerializer *pMsgSerializer, CLProtocolEncapsulator *pProtocolEncapsulator, CLDataPostChannelMaintainer *pChannelMaintainer, CLNotify *pEven/t);
 	virtual ~CLMessagePoster();
 
 	CLStatus Initialize(CLInitialDataPostChannelNotifier *pNotifier, void *pContext);
@@ -35,7 +35,7 @@ private:
 	CLMessageSerializer *m_pSerializer;
 	CLProtocolEncapsulator *m_pProtocolEncapsulator;
 	CLDataPostChannelMaintainer *m_pChannelMaintainer;
-	CLEvent *m_pEvent;
+	CLNotify *m_pEvent;
 
 	uuid_t m_UuidOfPoster;
 

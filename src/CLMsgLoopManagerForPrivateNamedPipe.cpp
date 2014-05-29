@@ -5,7 +5,7 @@
 #include "CLPointerToMsgDeserializer.h"
 #include "CLExecutiveNameServer.h"
 #include "CLLogger.h"
-#include "CLEvent.h"
+#include "CLNotify.h"
 #include "ErrorCode.h"
 #include "CLBufferManager.h"
 #include "CLMessagePoster.h"
@@ -28,7 +28,8 @@ CLMsgLoopManagerForPrivateNamedPipe::CLMsgLoopManagerForPrivateNamedPipe(CLMessa
 	string strPath = EXECUTIVE_CHANNEL_PATH;
 	strPath += pstrThreadName;
 
-	m_pEvent = new CLEvent(true);
+	//m_pEvent = new CLEvent(true);
+    m_pEvent = new CLNotify();
 	m_pMsgReceiver = new CLMessageReceiver(new CLBufferManager(), new CLDataReceiverByNamedPipe(strPath.c_str()), new CLPointerToMsgDeserializer(), new CLProtocolDecapsulatorBySplitPointer);
 }
 

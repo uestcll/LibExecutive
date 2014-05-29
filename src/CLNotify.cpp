@@ -2,13 +2,28 @@
 #include "CLEvent.h"
 #include "CLEventFd.h"
 
-CLNotify::CLNotify(int type)
+CLNotify::CLNotify(int type, bool isSemaphore = true, const char *name = NULL)
 {
     p_event = NULL;
     p_eventFd = NULL;
     m_type = type;
     if(m_type == EVENT)
-        p_event = new CLEvent();
+    {
+        if(NULL == name)
+        {
+            if(isSemaphore)
+                p_event = new CLEvent(true);
+            else
+                p_event = new CLEvent();
+        }
+        else
+        {
+            if(isSemaphore)
+                p_event = new CLEvent(name, true);
+            else
+                p_event = new CLEvent(name);
+        }
+    }
     if(m_type == EVENTFD)
         p_eventFd = new CLEventFd();
 }

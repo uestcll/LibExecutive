@@ -5,7 +5,7 @@
 #include "CLMessageLoopManager.h"
 
 class CLMessageReceiver;
-class CLEvent;
+class CLNotify;
 class CLBufferManager;
 class CLSTLqueue;
 
@@ -28,7 +28,7 @@ private:
 private:
 	std::string m_strThreadName;
 	CLMessageReceiver *m_pMsgReceiver;
-	CLEvent *m_pEvent;
+	CLNotify *m_pEvent;
 	CLSTLqueue *m_pSTLqueue;
 };
 

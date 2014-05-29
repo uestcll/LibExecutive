@@ -4,7 +4,7 @@
 #include "CLDataReceiverByNamedPipe.h"
 #include "CLExecutiveNameServer.h"
 #include "CLLogger.h"
-#include "CLEvent.h"
+#include "CLNotify.h"
 #include "ErrorCode.h"
 #include "CLBufferManager.h"
 #include "CLMessagePoster.h"
@@ -29,7 +29,8 @@ CLMsgLoopManagerForShareNamedPipe::CLMsgLoopManagerForShareNamedPipe(CLMessageOb
 	string strPath = EXECUTIVE_CHANNEL_PATH;
 	strPath += pstrThreadName;
 
-	m_pEvent = new CLEvent(m_strThreadName.c_str(), true);
+	//m_pEvent = new CLEvent(m_strThreadName.c_str(), true);
+    m_pEvent = new CLNotify(m_strThreadName.c_str());
 	m_pMsgDeserializer = pMsgDeserializer;
 	m_pMsgSerializer = pMsgSerializer;
 	m_pDecapsulator = pDecapsulator;

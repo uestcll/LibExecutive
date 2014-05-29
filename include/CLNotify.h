@@ -12,7 +12,7 @@ class CLEventFd;
 class CLNotify
 {
 public:
-    CLNotify(int type);
+    CLNotify(int type, bool isSemaphore = true, const char *name = NULL);
     ~CLNotify();
     CLStatus Set();
     CLStatus Wait();
