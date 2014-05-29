@@ -46,6 +46,9 @@ private:
 
     CLStatus Internal_RegisterConnectEvent(int fd, CLDataPostChannelMainter *pChannel);
 
+    void On_Read(int fd);
+    void On_Write(int fd);
+
 private:
     CLMsgLoopManagerForLibevent(const CLMsgLoopManagerForLibevent&);
     CLMsgLoopManagerForLibevent& operator=(const CLMsgLoopManagerForLibevent&);
@@ -53,10 +56,12 @@ private:
 private:
     std::string m_strThreadName;
 
-    std::map<struct event*, CLMessageReceiver*> m_ReadSetMap;
-    std::map<struct event*, CLMessagePoster*> m_WriteSetMap;
-    std::map<struct event*, CLDataPostChannelMainter*> m_ChannelMap;
-    std::set<struct event*> m_DeletedSet;
+    std::map<int, CLMessageReceiver*> m_ReadSetMap;
+    std::map<int, CLMessagePoster*> m_WriteSetMap;
+    std::map<int, CLDataPostChannelMainter*> m_ChannelMap;
+    std::set<int> m_DeletedSet;
+    std::vector<CLMessageReceiver*> m_readvector;
+    std::vector<CLMessagePoster*> m_writevector;
 
     CLMutex m_MutexForReadMap;
     CLMutex m_MutexForWriteMap;
