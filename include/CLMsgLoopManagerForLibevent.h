@@ -25,10 +25,10 @@ public:
     virtual ~CLMsgLoopManagerForLibevent();
 
     CLStatus RegisterReadEvent(int fd, CLMessageReceiver *pMsgReceiver);
-    CLStatus UnRegisterReadEvent(int fd);
+    //CLStatus UnRegisterReadEvent(int fd);
 
     CLStatus RegisterWriteEvent(int fd, CLMessagePoster *pMsgPoster);
-    CLStatus RegisterConnectEvent(int fd, CLDataPostChannelMainter *pChannel);
+    //CLStatus RegisterConnectEvent(int fd, CLDataPostChannelMainter *pChannel);
 
 protected:
     virtual CLStatus Initialize();
@@ -37,14 +37,14 @@ protected:
     virtual CLStatus WaitForMessage();
 
 private:
-    void ClearDeletedSet();
+   // void ClearDeletedSet();
 
     CLStatus Internal_RegisterReadEvent(int fd, CLMessageReceiver *pMsgReceiver);
-    CLStatus Internal_UnRegisterReadEvent(int fd);
+    //CLStatus Internal_UnRegisterReadEvent(int fd);
 
     CLStatus Internal_RegisterWriteEvent(int fd, CLMessagePoster *pMsgPoster);
 
-    CLStatus Internal_RegisterConnectEvent(int fd, CLDataPostChannelMainter *pChannel);
+    //CLStatus Internal_RegisterConnectEvent(int fd, CLDataPostChannelMainter *pChannel);
 
     void On_Read(int fd);
     void On_Write(int fd);
@@ -69,6 +69,7 @@ private:
     CLMutex m_MutexForChannelMap;
 
     bool m_bMultipleThread;
+    bool m_islooping;
 
     struct event_base *m_base;
 };

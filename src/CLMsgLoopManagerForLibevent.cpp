@@ -17,22 +17,27 @@ CLMsgLoopManagerForLibevent::CLMsgLoopManagerForLibevent(CLMessageObserver *pMsg
 	m_strThreadName = pstrThreadName;
 
     m_bMultipleThread = bMultipleThread;
+    m_islooping = false;
 
     m_base = event_base_new();
 }
 
 CLMsgLoopManagerForLibevent::~CLMsgLoopManagerForLibevent()
 {
-	map<struct event*, CLMessageReceiver*>::iterator it = m_ReadSetMap.begin();
+	map<int, CLMessageReceiver*>::iterator it = m_ReadSetMap.begin();
     for(; it != m_ReadSetMap.end(); ++it)
     {
         delete it->second;
     }
 
+    event_base_free(m_base);
 }
 
 CLStatus CLMsgLoopManagerForLibevent::Internal_RegisterReadEvent(int fd, CLMessageReceiver *pMsgReceiver)
 {
+    if(m_islooping)
+        return CLStatus(-1, NORMAL_ERROR);
+
     map<int, CLMessageReceiver*>::iterator it = m_ReadSetMap.find(fd);
     if(it != m_ReadSetMap.end())
         return CLStatus(-1, NORMAL_ERROR);
@@ -70,7 +75,7 @@ CLStatus CLMsgLoopManagerForLibevent::RegisterReadEvent(int fd, CLMessageReceive
 
     return CLStatus(-1, NORMAL_ERROR);
 }
-
+/*
 CLStatus CLMsgLoopManagerForLibevent::UnRegisterReadEvent(int fd)
 {
     if(m_bMultipleThread)
@@ -164,6 +169,7 @@ void CLMsgLoopManagerForLibevent::ClearDeletedSet()
         delete (*it);
     }
 }
+*/
 
 CLStatus CLMsgLoopManagerForLibevent::RegisterWriteEvent(int fd, CLMessagePoster *pMsgPoster)
 {
@@ -181,6 +187,9 @@ CLStatus CLMsgLoopManagerForLibevent::RegisterWriteEvent(int fd, CLMessagePoster
 
 CLStatus CLMsgLoopManagerForLibevent::Internal_RegisterWriteEvent(int fd, CLMessagePoster *pMsgPoster)
 {
+    if(m_islooping)
+        return CLStatus(-1, NORMAL_ERROR);
+
     map<int, CLMessagePoster*>::iterator it = m_WriteSetMap.find(fd);
     if(it != m_WriteSetMap.end())
         return CLStatus(0, 0);
@@ -195,6 +204,7 @@ CLStatus CLMsgLoopManagerForLibevent::Internal_RegisterWriteEvent(int fd, CLMess
     return CLStatus(0, 0);
 }
 
+/*
 CLStatus CLMsgLoopManagerForLibevent::Internal_RegisterConnectEvent(int fd, CLDataPostChannelMainter *pChannel)
 {
     map<int, CLDataPostChannelMainter*>::iterator it = m_ChannelMap.find(fd);
@@ -234,6 +244,7 @@ CLStatus CLMsgLoopManagerForLibevent::RegisterConnectEvent(int fd, CLDataPostCha
         return Internal_RegisterConnectEvent(fd, pChannel);
     }
 }
+*/
 
 void CLMsgLoopManagerForLibevent::On_Read(int fd)
 {
@@ -257,5 +268,6 @@ CLStatus CLMsgLoopManagerForLibevent::Uninitialize()
 
 CLStatus CLMsgLoopManagerForLibevent::WaitForMessage()
 {
-    event_base_dispatch(base);
+    m_islooping = true;
+    event_base_dispatch(m_base);
 }
