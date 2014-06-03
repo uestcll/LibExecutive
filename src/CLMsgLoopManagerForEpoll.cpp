@@ -57,12 +57,15 @@ CLStatus CLMsgLoopManagerForEpoll::Register(unsigned long lMsgID, CallBackForMes
 
 CLStatus CLMsgLoopManagerForEpoll::Initialize()
 {
-	// CLStatus s = m_pEpoll->Initialize(EPOLL_MAX_FD_SIZE);
-	// if(!s.IsSuccess())
-	// {
-	// 	CLLogger::WriteLogMsg("In CLMessageLoopManager::EnterMessageLoop(), m_pEpoll->Initialize() error", 0);
-	// 	return CLStatus(-1, 0);
-	// }
+    CLStatus s = m_pEpoll->Initialize(EPOLL_MAX_FD_SIZE);
+	
+    if(!s.IsSuccess())
+	{
+	    CLLogger::WriteLogMsg("In CLMessageLoopManager::EnterMessageLoop(), m_pEpoll->Initialize() error", 0);
+	 	return CLStatus(-1, 0);
+	}
+
+    return CLStatus(0, 0);
 }
 
 CLStatus CLMsgLoopManagerForEpoll::EnterMessageLoop(void *pContext)
