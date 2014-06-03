@@ -34,7 +34,8 @@ protected:
     virtual CLStatus Initialize();
     virtual CLStatus Uninitialize();
 
-    virtual CLStatus WaitForMessage();
+    //virtual CLStatus WaitForMessage();
+    virtual CLStatus EnterMessageLoop(void *pContext);
 
 private:
    // void ClearDeletedSet();

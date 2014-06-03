@@ -248,7 +248,53 @@ CLStatus CLMsgLoopManagerForLibevent::RegisterConnectEvent(int fd, CLDataPostCha
 
 void CLMsgLoopManagerForLibevent::On_Read(int fd)
 {
+    long old_size = m_MessageContainer.size();
+    map<int, CLMessageReceiver*>::iterator it = m_ReadSetMap.find(fd);
+    if(it == m_ReadSetMap.end())
+    {
+        return CLStatus(-1, -1);
+        CLLogger::WriteLogMsg("In CLMsgLoopManagerForLibevent::On_Read(), can't find fd", -1);
+    }
 
+    CLMessageReceiver *pMsgReceiver = m_ReadSetMap[fd];
+
+    CLStatus s1 = pMsgReceiver->GetMessage(m_MessageContainer);
+    while(!m_MessageContainer.empty())
+    {
+        SLMessageAndSource *pInfo = m_MessageContainer.front();
+        m_MessageContainer.pop();
+        if(pInfo && pInfo->pMsg)
+        {
+            CLStatus s3 = DispatchMessage(pInfo);
+
+            delete pInfo->pMsg;
+
+            delete pInfo;
+
+            if(s3.m_clReturnCode == QUIT_MESSAGE_LOOP)
+            {
+                bQuit = true;
+                break;
+            }
+        }
+        else if(pInfo)
+        {
+            delete pInfo;
+        }
+    }
+
+    while(!m_MessageContainer.empty())
+    {
+        SLMessageAndSource *pInfo = m_MessageContainer.front();
+        m_MessageContainer.pop();
+        if(pInfo)
+        {
+            if(pInfo->pMsg)
+                delete pInfo->pMsg;
+
+            delete pInfo;
+        }
+    }
 }
 
 void CLMsgLoopManagerForLibevent::On_Write(int fd)
@@ -266,8 +312,53 @@ CLStatus CLMsgLoopManagerForLibevent::Uninitialize()
     return CLStatus(0, 0);
 }
 
+/*
 CLStatus CLMsgLoopManagerForLibevent::WaitForMessage()
 {
     m_islooping = true;
     event_base_dispatch(m_base);
+}
+*/
+
+CLStatus CLMsgLoopManagerForLibevent::EnterMessageLoop(void *pContext)
+{
+    SLExecutiveInitialParameter *para = (SLExecutiveInitialParameter *)pContext;
+
+    if((para == 0) || (para->pNotifier == 0))
+        return CLStatus(-1, NORMAL_ERROR);
+    
+    CLStatus s = Initialize();
+    if(!s.IsSuccess())
+    {
+        CLLogger::WriteLogMsg("In CLMessageLoopManager::EnterMessageLoop(), Initialize error", 0);
+        para->pNotifier->NotifyInitialFinished(false);
+        return CLStatus(-1, NORMAL_ERROR);
+    }
+
+    CLStatus s1 = m_pMessageObserver->Initialize(this, para->pContext);
+    if(!s1.IsSuccess())
+    {
+        CLLogger::WriteLogMsg("In CLMessageLoopManager::EnterMessageLoop(), m_pMessageObserver->Initialize error", 0);
+
+        CLStatus s2 = Uninitialize();
+        if(!s2.IsSuccess())
+            CLLogger::WriteLogMsg("In CLMessageLoopManager::EnterMessageLoop(), Uninitialize() error", 0);  
+
+        para->pNotifier->NotifyInitialFinished(false);      
+        return CLStatus(-1, NORMAL_ERROR);
+    }
+
+    para->pNotifier->NotifyInitialFinished(true);
+
+    m_islooping = true;
+    event_base_dispatch(m_base);
+
+    CLStatus s2 = Uninitialize();
+    if(!s2.IsSuccess())
+    {
+        CLLogger::WriteLogMsg("In CLMessageLoopManager::EnterMessageLoop(), Uninitialize() error", 0);
+        return CLStatus(-1, NORMAL_ERROR);
+    }
+
+    return CLStatus(0, 0);
 }
