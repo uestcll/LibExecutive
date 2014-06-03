@@ -35,6 +35,13 @@ CLThreadForMsgLoop::CLThreadForMsgLoop(CLMessageObserver *pMsgObserver, const ch
 
 		return;
 	}
+    else if(ExecutiveType == EXECUTIVE_USE_LIBEVENT)
+    {
+        m_pSerializer = 0;
+        m_pDeserializer = 0;
+        m_pThread = new CLThread(new CLExecutiveFunctionForMsgLoop(new CLMsgLoopManagerForLibevent(pMsgObserver, pstrThreadName)), bWaitForDeath);
+        return;
+    }
 	else
 	{
 		m_pDeserializer = 0;

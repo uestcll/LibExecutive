@@ -1,5 +1,4 @@
-#include <string.h>
-#include "CLNonThreadForMsgLoop.h"
+
 #include "CLExecutiveFunctionForMsgLoop.h"
 #include "CLMsgLoopManagerForSTLqueue.h"
 #include "CLMsgLoopManagerForPrivateNamedPipe.h"
@@ -31,6 +30,14 @@ CLNonThreadForMsgLoop::CLNonThreadForMsgLoop(CLMessageObserver *pMsgObserver, co
 
 		return;
 	}
+    else if(ExecutiveType == EXECUTIVE_USE_LIBEVENT)
+    {
+        m_pSerializer = 0;
+        m_pDeserializer = 0;
+
+        m_pFunctionProvider = new CLExecutiveFunctionForMsgLoop(new CLMsgLoopManagerForLibevent(pMsgObserver, pstrThreadName));
+        return;
+    }
 	else
 	{
 		m_pSerializer = 0;
