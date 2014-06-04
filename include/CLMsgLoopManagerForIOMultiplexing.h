@@ -57,6 +57,7 @@ private:
 	void Internal_ProcessConnectWriteEvent(vector<pair<int, CLDataPostChannelMaintainer *> >& vSuccessChannel, vector<pair<int, CLDataPostChannelMaintainer *> >& vFailureChannel);
 
 	void ProcessWriteEvent(fd_set *pWriteSet);
+	void ProcessReadEvent(fd_set *pReadSet);
 
 private:
 	CLMsgLoopManagerForIOMultiplexing(const CLMsgLoopManagerForIOMultiplexing&);

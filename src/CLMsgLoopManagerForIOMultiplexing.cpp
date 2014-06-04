@@ -491,34 +491,46 @@ void CLMsgLoopManagerForIOMultiplexing::ProcessWriteEvent(fd_set *pWriteSet)
 	if(pWriteSet == 0)
 		return;
 
-	vector<pair<int, CLMessagePoster *>>//.....................
+	vector<pair<int, CLMessagePoster *>> vpMsgPoster;
 
-	map<int, CLMessagePoster*>::iterator it = m_WriteSetMap.begin();
-	for(; it != m_WriteSetMap.end(); ++it)
 	{
+		CLCriticalSection cs(&m_MutexForWriteMap);
 
+		map<int, CLMessagePoster*>::iterator it = m_WriteSetMap.begin();
+		for(; it != m_WriteSetMap.end(); ++it)
+		{
+			if(FD_ISSET(it->first, pWriteSet))
+			{
+				pair<int, CLDataPostChannelMaintainer*> p(it->first, it->second);
+				vpMsgPoster.push_back(p);
+			}
+		}	
+	}
+
+	vector<pair<int, CLMessagePoster *> >::iterator it = vpMsgPoster.begin();
+	for(; it != vpMsgPoster.end(); ++it)
+	{
+		CLStatus s1 = it->second->NotifyPoster();
+		if(!s1.IsSuccess())
+		{
+			CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::ProcessWriteEvent(), it->second->NotifyPoster() error", 0);
+		}
+
+		{
+			CLCriticalSection cs2(&m_MutexForWriteMap);
+			CLStatus s2 = Internal_UnRegisterWriteEvent(it->first);
+			if(!s2.IsSuccess())
+			{
+				CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::ProcessWriteEvent(), Internal_UnRegisterWriteEvent() error");
+			}	
+		}
 	}
 }
 
-CLStatus CLMsgLoopManagerForIOMultiplexing::WaitForMessage()
+void CLMsgLoopManagerForIOMultiplexing::ProcessReadEvent(fd_set *pReadSet)
 {
-	if(m_bMultipleThread)
-		ClearDeletedSet();
-
-	fd_set *pReadSet = 0;
-	fd_set *pWriteSet = 0;
-	int maxfdp1 = -1;
-
-	GetSelectParameters(&pReadSet, &pWriteSet, maxfdp1);
-
-	if(maxfdp1 == -1)
-		return CLStatus(0, 0);
-
-	int ready_fd = select(maxfdp1, pReadSet, pWriteSet, 0, 0);
-
-	ProcessConnectEvent(pReadSet, pWriteSet);
-
-	
+	if(pReadSet == 0)
+		return;
 
 	vector<CLMessageReceiver *> vpMsgReceiver;
 	
@@ -541,19 +553,34 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::WaitForMessage()
 		//bug iff getmessage return error how to notify user
 		(*iter_read)->GetMessage(m_MessageContainer);
 	}
+}
 
+CLStatus CLMsgLoopManagerForIOMultiplexing::WaitForMessage()
+{
+	if(m_bMultipleThread)
+		ClearDeletedSet();
+
+	fd_set *pReadSet = 0;
+	fd_set *pWriteSet = 0;
+	int maxfdp1 = -1;
+
+	GetSelectParameters(&pReadSet, &pWriteSet, maxfdp1);
+
+	if(maxfdp1 == -1)
+		return CLStatus(0, 0);
+
+	int ready_fd = select(maxfdp1, pReadSet, pWriteSet, 0, 0);
+
+	if(ready_fd <= 0)//no ready fds, back to loop to waitMsg again
 	{
-		CLCriticalSection cs(&m_MutexForWriteMap);
-
-		map<int, list<CLProtocolDataPoster*>*>::iterator it = m_WriteSetMap.begin();
-		for(; it != m_WriteSetMap.end(); ++it)
-		{
-			if(FD_ISSET(it->first, pWriteSet))
-			{
-				//.......................
-			}
-		}
+		return CLStatus(0, 0);
 	}
+
+	ProcessConnectEvent(pReadSet, pWriteSet);
+
+	ProcessReadEvent(pReadSet);
+
+	ProcessWriteEvent(pWriteSet);
 
 	if(pReadSet)
 		delete pReadSet;

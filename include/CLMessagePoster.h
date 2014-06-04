@@ -26,6 +26,7 @@ public:
 
 	CLStatus PostMessage(CLMessage *pMsg, CLDataPostResultNotifier *pResultNotifier, CLProtocolDataPoster *pDataPoster);
 	CLStatus PostLeftMessage(CLProtocolDataPoster *pDataPoster);
+	CLStatus NotifyPoster();
 
 private:
 	CLMessagePoster(const CLMessagePoster&);

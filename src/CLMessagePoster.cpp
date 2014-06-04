@@ -209,3 +209,10 @@ CLStatus CLMessagePoster::PostLeftMessage(CLProtocolDataPoster *pDataPoster)
 
 	return s;
 }
+
+CLStatus CLMessagePoster::NotifyPoster()
+{
+	
+
+	return CLStatus(0, 0);
+}
