@@ -29,7 +29,7 @@ CLMsgLoopManagerForPrivateNamedPipe::CLMsgLoopManagerForPrivateNamedPipe(CLMessa
 	strPath += pstrThreadName;
 
 	//m_pEvent = new CLEvent(true);
-    m_pEvent = new CLNotify();
+    m_pEvent = new CLNotify(EVENT);
 	m_pMsgReceiver = new CLMessageReceiver(new CLBufferManager(), new CLDataReceiverByNamedPipe(strPath.c_str()), new CLPointerToMsgDeserializer(), new CLProtocolDecapsulatorBySplitPointer);
 }
 
@@ -124,7 +124,7 @@ CLStatus CLMsgLoopManagerForPrivateNamedPipe::WaitForMessage()
 
 	if(new_size > old_size)
 	{
-		if(!(m_pEvent->ReleaseSemaphore(new_size - old_size - 1).IsSuccess()))
+		if(!(((CLEvent*)(m_pEvent->GetEvent()))->ReleaseSemaphore(new_size - old_size - 1).IsSuccess()))
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForPrivateNamedPipe::WaitForMessage(), m_pEvent->ReleaseSemaphore error; but may be made by the sequence of sendmsg.set.(wait).sendmsg(compute new_size).set", 0);
 	}
 

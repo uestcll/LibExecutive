@@ -3,6 +3,7 @@
 #include "CLThread.h"
 #include "CLExecutiveFunctionForMsgLoop.h"
 #include "CLMsgLoopManagerForSTLqueue.h"
+#include "CLMsgLoopManagerForLibevent.h"
 #include "CLThreadInitialFinishedNotifier.h"
 #include "CLMsgLoopManagerForPrivateNamedPipe.h"
 #include "CLMsgLoopManagerForShareNamedPipe.h"
@@ -39,7 +40,7 @@ CLThreadForMsgLoop::CLThreadForMsgLoop(CLMessageObserver *pMsgObserver, const ch
     {
         m_pSerializer = 0;
         m_pDeserializer = 0;
-        m_pThread = new CLThread(new CLExecutiveFunctionForMsgLoop(new CLMsgLoopManagerForLibevent(pMsgObserver, pstrThreadName)), bWaitForDeath);
+        m_pThread = new CLThread(new CLExecutiveFunctionForMsgLoop(new CLMsgLoopManagerForLibevent(pMsgObserver, pstrThreadName, false)), bWaitForDeath);
         return;
     }
 	else

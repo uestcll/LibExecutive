@@ -1,8 +1,10 @@
-
+#include <string.h>
+#include "CLNonThreadForMsgLoop.h"
 #include "CLExecutiveFunctionForMsgLoop.h"
 #include "CLMsgLoopManagerForSTLqueue.h"
 #include "CLMsgLoopManagerForPrivateNamedPipe.h"
 #include "CLMsgLoopManagerForShareNamedPipe.h"
+#include "CLMsgLoopManagerForLibevent.h"
 #include "CLProtocolDecapsulatorByDefaultMsgFormat.h"
 #include "CLThreadInitialFinishedNotifier.h"
 #include "CLMultiMsgSerializer.h"
@@ -35,7 +37,7 @@ CLNonThreadForMsgLoop::CLNonThreadForMsgLoop(CLMessageObserver *pMsgObserver, co
         m_pSerializer = 0;
         m_pDeserializer = 0;
 
-        m_pFunctionProvider = new CLExecutiveFunctionForMsgLoop(new CLMsgLoopManagerForLibevent(pMsgObserver, pstrThreadName));
+        m_pFunctionProvider = new CLExecutiveFunctionForMsgLoop(new CLMsgLoopManagerForLibevent(pMsgObserver, pstrThreadName, false));
         return;
     }
 	else

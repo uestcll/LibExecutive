@@ -30,7 +30,7 @@ CLMsgLoopManagerForShareNamedPipe::CLMsgLoopManagerForShareNamedPipe(CLMessageOb
 	strPath += pstrThreadName;
 
 	//m_pEvent = new CLEvent(m_strThreadName.c_str(), true);
-    m_pEvent = new CLNotify(m_strThreadName.c_str());
+    m_pEvent = new CLNotify(EVENT, m_strThreadName.c_str());
 	m_pMsgDeserializer = pMsgDeserializer;
 	m_pMsgSerializer = pMsgSerializer;
 	m_pDecapsulator = pDecapsulator;
@@ -133,7 +133,7 @@ CLStatus CLMsgLoopManagerForShareNamedPipe::WaitForMessage()
 
 	if(new_size > old_size)
 	{
-		if(!(m_pEvent->ReleaseSemaphore(new_size - old_size - 1).IsSuccess()))
+		if(!(m_pEvent->GetEvent()->ReleaseSemaphore(new_size - old_size - 1).IsSuccess()))
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForShareNamedPipe::WaitForMessage(), m_pEvent->ReleaseSemaphore error; but may be made by the sequence of sendmsg.set.(wait).sendmsg(compute new_size).set", 0);
 	}
 

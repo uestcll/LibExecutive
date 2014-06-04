@@ -4,7 +4,7 @@
 #include "CLStatus.h"
 
 class CLDataPostResultNotifier;
-class CLEvent;
+class CLNotify;
 class CLDataPoster;
 class CLIOVectors;
 class CLIteratorForIOVectors;

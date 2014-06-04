@@ -2,8 +2,9 @@
 #define CLNOTIFY_H
 
 #include "CLStatus.h"
+#include "CLEvent.h"
 
-class CLEvent;
+//class CLEvent;
 class CLEventFd;
 
 #define EVENT 0
@@ -16,6 +17,7 @@ public:
     ~CLNotify();
     CLStatus Set();
     CLStatus Wait();
+    CLEvent* GetEvent();
 
 private:
     int m_type;

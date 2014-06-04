@@ -1,8 +1,6 @@
-test : test.o CLMsgLoopManagerForLibevent.o
-	g++ -o test test.o CLMsgLoopManagerForLibevent.o ../libexecutive.a -g -I../include -levent -lpthread -luuid
+test : CLMsgLoopManagerForLibevent_test.o
+	g++ -I ../include -L .. -o test CLMsgLoopManagerForLibevent_test.o  -g -lexecutive -lpthread -luuid
+	rm *.o
 
-test.o : test.cpp
-	g++ -o test.o -c test.cpp -I../include -g -levent
-
-CLMsgLoopManagerForLibevent.o : CLMsgLoopManagerForLibevent.cpp
-	g++ -o CLMsgLoopManagerForLibevent.o -c CLMsgLoopManagerForLibevent.cpp -I../include -g -levent
+CLMsgLoopManagerForLibevent_test.o : ./CLMsgLoopManagerForLibevent_test.cpp
+	g++ -I ../include -o CLMsgLoopManagerForLibevent_test.o -c CLMsgLoopManagerForLibevent_test.cpp -g

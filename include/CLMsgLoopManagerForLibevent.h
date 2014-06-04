@@ -34,7 +34,7 @@ protected:
     virtual CLStatus Initialize();
     virtual CLStatus Uninitialize();
 
-    //virtual CLStatus WaitForMessage();
+    virtual CLStatus WaitForMessage();
     virtual CLStatus EnterMessageLoop(void *pContext);
 
 private:
@@ -47,8 +47,8 @@ private:
 
     //CLStatus Internal_RegisterConnectEvent(int fd, CLDataPostChannelMainter *pChannel);
 
-    void On_Read(int fd);
-    void On_Write(int fd);
+    static void On_Read(int fd, short ev, void *arg);
+    static void On_Write(int fd, short ev, void *arg);
 
 private:
     CLMsgLoopManagerForLibevent(const CLMsgLoopManagerForLibevent&);

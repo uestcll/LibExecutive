@@ -18,7 +18,7 @@ class CLProtocolDataPoster;
 class CLMessagePoster
 {
 public:
-	CLMessagePoster(CLMessageSerializer *pMsgSerializer, CLProtocolEncapsulator *pProtocolEncapsulator, CLDataPostChannelMaintainer *pChannelMaintainer, CLNotify *pEven/t);
+	CLMessagePoster(CLMessageSerializer *pMsgSerializer, CLProtocolEncapsulator *pProtocolEncapsulator, CLDataPostChannelMaintainer *pChannelMaintainer, CLNotify *pEvent);
 	virtual ~CLMessagePoster();
 
 	CLStatus Initialize(CLInitialDataPostChannelNotifier *pNotifier, void *pContext);

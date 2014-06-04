@@ -22,7 +22,7 @@ CLMsgLoopManagerForSTLqueue::CLMsgLoopManagerForSTLqueue(CLMessageObserver *pMsg
 		
 	m_strThreadName = pstrThreadName;
 	//m_pEvent = new CLEvent(true);
-    m_pEvent = new CLNotify();
+    m_pEvent = new CLNotify(EVENT);
 	m_pSTLqueue = new CLSTLqueue();
 
 	m_pMsgReceiver = new CLMessageReceiver(new CLBufferManager(), new CLDataReceiverBySTLqueue(m_pSTLqueue), new CLPointerToMsgDeserializer(), new CLProtocolDecapsulatorBySplitPointer());
@@ -119,7 +119,7 @@ CLStatus CLMsgLoopManagerForSTLqueue::WaitForMessage()
 
 	if(new_size > old_size)
 	{
-		if(!(m_pEvent->ReleaseSemaphore(new_size - old_size - 1).IsSuccess()))
+		if(!(m_pEvent->GetEvent()->ReleaseSemaphore(new_size - old_size - 1).IsSuccess()))
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForSTLqueue::WaitForMessage(), m_pEvent->ReleaseSemaphore error; but may be made by the sequence of sendmsg.set.(wait).sendmsg(compute new_size).set", 0);
 	}
 

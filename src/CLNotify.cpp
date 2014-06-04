@@ -53,3 +53,8 @@ CLStatus CLNotify::Wait()
     else
         p_eventFd->ReadFd();
 }
+
+CLEvent* CLNotify::GetEvent()
+{
+    return p_event;
+}

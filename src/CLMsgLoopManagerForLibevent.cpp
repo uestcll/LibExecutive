@@ -2,10 +2,13 @@
 #include <utility>
 #include <vector>
 #include "CLMsgLoopManagerForLibevent.h"
+#include "CLExecutiveInitialFinishedNotifier.h"
+#include "CLMessageObserver.h"
 #include "CLCriticalSection.h"
 #include "ErrorCode.h"
 #include "CLMessageReceiver.h"
 #include "CLLogger.h"
+#include "CLMessage.h"
 
 using namespace std;
 
@@ -46,7 +49,7 @@ CLStatus CLMsgLoopManagerForLibevent::Internal_RegisterReadEvent(int fd, CLMessa
 
     struct event *ev;
     //实现On_Read函数
-    ev = event_new(m_base, fd, EV_PERSIST | EV_READ, On_Read, fd);
+    ev = event_new(m_base, fd, EV_PERSIST | EV_READ, (event_callback_fn)CLMsgLoopManagerForLibevent::On_Read, this);
     event_add(ev, NULL);
 
     return CLStatus(0, 0);
@@ -198,7 +201,7 @@ CLStatus CLMsgLoopManagerForLibevent::Internal_RegisterWriteEvent(int fd, CLMess
 
     struct event *ev;
     //实现On_Write函数
-    ev = event_new(m_base, fd, EV_WRITE | EV_PERSIST, On_Write, fd);
+    ev = event_new(m_base, fd, EV_WRITE | EV_PERSIST, (event_callback_fn)CLMsgLoopManagerForLibevent::On_Write, this);
     event_add(ev, NULL);
 
     return CLStatus(0, 0);
@@ -246,58 +249,46 @@ CLStatus CLMsgLoopManagerForLibevent::RegisterConnectEvent(int fd, CLDataPostCha
 }
 */
 
-void CLMsgLoopManagerForLibevent::On_Read(int fd)
+void CLMsgLoopManagerForLibevent::On_Read(int fd, short ev, void *arg)
 {
-    long old_size = m_MessageContainer.size();
-    map<int, CLMessageReceiver*>::iterator it = m_ReadSetMap.find(fd);
-    if(it == m_ReadSetMap.end())
+    CLMsgLoopManagerForLibevent *pthis = (CLMsgLoopManagerForLibevent*)arg;
+    std::queue<CLMessage*> &messageContainer = pthis->m_MessageContainer;
+    long old_size = messageContainer.size();
+
+    std::map<int, CLMessageReceiver*> &readSetMap = pthis->m_ReadSetMap;
+    std::map<int, CLMessageReceiver*>::iterator it = readSetMap.find(fd);
+    if(it == readSetMap.end())
     {
-        return CLStatus(-1, -1);
+        return ;
         CLLogger::WriteLogMsg("In CLMsgLoopManagerForLibevent::On_Read(), can't find fd", -1);
     }
 
-    CLMessageReceiver *pMsgReceiver = m_ReadSetMap[fd];
+    CLMessageReceiver *pMsgReceiver = readSetMap[fd];
 
-    CLStatus s1 = pMsgReceiver->GetMessage(m_MessageContainer);
-    while(!m_MessageContainer.empty())
+    CLStatus s1 = pMsgReceiver->GetMessage(messageContainer);
+    while(!messageContainer.empty())
     {
-        SLMessageAndSource *pInfo = m_MessageContainer.front();
-        m_MessageContainer.pop();
-        if(pInfo && pInfo->pMsg)
+        CLMessage *pMsg = messageContainer.front();
+        messageContainer.pop();
+
+        if(pMsg)
         {
-            CLStatus s3 = DispatchMessage(pInfo);
+            CLStatus s2 = pthis->CLMessageLoopManager::DispatchMessage(pMsg);
 
-            delete pInfo->pMsg;
-
-            delete pInfo;
-
-            if(s3.m_clReturnCode == QUIT_MESSAGE_LOOP)
-            {
-                bQuit = true;
-                break;
-            }
-        }
-        else if(pInfo)
-        {
-            delete pInfo;
+            delete pMsg;
         }
     }
 
-    while(!m_MessageContainer.empty())
+    while(!messageContainer.empty())
     {
-        SLMessageAndSource *pInfo = m_MessageContainer.front();
-        m_MessageContainer.pop();
-        if(pInfo)
-        {
-            if(pInfo->pMsg)
-                delete pInfo->pMsg;
-
-            delete pInfo;
-        }
+        CLMessage *pMsg = messageContainer.front();
+        messageContainer.pop();
+        if(pMsg)
+            delete pMsg;
     }
 }
 
-void CLMsgLoopManagerForLibevent::On_Write(int fd)
+void CLMsgLoopManagerForLibevent::On_Write(int fd, short ev, void *arg)
 {
 
 }
@@ -312,13 +303,10 @@ CLStatus CLMsgLoopManagerForLibevent::Uninitialize()
     return CLStatus(0, 0);
 }
 
-/*
 CLStatus CLMsgLoopManagerForLibevent::WaitForMessage()
 {
-    m_islooping = true;
-    event_base_dispatch(m_base);
+    /*pure virtual in base*/
 }
-*/
 
 CLStatus CLMsgLoopManagerForLibevent::EnterMessageLoop(void *pContext)
 {
