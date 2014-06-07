@@ -70,7 +70,17 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::RegisterReadEvent(int fd, CLMessageR
 		CLCriticalSection cs(&m_MutexForReadMap);
 
 		if(Internal_RegisterReadEvent(fd, pMsgReceiver).IsSuccess())
+		{
+			//gzh add at 2014/6/7
+			set<int>::iterator iter = m_DeletedSet.find(fd);
+			if(iter != m_DeletedSet.end())
+			{
+				m_DeletedSet.erase(iter);
+			}
+			//end add
+
 			return CLStatus(0, 0);
+		}
 	}
 	else
 	{
@@ -209,6 +219,11 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::Internal_RegisterWriteEvent(int fd, 
 	m_WriteSetMap[fd] = pMsgPoster;
 
 	FD_SET(fd, m_pWriteSet);
+
+	return CLStatus(0, 0);
+}
+CLStatus CLMsgLoopManagerForIOMultiplexing::UnRegisterWriteEvent(int fd)
+{
 
 	return CLStatus(0, 0);
 }
@@ -509,21 +524,13 @@ void CLMsgLoopManagerForIOMultiplexing::ProcessWriteEvent(fd_set *pWriteSet)
 	}
 
 	vector<pair<int, CLMessagePoster *> >::iterator it = vpMsgPoster.begin();
+	
 	for(; it != vpMsgPoster.end(); ++it)
 	{
-		CLStatus s1 = it->second->NotifyPoster();
+		CLStatus s1 = it->second->NotifyMsgPosterReadyToPost();
 		if(!s1.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::ProcessWriteEvent(), it->second->NotifyPoster() error", 0);
-		}
-
-		{
-			CLCriticalSection cs2(&m_MutexForWriteMap);
-			CLStatus s2 = Internal_UnRegisterWriteEvent(it->first);
-			if(!s2.IsSuccess())
-			{
-				CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::ProcessWriteEvent(), Internal_UnRegisterWriteEvent() error", 0);
-			}	
 		}
 	}
 }

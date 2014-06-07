@@ -28,7 +28,8 @@ public:
 	CLStatus UnRegisterReadEvent(int fd);
 
 	CLStatus RegisterWriteEvent(int fd, CLMessagePoster *pMsgPoster);
-
+	CLStatus UnRegisterWriteEvent(int fd);
+	
 	CLStatus RegisterConnectEvent(int fd, CLDataPostChannelMaintainer *pChannel);
 
 protected:
