@@ -4,12 +4,15 @@
 #include <string>
 #include <map>
 #include <set>
+#include <vector>
 #include <utility>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include "CLMessageLoopManager.h"
 #include "CLMutex.h"
+
+using namespace std;
 
 class CLMessageReceiver;
 class CLMessagePoster;
@@ -64,15 +67,15 @@ private:
 	CLMsgLoopManagerForIOMultiplexing& operator=(const CLMsgLoopManagerForIOMultiplexing&);
 
 private:
-	std::string m_strThreadName;
+	string m_strThreadName;
 
 	fd_set *m_pReadSet;
 	fd_set *m_pWriteSet;
 
-	std::map<int, CLMessageReceiver*> m_ReadSetMap;
-	std::map<int, CLMessagePoster*> m_WriteSetMap;
-	std::map<int, CLDataPostChannelMaintainer*> m_ChannelMap;
-	std::set<int> m_DeletedSet;
+	map<int, CLMessageReceiver*> m_ReadSetMap;
+	map<int, CLMessagePoster*> m_WriteSetMap;
+	map<int, CLDataPostChannelMaintainer*> m_ChannelMap;
+	set<int> m_DeletedSet;
 
 	CLMutex m_MutexForReadMap;
 	CLMutex m_MutexForWriteMap;

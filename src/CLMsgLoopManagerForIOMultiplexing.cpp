@@ -8,6 +8,7 @@
 #include "CLMessageReceiver.h"
 #include "CLMessagePoster.h"
 #include "CLLogger.h"
+#include "CLDataPostChannelMaintainer.h"
 
 using namespace std;
 
@@ -279,8 +280,8 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::GetInfoFromSet(bool bReadSet, fd_set
 {
 	if(bReadSet)
 	{
-		map<int, CLMessageReceiver*>::iterator it = m_ReadSetMap.rbegin();
-		if(it != m_ReadSetMap.end())
+		map<int, CLMessageReceiver*>::reverse_iterator it = m_ReadSetMap.rbegin();
+		if(it != m_ReadSetMap.rend())
 		{
 			maxfd = it->first;
 
@@ -293,8 +294,8 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::GetInfoFromSet(bool bReadSet, fd_set
 	}
 	else
 	{
-		map<int, CLMessagePoster*>::iterator it = m_WriteSetMap.rbegin();
-		if(it != m_WriteSetMap.end())
+		map<int, CLMessagePoster*>::reverse_iterator it = m_WriteSetMap.rbegin();
+		if(it != m_WriteSetMap.rend())
 		{
 			maxfd = it->first;
 
@@ -491,7 +492,7 @@ void CLMsgLoopManagerForIOMultiplexing::ProcessWriteEvent(fd_set *pWriteSet)
 	if(pWriteSet == 0)
 		return;
 
-	vector<pair<int, CLMessagePoster *>> vpMsgPoster;
+	vector<pair<int, CLMessagePoster *> > vpMsgPoster;
 
 	{
 		CLCriticalSection cs(&m_MutexForWriteMap);
@@ -501,7 +502,7 @@ void CLMsgLoopManagerForIOMultiplexing::ProcessWriteEvent(fd_set *pWriteSet)
 		{
 			if(FD_ISSET(it->first, pWriteSet))
 			{
-				pair<int, CLDataPostChannelMaintainer*> p(it->first, it->second);
+				pair<int, CLMessagePoster*> p(it->first, it->second);
 				vpMsgPoster.push_back(p);
 			}
 		}	
@@ -521,7 +522,7 @@ void CLMsgLoopManagerForIOMultiplexing::ProcessWriteEvent(fd_set *pWriteSet)
 			CLStatus s2 = Internal_UnRegisterWriteEvent(it->first);
 			if(!s2.IsSuccess())
 			{
-				CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::ProcessWriteEvent(), Internal_UnRegisterWriteEvent() error");
+				CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::ProcessWriteEvent(), Internal_UnRegisterWriteEvent() error", 0);
 			}	
 		}
 	}
@@ -563,30 +564,35 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::WaitForMessage()
 	fd_set *pReadSet = 0;
 	fd_set *pWriteSet = 0;
 	int maxfdp1 = -1;
-
-	GetSelectParameters(&pReadSet, &pWriteSet, maxfdp1);
-
-	if(maxfdp1 == -1)
-		return CLStatus(0, 0);
-
-	int ready_fd = select(maxfdp1, pReadSet, pWriteSet, 0, 0);
-
-	if(ready_fd <= 0)//no ready fds, back to loop to waitMsg again
+	
+	try
 	{
-		return CLStatus(0, 0);
+		GetSelectParameters(&pReadSet, &pWriteSet, maxfdp1);
+
+		if(maxfdp1 == -1)
+			throw CLStatus(0, 0);
+
+		int ready_fd = select(maxfdp1, pReadSet, pWriteSet, 0, 0);
+
+		if(ready_fd <= 0)//no ready fds, back to loop to waitMsg again
+		{
+			throw CLStatus(0, 0);
+		}
+
+		ProcessConnectEvent(pReadSet, pWriteSet);
+
+		ProcessReadEvent(pReadSet);
+
+		ProcessWriteEvent(pWriteSet);
+	}
+	catch(CLStatus& s)
+	{
+		if(pReadSet)
+			delete pReadSet;
+
+		if(pWriteSet)
+			delete pWriteSet;
 	}
 
-	ProcessConnectEvent(pReadSet, pWriteSet);
-
-	ProcessReadEvent(pReadSet);
-
-	ProcessWriteEvent(pWriteSet);
-
-	if(pReadSet)
-		delete pReadSet;
-
-	if(pWriteSet)
-		delete pWriteSet;
-
-	return CLStatus(0, 0);
+	return CLStatus(0, 0);	
 }
