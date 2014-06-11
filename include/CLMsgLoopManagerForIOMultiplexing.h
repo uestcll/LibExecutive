@@ -29,7 +29,7 @@ public:
 
 	CLStatus RegisterWriteEvent(int fd, CLMessagePoster *pMsgPoster);
 	CLStatus UnRegisterWriteEvent(int fd);
-	
+
 	CLStatus RegisterConnectEvent(int fd, CLDataPostChannelMaintainer *pChannel);
 
 protected:
@@ -62,6 +62,10 @@ private:
 
 	void ProcessWriteEvent(fd_set *pWriteSet);
 	void ProcessReadEvent(fd_set *pReadSet);
+
+	void Internal_ProcessWriteEvent(vector<pair<int, CLMessagePoster *> >& vMsgPoster, fd_set *pWriteSet);
+	void Internal_ProcessReadEvent(vector<pair<int, CLMessageReceiver*> >& vMsgReceiver, fd_set *pReadSet);
+
 
 private:
 	CLMsgLoopManagerForIOMultiplexing(const CLMsgLoopManagerForIOMultiplexing&);

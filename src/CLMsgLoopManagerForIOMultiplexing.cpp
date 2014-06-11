@@ -224,8 +224,19 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::Internal_RegisterWriteEvent(int fd, 
 }
 CLStatus CLMsgLoopManagerForIOMultiplexing::UnRegisterWriteEvent(int fd)
 {
+	if(fd < 0)
+		return CLStatus(-1, NORMAL_ERROR);
 
-	return CLStatus(0, 0);
+	if(m_bMultipleThread)
+	{
+		CLCriticalSection cs(&m_MutexForWriteMap);
+
+		return Internal_UnRegisterWriteEvent(fd);
+	}
+	else
+	{
+		return Internal_UnRegisterWriteEvent(fd);
+	}
 }
 
 CLStatus CLMsgLoopManagerForIOMultiplexing::Internal_UnRegisterWriteEvent(int fd)
@@ -507,32 +518,52 @@ void CLMsgLoopManagerForIOMultiplexing::ProcessWriteEvent(fd_set *pWriteSet)
 	if(pWriteSet == 0)
 		return;
 
-	vector<pair<int, CLMessagePoster *> > vpMsgPoster;
+	vector<pair<int, CLMessagePoster *> >vpMsgPoster;
 
+	if(m_bMultipleThread)
 	{
 		CLCriticalSection cs(&m_MutexForWriteMap);
-
-		map<int, CLMessagePoster*>::iterator it = m_WriteSetMap.begin();
-		for(; it != m_WriteSetMap.end(); ++it)
-		{
-			if(FD_ISSET(it->first, pWriteSet))
-			{
-				pair<int, CLMessagePoster*> p(it->first, it->second);
-				vpMsgPoster.push_back(p);
-			}
-		}	
+		
+		Internal_ProcessWriteEvent(vpMsgPoster, pWriteSet);
+	}
+	else
+	{
+		Internal_ProcessWriteEvent(vpMsgPoster, pWriteSet);
 	}
 
 	vector<pair<int, CLMessagePoster *> >::iterator it = vpMsgPoster.begin();
 	
 	for(; it != vpMsgPoster.end(); ++it)
 	{
-		CLStatus s1 = it->second->NotifyMsgPosterReadyToPost();
-		if(!s1.IsSuccess())
+		CLStatus ss = UnRegisterWriteEvent(it->first);
+		if(!ss.IsSuccess())
+		{
+			CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::ProcessWriteEvent(), UnRegisterWriteEvent() error", it->first);
+		}
+
+		CLStatus s = it->second->NotifyMsgPosterReadyToPost();
+		if(!s.IsSuccess())
 		{
 			CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::ProcessWriteEvent(), it->second->NotifyPoster() error", 0);
 		}
 	}
+
+	return;
+}
+
+void CLMsgLoopManagerForIOMultiplexing::Internal_ProcessWriteEvent(vector<pair<int, CLMessagePoster *> >& vMsgPoster, fd_set *pWriteSet)
+{
+	map<int, CLMessagePoster*>::iterator it = m_WriteSetMap.begin();
+	for(; it != m_WriteSetMap.end(); ++it)
+	{
+		if(FD_ISSET(it->first, pWriteSet))
+		{
+			pair<int, CLMessagePoster*> p(it->first, it->second);
+			vMsgPoster.push_back(p);
+		}
+	}
+
+	return;
 }
 
 void CLMsgLoopManagerForIOMultiplexing::ProcessReadEvent(fd_set *pReadSet)
@@ -540,27 +571,47 @@ void CLMsgLoopManagerForIOMultiplexing::ProcessReadEvent(fd_set *pReadSet)
 	if(pReadSet == 0)
 		return;
 
-	vector<CLMessageReceiver *> vpMsgReceiver;
+	vector<pair<int, CLMessageReceiver *> > vpMsgReceiver;
 	
+	if(m_bMultipleThread)
 	{
 		CLCriticalSection cs(&m_MutexForReadMap);
 
-		map<int, CLMessageReceiver*>::iterator it = m_ReadSetMap.begin();
-		for(; it != m_ReadSetMap.end(); ++it)
+		Internal_ProcessReadEvent(vpMsgReceiver, pReadSet);
+	}
+	else
+	{
+		Internal_ProcessReadEvent(vpMsgReceiver, pReadSet);
+	}
+
+	vector<pair<int, CLMessageReceiver*> >::iterator iter_read = vpMsgReceiver.begin();
+	for(; iter_read != vpMsgReceiver.end(); ++iter_read)
+	{
+		CLStatus s = iter_read->second->GetMessage(m_MessageContainer);
+		if(!s.IsSuccess())
 		{
-			if(FD_ISSET(it->first, pReadSet))
+			CLStatus s1 = UnRegisterReadEvent(iter_read->first);
+			if(!s1.IsSuccess())
 			{
-				vpMsgReceiver.push_back(it->second);
+				CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::ProcessReadEvent(), UnRegisterReadEvent error", iter_read->first);
 			}
 		}
 	}
+}
 
-	vector<CLMessageReceiver *>::iterator iter_read = vpMsgReceiver.begin();
-	for(; iter_read != vpMsgReceiver.end(); ++iter_read)
+void CLMsgLoopManagerForIOMultiplexing::Internal_ProcessReadEvent(vector<pair<int, CLMessageReceiver*> >& vMsgReceiver, fd_set *pReadSet)
+{
+	map<int, CLMessageReceiver* >::iterator it = m_ReadSetMap.begin();
+	for(; it != m_ReadSetMap.end(); ++ it)
 	{
-		//bug iff getmessage return error how to notify user
-		(*iter_read)->GetMessage(m_MessageContainer);
+		if(FD_ISSET(it->first, pReadSet))
+		{
+			pair<int, CLMessageReceiver*> p(it->first, it->second);
+			vMsgReceiver.push_back(p);
+		}
 	}
+
+	return;
 }
 
 CLStatus CLMsgLoopManagerForIOMultiplexing::WaitForMessage()
