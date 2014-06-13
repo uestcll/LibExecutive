@@ -178,6 +178,8 @@ CLStatus CLMessageReceiver::GetMessage(std::queue<SLMessageAndSource*>& qMsgCont
 		pMsgInfo1->ChannelUuid = *m_pChannelUuid;
 
 		qMsgContainer.push(pMsgInfo1);
+
+		return CLStatus(0, 0);
 	}
 	catch(CLStatus& s)
 	{
@@ -188,7 +190,7 @@ CLStatus CLMessageReceiver::GetMessage(std::queue<SLMessageAndSource*>& qMsgCont
 			pErrorMsgInfo->ChannelUuid = *m_pChannelUuid;
 			qMsgContainer.push(pErrorMsgInfo);
 
-			return CLStatus(-1, 0);
+			return CLStatus(-1, NORMAL_ERROR);
 		}
 		else
 			return CLStatus(0, 0);

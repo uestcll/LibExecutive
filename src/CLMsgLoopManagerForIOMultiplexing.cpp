@@ -70,17 +70,7 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::RegisterReadEvent(int fd, CLMessageR
 		CLCriticalSection cs(&m_MutexForReadMap);
 
 		if(Internal_RegisterReadEvent(fd, pMsgReceiver).IsSuccess())
-		{
-			//gzh add at 2014/6/7
-			set<int>::iterator iter = m_DeletedSet.find(fd);
-			if(iter != m_DeletedSet.end())
-			{
-				m_DeletedSet.erase(iter);
-			}
-			//end add
-
 			return CLStatus(0, 0);
-		}
 	}
 	else
 	{
@@ -147,6 +137,11 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::Internal_UnRegisterReadEvent(int fd)
 	FD_CLR(it->first, m_pReadSet);
 
 	m_ReadSetMap.erase(it);
+
+	// if(-1 == (close(it->first)))
+	// {
+	// 	CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::Internal_UnRegisterReadEvent(), close fd error", it->first);
+	// }
 
 	return CLStatus(0, (long)pTmp);
 }
@@ -222,6 +217,7 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::Internal_RegisterWriteEvent(int fd, 
 
 	return CLStatus(0, 0);
 }
+
 CLStatus CLMsgLoopManagerForIOMultiplexing::UnRegisterWriteEvent(int fd)
 {
 	if(fd < 0)
@@ -639,9 +635,11 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::WaitForMessage()
 
 		ProcessConnectEvent(pReadSet, pWriteSet);
 
+		ProcessWriteEvent(pWriteSet);
+
 		ProcessReadEvent(pReadSet);
 
-		ProcessWriteEvent(pWriteSet);
+		throw CLStatus(0, 0);
 	}
 	catch(CLStatus& s)
 	{
