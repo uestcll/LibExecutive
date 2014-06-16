@@ -138,10 +138,10 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::Internal_UnRegisterReadEvent(int fd)
 
 	m_ReadSetMap.erase(it);
 
-	// if(-1 == (close(it->first)))
-	// {
-	// 	CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::Internal_UnRegisterReadEvent(), close fd error", it->first);
-	// }
+	if(-1 == close(fd))
+	{
+		CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::UnRegisterReadEvent(), close fd error", fd);
+	}
 
 	return CLStatus(0, (long)pTmp);
 }
@@ -366,7 +366,6 @@ void CLMsgLoopManagerForIOMultiplexing::GetSelectParameters(fd_set **ppReadSet, 
 		return;
 	}
 		
-
 	if(maxrfd > maxwfd)
 		maxfdp1 = maxrfd + 1;
 	else
@@ -584,13 +583,9 @@ void CLMsgLoopManagerForIOMultiplexing::ProcessReadEvent(fd_set *pReadSet)
 	for(; iter_read != vpMsgReceiver.end(); ++iter_read)
 	{
 		CLStatus s = iter_read->second->GetMessage(m_MessageContainer);
-		if(!s.IsSuccess())
+		if(!s.IsSuccess() && (s.m_clErrorCode == NORMAL_ERROR))
 		{
-			CLStatus s1 = UnRegisterReadEvent(iter_read->first);
-			if(!s1.IsSuccess())
-			{
-				CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::ProcessReadEvent(), UnRegisterReadEvent error", iter_read->first);
-			}
+			ProcessErrorReadEvent(iter_read->first);
 		}
 	}
 }
@@ -605,6 +600,22 @@ void CLMsgLoopManagerForIOMultiplexing::Internal_ProcessReadEvent(vector<pair<in
 			pair<int, CLMessageReceiver*> p(it->first, it->second);
 			vMsgReceiver.push_back(p);
 		}
+	}
+
+	return;
+}
+
+void CLMsgLoopManagerForIOMultiplexing::ProcessErrorReadEvent(int fd)
+{
+	if(m_bMultipleThread)
+	{
+		CLCriticalSection cs(&m_MutexForReadMap);
+
+		FD_CLR(fd, m_pReadSet);
+	}
+	else
+	{
+		FD_CLR(fd, m_pReadSet);
 	}
 
 	return;
@@ -628,7 +639,7 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::WaitForMessage()
 
 		int ready_fd = select(maxfdp1, pReadSet, pWriteSet, 0, 0);
 
-		if(ready_fd <= 0)//no ready fds, back to loop to waitMsg again
+		if(ready_fd <= 0)
 		{
 			throw CLStatus(0, 0);
 		}

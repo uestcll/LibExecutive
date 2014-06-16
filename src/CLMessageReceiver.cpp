@@ -10,7 +10,7 @@
 #include "ErrorCode.h"
 #include "CLBufferManager.h"
 #include "CLChannelClosedMsg.h"
-#include "CLGetMessageErrorMsg.h"
+#include "CLChannelErrorMsg.h"
 
 using namespace std;
 
@@ -186,9 +186,9 @@ CLStatus CLMessageReceiver::GetMessage(std::queue<SLMessageAndSource*>& qMsgCont
 		if(!s.IsSuccess())
 		{
 			SLMessageAndSource *pErrorMsgInfo = new SLMessageAndSource;
-			pErrorMsgInfo->pMsg = new CLGetMessageErrorMsg;
+			pErrorMsgInfo->pMsg = new CLChannelErrorMsg(s.m_clErrorCode);
 			pErrorMsgInfo->ChannelUuid = *m_pChannelUuid;
-			qMsgContainer.push(pErrorMsgInfo);
+			qMsgContainer.push(pErrorMsgInfo); 
 
 			return CLStatus(-1, NORMAL_ERROR);
 		}

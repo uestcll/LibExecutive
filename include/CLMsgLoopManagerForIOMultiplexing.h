@@ -26,7 +26,6 @@ public:
 	CLStatus UnRegisterReadEvent(int fd);
 
 	CLStatus RegisterWriteEvent(int fd, CLMessagePoster *pMsgPoster);
-	CLStatus UnRegisterWriteEvent(int fd);
 
 	CLStatus RegisterConnectEvent(int fd, CLDataPostChannelMaintainer *pChannel);
 
@@ -38,6 +37,8 @@ protected:
 
 private:
 	void ClearDeletedSet();
+
+	CLStatus UnRegisterWriteEvent(int fd);
 
 	CLStatus Internal_RegisterReadEvent(int fd, CLMessageReceiver *pMsgReceiver);
 	CLStatus Internal_UnRegisterReadEvent(int fd);
@@ -63,6 +64,9 @@ private:
 
 	void Internal_ProcessWriteEvent(std::vector<std::pair<int, CLMessagePoster *> >& vMsgPoster, fd_set *pWriteSet);
 	void Internal_ProcessReadEvent(std::vector<std::pair<int, CLMessageReceiver*> >& vMsgReceiver, fd_set *pReadSet);
+
+	void ProcessErrorReadEvent(int fd);
+
 
 private:
 	CLMsgLoopManagerForIOMultiplexing(const CLMsgLoopManagerForIOMultiplexing&);
