@@ -67,7 +67,6 @@ private:
 
 	void ProcessErrorReadEvent(int fd);
 
-
 private:
 	CLMsgLoopManagerForIOMultiplexing(const CLMsgLoopManagerForIOMultiplexing&);
 	CLMsgLoopManagerForIOMultiplexing& operator=(const CLMsgLoopManagerForIOMultiplexing&);

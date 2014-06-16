@@ -99,7 +99,7 @@ CLStatus CLMessageReceiver::GetMessage(std::queue<SLMessageAndSource*>& qMsgCont
 				pMsgInfo->ChannelUuid = *m_pChannelUuid;
 
 				qMsgContainer.push(pMsgInfo);
-				throw CLStatus(0, 0);
+				return CLStatus(0, 0);
 			}
 
 			throw s1;
