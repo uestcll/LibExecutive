@@ -3,6 +3,7 @@
 #include <netdb.h>
 #include <errno.h>
 #include <strings.h>
+#include <unistd.h>
 #include "CLTCPClientSocket.h"
 #include "ErrorCode.h"
 #include "CLLogger.h"

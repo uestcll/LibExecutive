@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <string>
 #include <errno.h>
+#include <unistd.h>
 #include "CLSharedMemory.h"
 #include "CLLogger.h"
 #include "CLCriticalSection.h"
