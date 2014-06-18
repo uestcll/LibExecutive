@@ -18,6 +18,18 @@ TEST(CLMessageReceiver, GetMessage_Features_Test)
 	CLStatus s1 = pMsgReceiver->GetMessage(qCon);
 	EXPECT_FALSE(s1.IsSuccess());
 	EXPECT_TRUE(s1.m_clErrorCode == MSG_RECEIVED_ZERO);
+	EXPECT_TRUE(qCon.size() == 1);
+
+	SLMessageAndSource *pInfo = qCon.front();
+	qCon.pop();
+	EXPECT_TRUE((pInfo->pMsg).m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
+	EXPECT_TRUE((pInfo->pMsg).m_lErrCode == MSG_RECEIVED_ZERO);
+
+	CLUuidComparer compare;
+	EXPECT_TRUE(compare(u1, pInfo->ChannelUuid) == 0);
+
+	delete pInfo->pMsg;
+	delete pInfo;
 
 	delete pMsgReceiver;
 }
@@ -66,20 +78,34 @@ TEST(CLMessageReceiver, GetMessageSTL_Features_Test)
 	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
 	CLStatus s2 = pMsgReceiver->GetMessage(qCon);
 	EXPECT_FALSE(s2.IsSuccess());
-	EXPECT_TRUE(qCon.size() == 50);
+	EXPECT_TRUE(qCon.size() == 51);
+
 	i = 0;
 	while(!qCon.empty())
 	{
 		SLMessageAndSource *pInfo = qCon.front();
 		qCon.pop();
+	
+		if(i == 50)
+		{
+			EXPECT_TRUE((pInfo->pMsg).m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
+			EXPECT_TRUE((pInfo->pMsg).m_lErrCode == NORMAL_ERROR);
 
-		EXPECT_TRUE(pInfo->pMsg == (CLMessage *)(i + 1));
-		i++;
+			delete pInfo->pMsg;
+
+			i++;
+		}
+		else
+		{
+			EXPECT_TRUE(pInfo->pMsg == (CLMessage *)(i + 1));
+			i++;
+		}
 
 		CLUuidComparer compare;
 		EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
 
 		delete pInfo;
+
 	}
 
 	for(i = 0; i < 1000; i++)
@@ -161,10 +187,24 @@ TEST(CLMessageReceiver, GetMessageSTL2_Features_Test)
 	CLStatus s1 = pMsgReceiver->GetMessage(qCon);
 	EXPECT_FALSE(s1.IsSuccess());
 	EXPECT_TRUE(s1.m_clErrorCode == NORMAL_ERROR);
+	EXPECT_TRUE(qCon.size() == 1);
+
+	SLMessageAndSource *pInfo = qCon.front();
+	qCon.pop();
+
+	EXPECT_TRUE((pInfo->pMsg).m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
+	EXPECT_TRUE((pInfo->pMsg).m_lErrCode == NORMAL_ERROR);
+
+	CLUuidComparer compare;
+	EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
+
+	delete pInfo->pMsg;
+	delete pInfo;
 
 	delete pMsgReceiver;
 }
 
+/*
 TEST(CLMessageReceiver, GetMessagePrivateNamedPipe_Features_Test)
 {
 	const char *strPath = "/tmp/NamedPipe_For_CLMessageReceiver_Test";
@@ -1655,3 +1695,4 @@ TEST(CLMessageReceiver, GetMessageTCPSocket_ProtocolError_Test)
 	delete pMsgReceiver1;
 	delete pMsgReceiver;
 }
+*/
