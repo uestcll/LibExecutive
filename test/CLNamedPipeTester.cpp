@@ -9,7 +9,8 @@ TEST(CLNamedPipe, Read_Features_Test)
 
 	CLNamedPipe pipe("/tmp/CLNamedPipe_Read_Features_Test", true);
 
-	EXPECT_EQ(pipe.GetSizeForAtomWriting(), 4096);
+	long size = pipe.GetSizeForAtomWriting();
+	EXPECT_TRUE((size == 4096) || (size == 65536));
 
 	int fd = open("/tmp/CLNamedPipe_Read_Features_Test", O_WRONLY);
 	char buf[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -66,7 +67,8 @@ TEST(CLNamedPipe, Read_Features3_Test)
 {
 	CLNamedPipe pipe("/tmp/CLNamedPipe_Read_Features_Test", true, "mutex_for_CLNamedPipe_Read_Features_Test");
 
-	EXPECT_EQ(pipe.GetSizeForAtomWriting(), 4096);
+	long size = pipe.GetSizeForAtomWriting();
+	EXPECT_TRUE((size == 4096) || (size == 65536));
 
 	int fd = open("/tmp/CLNamedPipe_Read_Features_Test", O_WRONLY);
 	char buf[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -125,7 +127,8 @@ TEST(CLNamedPipe, Write_Features_Test)
 	char buf[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
 	CLNamedPipe pipe("/tmp/CLNamedPipe_Read_Features_Test", false);
-	EXPECT_EQ(pipe.GetSizeForAtomWriting(), 4096);
+	long size = pipe.GetSizeForAtomWriting();
+	EXPECT_TRUE((size == 4096) || (size == 65536));
 
 	CLIOVectors iov;
 
@@ -154,7 +157,8 @@ TEST(CLNamedPipe, Write_Features2_Test)
 	char buf[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
 	CLNamedPipe pipe("/tmp/CLNamedPipe_Read_Features_Test", false, "mutex_for_CLNamedPipe_Read_Features_Test");
-	EXPECT_EQ(pipe.GetSizeForAtomWriting(), 4096);
+	long size = pipe.GetSizeForAtomWriting();
+	EXPECT_TRUE((size == 4096) || (size == 65536));
 
 	CLIOVectors iov;
 

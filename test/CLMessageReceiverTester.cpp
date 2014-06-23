@@ -22,13 +22,16 @@ TEST(CLMessageReceiver, GetMessage_Features_Test)
 
 	SLMessageAndSource *pInfo = qCon.front();
 	qCon.pop();
-	EXPECT_TRUE((pInfo->pMsg).m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
-	EXPECT_TRUE((pInfo->pMsg).m_lErrCode == MSG_RECEIVED_ZERO);
+
+	CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pInfo->pMsg);
+
+	EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
+	EXPECT_TRUE(p->m_lErrCode == MSG_RECEIVED_ZERO);
 
 	CLUuidComparer compare;
 	EXPECT_TRUE(compare(u1, pInfo->ChannelUuid) == 0);
 
-	delete pInfo->pMsg;
+	delete p;
 	delete pInfo;
 
 	delete pMsgReceiver;
@@ -88,8 +91,10 @@ TEST(CLMessageReceiver, GetMessageSTL_Features_Test)
 	
 		if(i == 50)
 		{
-			EXPECT_TRUE((pInfo->pMsg).m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
-			EXPECT_TRUE((pInfo->pMsg).m_lErrCode == NORMAL_ERROR);
+			CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pInfo->pMsg);
+
+			EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
+			EXPECT_TRUE(p->m_lErrCode == NORMAL_ERROR);
 
 			delete pInfo->pMsg;
 
@@ -192,8 +197,10 @@ TEST(CLMessageReceiver, GetMessageSTL2_Features_Test)
 	SLMessageAndSource *pInfo = qCon.front();
 	qCon.pop();
 
-	EXPECT_TRUE((pInfo->pMsg).m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
-	EXPECT_TRUE((pInfo->pMsg).m_lErrCode == NORMAL_ERROR);
+	CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pInfo->pMsg);
+
+	EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
+	EXPECT_TRUE(p->m_lErrCode == NORMAL_ERROR);
 
 	CLUuidComparer compare;
 	EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
@@ -204,7 +211,7 @@ TEST(CLMessageReceiver, GetMessageSTL2_Features_Test)
 	delete pMsgReceiver;
 }
 
-/*
+
 TEST(CLMessageReceiver, GetMessagePrivateNamedPipe_Features_Test)
 {
 	const char *strPath = "/tmp/NamedPipe_For_CLMessageReceiver_Test";
@@ -216,6 +223,22 @@ TEST(CLMessageReceiver, GetMessagePrivateNamedPipe_Features_Test)
 	CLStatus s11 = pMsgReceiver->GetMessage(qCon);
 	EXPECT_FALSE(s11.IsSuccess());
 	EXPECT_TRUE(s11.m_clErrorCode == MSG_RECEIVED_ZERO);
+
+	EXPECT_TRUE(qCon.size() == 1);
+
+	SLMessageAndSource *pInfo = qCon.front();
+	qCon.pop();
+
+	CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pInfo->pMsg);
+
+	EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
+	EXPECT_TRUE(p->m_lErrCode == MSG_RECEIVED_ZERO);
+
+	CLUuidComparer compare1;
+	EXPECT_TRUE(compare1(u1, pInfo->ChannelUuid) == 0);
+
+	delete p;
+	delete pInfo;
 
 	long i;
 	int fd = open(strPath, O_WRONLY);
@@ -258,14 +281,31 @@ TEST(CLMessageReceiver, GetMessagePrivateNamedPipe_Features_Test)
 	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
 	CLStatus s2 = pMsgReceiver->GetMessage(qCon);
 	EXPECT_FALSE(s2.IsSuccess());
-	EXPECT_TRUE(qCon.size() == 50);
+	EXPECT_TRUE(qCon.size() == 51);
 	i = 0;
 	while(!qCon.empty())
 	{
 		SLMessageAndSource *pInfo = qCon.front();
 		qCon.pop();
 
-		EXPECT_TRUE(pInfo->pMsg == (CLMessage *)(i + 1));
+		if(i == 50)
+		{
+
+			CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pInfo->pMsg);
+
+			EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
+			EXPECT_TRUE(p->m_lErrCode == NORMAL_ERROR);
+
+			CLUuidComparer compare;
+			EXPECT_TRUE(compare(u1, pInfo->ChannelUuid) == 0);
+
+			delete p;
+		}
+		else
+		{
+			EXPECT_TRUE(pInfo->pMsg == (CLMessage *)(i + 1));
+		}
+
 		i++;
 
 		CLUuidComparer compare;
@@ -346,6 +386,22 @@ TEST(CLMessageReceiver, GetMessagePrivateNamedPipe3_Features_Test)
 	CLStatus s1 = pMsgReceiver->GetMessage(qCon);
 	EXPECT_FALSE(s1.IsSuccess());
 	EXPECT_TRUE(s1.m_clErrorCode == NORMAL_ERROR);
+
+	EXPECT_TRUE(qCon.size() == 1);
+
+	SLMessageAndSource *pInfo = qCon.front();
+	qCon.pop();
+
+	CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pInfo->pMsg);
+
+	EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
+	EXPECT_TRUE(p->m_lErrCode == NORMAL_ERROR);
+
+	CLUuidComparer compare;
+	EXPECT_TRUE(compare(u1, pInfo->ChannelUuid) == 0);
+
+	delete p;
+	delete pInfo;
 
 	delete pMsgReceiver;
 }
@@ -480,6 +536,23 @@ TEST(CLMessageReceiver, GetMessageNamedPipe_Features_Test)
 	CLStatus s11 = pMsgReceiver->GetMessage(qCon);
 	EXPECT_FALSE(s11.IsSuccess());
 	EXPECT_TRUE(s11.m_clErrorCode == MSG_RECEIVED_ZERO);
+
+	EXPECT_TRUE(qCon.size() == 1);
+
+	SLMessageAndSource *pInfo = qCon.front();
+	qCon.pop();
+
+	CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pInfo->pMsg);
+
+	EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
+	EXPECT_TRUE(p->m_lErrCode == MSG_RECEIVED_ZERO);
+
+	CLUuidComparer compare1;
+	EXPECT_TRUE(compare1(u1, pInfo->ChannelUuid) == 0);
+
+	delete p;
+	delete pInfo;
+
 
 	int buf1[5] = {16, 1, 0, 2, 3};
 	int buf2[3] = {8, 2, 0};
@@ -634,9 +707,9 @@ TEST(CLMessageReceiver, GetMessageNamedPipe2_Features_Test)
 	CLLogger::WriteLogMsg("2 The Following bug is produced on purpose 2", 0);
 	CLStatus s1 = pMsgReceiver->GetMessage(qCon);
 	EXPECT_FALSE(s1.IsSuccess());
-	EXPECT_TRUE(qCon.size() == 9);
+	EXPECT_TRUE(qCon.size() == 10);
 	i = 1;
-	while(!qCon.empty())
+	for(i = 1; i < 10; i++)
 	{
 		SLMessageAndSource *pInfo = qCon.front();
 		qCon.pop();
@@ -652,14 +725,26 @@ TEST(CLMessageReceiver, GetMessageNamedPipe2_Features_Test)
 			EXPECT_TRUE(p != 0);
 		}
 
-		i++;
-
 		CLUuidComparer compare;
 		EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
 
 		delete pInfo->pMsg;
 		delete pInfo;
 	}
+
+	SLMessageAndSource *pErrorInfo = qCon.front();
+	qCon.pop();
+
+	CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pErrorInfo->pMsg);
+
+	EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
+	EXPECT_TRUE(p->m_lErrCode == NORMAL_ERROR);
+
+	CLUuidComparer ErrorCompare;
+	EXPECT_TRUE(ErrorCompare(u1, pErrorInfo->ChannelUuid) == 0);
+
+	delete p;
+	delete pErrorInfo;
 
 	delete pMsgReceiver;
 }
@@ -888,13 +973,15 @@ TEST(CLMessageReceiver, GetMessageNamedPipe5_Features_Test)
 		write(fd, (char *)buf, 33);
 	close(fd);
 
+	sleep(2);
+
 	i = 0;
 	while (true)
 	{
 		CLStatus s1 = pMsgReceiver->GetMessage(qCon);
 		if(s1.m_clErrorCode == MSG_RECEIVED_ZERO)
 			break;
-
+			
 		if(i == 0)
 		{
 			EXPECT_EQ(qCon.size(), 124);
@@ -999,6 +1086,23 @@ TEST(CLMessageReceiver, GetMessageTCPSocket_Features_Test)
 	EXPECT_FALSE(s11.IsSuccess());
 	EXPECT_TRUE(s11.m_clErrorCode == MSG_RECEIVED_ZERO);
 	
+	EXPECT_TRUE(qCon.size() == 1);
+
+	SLMessageAndSource *pErrorInfo = qCon.front();
+	qCon.pop();
+
+	CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pErrorInfo->pMsg);
+
+	EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
+	EXPECT_TRUE(p->m_lErrCode == MSG_RECEIVED_ZERO);
+
+	CLUuidComparer compare1;
+	EXPECT_TRUE(compare1(u1, pErrorInfo->ChannelUuid) == 0);
+
+	delete p;
+	delete pErrorInfo;
+
+	
 	CLSocket *pClientSocket = new CLSocket("127.0.0.1", "3600", SOCKET_TYPE_TCP, true);
 	EXPECT_TRUE(pClientSocket->Connect().IsSuccess());
 
@@ -1040,6 +1144,23 @@ TEST(CLMessageReceiver, GetMessageTCPSocket_Features_Test)
 		CLStatus s1 = pMsgReceiver1->GetMessage(qCon);
 		EXPECT_FALSE(s1.IsSuccess());
 		EXPECT_TRUE(s1.m_clErrorCode == MSG_RECEIVED_ZERO);
+
+		EXPECT_TRUE(qCon.size() == 1);
+
+		SLMessageAndSource *pInfo = qCon.front();
+		qCon.pop();
+
+		CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pInfo->pMsg);
+
+		EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
+		EXPECT_TRUE(p->m_lErrCode == MSG_RECEIVED_ZERO);
+
+		CLUuidComparer compare1;
+		EXPECT_TRUE(compare1(u2, pInfo->ChannelUuid) == 0);
+
+		delete p;
+		delete pInfo;
+
 	}
 
 	int buf1[5] = {16, 1, 0, 2, 3};
@@ -1353,14 +1474,21 @@ TEST(CLMessageReceiver, GetMessageTCPSocket_DeserialError_Test)
 	CLLogger::WriteLogMsg("2 The Following bug is produced on purpose 2", 0);
 	CLStatus s1 = pMsgReceiver1->GetMessage(qCon);
 	EXPECT_FALSE(s1.IsSuccess());
-	EXPECT_TRUE(qCon.size() == 9);
+	EXPECT_TRUE(qCon.size() == 9 + 1);
 	i = 1;
 	while(!qCon.empty())
 	{
 		SLMessageAndSource *pInfo = qCon.front();
 		qCon.pop();
 
-		if(i % 2 == 0)
+		if(i == 10)
+		{
+			CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pInfo->pMsg);
+
+			EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
+			EXPECT_TRUE(p->m_lErrCode == NORMAL_ERROR);
+		}
+		else if(i % 2 == 0)
 		{
 			CLMsg1ForCLMessageReceiverTest *p = dynamic_cast<CLMsg1ForCLMessageReceiverTest *>(pInfo->pMsg);
 			EXPECT_TRUE(p != 0);
@@ -1495,7 +1623,7 @@ TEST(CLMessageReceiver, GetMessageTCPSocket_SendPointer_Test)
 
 	CLStatus s2 = pMsgReceiver1->GetMessage(qCon);
 	EXPECT_FALSE(s2.IsSuccess());
-	EXPECT_TRUE(qCon.size() == 50);
+	EXPECT_TRUE(qCon.size() == 50 + 1);
 
 	i = 0;
 	while(!qCon.empty())
@@ -1503,8 +1631,20 @@ TEST(CLMessageReceiver, GetMessageTCPSocket_SendPointer_Test)
 		SLMessageAndSource *pInfo = qCon.front();
 		qCon.pop();
 
-		EXPECT_TRUE(pInfo->pMsg == (CLMessage *)(i + 1));
-		i++;
+		if(i == 50)
+		{
+			CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pInfo->pMsg);
+
+			EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
+			EXPECT_TRUE(p->m_lErrCode == NORMAL_ERROR);
+
+			delete p;
+		}
+		else
+		{
+			EXPECT_TRUE(pInfo->pMsg == (CLMessage *)(i + 1));
+			i++;
+		}
 
 		CLUuidComparer compare;
 		EXPECT_TRUE(compare(pInfo->ChannelUuid, u2) == 0);
@@ -1561,6 +1701,22 @@ TEST(CLMessageReceiver, GetMessageTCPSocket_NONProtocl_Test)
 	CLStatus s11 = pMsgReceiver->GetMessage(qCon);
 	EXPECT_FALSE(s11.IsSuccess());
 	EXPECT_TRUE(s11.m_clErrorCode == MSG_RECEIVED_ZERO);
+
+	EXPECT_TRUE(qCon.size() == 1);
+
+	SLMessageAndSource *pErrorInfo = qCon.front();
+	qCon.pop();
+
+	CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pErrorInfo->pMsg);
+
+	EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
+	EXPECT_TRUE(p->m_lErrCode == MSG_RECEIVED_ZERO);
+
+	CLUuidComparer compare1;
+	EXPECT_TRUE(compare1(u1, pErrorInfo->ChannelUuid) == 0);
+
+	delete p;
+	delete pErrorInfo;
 
 	CLSocket *pClientSocket = new CLSocket("127.0.0.1", "3600", SOCKET_TYPE_TCP, true);
 	EXPECT_TRUE(pClientSocket->Connect().IsSuccess());
@@ -1647,6 +1803,22 @@ TEST(CLMessageReceiver, GetMessageTCPSocket_ProtocolError_Test)
 	EXPECT_FALSE(s11.IsSuccess());
 	EXPECT_TRUE(s11.m_clErrorCode == MSG_RECEIVED_ZERO);
 
+	EXPECT_TRUE(qCon.size() == 1);
+
+	SLMessageAndSource *pErrorInfo = qCon.front();
+	qCon.pop();
+
+	CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pErrorInfo->pMsg);
+
+	EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
+	EXPECT_TRUE(p->m_lErrCode == MSG_RECEIVED_ZERO);
+
+	CLUuidComparer compare1;
+	EXPECT_TRUE(compare1(u1, pErrorInfo->ChannelUuid) == 0);
+
+	delete p;
+	delete pErrorInfo;
+
 	CLSocket *pClientSocket = new CLSocket("127.0.0.1", "3600", SOCKET_TYPE_TCP, true);
 	EXPECT_TRUE(pClientSocket->Connect().IsSuccess());
 
@@ -1691,8 +1863,23 @@ TEST(CLMessageReceiver, GetMessageTCPSocket_ProtocolError_Test)
 	EXPECT_FALSE(s1.IsSuccess());
 	EXPECT_TRUE(s1.m_clErrorCode == NORMAL_ERROR);
 
+	EXPECT_TRUE(qCon.size() == 1);
+
+	SLMessageAndSource *pErrorInfo2 = qCon.front();
+	qCon.pop();
+
+	CLChannelErrorMsg *pErrMsg = dynamic_cast<CLChannelErrorMsg *>(pErrorInfo2->pMsg);
+
+	EXPECT_TRUE(pErrMsg->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
+	EXPECT_TRUE(pErrMsg->m_lErrCode == NORMAL_ERROR);
+
+	CLUuidComparer compare;
+	EXPECT_TRUE(compare(u2, pErrorInfo2->ChannelUuid) == 0);
+
+	delete pErrMsg;
+	delete pErrorInfo2;
+
 	delete pClientSocket;
 	delete pMsgReceiver1;
 	delete pMsgReceiver;
 }
-*/

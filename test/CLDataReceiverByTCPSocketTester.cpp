@@ -123,7 +123,7 @@ TEST(CLDataReceiverByTCPSocket, GetData_Error_Test)
 
 	CLLogger::WriteLogMsg("2 The Following bug is produced on purpose", 0);
 
-	sleep(60);
+	sleep(180);
 
 	CLDataReceiverByTCPSocket dt(ps);
 	CLStatus r3 = dt.GetData(iov2, &context);
