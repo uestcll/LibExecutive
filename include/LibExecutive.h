@@ -58,6 +58,7 @@
 #include "CLProtocolEncapsulator.h"
 #include "CLMsgLoopManagerForPrivateNamedPipe.h"
 #include "CLMsgLoopManagerForShareNamedPipe.h"
+#include "CLMsgLoopManagerForIOMultiplexing.h"
 #include "CLSocket.h"
 #include "CLSocketAddress.h"
 #include "CLDataReceiverByAccept.h"

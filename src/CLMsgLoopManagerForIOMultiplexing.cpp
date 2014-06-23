@@ -33,7 +33,7 @@ CLMsgLoopManagerForIOMultiplexing::~CLMsgLoopManagerForIOMultiplexing()
 	map<int, CLMessageReceiver*>::iterator it = m_ReadSetMap.begin();
 	for(; it != m_ReadSetMap.end(); ++it)
 	{
-		delete it->second;
+		//delete it->second;
 	}
 
 	delete m_pReadSet;
@@ -138,10 +138,10 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::Internal_UnRegisterReadEvent(int fd)
 
 	m_ReadSetMap.erase(it);
 
-	if(-1 == close(fd))
-	{
-		CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::UnRegisterReadEvent(), close fd error", fd);
-	}
+	// if(-1 == close(fd))
+	// {
+	// 	CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::UnRegisterReadEvent(), close fd error", fd);
+	// }
 
 	return CLStatus(0, (long)pTmp);
 }

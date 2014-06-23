@@ -37,3 +37,8 @@ CLUuid CLDataReceiverByNamedPipe::GetUuid()
 {
 	return m_NamedPipe.GetUuid();
 }
+
+int CLDataReceiverByNamedPipe::GetFd()
+{
+	return m_NamedPipe.GetFd();
+}

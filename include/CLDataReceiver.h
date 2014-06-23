@@ -14,6 +14,7 @@ public:
 
 	virtual CLStatus GetData(CLIOVectors& IOVectors, void *pContext) = 0;
 	virtual CLUuid GetUuid() = 0;
+	virtual int GetFd();
 
 private:
 	CLDataReceiver(const CLDataReceiver&);
