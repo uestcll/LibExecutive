@@ -44,3 +44,8 @@ CLUuid CLDataReceiverByTCPSocket::GetUuid()
 {
 	return m_pSocket->GetUuid();
 }
+
+int CLDataReceiverByTCPSocket::GetFd()
+{
+	return m_pSocket->GetSocket();
+}

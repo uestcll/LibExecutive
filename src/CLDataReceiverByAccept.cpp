@@ -52,3 +52,8 @@ CLUuid CLDataReceiverByAccept::GetUuid()
 {
 	return m_pSocket->GetUuid();
 }
+
+int CLDataReceiverByAccept::GetFd()
+{
+	return m_pSocket->GetSocket();
+}
