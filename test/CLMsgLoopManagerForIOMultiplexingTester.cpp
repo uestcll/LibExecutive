@@ -5,6 +5,7 @@
 static unsigned int gmsg1 = 0;
 static unsigned int gmsg2 = 0;
 static unsigned int gmsg3 = 0;
+static unsigned int gmsg4 = 0;
 
 class CLMsg1ForCLMsgLoopManagerForIOMultiplexingTest : public CLMessage
 {
@@ -51,6 +52,19 @@ public:
 	}
 
 	int i;
+};
+
+class CLMsg4ForCLMsgLoopManagerForIOMultiplexingTest : public CLMessage
+{
+public:
+	CLMsg4ForCLMsgLoopManagerForIOMultiplexingTest() : CLMessage(4)
+	{
+	}
+
+	virtual ~CLMsg4ForCLMsgLoopManagerForIOMultiplexingTest()
+	{
+		gmsg4++;
+	}
 };
 
 class CLMsg1ForCLMsgLoopManagerForIOMultiplexingTest_Serializer : public CLMessageSerializer
@@ -233,6 +247,7 @@ public:
 static unsigned int g1 = 0;
 static unsigned int g2 = 0;
 static unsigned int g3 = 0;
+static unsigned int g4 = 0;
 
 static int fd1 = 0;
 static int fd2 = 0;
@@ -409,6 +424,7 @@ CLSocket *pConnSocket  = 0;
 
 static int gError = 0;
 static int gClose = 0;
+static int gArril = 0;
 
 const int MESSAGE_NUM = 100;
 
@@ -418,11 +434,12 @@ public:
 	virtual CLStatus Initialize(CLMessageLoopManager *pMessageLoop, void* pContext)
 	{
 		pMessageLoop->Register(1, (CallBackForMessageLoop)(&CLObserverTester2ForCLMsgLoopManagerForIOMultiplexing::On_1));
-		// pMessageLoop->Register(2, (CallBackForMessageLoop)(&CLObserverTester2ForCLMsgLoopManagerForIOMultiplexing::On_2));
+		pMessageLoop->Register(2, (CallBackForMessageLoop)(&CLObserverTester2ForCLMsgLoopManagerForIOMultiplexing::On_2));
 		pMessageLoop->Register(3, (CallBackForMessageLoop)(&CLObserverTester2ForCLMsgLoopManagerForIOMultiplexing::On_3));
 		pMessageLoop->Register(MESSAGE_ID_FOR_CHANNEL_ERROR, (CallBackForMessageLoop)(&CLObserverTester2ForCLMsgLoopManagerForIOMultiplexing::On_Error));
 		pMessageLoop->Register(MESSAGE_ID_FOR_CHANNEL_CLOSED, (CallBackForMessageLoop)(&CLObserverTester2ForCLMsgLoopManagerForIOMultiplexing::On_Close));
 		pMessageLoop->Register(MESSAGE_ID_FOR_CLIENT_ARRIVED, (CallBackForMessageLoop)(&CLObserverTester2ForCLMsgLoopManagerForIOMultiplexing::On_ClientArrival));
+		
 		m_pML = dynamic_cast<CLMsgLoopManagerForIOMultiplexing *>(pMessageLoop);
 		EXPECT_TRUE(m_pML);
 
@@ -481,7 +498,7 @@ public:
 		}
 		else if(compare(u1, connUuid) == 0)//unregister fd
 		{
-
+			CLLogger::WriteLogMsg("In CLObserverTester2ForCLMsgLoopManagerForIOMultiplexing::On_Error() Error frome conn fd", 0);
 		}
 
 		gError++;
@@ -491,7 +508,7 @@ public:
 
 	CLStatus On_ClientArrival(CLMessage *pm, CLUuid u1)
 	{
-		g2++;
+		gArril++;
 
 		EXPECT_EQ(pm->m_clMsgID, MESSAGE_ID_FOR_CLIENT_ARRIVED);
 
@@ -528,12 +545,24 @@ public:
 		EXPECT_TRUE(compare1(u1, connUuid) == 0);
 
 		int fd = pConnSocket->GetSocket();
-		EXPECT_TRUE(m_pML->UnRegisterReadEvent(fd).IsSuccess());
-		EXPECT_TRUE(m_pML->UnRegisterReadEvent(listenFd).IsSuccess());
+		EXPECT_TRUE(m_pML->UnRegisterReadEvent(fd).IsSuccess()); //In Multi Thread case the receiver pointer has not been deleted
+		EXPECT_TRUE(m_pML->UnRegisterReadEvent(listenFd).IsSuccess());//cause the next is quit from loop
 
 		gClose++;
 
 		return CLStatus(QUIT_MESSAGE_LOOP, 0);
+	}
+
+	CLStatus On_2(CLMessage *pm, CLUuid u1)
+	{
+		EXPECT_EQ(pm->m_clMsgID, 2);
+
+		CLUuidComparer compare1;
+		EXPECT_TRUE(compare1(u1, uu1) == 0);
+
+		g2++;
+
+		return CLStatus(0, 0);
 	}
 
 	CLMsgLoopManagerForIOMultiplexing *m_pML;
@@ -653,12 +682,203 @@ TEST(CLMsgLoopManagerForIOMultiplexing, SingleThreadSocket)
 	EXPECT_EQ(gmsg2, 0);
 
 	EXPECT_EQ(g1, MESSAGE_NUM);
-	EXPECT_EQ(g2, 1);
+	EXPECT_EQ(gArril, 1);
 	EXPECT_EQ(g3, 1);
 	EXPECT_EQ(gError, 0);
 	EXPECT_EQ(gClose, 1);
 }
 
+class CLObserverTester3ForCLMsgLoopManagerForIOMultiplexing : public CLMessageObserver
+{
+public:
+	virtual CLStatus Initialize(CLMessageLoopManager *pMessageLoop, void* pContext)
+	{
+		pMessageLoop->Register(1, (CallBackForMessageLoop)(&CLObserverTester2ForCLMsgLoopManagerForIOMultiplexing::On_1));
+		pMessageLoop->Register(2, (CallBackForMessageLoop)(&CLObserverTester3ForCLMsgLoopManagerForIOMultiplexing::On_2));
+		pMessageLoop->Register(3, (CallBackForMessageLoop)(&CLObserverTester2ForCLMsgLoopManagerForIOMultiplexing::On_3));
+		pMessageLoop->Register(4, (CallBackForMessageLoop)(&CLObserverTester3ForCLMsgLoopManagerForIOMultiplexing::On_4));
+		pMessageLoop->Register(MESSAGE_ID_FOR_CHANNEL_ERROR, (CallBackForMessageLoop)(&CLObserverTester2ForCLMsgLoopManagerForIOMultiplexing::On_Error));
+		pMessageLoop->Register(MESSAGE_ID_FOR_CHANNEL_CLOSED, (CallBackForMessageLoop)(&CLObserverTester3ForCLMsgLoopManagerForIOMultiplexing::On_Close));
+		pMessageLoop->Register(MESSAGE_ID_FOR_CLIENT_ARRIVED, (CallBackForMessageLoop)(&CLObserverTester2ForCLMsgLoopManagerForIOMultiplexing::On_ClientArrival));
+		
+		m_pML = dynamic_cast<CLMsgLoopManagerForIOMultiplexing *>(pMessageLoop);
+		EXPECT_TRUE(m_pML);
+
+		return CLStatus(0, 0);
+	}
+
+
+	CLStatus On_Close(CLMessage *pm, CLUuid u1)
+	{
+		EXPECT_EQ(pm->m_clMsgID, MESSAGE_ID_FOR_CHANNEL_CLOSED);
+
+		CLUuidComparer compare1;
+		EXPECT_TRUE(compare1(u1, connUuid) == 0);
+
+		int fd = pConnSocket->GetSocket();
+		EXPECT_TRUE(m_pML->UnRegisterReadEvent(fd).IsSuccess()); //In Multi Thread case the receiver pointer has not been deleted
+		EXPECT_TRUE(m_pML->UnRegisterReadEvent(listenFd).IsSuccess());//cause the next is quit from loop
+
+		gClose++;
+
+		EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage("PrivateNamedPipe_For_CLMsgLoopManagerForIOMultiplexing_Test2", new CLMsg2ForCLMsgLoopManagerForIOMultiplexingTest, false).IsSuccess());	
+
+		return CLStatus(0, 0);
+	}
+
+
+	CLStatus On_4(CLMessage *pm, CLUuid u1)
+	{
+		EXPECT_EQ(pm->m_clMsgID, 4);
+
+		CLUuidComparer compare1;
+		EXPECT_TRUE(compare1(u1, uu1) == 0);
+
+		g4++;
+
+		return CLStatus(0, 0);
+	}
+
+	CLStatus On_2(CLMessage *pm, CLUuid u1)
+	{
+		EXPECT_EQ(pm->m_clMsgID, 2);
+
+		CLUuidComparer compare1;
+		EXPECT_TRUE(compare1(u1, uu1) == 0);
+
+		g2++;
+
+		return CLStatus(QUIT_MESSAGE_LOOP, 0);
+	}
+
+	CLMsgLoopManagerForIOMultiplexing *m_pML;
+};
+
+void *TestThread1ForCLMsgLoopManagerForIOMultiplexing(void *arg)
+{
+	sleep(5);
+
+	CLMsgLoopManagerForIOMultiplexing *pM = (CLMsgLoopManagerForIOMultiplexing *)(arg);
+	
+	EXPECT_TRUE(pM);
+
+	const char *privatePipeStrPath = "/tmp/PrivateNamedPipe_For_CLMsgLoopManagerForIOMultiplexing_Test2";
+
+	CLDataReceiver *pPrivatePipeDataReceiver = new CLDataReceiverByNamedPipe(privatePipeStrPath);
+	uu1 = pPrivatePipeDataReceiver->GetUuid();
+	fd1 = pPrivatePipeDataReceiver->GetFd();
+	CLMessageReceiver *pMsgReceiverForPrivatePipe = new CLMessageReceiver(&uu1, new CLBufferManager(), pPrivatePipeDataReceiver, new CLPointerToMsgDeserializer(), new CLProtocolDecapsulatorBySplitPointer());
+
+	EXPECT_TRUE(pM->RegisterReadEvent(fd1, pMsgReceiverForPrivatePipe).IsSuccess());
+
+	CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
+	EXPECT_TRUE(pNameServer);
+
+	CLMessagePoster *pPrivatePipeMsgPoster = new CLMessagePoster(new CLMsgToPointerSerializer(), 0, new CLDataPostChannelByNamedPipeMaintainer(privatePipeStrPath), 0);
+	EXPECT_TRUE((pPrivatePipeMsgPoster->Initialize(new CLInitialDataPostChannelNotifier(), 0)).IsSuccess());
+	EXPECT_TRUE(pNameServer->Register("PrivateNamedPipe_For_CLMsgLoopManagerForIOMultiplexing_Test2", uu1, pPrivatePipeMsgPoster, pMsgReceiverForPrivatePipe).IsSuccess());
+	
+	return 0;
+}
+
+void *TestThread2ForCLMsgLoopManagerForIOMultiplexing(void *arg)
+{
+	sleep(60);
+
+	CLMsgLoopManagerForIOMultiplexing *pM = (CLMsgLoopManagerForIOMultiplexing *)(arg);
+	EXPECT_TRUE(pM);
+
+	pClientSocket = new CLSocket("127.0.0.1", "3600", SOCKET_TYPE_TCP, false);
+
+	clientUuid = pClientSocket->GetUuid();
+	
+	CLStatus ss1 = pClientSocket->Connect();
+	EXPECT_FALSE(ss1.IsSuccess());
+	EXPECT_EQ(ss1.m_clErrorCode, CONNECT_PENDING);
+	int clientFd = pClientSocket->GetSocket();
+	EXPECT_TRUE((pM->RegisterConnectEvent(clientFd, new CLDataPostChannelMaintainerTester(pClientSocket, pM))).IsSuccess());
+
+	sleep(150);
+
+	for(int i = 0; i < MESSAGE_NUM; i++)
+	{
+		EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage("PrivateNamedPipe_For_CLMsgLoopManagerForIOMultiplexing_Test2", new CLMsg4ForCLMsgLoopManagerForIOMultiplexingTest, false).IsSuccess());	
+	}
+
+	return 0;
+}
+
+TEST(CLMsgLoopManagerForIOMultiplexing, MultiThreadCase)
+{
+	gmsg1 = 0;
+	gmsg2 = 0;
+	gmsg3 = 0;
+	gmsg4 = 0;
+	g1 = 0;
+	g2 = 0;
+	g3 = 0;	
+	g4 = 0;
+	listenFd = 0;
+	//private pipe fd
+	fd1 = 0;
+
+	pClientSocket = 0;
+	pConnSocket  = 0;
+
+	gError = 0;
+	gClose = 0;
+	gArril = 0;
+
+	CLMsgLoopManagerForIOMultiplexing *pM = new CLMsgLoopManagerForIOMultiplexing(new CLObserverTester3ForCLMsgLoopManagerForIOMultiplexing, "CLMsgLoopManagerForIOMultiplexingTester3", true);
+
+	//For listen socket fd register
+	CLSocket *pSocket = new CLSocket("3600");
+	listenUid = pSocket->GetUuid();
+
+	CLDataReceiver *pListenDataReveiver = new CLDataReceiverByAccept(pSocket);
+	listenFd = pListenDataReveiver->GetFd();
+
+	CLMessageReceiver *pListenMsgReceiver = new CLMessageReceiver(&listenUid, new CLBufferManager(), pListenDataReveiver, new CLClientArrivedMsgDeserializer);
+	EXPECT_TRUE(pM->RegisterReadEvent(listenFd, pListenMsgReceiver).IsSuccess());
+
+	//For private pipe
+	SLExecutiveInitialParameter s;
+	s.pContext = 0;
+	CLThreadInitialFinishedNotifier notifier(0);
+	s.pNotifier = &notifier;
+
+	pthread_t tid1;
+	pthread_t tid2;
+	pthread_create(&tid1, 0, TestThread1ForCLMsgLoopManagerForIOMultiplexing, pM);
+	pthread_create(&tid2, 0, TestThread2ForCLMsgLoopManagerForIOMultiplexing, pM);
+
+	EXPECT_TRUE(pM->EnterMessageLoop(&s).IsSuccess());
+
+	CLExecutiveNameServer *pNameServer = CLExecutiveNameServer::GetInstance();
+	EXPECT_TRUE(pNameServer);
+
+	EXPECT_TRUE(pNameServer->ReleaseCommunicationPtr("PrivateNamedPipe_For_CLMsgLoopManagerForIOMultiplexing_Test2").IsSuccess());
+
+	delete pM;
+
+	pthread_join(tid1, 0);
+	pthread_join(tid2, 0);
+
+	EXPECT_EQ(gmsg1, MESSAGE_NUM);
+	EXPECT_EQ(gmsg3, 1);
+	EXPECT_EQ(gmsg2, 1);
+	EXPECT_EQ(gmsg4, MESSAGE_NUM);
+
+
+	EXPECT_EQ(g1, MESSAGE_NUM);
+	EXPECT_EQ(g2, 1);
+	EXPECT_EQ(g4, MESSAGE_NUM);
+	EXPECT_EQ(g3, 1);
+
+	EXPECT_EQ(gArril, 1);
+	EXPECT_EQ(gError, 0);
+	EXPECT_EQ(gClose, 1);	
+}
 
 class CLObserverTester1ForCLMsgLoopManagerForIOMultiplexing : public CLMessageObserver
 {
