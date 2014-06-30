@@ -13,7 +13,7 @@ public:
 	virtual CLStatus GetData(CLIOVectors& IOVectors, void *pContext);
 	virtual CLUuid GetUuid();
 
-	int GetFd();
+	virtual int GetFd();
 
 private:
 	CLDataReceiverByNamedPipe(const CLDataReceiverByNamedPipe&);

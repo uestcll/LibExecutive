@@ -9,6 +9,7 @@
 #include "CLMessagePoster.h"
 #include "CLLogger.h"
 #include "CLDataPostChannelMaintainer.h"
+#include "CLMsgReceiverReleaser.h"
 
 using namespace std;
 
@@ -30,10 +31,11 @@ CLMsgLoopManagerForIOMultiplexing::CLMsgLoopManagerForIOMultiplexing(CLMessageOb
 
 CLMsgLoopManagerForIOMultiplexing::~CLMsgLoopManagerForIOMultiplexing()
 {
-	map<int, CLMessageReceiver*>::iterator it = m_ReadSetMap.begin();
+	map<int, SLMsgReceiverAndReleaser*>::iterator it = m_ReadSetMap.begin();
 	for(; it != m_ReadSetMap.end(); ++it)
 	{
-		//delete it->second;
+		if(it->second)
+			ReleaseMessageReceiver(it->second);
 	}
 
 	delete m_pReadSet;
@@ -41,20 +43,20 @@ CLMsgLoopManagerForIOMultiplexing::~CLMsgLoopManagerForIOMultiplexing()
 	delete m_pWriteSet;
 }
 
-CLStatus CLMsgLoopManagerForIOMultiplexing::Internal_RegisterReadEvent(int fd, CLMessageReceiver *pMsgReceiver)
+CLStatus CLMsgLoopManagerForIOMultiplexing::Internal_RegisterReadEvent(int fd, SLMsgReceiverAndReleaser *pMsgReceiverAndReleaser)
 {
-	map<int, CLMessageReceiver*>::iterator it = m_ReadSetMap.find(fd);
+	map<int, SLMsgReceiverAndReleaser*>::iterator it = m_ReadSetMap.find(fd);
 	if(it != m_ReadSetMap.end())
 		return CLStatus(-1, NORMAL_ERROR);
 
-	m_ReadSetMap[fd] = pMsgReceiver;
+	m_ReadSetMap[fd] = pMsgReceiverAndReleaser;
 
 	FD_SET(fd, m_pReadSet);
 
 	return CLStatus(0, 0);
 }
 
-CLStatus CLMsgLoopManagerForIOMultiplexing::RegisterReadEvent(int fd, CLMessageReceiver *pMsgReceiver)
+CLStatus CLMsgLoopManagerForIOMultiplexing::RegisterReadEvent(int fd, CLMessageReceiver *pMsgReceiver, CLMsgReceiverReleaser *pReceiverReleaser)
 {
 	if(pMsgReceiver == 0)
 		return CLStatus(-1, NORMAL_ERROR);
@@ -65,23 +67,27 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::RegisterReadEvent(int fd, CLMessageR
 		return CLStatus(-1, NORMAL_ERROR);
 	}
 
+	SLMsgReceiverAndReleaser *pInfo = new SLMsgReceiverAndReleaser;
+	pInfo->m_pReceiver = pMsgReceiver;
+	pInfo->m_pReleaser = pReceiverReleaser;
+
 	if(m_bMultipleThread)
 	{
 		CLCriticalSection cs(&m_MutexForReadMap);
 
-		if(Internal_RegisterReadEvent(fd, pMsgReceiver).IsSuccess())
+		if(Internal_RegisterReadEvent(fd, pInfo).IsSuccess())
 			return CLStatus(0, 0);
 	}
 	else
 	{
-		if(Internal_RegisterReadEvent(fd, pMsgReceiver).IsSuccess())
+		if(Internal_RegisterReadEvent(fd, pInfo).IsSuccess())
 			return CLStatus(0, 0);
 	}
 
 	CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::RegisterReadEvent(), Internal_RegisterReadEvent error", fd);
 
-	delete pMsgReceiver;
-
+	ReleaseMessageReceiver(pInfo);
+	
 	return CLStatus(-1, NORMAL_ERROR);
 }
 
@@ -117,38 +123,57 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::UnRegisterReadEvent(int fd)
 			return s;
 		}
 
-		CLMessageReceiver *pTmp = (CLMessageReceiver *)s.m_clErrorCode;
+		SLMsgReceiverAndReleaser *pTmp = (SLMsgReceiverAndReleaser *)s.m_clErrorCode;
 
 		if(pTmp)
-			delete pTmp;
-
+			ReleaseMessageReceiver(pTmp);
+			
 		return s;
+	}
+}
+
+void CLMsgLoopManagerForIOMultiplexing::ReleaseMessageReceiver(SLMsgReceiverAndReleaser *pInfo)
+{
+	if(pInfo)
+	{
+		if(pInfo->m_pReleaser)
+		{
+			CLStatus s = pInfo->m_pReleaser->ReleaseMsgReceiver(pInfo->m_pReceiver);
+			if(!s.IsSuccess())
+			{
+				CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::ReleaseMessageReceiver(), ReleaseMsgReceiver error", 0);
+			}
+			delete pInfo->m_pReleaser;
+		}
+		else
+			delete pInfo->m_pReceiver;
+
+		delete pInfo;
+	}
+	else
+	{
+		CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::ReleaseMessageReceiver(), pInfo is NULL", 0);
 	}
 }
 
 CLStatus CLMsgLoopManagerForIOMultiplexing::Internal_UnRegisterReadEvent(int fd)
 {
-	map<int, CLMessageReceiver*>::iterator it = m_ReadSetMap.find(fd);
+	map<int, SLMsgReceiverAndReleaser*>::iterator it = m_ReadSetMap.find(fd);
 	if(it == m_ReadSetMap.end())
 		return CLStatus(-1, NORMAL_ERROR);
 
-	CLMessageReceiver *pTmp = it->second;
+	SLMsgReceiverAndReleaser *pTmp = it->second;
 
 	FD_CLR(it->first, m_pReadSet);
 
 	m_ReadSetMap.erase(it);
-
-	// if(-1 == close(fd))
-	// {
-	// 	CLLogger::WriteLogMsg("In CLMsgLoopManagerForIOMultiplexing::UnRegisterReadEvent(), close fd error", fd);
-	// }
 
 	return CLStatus(0, (long)pTmp);
 }
 
 void CLMsgLoopManagerForIOMultiplexing::ClearDeletedSet()
 {
-	vector<CLMessageReceiver *> vpMsgReceiver;
+	vector<SLMsgReceiverAndReleaser *> vpMsgReceiverInfo;
 
 	{
 		CLCriticalSection cs(&m_MutexForDeletedSet);
@@ -173,18 +198,18 @@ void CLMsgLoopManagerForIOMultiplexing::ClearDeletedSet()
 				continue;
 			}
 
-			CLMessageReceiver *pTmp = (CLMessageReceiver *)s1.m_clErrorCode;
+			SLMsgReceiverAndReleaser *pTmp = (SLMsgReceiverAndReleaser *)s1.m_clErrorCode;
 			if(pTmp)
-				vpMsgReceiver.push_back(pTmp);
+				vpMsgReceiverInfo.push_back(pTmp);
 		}
 
 		m_DeletedSet.clear();
 	}
 
-	vector<CLMessageReceiver*>::iterator it = vpMsgReceiver.begin();
-	for(; it != vpMsgReceiver.end(); ++it)
+	vector<SLMsgReceiverAndReleaser*>::iterator it = vpMsgReceiverInfo.begin();
+	for(; it != vpMsgReceiverInfo.end(); ++it)
 	{
-		delete (*it);
+		ReleaseMessageReceiver(*it);
 	}
 }
 
@@ -302,7 +327,7 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::GetInfoFromSet(bool bReadSet, fd_set
 {
 	if(bReadSet)
 	{
-		map<int, CLMessageReceiver*>::reverse_iterator it = m_ReadSetMap.rbegin();
+		map<int, SLMsgReceiverAndReleaser*>::reverse_iterator it = m_ReadSetMap.rbegin();
 		if(it != m_ReadSetMap.rend())
 		{
 			maxfd = it->first;
@@ -592,12 +617,12 @@ void CLMsgLoopManagerForIOMultiplexing::ProcessReadEvent(fd_set *pReadSet)
 
 void CLMsgLoopManagerForIOMultiplexing::Internal_ProcessReadEvent(vector<pair<int, CLMessageReceiver*> >& vMsgReceiver, fd_set *pReadSet)
 {
-	map<int, CLMessageReceiver* >::iterator it = m_ReadSetMap.begin();
+	map<int, SLMsgReceiverAndReleaser* >::iterator it = m_ReadSetMap.begin();
 	for(; it != m_ReadSetMap.end(); ++ it)
 	{
 		if(FD_ISSET(it->first, pReadSet))
 		{
-			pair<int, CLMessageReceiver*> p(it->first, it->second);
+			pair<int, CLMessageReceiver*> p(it->first, it->second->m_pReceiver);
 			vMsgReceiver.push_back(p);
 		}
 	}

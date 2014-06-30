@@ -15,6 +15,13 @@
 class CLMessageReceiver;
 class CLMessagePoster;
 class CLDataPostChannelMaintainer;
+class CLMsgReceiverReleaser;
+
+struct SLMsgReceiverAndReleaser
+{
+	CLMessageReceiver *m_pReceiver;
+	CLMsgReceiverReleaser *m_pReleaser;
+};
 
 class CLMsgLoopManagerForIOMultiplexing : public CLMessageLoopManager
 {
@@ -22,7 +29,7 @@ public:
 	CLMsgLoopManagerForIOMultiplexing(CLMessageObserver *pMsgObserver, const char* pstrThreadName, bool bMultipleThread);
 	virtual ~CLMsgLoopManagerForIOMultiplexing();
 
-	CLStatus RegisterReadEvent(int fd, CLMessageReceiver *pMsgReceiver);
+	CLStatus RegisterReadEvent(int fd, CLMessageReceiver *pMsgReceiver, CLMsgReceiverReleaser *pReceiverReleaser = NULL);
 	CLStatus UnRegisterReadEvent(int fd);
 
 	CLStatus RegisterWriteEvent(int fd, CLMessagePoster *pMsgPoster);
@@ -40,7 +47,7 @@ private:
 
 	CLStatus UnRegisterWriteEvent(int fd);
 
-	CLStatus Internal_RegisterReadEvent(int fd, CLMessageReceiver *pMsgReceiver);
+	CLStatus Internal_RegisterReadEvent(int fd, SLMsgReceiverAndReleaser *pMsgReceiverAndReleaser);
 	CLStatus Internal_UnRegisterReadEvent(int fd);
 
 	CLStatus Internal_RegisterWriteEvent(int fd, CLMessagePoster *pMsgPoster);
@@ -67,6 +74,9 @@ private:
 
 	void ProcessErrorReadEvent(int fd);
 
+	void ReleaseMessageReceiver(SLMsgReceiverAndReleaser *pInfo);
+
+
 private:
 	CLMsgLoopManagerForIOMultiplexing(const CLMsgLoopManagerForIOMultiplexing&);
 	CLMsgLoopManagerForIOMultiplexing& operator=(const CLMsgLoopManagerForIOMultiplexing&);
@@ -77,7 +87,7 @@ private:
 	fd_set *m_pReadSet;
 	fd_set *m_pWriteSet;
 
-	std::map<int, CLMessageReceiver*> m_ReadSetMap;
+	std::map<int, SLMsgReceiverAndReleaser*> m_ReadSetMap;
 	std::map<int, CLMessagePoster*> m_WriteSetMap;
 	std::map<int, CLDataPostChannelMaintainer*> m_ChannelMap;
 	std::set<int> m_DeletedSet;

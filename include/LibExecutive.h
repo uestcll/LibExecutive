@@ -68,5 +68,7 @@
 #include "CLUuid.h"
 #include "CLChannelClosedMsg.h"
 #include "CLChannelErrorMsg.h"
+#include "CLMsgReceiverReleaser.h"
+#include "CLMsgReceiverReleaserForPrivatePipe.h"
 
 #endif
