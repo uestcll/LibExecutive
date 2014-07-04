@@ -26,7 +26,7 @@ TEST(CLMessageReceiver, GetMessage_Features_Test)
 	CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pInfo->pMsg);
 
 	EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
-	EXPECT_TRUE(p->m_lErrCode == MSG_RECEIVED_ZERO);
+	EXPECT_TRUE(p->m_clErrorCode == MSG_RECEIVED_ZERO);
 
 	CLUuidComparer compare;
 	EXPECT_TRUE(compare(u1, pInfo->ChannelUuid) == 0);
@@ -94,7 +94,7 @@ TEST(CLMessageReceiver, GetMessageSTL_Features_Test)
 			CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pInfo->pMsg);
 
 			EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
-			EXPECT_TRUE(p->m_lErrCode == NORMAL_ERROR);
+			EXPECT_TRUE(p->m_clErrorCode == NORMAL_ERROR);
 
 			delete pInfo->pMsg;
 
@@ -200,7 +200,7 @@ TEST(CLMessageReceiver, GetMessageSTL2_Features_Test)
 	CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pInfo->pMsg);
 
 	EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
-	EXPECT_TRUE(p->m_lErrCode == NORMAL_ERROR);
+	EXPECT_TRUE(p->m_clErrorCode == NORMAL_ERROR);
 
 	CLUuidComparer compare;
 	EXPECT_TRUE(compare(pInfo->ChannelUuid, u1) == 0);
@@ -232,7 +232,7 @@ TEST(CLMessageReceiver, GetMessagePrivateNamedPipe_Features_Test)
 	CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pInfo->pMsg);
 
 	EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
-	EXPECT_TRUE(p->m_lErrCode == MSG_RECEIVED_ZERO);
+	EXPECT_TRUE(p->m_clErrorCode == MSG_RECEIVED_ZERO);
 
 	CLUuidComparer compare1;
 	EXPECT_TRUE(compare1(u1, pInfo->ChannelUuid) == 0);
@@ -294,7 +294,7 @@ TEST(CLMessageReceiver, GetMessagePrivateNamedPipe_Features_Test)
 			CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pInfo->pMsg);
 
 			EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
-			EXPECT_TRUE(p->m_lErrCode == NORMAL_ERROR);
+			EXPECT_TRUE(p->m_clErrorCode == NORMAL_ERROR);
 
 			CLUuidComparer compare;
 			EXPECT_TRUE(compare(u1, pInfo->ChannelUuid) == 0);
@@ -395,7 +395,7 @@ TEST(CLMessageReceiver, GetMessagePrivateNamedPipe3_Features_Test)
 	CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pInfo->pMsg);
 
 	EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
-	EXPECT_TRUE(p->m_lErrCode == NORMAL_ERROR);
+	EXPECT_TRUE(p->m_clErrorCode == NORMAL_ERROR);
 
 	CLUuidComparer compare;
 	EXPECT_TRUE(compare(u1, pInfo->ChannelUuid) == 0);
@@ -545,7 +545,7 @@ TEST(CLMessageReceiver, GetMessageNamedPipe_Features_Test)
 	CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pInfo->pMsg);
 
 	EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
-	EXPECT_TRUE(p->m_lErrCode == MSG_RECEIVED_ZERO);
+	EXPECT_TRUE(p->m_clErrorCode == MSG_RECEIVED_ZERO);
 
 	CLUuidComparer compare1;
 	EXPECT_TRUE(compare1(u1, pInfo->ChannelUuid) == 0);
@@ -738,7 +738,7 @@ TEST(CLMessageReceiver, GetMessageNamedPipe2_Features_Test)
 	CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pErrorInfo->pMsg);
 
 	EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
-	EXPECT_TRUE(p->m_lErrCode == NORMAL_ERROR);
+	EXPECT_TRUE(p->m_clErrorCode == NORMAL_ERROR);
 
 	CLUuidComparer ErrorCompare;
 	EXPECT_TRUE(ErrorCompare(u1, pErrorInfo->ChannelUuid) == 0);
@@ -1094,7 +1094,7 @@ TEST(CLMessageReceiver, GetMessageTCPSocket_Features_Test)
 	CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pErrorInfo->pMsg);
 
 	EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
-	EXPECT_TRUE(p->m_lErrCode == MSG_RECEIVED_ZERO);
+	EXPECT_TRUE(p->m_clErrorCode == MSG_RECEIVED_ZERO);
 
 	CLUuidComparer compare1;
 	EXPECT_TRUE(compare1(u1, pErrorInfo->ChannelUuid) == 0);
@@ -1153,7 +1153,7 @@ TEST(CLMessageReceiver, GetMessageTCPSocket_Features_Test)
 		CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pInfo->pMsg);
 
 		EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
-		EXPECT_TRUE(p->m_lErrCode == MSG_RECEIVED_ZERO);
+		EXPECT_TRUE(p->m_clErrorCode == MSG_RECEIVED_ZERO);
 
 		CLUuidComparer compare1;
 		EXPECT_TRUE(compare1(u2, pInfo->ChannelUuid) == 0);
@@ -1486,7 +1486,7 @@ TEST(CLMessageReceiver, GetMessageTCPSocket_DeserialError_Test)
 			CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pInfo->pMsg);
 
 			EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
-			EXPECT_TRUE(p->m_lErrCode == NORMAL_ERROR);
+			EXPECT_TRUE(p->m_clErrorCode == NORMAL_ERROR);
 		}
 		else if(i % 2 == 0)
 		{
@@ -1636,7 +1636,7 @@ TEST(CLMessageReceiver, GetMessageTCPSocket_SendPointer_Test)
 			CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pInfo->pMsg);
 
 			EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
-			EXPECT_TRUE(p->m_lErrCode == NORMAL_ERROR);
+			EXPECT_TRUE(p->m_clErrorCode == NORMAL_ERROR);
 
 			delete p;
 		}
@@ -1710,7 +1710,7 @@ TEST(CLMessageReceiver, GetMessageTCPSocket_NONProtocl_Test)
 	CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pErrorInfo->pMsg);
 
 	EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
-	EXPECT_TRUE(p->m_lErrCode == MSG_RECEIVED_ZERO);
+	EXPECT_TRUE(p->m_clErrorCode == MSG_RECEIVED_ZERO);
 
 	CLUuidComparer compare1;
 	EXPECT_TRUE(compare1(u1, pErrorInfo->ChannelUuid) == 0);
@@ -1811,7 +1811,7 @@ TEST(CLMessageReceiver, GetMessageTCPSocket_ProtocolError_Test)
 	CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg *>(pErrorInfo->pMsg);
 
 	EXPECT_TRUE(p->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
-	EXPECT_TRUE(p->m_lErrCode == MSG_RECEIVED_ZERO);
+	EXPECT_TRUE(p->m_clErrorCode == MSG_RECEIVED_ZERO);
 
 	CLUuidComparer compare1;
 	EXPECT_TRUE(compare1(u1, pErrorInfo->ChannelUuid) == 0);
@@ -1871,7 +1871,7 @@ TEST(CLMessageReceiver, GetMessageTCPSocket_ProtocolError_Test)
 	CLChannelErrorMsg *pErrMsg = dynamic_cast<CLChannelErrorMsg *>(pErrorInfo2->pMsg);
 
 	EXPECT_TRUE(pErrMsg->m_clMsgID == MESSAGE_ID_FOR_CHANNEL_ERROR);
-	EXPECT_TRUE(pErrMsg->m_lErrCode == NORMAL_ERROR);
+	EXPECT_TRUE(pErrMsg->m_clErrorCode == NORMAL_ERROR);
 
 	CLUuidComparer compare;
 	EXPECT_TRUE(compare(u2, pErrorInfo2->ChannelUuid) == 0);

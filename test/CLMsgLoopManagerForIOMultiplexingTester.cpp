@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <iostream>
 #include "LibExecutive.h"
 
 static unsigned int gmsg1 = 0;
@@ -379,7 +381,7 @@ TEST(CLMsgLoopManagerForIOMultiplexing, SingleThreadNormalForPipe)
 
 	CLMessagePoster *pPrivatePipeMsgPoster = new CLMessagePoster(new CLMsgToPointerSerializer(), 0, new CLDataPostChannelByNamedPipeMaintainer(privatePipeStrPath), 0);
 	EXPECT_TRUE((pPrivatePipeMsgPoster->Initialize(new CLInitialDataPostChannelNotifier(), 0)).IsSuccess());
-	EXPECT_TRUE(pNameServer->Register("PrivateNamedPipe_For_CLMsgLoopManagerForIOMultiplexing_Test", uu1, pPrivatePipeMsgPoster).IsSuccess());
+	EXPECT_TRUE(pNameServer->Register("PrivateNamedPipe_For_CLMsgLoopManagerForIOMultiplexing_Test", uu1, pPrivatePipeMsgPoster, pMsgReceiverForPrivatePipe).IsSuccess());
 
 	//For shared pipe register
 	const char *pSharedPipeStrPath = "/tmp/SharedNamedPipe_For_CLMsgLoopManagerForIOMultiplexing_Test";
@@ -499,10 +501,14 @@ public:
 		CLUuidComparer compare;
 		if(compare(u1, listenUid) == 0)
 		{
-			EXPECT_EQ(pErrMsg->m_lErrCode, MSG_RECEIVED_ZERO);
+			CLLogger::WriteLogMsg("1 The Following bug is on purpose. 1", 0);
+			CLLogger::WriteLogMsg("In CLObserverTester2ForCLMsgLoopManagerForIOMultiplexing::On_Error() Error frome listen fd", 0);
+			
+			EXPECT_EQ(pErrMsg->m_clErrorCode, MSG_RECEIVED_ZERO);
 		}
 		else if(compare(u1, connUuid) == 0)//unregister fd
 		{
+			CLLogger::WriteLogMsg("1 The Following bug is on purpose. 1", 0);
 			CLLogger::WriteLogMsg("In CLObserverTester2ForCLMsgLoopManagerForIOMultiplexing::On_Error() Error frome conn fd", 0);
 		}
 
@@ -800,7 +806,7 @@ void *TestThread1ForCLMsgLoopManagerForIOMultiplexing(void *arg)
 
 	CLMessagePoster *pPrivatePipeMsgPoster = new CLMessagePoster(new CLMsgToPointerSerializer(), 0, new CLDataPostChannelByNamedPipeMaintainer(privatePipeStrPath), 0);
 	EXPECT_TRUE((pPrivatePipeMsgPoster->Initialize(new CLInitialDataPostChannelNotifier(), 0)).IsSuccess());
-	EXPECT_TRUE(pNameServer->Register("PrivateNamedPipe_For_CLMsgLoopManagerForIOMultiplexing_Test2", uu1, pPrivatePipeMsgPoster).IsSuccess());
+	EXPECT_TRUE(pNameServer->Register("PrivateNamedPipe_For_CLMsgLoopManagerForIOMultiplexing_Test2", uu1, pPrivatePipeMsgPoster, pMsgReceiverForPrivatePipe).IsSuccess());
 	
 	g_Event.Set();
 
@@ -930,3 +936,123 @@ TEST(CLMsgLoopManagerForIOMultiplexing, ObserverInitializeFailure)
 	delete pM;
 }
 
+class CLErrorReleaser : public CLMsgReceiverReleaserForPrivatePipe
+{
+public:
+	CLErrorReleaser()
+	{
+
+	}
+
+	virtual ~CLErrorReleaser()
+	{
+
+	}
+
+	virtual CLStatus ReleaseMsgReceiver(CLMessageReceiver *pMsgReceiver)
+	{
+		delete pMsgReceiver;
+		CLLogger::WriteLogMsg("In CLErrorReleaser::ReleaseMsgReceiver(), ReleaseMsgReceiver() error In purpose", 0);
+		return CLStatus(-1, 0);
+	}
+};
+
+TEST(CLMsgLoopManagerForIOMultiplexing, FeatureTest)
+{
+
+	gmsg1 = 0;
+	gmsg2 = 0;
+	gmsg3 = 0;
+	gmsg4 = 0;
+	g1 = 0;
+	g2 = 0;
+	g3 = 0;	
+	g4 = 0;
+	//private pipe fd
+	fd1 = -1;
+
+	pClientSocket = 0;
+	pConnSocket  = 0;
+
+	gError = 0;
+	gClose = 0;
+	gArril = 0;
+
+	listenFd = -1;
+	//interface test
+	CLMsgLoopManagerForIOMultiplexing *pM = new CLMsgLoopManagerForIOMultiplexing(new CLObserverTesterForCLMsgLoopManagerForIOMultiplexing, "CLMsgLoopManagerForIOMultiplexingTester3", false);
+
+	// CLLogger::WriteLogMsg("2 The Following bug is produced on purpose 2", 0);
+	CLSocket *pSocket = new CLSocket("3600");
+	listenUid = pSocket->GetUuid();
+
+	CLDataReceiver *pListenDataReveiver = new CLDataReceiverByAccept(pSocket);
+	listenFd = pListenDataReveiver->GetFd();
+
+	CLMessageReceiver *pListenMsgReceiver = new CLMessageReceiver(&listenUid, new CLBufferManager(), pListenDataReveiver, new CLClientArrivedMsgDeserializer);
+	
+	EXPECT_FALSE((pM->RegisterReadEvent(10, 0)).IsSuccess());
+	EXPECT_FALSE((pM->RegisterReadEvent(-2, (CLMessageReceiver *)(120), new CLMsgReceiverReleaserForPrivatePipe)).IsSuccess());
+	EXPECT_TRUE((pM->RegisterReadEvent(listenFd, pListenMsgReceiver)).IsSuccess());
+
+	CLSocket *pSocket1 = new CLSocket("3611");
+	CLUuid uuid = pSocket1->GetUuid();
+	
+	CLDataReceiver *pListenDataReveiver1 = new CLDataReceiverByAccept(pSocket1);
+	int fd;
+	fd = pListenDataReveiver1->GetFd();
+
+	CLMessageReceiver *pMsgReceiver1 = new CLMessageReceiver(&uuid, new CLBufferManager(), pListenDataReveiver1, new CLClientArrivedMsgDeserializer);
+	CLLogger::WriteLogMsg("1 The Following bug is produced on purpose 1", 0);
+	EXPECT_FALSE((pM->RegisterReadEvent(listenFd, pMsgReceiver1)).IsSuccess());
+
+	CLSocket *pSocket2 = new CLSocket("7200");
+	CLUuid uuid2 = pSocket2->GetUuid();
+	
+	CLDataReceiver *pListenDataReveiver2 = new CLDataReceiverByAccept(pSocket2);
+	fd = pListenDataReveiver2->GetFd();
+
+	CLMessageReceiver *pMsgReceiver2 = new CLMessageReceiver(&uuid2, new CLBufferManager(), pListenDataReveiver2, new CLClientArrivedMsgDeserializer);
+	EXPECT_TRUE((pM->RegisterReadEvent(fd, pMsgReceiver2, new CLErrorReleaser)).IsSuccess());
+	CLLogger::WriteLogMsg("2 The Following bug is produced on purpose 2", 0);
+	EXPECT_TRUE((pM->UnRegisterReadEvent(fd)).IsSuccess());
+
+	EXPECT_FALSE((pM->UnRegisterReadEvent(-2)).IsSuccess());
+	CLLogger::WriteLogMsg("1 The Following bug is produced on purpose 1", 0);
+	EXPECT_FALSE((pM->UnRegisterReadEvent(100)).IsSuccess());
+	EXPECT_TRUE((pM->UnRegisterReadEvent(listenFd)).IsSuccess());
+
+
+	// pClientSocket = new CLSocket("127.0.0.1", "3600", SOCKET_TYPE_TCP, false);
+
+	// clientUuid = pClientSocket->GetUuid();
+	
+	// CLStatus ss1 = pClientSocket->Connect();
+	// EXPECT_FALSE(ss1.IsSuccess());
+	// EXPECT_EQ(ss1.m_clErrorCode, CONNECT_PENDING);
+	// int clientFd = pClientSocket->GetSocket();
+	EXPECT_TRUE((pM->RegisterConnectEvent(100, (CLDataPostChannelMaintainer *)101)).IsSuccess());
+
+	EXPECT_FALSE((pM->RegisterConnectEvent(-2, (CLDataPostChannelMaintainer *)102)).IsSuccess());
+	EXPECT_FALSE((pM->RegisterConnectEvent(100, (CLDataPostChannelMaintainer *)0)).IsSuccess());
+	EXPECT_TRUE((pM->RegisterConnectEvent(100, (CLDataPostChannelMaintainer *)103)).IsSuccess());
+
+	delete pM;
+}
+
+TEST(CLMsgLoopManagerForIOMultiplexing, FeatureTest2)
+{
+	CLMsgLoopManagerForIOMultiplexing *pM = new CLMsgLoopManagerForIOMultiplexing(new CLObserverTesterForCLMsgLoopManagerForIOMultiplexing, "CLMsgLoopManagerForIOMultiplexingTester3", false);
+
+	EXPECT_FALSE((pM->RegisterWriteEvent(-2, (CLMessagePoster *)5)).IsSuccess());
+	EXPECT_FALSE((pM->RegisterWriteEvent(9, (CLMessagePoster *)0)).IsSuccess());
+
+	EXPECT_TRUE((pM->RegisterWriteEvent(9, (CLMessagePoster *)7)).IsSuccess());
+	EXPECT_TRUE((pM->RegisterWriteEvent(9, (CLMessagePoster *)	8)).IsSuccess());
+
+	delete pM;
+
+	//构造出反注册的来
+	// EXPECT_FALSE((pM->UnRegisterWriteEvent(-2)).IsSuccess());
+	// EXPECT_FALSE((pM->UnRegisterWriteEvent(100)).IsSuccess());
+}
