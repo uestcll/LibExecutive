@@ -127,7 +127,7 @@ CLStatus CLMessageLoopManager::DispatchMessage(SLMessageAndSource *pMsgInfo)
 
 	if(it == m_MsgMappingTable.end())
 	{
-		CLLogger::WriteLogMsg("In CLMessageLoopManager::MessageDispatch(), it == m_MsgMappingTable.end", 0);
+		CLLogger::WriteLogMsg("In CLMessageLoopManager::MessageDispatch(), it == m_MsgMappingTable.end", pMsgInfo->pMsg->m_clMsgID);
 		return CLStatus(-1, NORMAL_ERROR);
 	}
 	

@@ -26,13 +26,13 @@ public:
 
 	CLStatus PostMessage(CLMessage *pMsg, CLDataPostResultNotifier *pResultNotifier, CLProtocolDataPoster *pDataPoster);
 	CLStatus PostLeftMessage(CLProtocolDataPoster *pDataPoster);
-	CLStatus NotifyMsgPosterReadyToPost();
+	virtual CLStatus NotifyMsgPosterReadyToPost();
 
 private:
 	CLMessagePoster(const CLMessagePoster&);
 	CLMessagePoster& operator=(const CLMessagePoster&);
 
-private:
+protected:
 	CLMessageSerializer *m_pSerializer;
 	CLProtocolEncapsulator *m_pProtocolEncapsulator;
 	CLDataPostChannelMaintainer *m_pChannelMaintainer;

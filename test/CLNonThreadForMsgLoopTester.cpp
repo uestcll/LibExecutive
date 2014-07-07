@@ -168,8 +168,19 @@ public:
 
 		pMessageLoop->Register(1, (CallBackForMessageLoop)(&CLObserverForCLNonThreadStressTest::On_1));
 		pMessageLoop->Register(2, (CallBackForMessageLoop)(&CLObserverForCLNonThreadStressTest::On_2));
+		pMessageLoop->Register(MESSAGE_ID_FOR_CHANNEL_ERROR, (CallBackForMessageLoop)(&CLObserverForCLNonThreadStressTest::On_Error));
 
 		EXPECT_TRUE(CLExecutiveNameServer::PostExecutiveMessage(test_pipe_name, new CLMsg1ForCLNonThreadForMsgLoopTest, bflagdestroy).IsSuccess());
+
+		return CLStatus(0, 0);
+	}
+
+	CLStatus On_Error(CLMessage *pm, CLUuid U1)
+	{
+		CLChannelErrorMsg *p = dynamic_cast<CLChannelErrorMsg*>(pm);
+		EXPECT_TRUE(p);
+
+		EXPECT_TRUE(p->m_clErrorCode == MSG_RECEIVED_ZERO);
 
 		return CLStatus(0, 0);
 	}
@@ -235,6 +246,8 @@ public:
 
 		pMessageLoop->Register(1, (CallBackForMessageLoop)(&CLSTLQueue_CLNonThreadForMsgLoop::On_1));
 		pMessageLoop->Register(2, (CallBackForMessageLoop)(&CLSTLQueue_CLNonThreadForMsgLoop::On_2));
+		pMessageLoop->Register(MESSAGE_ID_FOR_CHANNEL_ERROR, (CallBackForMessageLoop)(&CLObserverForCLNonThreadStressTest::On_Error));
+		
 
 		m_pThread = new CLThreadForMsgLoop(new CLObserverForCLNonThreadStressTest, test1_pipe_name, true);
 		EXPECT_TRUE(m_pThread->Run((void *)2).IsSuccess());

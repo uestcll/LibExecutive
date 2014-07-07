@@ -631,6 +631,7 @@ public:
 		}
 		else
 		{
+			CLLogger::WriteLogMsg("The Following is produced on purpose", 0);
 			CLLogger::WriteLogMsg("In CLDataPostChannelMaintainerTester::NotifyConnectionResult() Error", 0);
 		}
 
@@ -679,6 +680,14 @@ TEST(CLMsgLoopManagerForIOMultiplexing, SingleThreadSocket)
 	int clientFd = pClientSocket->GetSocket();
 	EXPECT_TRUE((pM->RegisterConnectEvent(clientFd, new CLDataPostChannelMaintainerTester(pClientSocket, pM))).IsSuccess());
 
+	CLSocket *pClientSocket2 = new CLSocket("127.0.0.1", "3601", SOCKET_TYPE_TCP, false);
+	
+	CLStatus ss = pClientSocket2->Connect();
+	EXPECT_FALSE(ss.IsSuccess());
+	EXPECT_EQ(ss.m_clErrorCode, CONNECT_PENDING);
+	int clientFd2 = pClientSocket2->GetSocket();
+	EXPECT_TRUE((pM->RegisterConnectEvent(clientFd2, new CLDataPostChannelMaintainerTester(pClientSocket2, pM))).IsSuccess());
+
 	SLExecutiveInitialParameter s;
 	s.pContext = 0;
 	CLThreadInitialFinishedNotifier notifier(0);
@@ -687,6 +696,7 @@ TEST(CLMsgLoopManagerForIOMultiplexing, SingleThreadSocket)
 	EXPECT_TRUE(pM->EnterMessageLoop(&s).IsSuccess());
 
 	delete pM;
+	delete pClientSocket2;
 
 	EXPECT_EQ(gmsg1, MESSAGE_NUM);
 	EXPECT_EQ(gmsg3, 1);
@@ -959,7 +969,6 @@ public:
 
 TEST(CLMsgLoopManagerForIOMultiplexing, FeatureTest)
 {
-
 	gmsg1 = 0;
 	gmsg2 = 0;
 	gmsg3 = 0;
@@ -1003,7 +1012,7 @@ TEST(CLMsgLoopManagerForIOMultiplexing, FeatureTest)
 	fd = pListenDataReveiver1->GetFd();
 
 	CLMessageReceiver *pMsgReceiver1 = new CLMessageReceiver(&uuid, new CLBufferManager(), pListenDataReveiver1, new CLClientArrivedMsgDeserializer);
-	CLLogger::WriteLogMsg("1 The Following bug is produced on purpose 1", 0);
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
 	EXPECT_FALSE((pM->RegisterReadEvent(listenFd, pMsgReceiver1)).IsSuccess());
 
 	CLSocket *pSocket2 = new CLSocket("7200");
@@ -1018,19 +1027,10 @@ TEST(CLMsgLoopManagerForIOMultiplexing, FeatureTest)
 	EXPECT_TRUE((pM->UnRegisterReadEvent(fd)).IsSuccess());
 
 	EXPECT_FALSE((pM->UnRegisterReadEvent(-2)).IsSuccess());
-	CLLogger::WriteLogMsg("1 The Following bug is produced on purpose 1", 0);
+	CLLogger::WriteLogMsg("The Following bug is produced on purpose", 0);
 	EXPECT_FALSE((pM->UnRegisterReadEvent(100)).IsSuccess());
 	EXPECT_TRUE((pM->UnRegisterReadEvent(listenFd)).IsSuccess());
 
-
-	// pClientSocket = new CLSocket("127.0.0.1", "3600", SOCKET_TYPE_TCP, false);
-
-	// clientUuid = pClientSocket->GetUuid();
-	
-	// CLStatus ss1 = pClientSocket->Connect();
-	// EXPECT_FALSE(ss1.IsSuccess());
-	// EXPECT_EQ(ss1.m_clErrorCode, CONNECT_PENDING);
-	// int clientFd = pClientSocket->GetSocket();
 	EXPECT_TRUE((pM->RegisterConnectEvent(100, (CLDataPostChannelMaintainer *)101)).IsSuccess());
 
 	EXPECT_FALSE((pM->RegisterConnectEvent(-2, (CLDataPostChannelMaintainer *)102)).IsSuccess());
@@ -1040,19 +1040,341 @@ TEST(CLMsgLoopManagerForIOMultiplexing, FeatureTest)
 	delete pM;
 }
 
+class CLMessagePosterTester : public CLMessagePoster
+{
+public:
+	CLMessagePosterTester(CLSocket *pConnSocket, CLMessageSerializer *pMsgSerializer, CLDataPostChannelMaintainer *pChannelMaintainer) : CLMessagePoster(pMsgSerializer, NULL, pChannelMaintainer, NULL)
+	{
+		m_pSocket = pConnSocket;
+	}
+	virtual ~CLMessagePosterTester()
+	{}
+
+	virtual CLStatus NotifyMsgPosterReadyToPost()
+	{
+		//client send msg 1
+		int buf1[5] = {16, 1, 0, 2, 3};
+
+		CLIOVectors iov1;
+		EXPECT_TRUE(iov1.PushBack((char*)buf1, 20).IsSuccess());
+		int i;
+
+		CLStatus s13 = m_pSocket->Write(iov1);
+		EXPECT_EQ(s13.m_clReturnCode, 20);			
+		
+		delete this;
+
+		return CLStatus(0, 0);
+	}
+
+private:
+	CLMessagePosterTester(const CLMessagePosterTester&);
+	CLMessagePosterTester& operator=(const CLMessagePosterTester&);
+
+	CLSocket *m_pSocket;
+};
+
+class CLDataPostChannelMaintainerTester2 : public CLDataPostChannelMaintainer
+{
+public:
+	CLDataPostChannelMaintainerTester2(CLSocket *pConnSocket, CLMsgLoopManagerForIOMultiplexing *pM)
+	{
+		m_pSocket = pConnSocket;
+		m_pM = pM;
+	}
+
+	virtual ~CLDataPostChannelMaintainerTester2()
+	{
+	}
+
+	virtual CLStatus Initialize(CLInitialDataPostChannelNotifier *pNotifier, void *pContext)
+	{
+	}
+
+	virtual CLStatus Uninitialize(void *pContext)
+	{
+	}
+
+	virtual CLDataPoster* GetDataPoster()
+	{
+	}
+
+	virtual void NotifyConnectionResult(bool bSuccess)
+	{
+		if(bSuccess)
+		{
+			m_pSocket->NotifyConnectResults(true);
+
+	 		CLMultiMsgDeserializer *pd = new CLMultiMsgDeserializer();
+			EXPECT_TRUE(pd->RegisterDeserializer(3, new CLMsg3ForCLMsgLoopManagerForIOMultiplexingTest_Deserializer).IsSuccess());
+
+			CLDataReceiver *pClientDataReceiver = new CLDataReceiverByTCPSocket(m_pSocket);
+			int fd = m_pSocket->GetSocket();
+			CLMessageReceiver *pClientMsgReceiver = new CLMessageReceiver(&clientUuid, new CLBufferManager(), pClientDataReceiver, pd);
+			EXPECT_TRUE((m_pM->RegisterReadEvent(fd, pClientMsgReceiver)).IsSuccess());
+
+			CLMessagePoster *pPoster = new CLMessagePosterTester(m_pSocket, new CLMsgToPointerSerializer, new CLDataPostChannelMaintainerTester(NULL, NULL));
+			EXPECT_TRUE((m_pM->RegisterWriteEvent(fd, pPoster)).IsSuccess());
+		}
+		else
+		{
+			CLLogger::WriteLogMsg("The Following is produced on purpose", 0);
+			CLLogger::WriteLogMsg("In CLDataPostChannelMaintainerTester2::NotifyConnectionResult() Error", 0);
+		}
+
+		delete this;
+	}
+
+protected:
+	CLDataPostChannelMaintainerTester2(const CLDataPostChannelMaintainerTester2&);
+	CLDataPostChannelMaintainerTester2& operator=(const CLDataPostChannelMaintainerTester2&);
+
+private:
+	CLSocket *m_pSocket;
+	CLMsgLoopManagerForIOMultiplexing *m_pM;
+};
+
 TEST(CLMsgLoopManagerForIOMultiplexing, FeatureTest2)
 {
-	CLMsgLoopManagerForIOMultiplexing *pM = new CLMsgLoopManagerForIOMultiplexing(new CLObserverTesterForCLMsgLoopManagerForIOMultiplexing, "CLMsgLoopManagerForIOMultiplexingTester3", false);
+	CLMsgLoopManagerForIOMultiplexing *pM = new CLMsgLoopManagerForIOMultiplexing(new CLObserverTester2ForCLMsgLoopManagerForIOMultiplexing, "CLMsgLoopManagerForIOMultiplexingTester3", false);
 
 	EXPECT_FALSE((pM->RegisterWriteEvent(-2, (CLMessagePoster *)5)).IsSuccess());
 	EXPECT_FALSE((pM->RegisterWriteEvent(9, (CLMessagePoster *)0)).IsSuccess());
 
 	EXPECT_TRUE((pM->RegisterWriteEvent(9, (CLMessagePoster *)7)).IsSuccess());
-	EXPECT_TRUE((pM->RegisterWriteEvent(9, (CLMessagePoster *)	8)).IsSuccess());
+	EXPECT_TRUE((pM->RegisterWriteEvent(9, (CLMessagePoster *)8)).IsSuccess());
+
+	delete pM;
+}
+
+std::vector<CLSocket *> vpClientSocket;
+std::vector<CLSocket *> vpConnectSocket;
+
+const int CLIENT_NUM = 500;
+
+class CLObserverTester4ForCLMsgLoopManagerForIOMultiplexing : public CLMessageObserver
+{
+public:
+	virtual CLStatus Initialize(CLMessageLoopManager *pMessageLoop, void* pContext)
+	{
+		pMessageLoop->Register(1, (CallBackForMessageLoop)(&CLObserverTester4ForCLMsgLoopManagerForIOMultiplexing::On_1));
+		pMessageLoop->Register(3, (CallBackForMessageLoop)(&CLObserverTester4ForCLMsgLoopManagerForIOMultiplexing::On_3));
+		pMessageLoop->Register(MESSAGE_ID_FOR_CHANNEL_ERROR, (CallBackForMessageLoop)(&CLObserverTester4ForCLMsgLoopManagerForIOMultiplexing::On_Error));
+		pMessageLoop->Register(MESSAGE_ID_FOR_CHANNEL_CLOSED, (CallBackForMessageLoop)(&CLObserverTester4ForCLMsgLoopManagerForIOMultiplexing::On_Close));
+		pMessageLoop->Register(MESSAGE_ID_FOR_CLIENT_ARRIVED, (CallBackForMessageLoop)(&CLObserverTester4ForCLMsgLoopManagerForIOMultiplexing::On_ClientArrival));
+		
+		m_pML = dynamic_cast<CLMsgLoopManagerForIOMultiplexing *>(pMessageLoop);
+		EXPECT_TRUE(m_pML);
+
+		return CLStatus(0, 0);
+	}
+
+	CLStatus On_1(CLMessage *pm, CLUuid u1)
+	{
+		EXPECT_EQ(pm->m_clMsgID, 1);
+		
+		CLUuidComparer compare1;
+		CLSocket *pSocket = vpClientSocket[g1++];
+
+		// EXPECT_TRUE(compare1(u1, pSocket->GetUuid()) == 0);
+
+		if(g1 == CLIENT_NUM)
+		{	
+			int buf1[4] = {12, 3, 0, 3};
+
+			CLIOVectors iov1;
+			EXPECT_TRUE(iov1.PushBack((char*)buf1, 16).IsSuccess());
+		
+			CLStatus s13 = pSocket->Write(iov1);
+			EXPECT_EQ(s13.m_clReturnCode, 16);			
+		}
+
+		return CLStatus(0, 0);
+	}
+
+	CLStatus On_3(CLMessage *pm, CLUuid u1)
+	{
+		EXPECT_EQ(pm->m_clMsgID, 3);
+		
+		g3++;
+
+		std::vector<CLSocket *>::iterator it = vpClientSocket.begin();
+
+		int fd;
+
+		for(it; it != vpClientSocket.end(); ++it)
+		{
+			fd = (*it)->GetSocket();
+			EXPECT_TRUE(m_pML->UnRegisterReadEvent(fd).IsSuccess());
+
+			g2++;
+		}
+
+		return CLStatus(0, 0);
+	}
+
+	CLStatus On_Error(CLMessage *pm, CLUuid u1)
+	{
+		EXPECT_EQ(pm->m_clMsgID, MESSAGE_ID_FOR_CHANNEL_ERROR);
+		
+		CLChannelErrorMsg *pErrMsg = dynamic_cast<CLChannelErrorMsg*> (pm);
+		EXPECT_TRUE(pErrMsg);
+
+		CLUuidComparer compare;
+		if(compare(u1, listenUid) == 0)
+		{
+			CLLogger::WriteLogMsg("1 The Following bug is on purpose. 1", 0);
+			CLLogger::WriteLogMsg("In CLObserverTester2ForCLMsgLoopManagerForIOMultiplexing::On_Error() Error frome listen fd", 0);
+			
+			EXPECT_EQ(pErrMsg->m_clErrorCode, MSG_RECEIVED_ZERO);
+		}
+		else if(compare(u1, connUuid) == 0)//unregister fd
+		{
+			CLLogger::WriteLogMsg("1 The Following bug is on purpose. 1", 0);
+			CLLogger::WriteLogMsg("In CLObserverTester2ForCLMsgLoopManagerForIOMultiplexing::On_Error() Error frome conn fd", 0);
+		}
+
+		gError++;
+
+		return CLStatus(0, 0);
+	}
+
+	CLStatus On_ClientArrival(CLMessage *pm, CLUuid u1)
+	{
+		gArril++;
+
+		EXPECT_EQ(pm->m_clMsgID, MESSAGE_ID_FOR_CLIENT_ARRIVED);
+
+		CLUuidComparer compare1;
+		EXPECT_TRUE(compare1(u1, listenUid) == 0);
+
+		CLClientArrivedMsg *pMsg = dynamic_cast<CLClientArrivedMsg *>(pm);
+		EXPECT_TRUE(pMsg);
+		//For server connect fd
+		CLSocket *pSocket = pMsg->GetSocket();
+		EXPECT_TRUE(pSocket);
+		vpConnectSocket.push_back(pSocket);
+
+		CLDataReceiver *pTmpDataReveiver = new CLDataReceiverByTCPSocket(pSocket);
+		CLUuid uid = pTmpDataReveiver->GetUuid();
+		int connectionFd = pTmpDataReveiver->GetFd();
+
+		CLMultiMsgDeserializer *pdd = new CLMultiMsgDeserializer();
+		EXPECT_TRUE(pdd->RegisterDeserializer(1, new CLMsg1ForCLMsgLoopManagerForIOMultiplexingTest_Deserializer).IsSuccess());
+		EXPECT_TRUE(pdd->RegisterDeserializer(2, new CLMsg2ForCLMsgLoopManagerForIOMultiplexingTest_Deserializer).IsSuccess());
+		EXPECT_TRUE(pdd->RegisterDeserializer(3, new CLMsg3ForCLMsgLoopManagerForIOMultiplexingTest_Deserializer).IsSuccess());
+
+		CLMessageReceiver *pConnMsgReceiver = new CLMessageReceiver(&uid, new CLBufferManager(), pTmpDataReveiver, pdd, new CLProtocolDecapsulatorByDefaultMsgFormat);
+ 		
+ 		EXPECT_TRUE((m_pML->RegisterReadEvent(connectionFd, pConnMsgReceiver)).IsSuccess());
+
+		return CLStatus(0, 0);
+	}
+
+	CLStatus On_Close(CLMessage *pm, CLUuid u1)
+	{
+		EXPECT_EQ(pm->m_clMsgID, MESSAGE_ID_FOR_CHANNEL_CLOSED);
+
+		CLUuidComparer compare1;
+
+		EXPECT_TRUE(compare1(u1, vpConnectSocket[gClose]->GetUuid()) == 0);
+
+		gClose++;
+
+		if(gClose == CLIENT_NUM)
+		{
+			std::vector<CLSocket *>::iterator it = vpConnectSocket.begin();
+
+			int fd;
+
+			for(it; it != vpConnectSocket.end(); ++it)
+			{
+				fd = (*it)->GetSocket();
+				EXPECT_TRUE(m_pML->UnRegisterReadEvent(fd).IsSuccess());
+
+				g4++;
+			}
+
+			EXPECT_TRUE(m_pML->UnRegisterReadEvent(listenFd).IsSuccess());//cause the next is quit from loop
+
+			return CLStatus(QUIT_MESSAGE_LOOP, 0);
+
+		}
+
+		return CLStatus(0, 0);
+	}
+
+	CLMsgLoopManagerForIOMultiplexing *m_pML;
+};
+
+TEST(CLMsgLoopManagerForIOMultiplexing, SocketStressTest)
+{
+	gmsg1 = 0;
+	gmsg2 = 0;
+	gmsg3 = 0;
+	gmsg4 = 0;
+	g1 = 0;
+	g2 = 0;
+	g3 = 0;	
+	g4 = 0;
+	//private pipe fd
+	fd1 = -1;
+
+	pClientSocket = 0;
+	pConnSocket  = 0;
+
+	gError = 0;
+	gClose = 0;
+	gArril = 0;
+
+	listenFd = -1;
+
+	CLMsgLoopManagerForIOMultiplexing *pM = new CLMsgLoopManagerForIOMultiplexing(new CLObserverTester4ForCLMsgLoopManagerForIOMultiplexing, "CLMsgLoopManagerForIOMultiplexingTester3", false);
+
+	CLSocket *pSocket = new CLSocket("3600");
+	listenUid = pSocket->GetUuid();
+
+	CLDataReceiver *pListenDataReveiver = new CLDataReceiverByAccept(pSocket);
+	listenFd = pListenDataReveiver->GetFd();
+
+	CLMessageReceiver *pListenMsgReceiver = new CLMessageReceiver(&listenUid, new CLBufferManager(), pListenDataReveiver, new CLClientArrivedMsgDeserializer);	
+	EXPECT_TRUE((pM->RegisterReadEvent(listenFd, pListenMsgReceiver)).IsSuccess());
+
+	for (int i = 0; i < CLIENT_NUM; ++i)
+	{
+		CLSocket *pS = new CLSocket("127.0.0.1", "3600", SOCKET_TYPE_TCP, false);
+		vpClientSocket.push_back(pS);
+
+		CLStatus ss1 = pS->Connect();
+		EXPECT_FALSE(ss1.IsSuccess());
+		EXPECT_EQ(ss1.m_clErrorCode, CONNECT_PENDING);
+		int clientFd = pS->GetSocket();
+		EXPECT_TRUE((pM->RegisterConnectEvent(clientFd, new CLDataPostChannelMaintainerTester2(pS, pM))).IsSuccess());
+	}
+
+	SLExecutiveInitialParameter s;
+	s.pContext = 0;
+	CLThreadInitialFinishedNotifier notifier(0);
+	s.pNotifier = &notifier;
+
+	EXPECT_TRUE(pM->EnterMessageLoop(&s).IsSuccess());
 
 	delete pM;
 
-	//构造出反注册的来
-	// EXPECT_FALSE((pM->UnRegisterWriteEvent(-2)).IsSuccess());
-	// EXPECT_FALSE((pM->UnRegisterWriteEvent(100)).IsSuccess());
+	EXPECT_EQ(vpClientSocket.size(), CLIENT_NUM);
+	EXPECT_EQ(vpConnectSocket.size(), CLIENT_NUM);
+
+	EXPECT_EQ(gmsg1, CLIENT_NUM);
+	EXPECT_EQ(gmsg3, 1);
+	EXPECT_EQ(gmsg2, 0);
+	EXPECT_EQ(gmsg4, 0);
+
+	EXPECT_EQ(g1, CLIENT_NUM);
+	EXPECT_EQ(g3, 1);
+	EXPECT_EQ(g2, CLIENT_NUM);
+	EXPECT_EQ(g4, CLIENT_NUM);
+
+	EXPECT_EQ(gArril, CLIENT_NUM);
+	EXPECT_EQ(gError, 0);
+	EXPECT_EQ(gClose, CLIENT_NUM);	
 }

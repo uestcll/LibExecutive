@@ -63,7 +63,14 @@ CLStatus CLMsgLoopManagerForIOMultiplexing::RegisterReadEvent(int fd, CLMessageR
 
 	if(fd < 0)
 	{
-		delete pMsgReceiver;
+		if(pReceiverReleaser)
+		{
+			pReceiverReleaser->ReleaseMsgReceiver(pMsgReceiver);
+			delete pReceiverReleaser;
+		}
+		else
+			delete pMsgReceiver;
+		
 		return CLStatus(-1, NORMAL_ERROR);
 	}
 

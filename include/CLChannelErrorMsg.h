@@ -6,12 +6,14 @@
 class CLChannelErrorMsg : public CLMessage
 {
 public:
-	CLChannelErrorMsg();
 	CLChannelErrorMsg(long errCode);
 	virtual ~CLChannelErrorMsg();
 
 public:
-	long m_lErrCode;
+	const long& m_clErrorCode;
+
+private:
+	long m_lErrorCode;
 
 private:
 	CLChannelErrorMsg(const CLChannelErrorMsg&);
